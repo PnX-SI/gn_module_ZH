@@ -2,6 +2,7 @@ Template de création d'un module GeoNature
 ==========================================
 
 Ce template décrit la structure obligatoire d'un module GeoNature.
+
 - Le backend est développé en Python grâce au framework Flask.
 - Le frontend est développé grâce au framework Angular (voir la version actuelle du coeur)
 
@@ -45,7 +46,7 @@ Le dossier ``frontend`` comprend les élements suivants :
 
 - le dossier ``app`` comprend le code typescript du module
 
-     Il doit inclure le "module Angular racine", celui-ci doit impérativement s'appeler ``gnModule.module.ts`` 
+     - Il doit inclure le "module Angular racine", celui-ci doit impérativement s'appeler ``gnModule.module.ts`` 
 
 - le dossier ``assets`` avec l'ensemble des médias (images, son).
     
