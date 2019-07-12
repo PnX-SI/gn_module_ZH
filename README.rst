@@ -8,6 +8,11 @@ Ce template décrit la structure obligatoire d'un module GeoNature.
 
 GeoNature prévoit cependant l'intégration de module "externe" dont le frontend serait développé dans d'autres technologies. La gestion de l'intégration du module est à la charge du développeur.
 
+Documentation : 
+
+- Développer un module GeoNature : http://docs.geonature.fr/development.html#developper-un-gn-module
+- Installer un module GeoNature : http://docs.geonature.fr/development.html#installer-un-gn-module
+
 Fichiers relatifs à l'installation
 ==================================
 
