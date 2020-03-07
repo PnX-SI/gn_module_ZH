@@ -20,7 +20,7 @@
     ]
   },
   "angularCompilerOptions": {
-    "enableIvy": false,
+    "enableIvy": true,
     "strictInjectionParameters": true,
     "allowEmptyCodegenFiles": false
   }
