@@ -4,6 +4,7 @@ Module Zones Humides de GeoNature
 Installation
 ------------
 
+- cd /home/\`whoami\`
 - git clone https://gitlab.com/natural-solutions/gn_module_zones_humides.git
 - cd /home/\`whoami\`/gn_module_zones_humides
 - git checkout branchname
