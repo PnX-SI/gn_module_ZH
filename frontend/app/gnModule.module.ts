@@ -6,14 +6,15 @@ import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { Routes, RouterModule } from "@angular/router";
 import { GN2CommonModule } from "@geonature_common/GN2Common.module";
 
-import { AppComponent } from './components/app.component';
+//Components
+import { ZhMapListComponent } from './zh-map-list/zh-map-list.component';
 
 // my module routing
-const routes: Routes = [{ path: "", component: AppComponent }];
+const routes: Routes = [{ path: "", component: ZhMapListComponent }];
 
 @NgModule({
   declarations: [
-    AppComponent
+    ZhMapListComponent
 
   ],
   imports: [
@@ -24,6 +25,6 @@ const routes: Routes = [{ path: "", component: AppComponent }];
     NgbModule.forRoot()
   ],
   providers: [HttpClient],
-  bootstrap: [AppComponent]
+  bootstrap: [ZhMapListComponent]
 })
 export class GeonatureModule { }

@@ -8,5 +8,25 @@
 from marshmallow import Schema, fields
 
 
-class GnModuleSchemaConf(Schema):
+class MapListConfig(Schema):
     pass
+
+
+default_map_list_conf = [
+    {"prop": "main_name", "name": "Nom principal"},
+    {"prop": "create_date", "name": "Date de création"}
+]
+
+available_maplist_column = [
+    {"prop": "main_name", "name": "Nom principal"},
+    {"prop": "create_date", "name": "Date de création"},
+    {"prop": "update_date", "name": "Date de modification"}
+]
+
+
+class GnModuleSchemaConf(Schema):
+    default_maplist_columns = fields.List(fields.Dict(), missing=default_map_list_conf)
+    available_maplist_column = fields.List(
+        fields.Dict(), missing=available_maplist_column
+    )
+
