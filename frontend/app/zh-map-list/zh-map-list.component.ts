@@ -2,12 +2,18 @@ import {
   Component,
   OnInit,
   ViewChild,
-  HostListener
+  HostListener,
+  Renderer2
 } from '@angular/core';
 import { MapListService } from "@geonature_common/map-list/map-list.service";
 import { MapService } from "@geonature_common/map/map.service";
 import { DatatableComponent } from "@swimlane/ngx-datatable/release";
 import { ModuleConfig } from "../module.config";
+import { AppConfig } from "@geonature_config/app.config";
+import * as moment from "moment";
+import { ZhDataService } from "../services/zh-data.service";
+import { CommonService } from "@geonature_common/service/common.service";
+import { Router } from "@angular/router";
 
 @Component({
   selector: 'zh-map-list',
@@ -16,6 +22,10 @@ import { ModuleConfig } from "../module.config";
 })
 export class ZhMapListComponent 
   implements OnInit{
+  public displayColumns: Array<any>;
+  public availableColumns: Array<any>;
+  public idName: string;
+  public apiEndPoint: string;
   public zhConfig: any;
   public rowPerPage: number;
   public cardContentHeight: number;
@@ -24,18 +34,39 @@ export class ZhMapListComponent
   table: DatatableComponent;
 
   constructor(
+    private _router: Router,
     public mapListService: MapListService,
-    private _mapService: MapService
+    private _mapService: MapService,
+    private _zhService: ZhDataService,
+    private renderer: Renderer2,
+    private _commonService: CommonService
   ) { }
 
   ngOnInit() {
+    console.log(this.mapListService);
+    console.log(ModuleConfig);
+    console.log(AppConfig);
     //config
     this.zhConfig = ModuleConfig;
+    this.idName = "id_zh";
+    this.apiEndPoint = this.zhConfig.MODULE_URL;
     // parameters for maplist
     // columns to be default displayed
     this.mapListService.displayColumns = this.zhConfig.default_maplist_columns;
     // columns available for display
     this.mapListService.availableColumns = this.zhConfig.available_maplist_column;
+
+    this.mapListService.idName = this.idName;
+    // FETCH THE DATA
+    this.mapListService.refreshUrlQuery();
+    this.calculateNbRow();
+    this.mapListService.getData(
+      this.apiEndPoint,
+      [{ param: "limit", value: this.rowPerPage }],
+      this.zhCustomCallBack.bind(this)
+    );
+    
+    // end OnInit
   }
 
   ngAfterViewInit() {
@@ -78,6 +109,58 @@ export class ZhMapListComponent
         this._mapService.map.invalidateSize();
       }, 10);
     }
+  }
+
+  onChangePage(event) {
+    this.mapListService.setTablePage(event, this.apiEndPoint);
+  }
+
+  onColumnSort(event) {
+    this.mapListService.setHttpParam("orderby", event.column.prop);
+    this.mapListService.setHttpParam("order", event.newValue);
+    this.mapListService.deleteHttpParam("offset");
+    this.mapListService.refreshData(this.apiEndPoint, "set");
+  }
+
+  displayAuthorName(element) {
+    return element[0].nom_complet 
+  }
+
+  displayDate(element): string {
+    return moment(element).format("DD-MM-YYYY")
+  }
+
+  zhCustomCallBack(feature): any {
+    // set Author name
+    feature["properties"]["author"] = this.displayAuthorName(feature["properties"]["authors"]);
+
+    // format Date
+    feature["properties"]["create_date"] = this.displayDate(feature["properties"]["create_date"]);
+
+    return feature
+  }
+
+  deleteReleve(row) {
+    console.log(row);
+    /*
+    this._zhService.deleteZh(row.id_zh).subscribe(
+      () => {
+        this._commonService.translateToaster(
+          "success",
+          "Releve.DeleteSuccessfully"
+        );
+        this._router.navigate([""]);
+      },
+      (error) => {
+        if (error.status === 403) {
+          this._commonService.translateToaster("error", "NotAllowed");
+        } else {
+          this._commonService.translateToaster("error", "ErrorMessage");
+        }
+      }
+    );
+    */
+    
   }
 
 }

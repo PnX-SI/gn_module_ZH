@@ -4,11 +4,27 @@ export const ModuleConfig = {
  "MODULE_URL": "zones_humides",
  "available_maplist_column": [
   {
+   "name": "Id",
+   "prop": "id_zh"
+  },
+  {
+   "name": "Code",
+   "prop": "code"
+  },
+  {
    "name": "Nom principal",
    "prop": "main_name"
   },
   {
-   "name": "Date de cr\u00e9ation",
+   "name": "Auteur",
+   "prop": "author"
+  },
+  {
+   "name": "Auteur derniere modification",
+   "prop": "update_author"
+  },
+  {
+   "name": "Date de creation",
    "prop": "create_date"
   },
   {
@@ -18,11 +34,19 @@ export const ModuleConfig = {
  ],
  "default_maplist_columns": [
   {
+   "name": "Code",
+   "prop": "code"
+  },
+  {
    "name": "Nom principal",
    "prop": "main_name"
   },
   {
-   "name": "Date de cr\u00e9ation",
+    "name": "Auteur",
+    "prop": "author"
+   },
+  {
+   "name": "Date de creation",
    "prop": "create_date"
   }
  ]

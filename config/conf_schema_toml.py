@@ -13,13 +13,20 @@ class MapListConfig(Schema):
 
 
 default_map_list_conf = [
+    {"prop": "code", "name": "Code"},
     {"prop": "main_name", "name": "Nom principal"},
-    {"prop": "create_date", "name": "Date de création"}
+    {"prop": "create_author", "name": "Auteur"},
+    {"prop": "create_date", "name": "Date de creation"}
 ]
 
+
 available_maplist_column = [
+    {"prop": "id_zh", "name": "Id"},
+    {"prop": "code", "name": "Code"},
     {"prop": "main_name", "name": "Nom principal"},
-    {"prop": "create_date", "name": "Date de création"},
+    {"prop": "create_author", "name": "Auteur"},
+    {"prop": "update_author", "name": "Auteur derniere modification"},
+    {"prop": "create_date", "name": "Date de creation"},
     {"prop": "update_date", "name": "Date de modification"}
 ]
 

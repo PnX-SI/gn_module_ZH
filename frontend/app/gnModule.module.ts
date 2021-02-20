@@ -9,6 +9,9 @@ import { GN2CommonModule } from "@geonature_common/GN2Common.module";
 //Components
 import { ZhMapListComponent } from './zh-map-list/zh-map-list.component';
 
+// Service
+import { ZhDataService } from "./services/zh-data.service";
+
 // my module routing
 const routes: Routes = [{ path: "", component: ZhMapListComponent }];
 
@@ -24,7 +27,10 @@ const routes: Routes = [{ path: "", component: ZhMapListComponent }];
     RouterModule.forChild(routes),
     NgbModule.forRoot()
   ],
-  providers: [HttpClient],
+  providers: [
+    HttpClient,
+    ZhDataService
+  ],
   bootstrap: [ZhMapListComponent]
 })
 export class GeonatureModule { }
