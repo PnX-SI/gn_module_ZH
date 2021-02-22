@@ -42,9 +42,9 @@ export const ModuleConfig = {
    "prop": "main_name"
   },
   {
-    "name": "Auteur",
-    "prop": "author"
-   },
+   "name": "Auteur",
+   "prop": "author"
+  },
   {
    "name": "Date de creation",
    "prop": "create_date"

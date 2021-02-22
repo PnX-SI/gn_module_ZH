@@ -9,7 +9,7 @@ from geojson import FeatureCollection
 
 from geonature.utils.utilssqlalchemy import json_resp
 from geonature.utils.env import DB
-# from geonature.utils.env import get_id_module
+#from geonature.utils.env import get_id_module
 
 # import des fonctions utiles depuis le sous-module d'authentification
 from geonature.core.gn_permissions import decorators as permissions
@@ -17,18 +17,22 @@ from geonature.core.gn_permissions.tools import get_or_fetch_user_cruved
 
 from .models import TZH
 
+from .repositories import (
+    ZhRepository
+)
+
 from pdb import set_trace as debug
 
-blueprint = Blueprint("zones_humides", __name__)
+blueprint = Blueprint("pr_zh", __name__)
 
 
 # Route pour afficher liste des zones humides
 @blueprint.route("", methods=["GET"])
-#@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
-def get_zh():
-    #debug()
+def get_zh(info_role):
 
+    #debug()
     q = DB.session.query(TZH)
 
     parameters = request.args
@@ -39,15 +43,13 @@ def get_zh():
     # Pour obtenir le nombre de résultat de la requete sans le LIMIT
     nb_results_without_limit = q.count()
 
-    '''
     user = info_role
     user_cruved = get_or_fetch_user_cruved(
         session=session, id_role=info_role.id_role, module_code="ZONES_HUMIDES"
     )
-    '''
 
     data = q.limit(limit).offset(page * limit).all()
-    #debug()
+    
     featureCollection = []
     for n in data:
         #releve_cruved = n.get_releve_cruved(user, user_cruved)
@@ -74,16 +76,10 @@ def deleteOneZh(id_zh, info_role):
     :params int id_zh: ID of the zh to delete
 
     """
-    debug()
-    #releveRepository = ReleveRepository(TRelevesOccurrence)
-    #releveRepository.delete(id_releve, info_role)
-    zh = DB.session.query(TZH).get(id_zh)
-    if zh:
-        zh = zh.get_releve_if_allowed(info_user)
-        DB.session.delete(zh)
-        DB.session.commit()
-        return {"message": "delete with success"}, 200
-    raise NotFound('The zh "{}" does not exist'.format(id_zh))
+    zhRepository = ZhRepository(TZH)
+    zhRepository.delete(id_zh, info_role)
+
+    return {"message": "delete with success"}, 200
 
 
 # Exemple d'une route protégée le CRUVED du sous module d'authentification

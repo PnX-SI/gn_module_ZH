@@ -3,10 +3,12 @@ from sqlalchemy import ForeignKey
 # import utiles pour déclarer les classes SQLAlchemy
 from sqlalchemy.sql import select, func, and_
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 
 from geoalchemy2 import Geometry
 
 from pypnusershub.db.models import User
+from pypnusershub.db.tools import InsufficientRightsError
 
 # méthode de sérialisation
 from utils_flask_sqla.serializers import serializable
@@ -19,41 +21,114 @@ from pdb import set_trace as debug
 from sqlalchemy.inspection import inspect
 
 
-# ajoute la méthode as_dict() à la classe
+
+class ZhModel(DB.Model):
+    """
+        Classe abstraite permettant d'ajout des méthodes
+        de controle d'accès à la donnée en fonction
+        des droits associés à un utilisateur
+    """
+
+    __abstract__ = True
+
+    def user_is_allowed_to(self, user, level):
+        """
+            Fonction permettant de dire si un utilisateur
+            peu ou non agir sur une donnée
+        """
+        # Si l'utilisateur n'a pas de droit d'accès aux données
+        if level == "0" or level not in ("1", "2", "3"):
+            return False
+
+        # Si l'utilisateur à le droit d'accéder à toutes les données
+        if level == "3":
+            return True
+
+        # Si l'utilisateur est propriétaire de la données
+        #if self.user_is_observer_or_digitiser(user):
+        #    return True
+
+        # Si l'utilisateur appartient à un organisme
+        # qui a un droit sur la données et
+        # que son niveau d'accès est 2 ou 3
+        #if self.user_is_in_dataset_actor(user) and level in ("2", "3"):
+        #    return True
+        return False
+
+    def get_zh_if_allowed(self, user):
+        """
+            Return the zh if the user is allowed
+            params:
+                user: object from TRole
+        """
+        if self.user_is_allowed_to(user, user.value_filter):
+            return self
+
+        raise InsufficientRightsError(
+            ('User "{}" cannot "{}" this current zh').format(
+                user.id_role, user.code_action
+            ),
+            403,
+        )
+
+
 @serializable
-# ajoute la méthode as_geofeature() générant un geojson à la classe
 @geoserializable
-class TZH(DB.Model):
+class TZH(ZhModel):
     __tablename__ = "t_zh"
     __table_args__ = {"schema": "pr_zh"}
     id_zh = DB.Column(DB.Integer, primary_key=True)
-    zh_uuid = DB.Column(
-        UUID(as_uuid=True), default=select([func.uuid_generate_v4()])
-    )
+    #zh_uuid = DB.Column(
+    #    UUID(as_uuid=True), default=select([func.uuid_generate_v4()])
+    #)
     code = DB.Column(DB.Unicode, nullable=False)
     main_name = DB.Column(DB.Unicode, nullable=False)
     secondary_name = DB.Column(DB.Unicode)
-    id_site_space = DB.Column(DB.Integer)
-    create_author = DB.Column(DB.Integer, nullable=False)
-    update_author = DB.Column(DB.Integer, nullable=False)
+    id_site_space = DB.Column(
+        DB.Integer, 
+        ForeignKey("pr_zh.bib_site_space.id_site_space"))
+    create_author = DB.Column(
+        DB.Integer,
+        ForeignKey("utilisateurs.t_roles.id_role"),
+        nullable=False)
+    update_author = DB.Column(
+        DB.Integer,
+        ForeignKey("utilisateurs.t_roles.id_role"),
+        nullable=False)
     create_date = DB.Column(DB.DateTime)
     update_date = DB.Column(DB.DateTime)
     geom = DB.Column(
         Geometry("GEOMETRY", 4326))
     remark_lim = DB.Column(DB.Unicode)
     remark_lim_fs = DB.Column(DB.Unicode)
-    id_sdage = DB.Column(DB.Integer)
-    id_local_typo = DB.Column(DB.Integer)
+    id_sdage = DB.Column(
+        DB.Integer, 
+        ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"))
+    id_local_typo = DB.Column(
+        DB.Integer,
+        ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"))
     remark_pres = DB.Column(DB.Unicode)
     v_habref = DB.Column(DB.Unicode)
     ef_area = DB.Column(DB.Integer)
     global_remark_activity = DB.Column(DB.Unicode)
-    id_thread = DB.Column(DB.Integer)
-    id_frequency = DB.Column(DB.Integer)
-    id_spread = DB.Column(DB.Integer)
-    id_connexion = DB.Column(DB.Integer)
-    id_diag_hydro = DB.Column(DB.Integer)
-    id_diag_bio = DB.Column(DB.Integer)
+    id_thread = DB.Column(
+        DB.Integer,
+        ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"))
+    id_frequency = DB.Column(
+        DB.Integer,
+        ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"))
+    id_spread = DB.Column(
+        DB.Integer,
+        ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"))
+    id_connexion = DB.Column(
+        DB.Integer,
+        ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"))
+    id_diag_hydro = DB.Column(
+        DB.Integer,
+        ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"))
+    id_diag_bio = DB.Column(
+        DB.Integer,
+        ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"))
     remark_diag = DB.Column(DB.Unicode)
     other_inventory = DB.Column(DB.Boolean)
     carto_hab = DB.Column(DB.Boolean)
@@ -62,21 +137,23 @@ class TZH(DB.Model):
     nb_flora_sp = DB.Column(DB.Integer)
     nb_vertebrate_sp = DB.Column(DB.Integer)
     nb_invertebrate_sp = DB.Column(DB.Integer)
-    remark_eval_functions = DB.Column(DB.Unicode)
-    remark_eval_heritage = DB.Column(DB.Unicode)
-    remark_eval_thread = DB.Column(DB.Unicode)
-    reamrk_eval_actions = DB.Column(DB.Unicode)
-
+    #remark_eval_functions = DB.Column(DB.Unicode)
+    #remark_eval_heritage = DB.Column(DB.Unicode)
+    #remark_eval_thread = DB.Column(DB.Unicode)
+    #reamrk_eval_actions = DB.Column(DB.Unicode)
+    
     authors = DB.relationship(
         User,
         lazy="joined",
-        #secondary=corRoleRelevesOccurrence.__table__,
-        primaryjoin=(User.id_role == create_author),
-        #secondaryjoin=(corRoleRelevesOccurrence.id_role == User.id_role),
-        #cascade="all, delete-orphan",
-        foreign_keys=[User.id_role]
+        primaryjoin=(User.id_role == create_author)
     )
 
     def get_geofeature(self, recursif=True, relationships=()):
         return self.as_geofeature("geom", "id_zh", recursif, relationships=relationships)
 
+
+class BibSiteSpace(DB.Model):
+    __tablename__ = "bib_site_space"
+    __table_args__ = {"schema": "pr_zh"}
+    id_site_space = DB.Column(DB.Integer, primary_key=True)
+    name = DB.Column(DB.Unicode)

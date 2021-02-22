@@ -1,6 +1,8 @@
 import { 
   Component,
   OnInit,
+  OnDestroy,
+  AfterViewInit,
   ViewChild,
   HostListener,
   Renderer2
@@ -14,6 +16,8 @@ import * as moment from "moment";
 import { ZhDataService } from "../services/zh-data.service";
 import { CommonService } from "@geonature_common/service/common.service";
 import { Router } from "@angular/router";
+import { Subscription } from "rxjs/Subscription";
+import { GlobalSubService } from "@geonature/services/global-sub.service";
 
 @Component({
   selector: 'zh-map-list',
@@ -21,7 +25,8 @@ import { Router } from "@angular/router";
   styleUrls: ['./zh-map-list.component.scss']
 })
 export class ZhMapListComponent 
-  implements OnInit{
+  implements OnInit,  AfterViewInit{
+  public userCruved: any;
   public displayColumns: Array<any>;
   public availableColumns: Array<any>;
   public idName: string;
@@ -29,6 +34,8 @@ export class ZhMapListComponent
   public zhConfig: any;
   public rowPerPage: number;
   public cardContentHeight: number;
+  public moduleSub: Subscription;
+
 
   @ViewChild("table")
   table: DatatableComponent;
@@ -39,6 +46,7 @@ export class ZhMapListComponent
     private _mapService: MapService,
     private _zhService: ZhDataService,
     private renderer: Renderer2,
+    public globalSub: GlobalSubService,
     private _commonService: CommonService
   ) { }
 
@@ -50,6 +58,15 @@ export class ZhMapListComponent
     this.zhConfig = ModuleConfig;
     this.idName = "id_zh";
     this.apiEndPoint = this.zhConfig.MODULE_URL;
+
+    // get user cruved
+    this.moduleSub = this.globalSub.currentModuleSub
+      // filter undefined or null
+      .filter((mod) => mod)
+      .subscribe((mod) => {
+        this.userCruved = mod.cruved;
+      });
+
     // parameters for maplist
     // columns to be default displayed
     this.mapListService.displayColumns = this.zhConfig.default_maplist_columns;
@@ -123,7 +140,8 @@ export class ZhMapListComponent
   }
 
   displayAuthorName(element) {
-    return element[0].nom_complet 
+    console.log('test = ' + element);
+    return element.nom_complet
   }
 
   displayDate(element): string {
@@ -140,14 +158,13 @@ export class ZhMapListComponent
     return feature
   }
 
-  deleteReleve(row) {
-    console.log(row);
-    /*
-    this._zhService.deleteZh(row.id_zh).subscribe(
+  deleteOneZh(row) {
+    
+    this._zhService.deleteOneZh(row.id_zh).subscribe(
       () => {
         this._commonService.translateToaster(
           "success",
-          "Releve.DeleteSuccessfully"
+          "la zh a été supprimée avec succès"
         );
         this._router.navigate([""]);
       },
@@ -159,7 +176,6 @@ export class ZhMapListComponent
         }
       }
     );
-    */
     
   }
 

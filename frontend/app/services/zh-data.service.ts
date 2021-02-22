@@ -12,7 +12,7 @@ export class ZhDataService {
     return this._api.get<any>(`${AppConfig.API_ENDPOINT}/zones_humides`);
   }
 
-  deleteZh(id) {
+  deleteOneZh(id) {
     return this._api.delete(`${AppConfig.API_ENDPOINT}/zones_humides/${id}`);
   }
 }
