@@ -78,9 +78,9 @@ class TZH(ZhModel):
     __tablename__ = "t_zh"
     __table_args__ = {"schema": "pr_zh"}
     id_zh = DB.Column(DB.Integer, primary_key=True)
-    #zh_uuid = DB.Column(
-    #    UUID(as_uuid=True), default=select([func.uuid_generate_v4()])
-    #)
+    zh_uuid = DB.Column(
+        UUID(as_uuid=True), default=select([func.uuid_generate_v4()])
+    )
     code = DB.Column(DB.Unicode, nullable=False)
     main_name = DB.Column(DB.Unicode, nullable=False)
     secondary_name = DB.Column(DB.Unicode)
@@ -137,10 +137,10 @@ class TZH(ZhModel):
     nb_flora_sp = DB.Column(DB.Integer)
     nb_vertebrate_sp = DB.Column(DB.Integer)
     nb_invertebrate_sp = DB.Column(DB.Integer)
-    #remark_eval_functions = DB.Column(DB.Unicode)
-    #remark_eval_heritage = DB.Column(DB.Unicode)
-    #remark_eval_thread = DB.Column(DB.Unicode)
-    #reamrk_eval_actions = DB.Column(DB.Unicode)
+    remark_eval_functions = DB.Column(DB.Unicode)
+    remark_eval_heritage = DB.Column(DB.Unicode)
+    remark_eval_thread = DB.Column(DB.Unicode)
+    reamrk_eval_actions = DB.Column(DB.Unicode)
     
     authors = DB.relationship(
         User,
