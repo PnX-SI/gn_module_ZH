@@ -31,6 +31,14 @@ class ZhModel(DB.Model):
 
     __abstract__ = True
 
+    def user_is_observer_or_digitiser(self, user):
+        observers = [d.id_role for d in self.observers]
+        return user.id_role == self.id_digitiser or user.id_role in observers
+
+    def user_is_in_dataset_actor(self, user):
+        only_user = user.value_filter == "1"
+        return self.id_dataset in TDatasets.get_user_datasets(user, only_user=only_user)
+
     def user_is_allowed_to(self, user, level):
         """
             Fonction permettant de dire si un utilisateur
@@ -45,14 +53,14 @@ class ZhModel(DB.Model):
             return True
 
         # Si l'utilisateur est propriétaire de la données
-        #if self.user_is_observer_or_digitiser(user):
-        #    return True
+        if self.user_is_observer_or_digitiser(user):
+            return True
 
         # Si l'utilisateur appartient à un organisme
         # qui a un droit sur la données et
         # que son niveau d'accès est 2 ou 3
-        #if self.user_is_in_dataset_actor(user) and level in ("2", "3"):
-        #    return True
+        if self.user_is_in_dataset_actor(user) and level in ("2", "3"):
+            return True
         return False
 
     def get_zh_if_allowed(self, user):
@@ -70,6 +78,18 @@ class ZhModel(DB.Model):
             ),
             403,
         )
+    def get_releve_cruved(self, user, user_cruved):
+        """
+        Return the user's cruved for a Releve instance.
+        Use in the map-list interface to allow or not an action
+        params:
+            - user : a TRole object
+            - user_cruved: object return by cruved_for_user_in_app(user)
+        """
+        return {
+            action: self.user_is_allowed_to(user, level)
+            for action, level in user_cruved.items()
+        }
 
 
 @serializable

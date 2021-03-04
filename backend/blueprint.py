@@ -31,8 +31,6 @@ blueprint = Blueprint("pr_zh", __name__)
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
 def get_zh(info_role):
-
-    #debug()
     q = DB.session.query(TZH)
 
     parameters = request.args
@@ -52,11 +50,11 @@ def get_zh(info_role):
     
     featureCollection = []
     for n in data:
-        #releve_cruved = n.get_releve_cruved(user, user_cruved)
+        releve_cruved = n.get_releve_cruved(user, user_cruved)
         feature = n.get_geofeature(
             relationships=()
         )
-        #feature["properties"]["rights"] = releve_cruved
+        feature["properties"]["rights"] = releve_cruved
         featureCollection.append(feature)
     return {
         "total": nb_results_without_limit,
@@ -82,6 +80,7 @@ def deleteOneZh(id_zh, info_role):
     return {"message": "delete with success"}, 200
 
 
+"""
 # Exemple d'une route protégée le CRUVED du sous module d'authentification
 @blueprint.route("/test_cruved", methods=["GET"])
 @permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
@@ -99,3 +98,4 @@ def get_sensitive_view(info_role):
     q = DB.session.query(MySQLAModel)
     data = q.all()
     return [d.as_dict() for d in data]
+"""

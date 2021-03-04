@@ -2,7 +2,7 @@ import { NgModule } from "@angular/core";
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 //import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule, HttpClient } from '@angular/common/http';
+//import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { Routes, RouterModule } from "@angular/router";
 import { GN2CommonModule } from "@geonature_common/GN2Common.module";
 import { MapListService } from "@geonature_common/map-list/map-list.service";
@@ -24,7 +24,7 @@ const routes: Routes = [
 
   ],
   imports: [
-    HttpClientModule,
+    //HttpClientModule,
     CommonModule,
     GN2CommonModule,
     RouterModule.forChild(routes),
@@ -32,7 +32,7 @@ const routes: Routes = [
     NgbModule
   ],
   providers: [
-    HttpClient,
+    //HttpClient,
     ZhDataService,
     MapListService
   ],

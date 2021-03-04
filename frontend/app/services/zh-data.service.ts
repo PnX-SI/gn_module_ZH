@@ -8,9 +8,11 @@ import { AppConfig } from "@geonature_config/app.config";
 export class ZhDataService {
   constructor(private _api: HttpClient) {}
 
+  /*
   getZhList() {
     return this._api.get<any>(`${AppConfig.API_ENDPOINT}/zones_humides`);
   }
+  */
 
   deleteOneZh(id) {
     return this._api.delete(`${AppConfig.API_ENDPOINT}/zones_humides/${id}`);

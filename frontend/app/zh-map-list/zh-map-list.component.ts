@@ -25,7 +25,7 @@ import { GlobalSubService } from "@geonature/services/global-sub.service";
   styleUrls: ['./zh-map-list.component.scss']
 })
 export class ZhMapListComponent 
-  implements OnInit,  AfterViewInit{
+  implements OnInit, OnDestroy, AfterViewInit{
   public userCruved: any;
   public displayColumns: Array<any>;
   public availableColumns: Array<any>;
@@ -51,9 +51,7 @@ export class ZhMapListComponent
   ) { }
 
   ngOnInit() {
-    console.log(this.mapListService);
-    console.log(ModuleConfig);
-    console.log(AppConfig);
+    this.mapListService.zoomOnLayer = true;
     //config
     this.zhConfig = ModuleConfig;
     this.idName = "id_zh";
@@ -99,6 +97,9 @@ export class ZhMapListComponent
     )
   }
 
+  ngOnDestroy() {
+    this.moduleSub.unsubscribe();
+  }
 
   @HostListener("window:resize", ["$event"])
   onResize(event) {
@@ -140,7 +141,6 @@ export class ZhMapListComponent
   }
 
   displayAuthorName(element) {
-    console.log('test = ' + element);
     return element.nom_complet
   }
 
