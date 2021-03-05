@@ -38,7 +38,7 @@ CREATE  TABLE pr_zh.t_zh (
 	update_author        integer  NOT NULL ,
 	create_date          timestamp(0) DEFAULT CURRENT_TIMESTAMP NOT NULL ,
 	update_date          timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL ,
-	geom           geometry(Geometry,4326)   ,
+	geom           geometry(Geometry,4326) NOT NULL ,
 	remark_lim           text   ,
 	remark_lim_fs        text   ,
 	id_sdage             integer ,
