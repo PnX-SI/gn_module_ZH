@@ -1,0 +1,99 @@
+<div class="container-fluid">
+    <div class="map-list-container">
+
+        <div class="row">
+
+            <div
+              class="col-xs-12 col-sm-12 col-md-6 col-lg-6 padding-sm-occ"
+              [ngStyle]="{'min-height.px': cardContentHeight}"
+            >
+              <!-- MAP -->
+              <pnx-map-list
+                [idName]="idName"
+                height="100%"
+              >
+              </pnx-map-list>
+            </div>
+
+            <div
+              class="col-xs-12 col-sm-12 col-md-6 col-lg-6 padding-sm-occ"
+              [ngStyle]="{'min-height.px': cardContentHeight}"
+            >
+              <!-- LIST -->
+              <!--Table-->
+              <ngx-datatable
+                #table
+                class="material striped margin-top-xs table-size expandable"
+                [columnMode]="'force'"
+                [columns]="mapListService.displayColumns"
+                [count]="mapListService.page.totalElements"
+                [draggable]="false"
+                [externalPaging]="true"
+                [externalSorting]="true"
+                [footerHeight]="40"
+                [headerHeight]="35"
+                [limit]="rowPerPage"
+                [loadingIndicator]="mapListService.isLoading"
+                [offset]="mapListService.page.pageNumber"
+                [rowClass]="mapListService.getRowClass"
+                [rowHeight]="40"
+                [rows]="mapListService.tableData"
+                [scrollbarH]="false"
+                [selected]="mapListService.selectedRow"
+                [selectionType]="'single'"
+                (page)="onChangePage($event)"
+                (select)="mapListService.onRowSelect($event)"
+                (sort)="onColumnSort($event)"
+              >
+
+                <ngx-datatable-column
+                  [width]="10"
+                  [resizeable]="false"
+                  [sortable]="false"
+                  [draggable]="false"
+                  [canAutoResize]="false"
+                >
+                </ngx-datatable-column>
+
+            
+                <ngx-datatable-column maxWidth="10">
+                  <ng-template
+                    let-row="row"
+                    ngx-datatable-cell-template
+                  >
+                    <button
+                      class="btn btn-outline-shadow btn-no-padding btn-ghost"
+                      [disabled]="false"
+                      (click)="deleteOneZh(row)"
+                    >
+                      <i
+                        [ngClass]="{'disabled' : false}"
+                        #iElement
+                        matTooltip="{{ 'Supprimer la ZH ' }} {{row[mapListService.idName]}}"
+                        class="fa fa-trash-o"
+                        aria-hidden="true"
+                      ></i>
+                    </button>
+                  </ng-template>
+                </ngx-datatable-column>
+              
+
+                <!-- DATA COLUMNS -->
+                <ng-container *ngFor="let col of mapListService.displayColumns">
+                  <ngx-datatable-column
+                    [ngSwitch]="col.prop"
+                    [maxWidth]="col.max_width"
+                    [prop]="col.prop"
+                    [name]="col.name"
+                    [sortable]="true"
+                  >
+
+                  </ngx-datatable-column>
+                </ng-container>
+              
+              </ngx-datatable>
+            </div>
+        </div>
+    
+    </div>
+</div>
