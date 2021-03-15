@@ -1,21 +1,11 @@
-import { 
-  Component,
-  OnInit,
-  OnDestroy,
-  AfterViewInit,
-  ViewChild,
-  HostListener,
-  Renderer2
-} from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { MapListService } from "@geonature_common/map-list/map-list.service";
 import { MapService } from "@geonature_common/map/map.service";
-import { DatatableComponent } from "@swimlane/ngx-datatable/release";
 import { ModuleConfig } from "../module.config";
-import { AppConfig } from "@geonature_config/app.config";
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import * as moment from "moment";
 import { ZhDataService } from "../services/zh-data.service";
 import { CommonService } from "@geonature_common/service/common.service";
-import { Router } from "@angular/router";
 import { Subscription } from "rxjs/Subscription";
 import { GlobalSubService } from "@geonature/services/global-sub.service";
 
@@ -24,8 +14,8 @@ import { GlobalSubService } from "@geonature/services/global-sub.service";
   templateUrl: './zh-map-list.component.html',
   styleUrls: ['./zh-map-list.component.scss']
 })
-export class ZhMapListComponent 
-  implements OnInit, OnDestroy, AfterViewInit{
+export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
+
   public userCruved: any;
   public displayColumns: Array<any>;
   public availableColumns: Array<any>;
@@ -36,16 +26,11 @@ export class ZhMapListComponent
   public cardContentHeight: number;
   public moduleSub: Subscription;
 
-
-  @ViewChild("table")
-  table: DatatableComponent;
-
   constructor(
-    private _router: Router,
     public mapListService: MapListService,
     private _mapService: MapService,
     private _zhService: ZhDataService,
-    private renderer: Renderer2,
+    public ngbModal: NgbModal,
     public globalSub: GlobalSubService,
     private _commonService: CommonService
   ) { }
@@ -80,9 +65,9 @@ export class ZhMapListComponent
       [{ param: "limit", value: this.rowPerPage }],
       this.zhCustomCallBack.bind(this)
     );
-    
     // end OnInit
   }
+
 
   ngAfterViewInit() {
     setTimeout(() => this.calcCardContentHeight(), 500);
@@ -99,11 +84,6 @@ export class ZhMapListComponent
 
   ngOnDestroy() {
     this.moduleSub.unsubscribe();
-  }
-
-  @HostListener("window:resize", ["$event"])
-  onResize(event) {
-    this.calcCardContentHeight();
   }
 
   calculateNbRow() {
@@ -159,14 +139,13 @@ export class ZhMapListComponent
   }
 
   deleteOneZh(row) {
-    
     this._zhService.deleteOneZh(row.id_zh).subscribe(
       () => {
+        this.mapListService.deleteObsFront(row.id_zh);
         this._commonService.translateToaster(
           "success",
           "la zh a été supprimée avec succès"
         );
-        this._router.navigate([""]);
       },
       (error) => {
         if (error.status === 403) {
@@ -176,7 +155,20 @@ export class ZhMapListComponent
         }
       }
     );
-    
+
+  }
+
+  openDeleteModal(event, modal, iElement, row) {
+    this.mapListService.urlQuery;
+    this.mapListService.selectedRow = [];
+    this.mapListService.selectedRow.push(row);
+    event.stopPropagation();
+    // prevent erreur link to the component
+    iElement &&
+      iElement.parentElement &&
+      iElement.parentElement.parentElement &&
+      iElement.parentElement.parentElement.blur();
+    this.ngbModal.open(modal);
   }
 
 }
