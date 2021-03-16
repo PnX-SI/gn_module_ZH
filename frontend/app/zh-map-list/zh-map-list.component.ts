@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { MapListService } from "@geonature_common/map-list/map-list.service";
 import { MapService } from "@geonature_common/map/map.service";
 import { ModuleConfig } from "../module.config";
@@ -84,6 +84,11 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnDestroy() {
     this.moduleSub.unsubscribe();
+  }
+
+  @HostListener("window:resize", ["$event"])
+  onResize(event) {
+    this.calcCardContentHeight();
   }
 
   calculateNbRow() {
