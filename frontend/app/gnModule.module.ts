@@ -9,19 +9,23 @@ import { MapListService } from "@geonature_common/map-list/map-list.service";
 
 //Components
 import { ZhMapListComponent } from './zh-map-list/zh-map-list.component';
-
+import { ZhFormsComponent } from "./zh-forms/zh-forms.component";
 // Service
 import { ZhDataService } from "./services/zh-data.service";
+import { ZhFormMapService } from "./zh-forms/map/map.service";
+import { ZhFormMapComponent } from "./zh-forms/map/map.component";
 
 // my module routing
 const routes: Routes = [
-  { path: "", component: ZhMapListComponent }
+  { path: "", component: ZhMapListComponent },
+  { path: "form", component: ZhFormsComponent },
 ];
 
 @NgModule({
   declarations: [
-    ZhMapListComponent
-
+    ZhMapListComponent,
+    ZhFormsComponent,
+    ZhFormMapComponent
   ],
   imports: [
     //HttpClientModule,
@@ -34,7 +38,8 @@ const routes: Routes = [
   providers: [
     //HttpClient,
     ZhDataService,
-    MapListService
+    MapListService,
+    ZhFormMapService
   ],
   bootstrap: [ZhMapListComponent]
 })

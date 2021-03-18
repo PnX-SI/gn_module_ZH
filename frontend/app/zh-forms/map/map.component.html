@@ -1,0 +1,46 @@
+<pnx-map
+  height="100%"
+  class="map-card"
+>
+  <pnx-marker
+    [coordinates]="coordinates"
+    [zoomLevel]="zhConfig.releve_map_zoom_level"
+    (markerChanged)="sendGeoInfo($event)"
+  >
+  </pnx-marker>
+
+  <pnx-leaflet-draw
+    [geojson]="geometry"
+    [options]="leafletDrawOptions"
+    [zoomLevel]="zhConfig.releve_map_zoom_level"
+    (layerDrawed)="sendGeoInfo($event)"
+  >
+  </pnx-leaflet-draw>
+
+  <pnx-leaflet-filelayer
+    *ngIf="zhConfig.ENABLE_UPLOAD_TOOL"
+    [editMode]="true"
+    (onLoad)="infoMessageFileLayer()"
+    [style]="{'color': 'green'}"
+  >
+  </pnx-leaflet-filelayer>
+
+  <pnx-gps
+    *ngIf="zhConfig.ENABLE_GPS_TOOL"
+    (markerChanged)="sendGeoInfo($event)"
+  >
+  </pnx-gps>
+
+  <pnx-places
+    *ngIf="zhConfig.ENABLE_MY_PLACES"
+    (markerChanged)="sendGeoInfo($event)"
+  >
+  </pnx-places>
+
+  <pnx-placesList
+    *ngIf="zhConfig.ENABLE_MY_PLACES"
+    (markerChanged)="sendGeoInfo($event)"
+  >
+  </pnx-placesList>
+
+</pnx-map>
