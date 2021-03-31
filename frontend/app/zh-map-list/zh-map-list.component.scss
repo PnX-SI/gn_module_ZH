@@ -1,3 +1,10 @@
+.float-btns {
+  position: absolute;
+  z-index: 10000;
+  margin-top: 5px;
+  margin-left: 5px;
+}
+
 .map-list-container {
   background-color: #fff;
   border: 1px solid #f1f1f1;
@@ -39,4 +46,16 @@ ngx-datatable {
 :host /deep/ .datatable-row-detail {
   height: auto !important;
   font-size: 0.8em;
+}
+
+.modal-body {
+  padding: 20px
+}
+
+.modal-header {
+  padding: 10px;
+  color: white;
+  display: flex;
+  justify-content: center;
+  background-color: #ff6666
 }
