@@ -10,10 +10,12 @@ import { MapListService } from "@geonature_common/map-list/map-list.service";
 //Components
 import { ZhMapListComponent } from './zh-map-list/zh-map-list.component';
 import { ZhFormsComponent } from "./zh-forms/zh-forms.component";
+import { ZhFormMapComponent } from "./zh-forms/map/map.component";
+import { GeneralInfoComponent } from "./zh-forms/general-information/general-info.component";
 // Service
 import { ZhDataService } from "./services/zh-data.service";
 import { ZhFormMapService } from "./zh-forms/map/map.service";
-import { ZhFormMapComponent } from "./zh-forms/map/map.component";
+
 
 // my module routing
 const routes: Routes = [
@@ -25,7 +27,8 @@ const routes: Routes = [
   declarations: [
     ZhMapListComponent,
     ZhFormsComponent,
-    ZhFormMapComponent
+    ZhFormMapComponent,
+    GeneralInfoComponent
   ],
   imports: [
     //HttpClientModule,
