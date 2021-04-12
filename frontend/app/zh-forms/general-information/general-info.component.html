@@ -1,0 +1,212 @@
+<form>
+    <fieldset>
+        <legend>
+            <h5 class="section-title">Identification</h5>
+        </legend>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <small class="required">Nom Usuel</small>
+                <input
+                class="form-control form-control-sm"
+                type='text'
+                [formControl]="generalInfoForm.controls.name"
+                />
+            </div>
+            <div class="form-group col-md-6">
+                <small>Autre nom</small>
+                <input
+                    class="form-control form-control-sm"
+                    type='text'
+                    [formControl]="generalInfoForm.controls.otherName"
+                />
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <small>Partie d'un ensemble ?</small>
+                <select 
+                    class="form-control form-control-sm" 
+                    [formControl]="generalInfoForm.controls.hasGrandEsemble">
+                    <option [ngValue]=false></option>
+                    <option [ngValue]=true>Oui</option>
+                    <option [ngValue]=false>Non</option>
+                </select>
+            </div>
+            <div class="form-group col-md-6">
+                <small>Nom du grand ensemble</small>
+                <input 
+                list="grandEnsemble"
+                 name="grandEnsemble"
+                 autocomplete="off"
+                 class="form-control form-control-sm" 
+                 [formControl]="generalInfoForm.controls.grandEsemble">
+                <datalist id="grandEnsemble">
+                    <option [ngValue]=null></option>
+                    <option [ngValue]=true>Ensemble 1</option>
+                    <option [ngValue]=false>Ensemble 2</option>
+                </datalist>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <small>Code de la zone humide </small>
+                <input
+                class="form-control form-control-sm"
+                type='text'
+                [formControl]="generalInfoForm.controls.zhCode"
+                readonly
+                />
+            </div>
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>
+            <h5 class="section-title">Localisation</h5>
+        </legend>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <small>Région</small>
+                <input
+                class="form-control form-control-sm"
+                    type='text'
+                    readonly
+                />
+            </div>
+            <div class="form-group col-md-6">
+                <small>Département</small>
+                <input
+                    class="form-control form-control-sm"
+                    type='text'
+                    readonly
+                />
+            </div>
+            <div class="form-group col-md-6">
+                <small>Commune</small>
+                <input
+                class="form-control form-control-sm"
+                    type='text'
+                    readonly
+                />
+            </div>
+            <div class="form-group col-md-6">
+                <small>Code INSEE</small>
+                <input
+                    class="form-control form-control-sm"
+                    type='text'
+                    readonly
+                />
+            </div>
+            <div class="form-group col-md-6">
+                <small>Couverture de la zonne humide</small>
+                <input
+                    class="form-control form-control-sm"
+                    type='text'
+                    readonly
+                />
+            </div>
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>
+            <h5 class="section-title">Auteur</h5>
+        </legend>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <small>Auteur de la fiche</small>
+                <input
+                class="form-control form-control-sm"
+                    type='text'
+                    readonly
+                />
+            </div>
+            <div class="form-group col-md-6">
+                <small>Auteur des dernières modifications</small>
+                <input
+                    class="form-control form-control-sm"
+                    type='text'
+                    readonly
+                />
+            </div>
+            <div class="form-group col-md-6">
+                <small>Date d'établissement</small>
+                <input
+                class="form-control form-control-sm"
+                    type='text'
+                    readonly
+                />
+            </div>
+            <div class="form-group col-md-6">
+                <small>Date des dernières modifications</small>
+                <input
+                    class="form-control form-control-sm"
+                    type='text'
+                    readonly
+                />
+            </div>
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>
+            <h5 class="section-title">Principales références bibliographiques</h5>
+        </legend>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <small>Référence</small>
+                <input
+                class="form-control form-control-sm"
+                    type='text'
+                />
+            </div>
+            <div class="form-group col-md-6">
+                <small>Titre du docuemnt</small>
+                <input
+                    class="form-control form-control-sm"
+                    type='text'
+                />
+            </div>
+            <div class="form-group col-md-6">
+                <small>Auteurs</small>
+                <input
+                class="form-control form-control-sm"
+                    type='text'
+                />
+            </div>
+            <div class="form-group col-md-6">
+                <small>Année de parution</small>
+                <input
+                    class="form-control form-control-sm"
+                    type='text'
+                />
+            </div>
+            <div class="form-group col-md-6">
+                <small>Editeur</small>
+                <input
+                class="form-control form-control-sm"
+                    type='text'
+                />
+            </div>
+            <div class="form-group col-md-6">
+                <small>Lieu</small>
+                <input
+                class="form-control form-control-sm"
+                    type='text'
+                />
+            </div>
+            <div class="form-group col-md-6">
+                <small>Url</small>
+                <input
+                    class="form-control form-control-sm"
+                    type='text'
+                />
+            </div>
+            <div class="form-group col-md-6">
+                <small>Bassin Versant</small>
+                <input
+                    class="form-control form-control-sm"
+                    type='text'
+                    readonly
+                />
+            </div>
+        </div>
+    </fieldset>
+</form>
