@@ -20,6 +20,9 @@ def gnmodule_install_app(gn_db, gn_app):
             gn_db.session.execute(
                 open(str(ROOT_DIR / "data/script_create_tables.sql"), "r").read()
             )
+            gn_db.session.execute(
+                open(str(ROOT_DIR / "data/insert_into_ref_nomenclatures_schema"), "r").read()
+            )
             gn_db.session.commit()
         except Exception as e:
             log.error(e)
