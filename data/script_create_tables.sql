@@ -1,16 +1,3 @@
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SET check_function_bodies = false;
-SET client_min_messages = warning;
-SET search_path = gn_imports, pg_catalog, public;
-SET default_with_oids = false;
-
-
-BEGIN;
-
-
 CREATE SCHEMA IF NOT EXISTS pr_zh;
 
 CREATE SEQUENCE pr_zh.bib_actions_id_action_seq START WITH 1 INCREMENT BY 1;
@@ -120,8 +107,7 @@ COMMENT ON COLUMN pr_zh.cor_sdage_sage.id_sage IS 'id_nomenclature sage dans ref
 CREATE  TABLE pr_zh.cor_urban_type_range ( 
 	id_range_type        integer  NOT NULL ,
 	id_doc_type          integer  NOT NULL ,
-	CONSTRAINT pk_cor_urban_type_range PRIMARY KEY ( id_range_type, id_doc_type ),
-	CONSTRAINT unq_cor_urban_type_range_id_range_type UNIQUE ( id_range_type ) 
+	CONSTRAINT pk_cor_urban_type_range PRIMARY KEY ( id_range_type, id_doc_type )
  );
 
 CREATE  TABLE pr_zh.cor_zh_area ( 
@@ -672,4 +658,3 @@ ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_cor_lim_list FOREIGN KEY ( id_lim_
 
 COMMENT ON CONSTRAINT fk_t_zh_cor_lim_list ON pr_zh.t_zh IS 'pr_zh.t_zh.id_lim_list references pr_zh.t_zh.id_lim_list';
 
-COMMIT;
