@@ -18,7 +18,7 @@ def gnmodule_install_app(gn_db, gn_app):
         #gn_db.session.commit()
         try:
             gn_db.session.execute(
-                open(str(ROOT_DIR / "data/table_zh.sql"), "r").read()
+                open(str(ROOT_DIR / "data/script_create_tables.sql"), "r").read()
             )
             gn_db.session.commit()
         except Exception as e:
