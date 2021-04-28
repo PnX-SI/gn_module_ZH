@@ -67,10 +67,9 @@ CREATE  TABLE pr_zh.cor_impact_types (
  );
 
 CREATE  TABLE pr_zh.cor_lim_list ( 
-	id_lim_list          integer DEFAULT nextval('pr_zh.cor_lim_list_seq'::regclass) NOT NULL ,
+	id_lim_list          integer  NOT NULL ,
 	id_lim               integer  NOT NULL ,
-	CONSTRAINT pk_cor_lim_list PRIMARY KEY ( id_lim_list, id_lim ),
-	CONSTRAINT unq_cor_lim_list_id_lim_list UNIQUE ( id_lim_list ) 
+	CONSTRAINT pk_cor_lim_list PRIMARY KEY ( id_lim_list, id_lim )
  );
 
 COMMENT ON TABLE pr_zh.cor_lim_list IS 'Correspondance entre zh et critères de délimitation de la zone humide';
@@ -107,7 +106,8 @@ COMMENT ON COLUMN pr_zh.cor_sdage_sage.id_sage IS 'id_nomenclature sage dans ref
 CREATE  TABLE pr_zh.cor_urban_type_range ( 
 	id_range_type        integer  NOT NULL ,
 	id_doc_type          integer  NOT NULL ,
-	CONSTRAINT pk_cor_urban_type_range PRIMARY KEY ( id_range_type, id_doc_type )
+	CONSTRAINT pk_cor_urban_type_range PRIMARY KEY ( id_range_type, id_doc_type ),
+	CONSTRAINT unq_cor_urban_type_range_id_range_type UNIQUE ( id_range_type ) 
  );
 
 CREATE  TABLE pr_zh.cor_zh_area ( 
@@ -174,7 +174,7 @@ COMMENT ON COLUMN pr_zh.t_river_basin.id_river_flow IS 'régime des cours d''eau
 
 CREATE  TABLE pr_zh.t_zh ( 
 	id_zh                integer DEFAULT nextval('pr_zh.t_zh_id_zh_seq'::regclass) NOT NULL ,
-	zh_uuid              uuid  NOT NULL ,
+	zh_uuid              uuid DEFAULT uuid_generate_v4() NOT NULL ,
 	code                 varchar(12)  NOT NULL ,
 	main_name            varchar(100)  NOT NULL ,
 	secondary_name       varchar(100)   ,
@@ -653,8 +653,4 @@ ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_t_nomenclatures_connexion FOREIGN 
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_t_nomenclatures_diag_hydro FOREIGN KEY ( id_diag_hydro ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_t_nomenclatures_diag_bio FOREIGN KEY ( id_diag_bio ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
-
-ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_cor_lim_list FOREIGN KEY ( id_lim_list ) REFERENCES pr_zh.cor_lim_list( id_lim_list )  ON UPDATE CASCADE;
-
-COMMENT ON CONSTRAINT fk_t_zh_cor_lim_list ON pr_zh.t_zh IS 'pr_zh.t_zh.id_lim_list references pr_zh.t_zh.id_lim_list';
 

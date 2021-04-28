@@ -1,8 +1,14 @@
 BEGIN;
 
-INSERT INTO ref_habitats.bib_list_habitat(list_name) VALUES
-('Liste des habitats humides selon la nomenclature CORINE Biotopes')
+
+INSERT INTO ref_habitats.bib_list_habitat(list_name)
+SELECT 'Liste des habitats humides selon la nomenclature CORINE Biotopes'
+WHERE NOT EXISTS 
+	(
+		SELECT list_name FROM ref_habitats.bib_list_habitat WHERE list_name = 'Liste des habitats humides selon la nomenclature CORINE Biotopes'
+    )
 ;
+
 
 INSERT INTO ref_habitats.cor_list_habitat(id_list,cd_hab) VALUES
 ((SELECT id_list FROM ref_habitats.bib_list_habitat WHERE list_name = 'Liste des habitats humides selon la nomenclature CORINE Biotopes'),(SELECT cd_hab FROM ref_habitats.habref WHERE cd_typo=22 AND lb_code='1')),
@@ -590,6 +596,8 @@ INSERT INTO ref_habitats.cor_list_habitat(id_list,cd_hab) VALUES
 ((SELECT id_list FROM ref_habitats.bib_list_habitat WHERE list_name = 'Liste des habitats humides selon la nomenclature CORINE Biotopes'),(SELECT cd_hab FROM ref_habitats.habref WHERE cd_typo=22 AND lb_code='84.4')),
 ((SELECT id_list FROM ref_habitats.bib_list_habitat WHERE list_name = 'Liste des habitats humides selon la nomenclature CORINE Biotopes'),(SELECT cd_hab FROM ref_habitats.habref WHERE cd_typo=22 AND lb_code='87.1')),
 ((SELECT id_list FROM ref_habitats.bib_list_habitat WHERE list_name = 'Liste des habitats humides selon la nomenclature CORINE Biotopes'),(SELECT cd_hab FROM ref_habitats.habref WHERE cd_typo=22 AND lb_code='87.2'))
+ON CONFLICT (id_list,cd_hab) DO NOTHING
 ;
+
 
 COMMIT;

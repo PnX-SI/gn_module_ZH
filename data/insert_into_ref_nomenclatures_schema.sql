@@ -40,7 +40,8 @@ INSERT INTO ref_nomenclatures.bib_nomenclatures_types(mnemonique,label_default,d
     ('NIV_PROTECTION','Niveau de protection','Niveau de protection','Niveau de protection','Niveau de protection','ZONES_HUMIDES','Non validé'),
     ('PROTECTION_TYP','Type de protection','Type de protection','Type de protection','Type de protection','ZONES_HUMIDES','Non validé'),
     ('TYP_DOC_COMM','Type de document communal','Type de document communal','Type de document communal','Type de document communal','ZONES_HUMIDES','Non validé'),
-    ('TYP_CLASS_COMM','Type de classement','Type de classement (document communal)','Type de classement','Type de classement (document communal)','ZONES_HUMIDES','Non validé');
+    ('TYP_CLASS_COMM','Type de classement','Type de classement (document communal)','Type de classement','Type de classement (document communal)','ZONES_HUMIDES','Non validé')
+    ON CONFLICT (mnemonique) DO NOTHING;;
     
     
 -- fillref_nomenclatures.t_nomenclatures
@@ -460,7 +461,9 @@ INSERT INTO ref_nomenclatures.t_nomenclatures(id_type,cd_nomenclature,mnemonique
     ((select ref_nomenclatures.get_id_nomenclature_type('TYP_CLASS_COMM')),'7','Zones de hameaux ou de petits villages (NB)','Zones de hameaux ou de petits villages (NB)','Zones de hameaux ou de petits villages (NB)','Zones de hameaux ou de petits villages (NB)','Zones de hameaux ou de petits villages (NB)','ZONES_HUMIDES','non validé','6.7'),
     ((select ref_nomenclatures.get_id_nomenclature_type('TYP_CLASS_COMM')),'8','Zones de protection des ressources naturelles agricoles (NC)','Zones de protection des ressources naturelles agricoles (NC)','Zones de protection des ressources naturelles agricoles (NC)','Zones de protection des ressources naturelles agricoles (NC)','Zones de protection des ressources naturelles agricoles (NC)','ZONES_HUMIDES','non validé','6.7'),
     ((select ref_nomenclatures.get_id_nomenclature_type('TYP_CLASS_COMM')),'9','Zones de protection des milieux naturels (ND)','Zones de protection des milieux naturels (ND)','Zones de protection des milieux naturels (ND)','Zones de protection des milieux naturels (ND)','Zones de protection des milieux naturels (ND)','ZONES_HUMIDES','non validé','6.7'),
-    ((select ref_nomenclatures.get_id_nomenclature_type('TYP_CLASS_COMM')),'10','Sans objet','Sans objet','Sans objet','Sans objet','Sans objet','ZONES_HUMIDES','non validé','6.7');
+    ((select ref_nomenclatures.get_id_nomenclature_type('TYP_CLASS_COMM')),'10','Sans objet','Sans objet','Sans objet','Sans objet','Sans objet','ZONES_HUMIDES','non validé','6.7')
+    ON CONFLICT (id_type, cd_nomenclature) DO NOTHING;
+    ;
 
 
 -- fill ref_nomenclatures.defaults_nomenclatures_value
@@ -479,6 +482,7 @@ INSERT INTO ref_nomenclatures.defaults_nomenclatures_value VALUES
 ('ETAT_CONSERVATION',0,(SELECT ref_nomenclatures.get_id_nomenclature('ETAT_CONSERVATION','0'))),
 ('STATUT_PROPRIETE',0,(SELECT ref_nomenclatures.get_id_nomenclature('STATUT_PROPRIETE','0'))),
 ('STATUT_PROTECTION',0,(SELECT ref_nomenclatures.get_id_nomenclature('STATUT_PROTECTION','0')))
+ON CONFLICT (mnemonique_type, id_organism) DO NOTHING;
 ;
 
     
