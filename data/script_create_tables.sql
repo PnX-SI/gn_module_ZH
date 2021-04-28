@@ -104,10 +104,10 @@ COMMENT ON TABLE pr_zh.cor_sdage_sage IS 'table de correspondance entre les type
 COMMENT ON COLUMN pr_zh.cor_sdage_sage.id_sage IS 'id_nomenclature sage dans ref_nomenclatures.t_nomenclatures';
 
 CREATE  TABLE pr_zh.cor_urban_type_range ( 
+	id_cor               integer  NOT NULL ,
 	id_range_type        integer  NOT NULL ,
 	id_doc_type          integer  NOT NULL ,
-	CONSTRAINT pk_cor_urban_type_range PRIMARY KEY ( id_range_type, id_doc_type ),
-	CONSTRAINT unq_cor_urban_type_range_id_range_type UNIQUE ( id_range_type ) 
+	CONSTRAINT pk_cor_urban_type_range PRIMARY KEY ( id_cor )
  );
 
 CREATE  TABLE pr_zh.cor_zh_area ( 
@@ -486,14 +486,14 @@ CREATE  TABLE pr_zh.t_urban_planning_docs (
 	id_doc               integer DEFAULT nextval('pr_zh.t_urban_planning_docs_id_doc_seq'::regclass) NOT NULL ,
 	id_area              integer  NOT NULL ,
 	id_zh                integer  NOT NULL ,
-	id_range_type        integer DEFAULT 99 NOT NULL ,
+	id_urban_type        integer  NOT NULL ,
 	remark               varchar(2000)   ,
 	CONSTRAINT pk_t_docs_id_doc PRIMARY KEY ( id_doc )
  );
 
 COMMENT ON TABLE pr_zh.t_urban_planning_docs IS 'liste zonage des documents d''urbanisme';
 
-COMMENT ON COLUMN pr_zh.t_urban_planning_docs.id_range_type IS 'type de classement';
+COMMENT ON COLUMN pr_zh.t_urban_planning_docs.id_urban_type IS 'type de classement';
 
 CREATE  TABLE pr_zh.t_management_plans ( 
 	id_plan              integer DEFAULT nextval('pr_zh.t_management_plans_id_plan_seq'::regclass) NOT NULL ,
@@ -634,7 +634,7 @@ ALTER TABLE pr_zh.t_urban_planning_docs ADD CONSTRAINT fk_t_docs_t_municipalitie
 
 ALTER TABLE pr_zh.t_urban_planning_docs ADD CONSTRAINT fk_t_docs_t_zh FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh ) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE pr_zh.t_urban_planning_docs ADD CONSTRAINT fk_t_urban_planning_docs_type FOREIGN KEY ( id_range_type ) REFERENCES pr_zh.cor_urban_type_range( id_range_type )  ON UPDATE CASCADE;
+ALTER TABLE pr_zh.t_urban_planning_docs ADD CONSTRAINT fk_t_urban_planning_docs FOREIGN KEY ( id_urban_type ) REFERENCES pr_zh.cor_urban_type_range( id_cor )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_bib_site_space FOREIGN KEY ( id_site_space ) REFERENCES pr_zh.bib_site_space( id_site_space )  ON UPDATE CASCADE;
 

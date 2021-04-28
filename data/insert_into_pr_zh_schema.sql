@@ -787,20 +787,20 @@ INSERT INTO pr_zh.bib_actions VALUES
 
 
 INSERT INTO pr_zh.cor_urban_type_range VALUES
-((SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','1')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','1'))),
-((SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','2')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','2'))),
-((SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','2')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','3'))),
-((SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','2')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','4'))),
-((SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','2')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','5'))),
-((SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','2')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','1'))),
-((SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','3')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','2'))),
-((SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','3')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','6'))),
-((SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','3')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','7'))),
-((SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','3')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','8'))),
-((SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','3')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','9'))),
-((SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','3')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','1'))),
-((SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','4')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','10'))),
-((SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','5')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','10')))
+(1, (SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','1')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','1'))),
+(2, (SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','2')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','2'))),
+(3, (SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','2')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','3'))),
+(4, (SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','2')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','4'))),
+(5, (SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','2')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','5'))),
+(6, (SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','2')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','1'))),
+(7, (SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','3')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','2'))),
+(8, (SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','3')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','6'))),
+(9, (SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','3')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','7'))),
+(10, (SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','3')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','8'))),
+(11, (SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','3')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','9'))),
+(12, (SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','3')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','1'))),
+(13, (SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','4')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','10'))),
+(14, (SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','5')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','10')))
 ;
 
 
