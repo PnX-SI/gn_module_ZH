@@ -97,13 +97,18 @@ class ZhModel(DB.Model):
 class TZH(ZhModel):
     __tablename__ = "t_zh"
     __table_args__ = {"schema": "pr_zh"}
-    id_zh = DB.Column(DB.Integer, primary_key=True)
+    id_zh = DB.Column(
+        DB.Integer, 
+        primary_key=True)
     zh_uuid = DB.Column(
-        UUID(as_uuid=True), default=select([func.uuid_generate_v4()])
-    )
+        UUID(as_uuid=True), 
+        nullable=False)
     code = DB.Column(DB.Unicode, nullable=False)
     main_name = DB.Column(DB.Unicode, nullable=False)
     secondary_name = DB.Column(DB.Unicode)
+    is_id_site_space = DB.Column(
+        DB.Boolean,
+        default=False)
     id_site_space = DB.Column(
         DB.Integer, 
         ForeignKey("pr_zh.bib_site_space.id_site_space"))
@@ -118,13 +123,19 @@ class TZH(ZhModel):
     create_date = DB.Column(DB.DateTime)
     update_date = DB.Column(DB.DateTime)
     geom = DB.Column(
-        Geometry("GEOMETRY", 4326))
+        Geometry("GEOMETRY", 4326),
+        nullable=False)
+    id_lim_list = DB.Column(
+        DB.Integer,
+        ForeignKey("pr_zh.cor_lim_list.id_lim_list"),
+        nullable=False)
     remark_lim = DB.Column(DB.Unicode)
     remark_lim_fs = DB.Column(DB.Unicode)
     id_sdage = DB.Column(
         DB.Integer, 
-        ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"))
-    id_local_typo = DB.Column(
+        ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"),
+        nullable=False)
+    id_sage = DB.Column(
         DB.Integer,
         ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"))
     remark_pres = DB.Column(DB.Unicode)
@@ -150,17 +161,24 @@ class TZH(ZhModel):
         DB.Integer,
         ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"))
     remark_diag = DB.Column(DB.Unicode)
-    other_inventory = DB.Column(DB.Boolean)
-    carto_hab = DB.Column(DB.Boolean)
+    is_other_inventory = DB.Column(
+        DB.Boolean,
+        default=False)
+    is_carto_hab = DB.Column(
+        DB.Boolean,
+        default=False)
     nb_hab = DB.Column(DB.Integer)
-    total_hab_cover = DB.Column(DB.Integer)
+    total_hab_cover = DB.Column(
+        DB.Integer,
+        default=999,
+        nullable=False)
     nb_flora_sp = DB.Column(DB.Integer)
     nb_vertebrate_sp = DB.Column(DB.Integer)
     nb_invertebrate_sp = DB.Column(DB.Integer)
     remark_eval_functions = DB.Column(DB.Unicode)
     remark_eval_heritage = DB.Column(DB.Unicode)
     remark_eval_thread = DB.Column(DB.Unicode)
-    reamrk_eval_actions = DB.Column(DB.Unicode)
+    remark_eval_actions = DB.Column(DB.Unicode)
     
     authors = DB.relationship(
         User,
@@ -177,3 +195,16 @@ class BibSiteSpace(DB.Model):
     __table_args__ = {"schema": "pr_zh"}
     id_site_space = DB.Column(DB.Integer, primary_key=True)
     name = DB.Column(DB.Unicode)
+
+
+class CorLimList(DB.Model):
+    __tablename__ = "cor_lim_list"
+    __table_args__ = {"schema": "pr_zh"}
+    id_lim_list = DB.Column(
+        DB.Integer, 
+        primary_key=True)
+    id_lim = DB.Column(
+        DB.Integer,
+        ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"),
+        primary_key=True
+        )
