@@ -7,6 +7,11 @@ from flask import (
 
 from geojson import FeatureCollection
 
+from pypnnomenclature.models import (
+    TNomenclatures,
+    BibNomenclaturesTypes
+)
+
 from geonature.utils.utilssqlalchemy import json_resp
 from geonature.utils.env import DB
 #from geonature.utils.env import get_id_module
@@ -65,6 +70,17 @@ def get_zh(info_role):
     }
 
 
+# Route pour afficher liste des zones humides
+@blueprint.route("/form/0", methods=["GET"])
+@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@json_resp
+def get_tab0(info_role):
+    """Get form info for tab 0
+    """
+    mnemo_nomenc_list = ['CRIT_DELIM','SDAGE']
+    return {"test":"ok"},200
+
+
 @blueprint.route("/<int:id_zh>", methods=["DELETE"])
 @permissions.check_cruved_scope("D", True, module_code="ZONES_HUMIDES")
 @json_resp
@@ -77,7 +93,7 @@ def deleteOneZh(id_zh, info_role):
     zhRepository = ZhRepository(TZH)
     zhRepository.delete(id_zh, info_role)
 
-    return {"message": "delete with success"}, 200
+    return {"message": "delete with success"},200
 
 
 """
