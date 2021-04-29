@@ -98,6 +98,26 @@ class ZhModel(DB.Model):
 
 
 @serializable
+class Nomenclatures(TNomenclatures):
+
+    __abstract__ = True
+
+    @staticmethod
+    def get_nomenclature_info(bib_mnemo):
+        q = TNomenclatures.query.filter_by(
+            id_type=select([func.ref_nomenclatures.get_id_nomenclature_type(bib_mnemo)])
+            ).all()
+        return q
+
+
+class BibSiteSpace(DB.Model):
+    __tablename__ = "bib_site_space"
+    __table_args__ = {"schema": "pr_zh"}
+    id_site_space = DB.Column(DB.Integer, primary_key=True)
+    name = DB.Column(DB.Unicode)
+
+
+@serializable
 @geoserializable
 class TZH(ZhModel):
     __tablename__ = "t_zh"
@@ -111,14 +131,14 @@ class TZH(ZhModel):
     secondary_name = DB.Column(DB.Unicode)
     id_site_space = DB.Column(
         DB.Integer, 
-        ForeignKey("pr_zh.bib_site_space.id_site_space"))
+        ForeignKey(BibSiteSpace.id_site_space))
     create_author = DB.Column(
         DB.Integer,
-        ForeignKey("utilisateurs.t_roles.id_role"),
+        ForeignKey(User.id_role),
         nullable=False)
     update_author = DB.Column(
         DB.Integer,
-        ForeignKey("utilisateurs.t_roles.id_role"),
+        ForeignKey(User.id_role),
         nullable=False)
     create_date = DB.Column(DB.DateTime)
     update_date = DB.Column(DB.DateTime)
@@ -182,8 +202,3 @@ class TZH(ZhModel):
         return self.as_geofeature("geom", "id_zh", recursif, relationships=relationships)
 
 
-class BibSiteSpace(DB.Model):
-    __tablename__ = "bib_site_space"
-    __table_args__ = {"schema": "pr_zh"}
-    id_site_space = DB.Column(DB.Integer, primary_key=True)
-    name = DB.Column(DB.Unicode)
