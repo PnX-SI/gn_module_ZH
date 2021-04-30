@@ -5,6 +5,10 @@ from sqlalchemy.sql import select, func, and_
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
+from pypnnomenclature.models import (
+    TNomenclatures
+)
+
 from geoalchemy2 import Geometry
 
 from pypnusershub.db.models import User
@@ -78,6 +82,7 @@ class ZhModel(DB.Model):
             ),
             403,
         )
+
     def get_releve_cruved(self, user, user_cruved):
         """
         Return the user's cruved for a Releve instance.
@@ -90,6 +95,26 @@ class ZhModel(DB.Model):
             action: self.user_is_allowed_to(user, level)
             for action, level in user_cruved.items()
         }
+
+
+@serializable
+class Nomenclatures(TNomenclatures):
+
+    __abstract__ = True
+
+    @staticmethod
+    def get_nomenclature_info(bib_mnemo):
+        q = TNomenclatures.query.filter_by(
+            id_type=select([func.ref_nomenclatures.get_id_nomenclature_type(bib_mnemo)])
+            ).all()
+        return q
+
+
+class BibSiteSpace(DB.Model):
+    __tablename__ = "bib_site_space"
+    __table_args__ = {"schema": "pr_zh"}
+    id_site_space = DB.Column(DB.Integer, primary_key=True)
+    name = DB.Column(DB.Unicode)
 
 
 @serializable
@@ -111,14 +136,14 @@ class TZH(ZhModel):
         default=False)
     id_site_space = DB.Column(
         DB.Integer, 
-        ForeignKey("pr_zh.bib_site_space.id_site_space"))
+        ForeignKey(BibSiteSpace.id_site_space))
     create_author = DB.Column(
         DB.Integer,
-        ForeignKey("utilisateurs.t_roles.id_role"),
+        ForeignKey(User.id_role),
         nullable=False)
     update_author = DB.Column(
         DB.Integer,
-        ForeignKey("utilisateurs.t_roles.id_role"),
+        ForeignKey(User.id_role),
         nullable=False)
     create_date = DB.Column(DB.DateTime)
     update_date = DB.Column(DB.DateTime)
@@ -133,40 +158,41 @@ class TZH(ZhModel):
     remark_lim_fs = DB.Column(DB.Unicode)
     id_sdage = DB.Column(
         DB.Integer, 
-        ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"),
+        ForeignKey(TNomenclatures.id_nomenclature),
         nullable=False)
     id_sage = DB.Column(
         DB.Integer,
-        ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"))
+        ForeignKey(TNomenclatures.id_nomenclature))
     remark_pres = DB.Column(DB.Unicode)
     v_habref = DB.Column(DB.Unicode)
     ef_area = DB.Column(DB.Integer)
     global_remark_activity = DB.Column(DB.Unicode)
     id_thread = DB.Column(
         DB.Integer,
-        ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"))
+        ForeignKey(TNomenclatures.id_nomenclature),
+        default=TNomenclatures.get_default_nomenclature("EVAL_GLOB_MENACES"))
     id_frequency = DB.Column(
         DB.Integer,
-        ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"))
+        ForeignKey(TNomenclatures.id_nomenclature),
+        default=TNomenclatures.get_default_nomenclature("SUBMERSION_FREQ"))
     id_spread = DB.Column(
         DB.Integer,
-        ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"))
+        ForeignKey(TNomenclatures.id_nomenclature),
+        default=TNomenclatures.get_default_nomenclature("SUBMERSION_ETENDUE"))
     id_connexion = DB.Column(
         DB.Integer,
-        ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"))
+        ForeignKey(TNomenclatures.id_nomenclature))
     id_diag_hydro = DB.Column(
         DB.Integer,
-        ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"))
+        ForeignKey(TNomenclatures.id_nomenclature),
+        default=TNomenclatures.get_default_nomenclature("FONCTIONNALITE_HYDRO"))
     id_diag_bio = DB.Column(
         DB.Integer,
-        ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"))
+        ForeignKey(TNomenclatures.id_nomenclature),
+        default=TNomenclatures.get_default_nomenclature("FONCTIONNALITE_BIO"))
     remark_diag = DB.Column(DB.Unicode)
-    is_other_inventory = DB.Column(
-        DB.Boolean,
-        default=False)
-    is_carto_hab = DB.Column(
-        DB.Boolean,
-        default=False)
+    is_other_inventory = DB.Column(DB.Boolean, default=False)
+    is_carto_hab = DB.Column(DB.Boolean, default=False)
     nb_hab = DB.Column(DB.Integer)
     total_hab_cover = DB.Column(
         DB.Integer,
@@ -190,21 +216,3 @@ class TZH(ZhModel):
         return self.as_geofeature("geom", "id_zh", recursif, relationships=relationships)
 
 
-class BibSiteSpace(DB.Model):
-    __tablename__ = "bib_site_space"
-    __table_args__ = {"schema": "pr_zh"}
-    id_site_space = DB.Column(DB.Integer, primary_key=True)
-    name = DB.Column(DB.Unicode)
-
-
-class CorLimList(DB.Model):
-    __tablename__ = "cor_lim_list"
-    __table_args__ = {"schema": "pr_zh"}
-    id_lim_list = DB.Column(
-        DB.Integer, 
-        primary_key=True)
-    id_lim = DB.Column(
-        DB.Integer,
-        ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"),
-        primary_key=True
-        )

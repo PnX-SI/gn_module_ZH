@@ -7,6 +7,11 @@ from flask import (
 
 from geojson import FeatureCollection
 
+from pypnnomenclature.models import (
+    TNomenclatures,
+    BibNomenclaturesTypes
+)
+
 from geonature.utils.utilssqlalchemy import json_resp
 from geonature.utils.env import DB
 #from geonature.utils.env import get_id_module
@@ -15,11 +20,13 @@ from geonature.utils.env import DB
 from geonature.core.gn_permissions import decorators as permissions
 from geonature.core.gn_permissions.tools import get_or_fetch_user_cruved
 
-from .models import TZH
+from .models import TZH, Nomenclatures
 
 from .repositories import (
     ZhRepository
 )
+
+from .api_error import ZHApiError
 
 from pdb import set_trace as debug
 
@@ -65,6 +72,39 @@ def get_zh(info_role):
     }
 
 
+# Route pour afficher liste des zones humides
+@blueprint.route("/form/<int:id_tab>", methods=["GET"])
+@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@json_resp
+def get_tab(id_tab, info_role):
+    """Get form info for tabs
+    """
+    try:
+        mnemo_nomenc_list = blueprint.config["nomenc_mnemo_by_tab"][str(id_tab)]
+        nomenc_info = []
+        if mnemo_nomenc_list:
+            for mnemo in mnemo_nomenc_list:
+                nomenc = Nomenclatures.get_nomenclature_info(mnemo)
+                nomenc_list = []
+                for i in nomenc:
+                    nomenc_list.append(
+                        {
+                            "id_nomenclature": i.id_nomenclature,
+                            "mnemonique": i.mnemonique
+                        })
+                nomenc_dict = {
+                    mnemo: nomenc_list
+                }
+                nomenc_info.append(nomenc_dict)
+        else:
+            nomenc_info.append("no nomenclature in this tab")
+
+        return nomenc_info,200
+        
+    except Exception as e:
+        raise ZHApiError(message=str(e), details=str(e))
+
+
 @blueprint.route("/<int:id_zh>", methods=["DELETE"])
 @permissions.check_cruved_scope("D", True, module_code="ZONES_HUMIDES")
 @json_resp
@@ -77,7 +117,7 @@ def deleteOneZh(id_zh, info_role):
     zhRepository = ZhRepository(TZH)
     zhRepository.delete(id_zh, info_role)
 
-    return {"message": "delete with success"}, 200
+    return {"message": "delete with success"},200
 
 
 """
@@ -99,3 +139,10 @@ def get_sensitive_view(info_role):
     data = q.all()
     return [d.as_dict() for d in data]
 """
+
+
+@blueprint.errorhandler(ZHApiError)
+def handle_geonature_zh_api(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
