@@ -26,6 +26,8 @@ from .repositories import (
     ZhRepository
 )
 
+from .api_error import ZHApiError
+
 from pdb import set_trace as debug
 
 blueprint = Blueprint("pr_zh", __name__)
@@ -77,26 +79,30 @@ def get_zh(info_role):
 def get_tab(id_tab, info_role):
     """Get form info for tabs
     """
-    mnemo_nomenc_list = blueprint.config["nomenc_mnemo_by_tab"][str(id_tab)]
-    nomenc_info = []
-    if mnemo_nomenc_list:
-        for mnemo in mnemo_nomenc_list:
-            nomenc = Nomenclatures.get_nomenclature_info(mnemo)
-            nomenc_list = []
-            for i in nomenc:
-                nomenc_list.append(
-                    {
-                        "id_nomenclature": i.id_nomenclature,
-                        "mnemonique": i.mnemonique
-                    })
-            nomenc_dict = {
-                mnemo: nomenc_list
-            }
-            nomenc_info.append(nomenc_dict)
-    else:
-        nomenc_info.append("no nomenclature in this tab")
+    try:
+        mnemo_nomenc_list = blueprint.config["nomenc_mnemo_by_tab"][str(id_tab)]
+        nomenc_info = []
+        if mnemo_nomenc_list:
+            for mnemo in mnemo_nomenc_list:
+                nomenc = Nomenclatures.get_nomenclature_info(mnemo)
+                nomenc_list = []
+                for i in nomenc:
+                    nomenc_list.append(
+                        {
+                            "id_nomenclature": i.id_nomenclature,
+                            "mnemonique": i.mnemonique
+                        })
+                nomenc_dict = {
+                    mnemo: nomenc_list
+                }
+                nomenc_info.append(nomenc_dict)
+        else:
+            nomenc_info.append("no nomenclature in this tab")
 
-    return nomenc_info,200
+        return nomenc_info,200
+        
+    except Exception as e:
+        raise ZHApiError(message=str(e), details=str(e))
 
 
 @blueprint.route("/<int:id_zh>", methods=["DELETE"])
@@ -133,3 +139,10 @@ def get_sensitive_view(info_role):
     data = q.all()
     return [d.as_dict() for d in data]
 """
+
+
+@blueprint.errorhandler(ZHApiError)
+def handle_geonature_zh_api(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
