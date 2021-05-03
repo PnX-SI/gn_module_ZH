@@ -216,3 +216,14 @@ class TZH(ZhModel):
         return self.as_geofeature("geom", "id_zh", recursif, relationships=relationships)
 
 
+class CorLimList(DB.Model):
+    __tablename__ = "cor_lim_list"
+    __table_args__ = {"schema": "pr_zh"}
+    id_lim_list = DB.Column(
+        DB.Integer, 
+        primary_key=True)
+    id_lim = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+        )
