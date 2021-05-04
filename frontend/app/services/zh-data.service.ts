@@ -17,4 +17,10 @@ export class ZhDataService {
   deleteOneZh(id) {
     return this._api.delete(`${AppConfig.API_ENDPOINT}/zones_humides/${id}`);
   }
+
+  getForm(idTab) {
+    return this._api.get<any>(`${AppConfig.API_ENDPOINT}/zones_humides/form/${idTab}`);
+  }
+
+
 }

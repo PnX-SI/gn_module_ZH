@@ -81,7 +81,7 @@ def get_tab(id_tab, info_role):
     """
     try:
         mnemo_nomenc_list = blueprint.config["nomenc_mnemo_by_tab"][str(id_tab)]
-        nomenc_info = []
+        nomenc_info = {}
         if mnemo_nomenc_list:
             for mnemo in mnemo_nomenc_list:
                 nomenc = Nomenclatures.get_nomenclature_info(mnemo)
@@ -95,7 +95,7 @@ def get_tab(id_tab, info_role):
                 nomenc_dict = {
                     mnemo: nomenc_list
                 }
-                nomenc_info.append(nomenc_dict)
+                nomenc_info.update(nomenc_dict)
         else:
             nomenc_info.append("no nomenclature in this tab")
 

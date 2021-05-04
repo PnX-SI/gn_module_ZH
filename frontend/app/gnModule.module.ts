@@ -11,6 +11,7 @@ import { MapListService } from "@geonature_common/map-list/map-list.service";
 import { ZhMapListComponent } from './zh-map-list/zh-map-list.component';
 import { ZhFormsComponent } from "./zh-forms/zh-forms.component";
 import { ZhFormMapComponent } from "./zh-forms/map/map.component";
+import { ZhFormTab0Component } from "./zh-forms/tab0/zh-form-tab0.component";
 import { GeneralInfoComponent } from "./zh-forms/general-information/general-info.component";
 import { ZhFormTab2Component } from "./zh-forms/tab2/zh-form-tab2.component";
 import { ZhFormTab3Component } from "./zh-forms/tab3/zh-form-tab3.component";
@@ -34,6 +35,7 @@ const routes: Routes = [
     ZhFormsComponent,
     ZhFormMapComponent,
     GeneralInfoComponent,
+    ZhFormTab0Component,
     ZhFormTab2Component,
     ZhFormTab3Component,
     ZhFormTab4Component,
