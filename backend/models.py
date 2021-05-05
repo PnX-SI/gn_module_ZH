@@ -124,10 +124,11 @@ class TZH(ZhModel):
     __table_args__ = {"schema": "pr_zh"}
     id_zh = DB.Column(
         DB.Integer, 
-        primary_key=True)
+        primary_key=True,
+        autoincrement=True)
     zh_uuid = DB.Column(
         UUID(as_uuid=True), 
-        nullable=False)
+        default=select([func.uuid_generate_v4()]))
     code = DB.Column(DB.Unicode, nullable=False)
     main_name = DB.Column(DB.Unicode, nullable=False)
     secondary_name = DB.Column(DB.Unicode)
@@ -221,7 +222,8 @@ class CorLimList(DB.Model):
     __table_args__ = {"schema": "pr_zh"}
     id_lim_list = DB.Column(
         DB.Integer, 
-        primary_key=True)
+        primary_key=True
+        )
     id_lim = DB.Column(
         DB.Integer,
         ForeignKey(TNomenclatures.id_nomenclature),

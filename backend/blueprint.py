@@ -2,10 +2,15 @@ from flask import (
     Blueprint, 
     current_app, 
     session,
-    request
+    request,
+    json
 )
 
 from geojson import FeatureCollection
+
+from sqlalchemy import func
+import geoalchemy2
+from datetime import datetime, timezone
 
 from pypnnomenclature.models import (
     TNomenclatures,
@@ -20,7 +25,11 @@ from geonature.utils.env import DB
 from geonature.core.gn_permissions import decorators as permissions
 from geonature.core.gn_permissions.tools import get_or_fetch_user_cruved
 
-from .models import TZH, Nomenclatures
+from .models import (
+    TZH, 
+    Nomenclatures,
+    CorLimList
+)
 
 from .repositories import (
     ZhRepository
@@ -110,11 +119,39 @@ def get_tab(id_tab, info_role):
 def get_tab_data(id_tab, info_role):
     """Get form info for tabs
     """
+    print(info_role.id_role)
+
     # get form data
-    print(id_tab)
-    test = request.data
-    print(request)
-    print(request.data)
+    if id_tab == 0:
+        form_data = json.loads(request.data)
+        polygon = DB.session.query(func.ST_GeomFromGeoJSON(str(form_data['geom']['geometry'])))
+        print(polygon.one()[0])
+        zh_date = datetime.now(timezone.utc)
+
+        #select ref_geo.fct_get_area_intersection(ST_SetSRID('010300000001000000040000008978EBFCDB05054098FA795391844640904FC8CEDB180540139B8F6B438346402EAA454431F90440CAFB389A238346408978EBFCDB05054098FA795391844640'::geometry,4326),26)
+
+        # a modifier : critere_delim doit etre un multiselect
+        id_lim_list = DB.session.query(func.max(CorLimList.id_lim_list)).one()[0]+1
+        new_lim = CorLimList(id_lim_list=id_lim_list, id_lim=form_data['critere_delim'])
+        DB.session.add(new_lim)
+        DB.session.flush()
+
+        new_zh = TZH(
+            main_name = form_data['name'],
+            code = 'code',
+            create_author = info_role.id_role,
+            update_author = info_role.id_role,
+            create_date = zh_date,
+            update_date = zh_date,
+            id_lim_list = id_lim_list,
+            id_sdage = form_data['sdage'],
+            geom = polygon.one()[0]
+        )
+        DB.session.add(new_zh)
+        DB.session.commit()
+        DB.session.close()
+        
+
     return "ok"
 
 
