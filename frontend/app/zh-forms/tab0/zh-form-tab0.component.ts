@@ -1,6 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { FormGroup, FormBuilder, FormControl } from "@angular/forms";
 import { ZhDataService } from "../../services/zh-data.service";
+import { MapService } from '@geonature_common/map/map.service';
+import { ZhFormsComponent } from "../zh-forms.component";
 
 @Component({
   selector: "zh-form-tab0",
@@ -15,7 +17,9 @@ export class ZhFormTab0Component implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private _ds: ZhDataService
+    private _ds: ZhDataService,
+    private _mapService: MapService,
+    private zhForms: ZhFormsComponent
   ) { }
 
   ngOnInit() {
@@ -45,6 +49,15 @@ export class ZhFormTab0Component implements OnInit {
 
   onFormTab0(formValues: any) {
     console.log(formValues);
+    console.log(this.zhForms.geom);
+    this._ds.postUserData(formValues,this.zhForms.geom,0).subscribe(
+      data => {
+        console.log(data);
+      }
+    );
+    //console.log(this._mapService);
+    //console.log(this._mapService.gettingGeojson$);
+    //this._ds.postTab0(formValues, this._mapService.gettingGeojson$)
   }
 
   getForm(idTab) {

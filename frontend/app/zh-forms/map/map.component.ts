@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy } from "@angular/core";
+import { Component, OnInit, AfterViewInit, OnDestroy, Output, EventEmitter } from "@angular/core";
 import { Subscription } from "rxjs";
 import { filter, map } from "rxjs/operators";
 import { leafletDrawOption } from "@geonature_common/map/leaflet-draw.options";
@@ -20,13 +20,16 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit, OnDestroy {
   private $_geojsonSub: Subscription;
 
   public coordinates = null;
-  public geometry = null;
+  //public geometry:any = null;
   public firstGeom = true;
+  @Output() geometry = new EventEmitter();
 
   constructor(
     private _commonService: CommonService,
     private _mapService: MapService
   ) { }
+
+
 
   ngOnInit() {
     // overight the leaflet draw object to set options
@@ -45,7 +48,6 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // to get geometry from filelayer
     this._mapService.gettingGeojson$.subscribe(geojson => {
-
     })
   }
 
@@ -79,7 +81,7 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   sendGeoInfo(geojson) {
-
+    this.geometry.emit(geojson); 
   }
 
   ngOnDestroy() {

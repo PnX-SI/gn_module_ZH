@@ -72,7 +72,6 @@ def get_zh(info_role):
     }
 
 
-# Route pour afficher liste des zones humides
 @blueprint.route("/form/<int:id_tab>", methods=["GET"])
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
@@ -97,12 +96,26 @@ def get_tab(id_tab, info_role):
                 }
                 nomenc_info.update(nomenc_dict)
         else:
-            nomenc_info.append("no nomenclature in this tab")
+            nomenc_info.update("no nomenclature in this tab")
 
         return nomenc_info,200
         
     except Exception as e:
         raise ZHApiError(message=str(e), details=str(e))
+
+
+@blueprint.route("/form/<int:id_tab>/data", methods=["GET","POST"])
+@permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
+@json_resp
+def get_tab_data(id_tab, info_role):
+    """Get form info for tabs
+    """
+    # get form data
+    print(id_tab)
+    test = request.data
+    print(request)
+    print(request.data)
+    return "ok"
 
 
 @blueprint.route("/<int:id_zh>", methods=["DELETE"])

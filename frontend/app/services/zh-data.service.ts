@@ -22,5 +22,12 @@ export class ZhDataService {
     return this._api.get<any>(`${AppConfig.API_ENDPOINT}/zones_humides/form/${idTab}`);
   }
 
+  postUserData(value, geom, idTab) {
+    value['geom'] = geom;
+    const urlpost = `${AppConfig.API_ENDPOINT}/zones_humides/form/${idTab}/data`
+    console.log(urlpost);
+    console.log(value);
+    return this._api.post<any>(urlpost, value);
+  }
 
 }
