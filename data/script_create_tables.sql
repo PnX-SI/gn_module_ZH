@@ -112,8 +112,7 @@ CREATE  TABLE pr_zh.cor_zh_area (
 	id_area              integer  NOT NULL ,
 	id_zh                integer  NOT NULL ,
 	cover                integer   ,
-	CONSTRAINT pk_t_municipalities PRIMARY KEY ( id_area, id_zh ),
-	CONSTRAINT unq_t_municipalities_id_municipality UNIQUE ( id_area ) 
+	CONSTRAINT pk_t_municipalities PRIMARY KEY ( id_area, id_zh )
  );
 
 COMMENT ON COLUMN pr_zh.cor_zh_area.cover IS 'couverture de la zh par rapport à la municipalité (en pourcentage)';
