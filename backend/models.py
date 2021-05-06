@@ -152,8 +152,7 @@ class TZH(ZhModel):
         Geometry("GEOMETRY", 4326),
         nullable=False)
     id_lim_list = DB.Column(
-        DB.Integer,
-        ForeignKey("pr_zh.cor_lim_list.id_lim_list"),
+        UUID(as_uuid=True),
         nullable=False)
     remark_lim = DB.Column(DB.Unicode)
     remark_lim_fs = DB.Column(DB.Unicode)
@@ -221,7 +220,7 @@ class CorLimList(DB.Model):
     __tablename__ = "cor_lim_list"
     __table_args__ = {"schema": "pr_zh"}
     id_lim_list = DB.Column(
-        DB.Integer, 
+        UUID(as_uuid=True),
         primary_key=True
         )
     id_lim = DB.Column(

@@ -15,16 +15,14 @@
         </div>
         <div class="form-row">
             <div class="form-group col-md-6">
-                <small>Critères de délimitation de la zone humide</small>
-                <select 
-                    class="form-control form-control-sm" 
-                    [formControl]="formTab0.controls.critere_delim">
-                    <option
-                        *ngFor="let crit of critDelim"
-                        [ngValue]="crit.id_nomenclature"
-                    >
-                        {{crit.mnemonique}}</option>
-                </select>
+                <pnx-multiselect
+                    label="Critères de délimitation de la zone humide"
+                    [values]="critDelim"
+                    [parentFormControl]="formTab0.controls.critere_delim"
+                    keyLabel="mnemonique"
+                    keyValue="id_nomenclature"
+                >
+                </pnx-multiselect>
             </div>
         </div>
         <div class="form-row">

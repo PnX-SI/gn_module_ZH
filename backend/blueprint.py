@@ -6,6 +6,10 @@ from flask import (
     json
 )
 
+import uuid
+
+#import psycopg2
+
 from geojson import FeatureCollection
 
 from sqlalchemy import func
@@ -120,38 +124,43 @@ def get_tab_data(id_tab, info_role):
     """Get form info for tabs
     """
     print(info_role.id_role)
-
+    print(json.loads(request.data))
     # get form data
     if id_tab == 0:
         form_data = json.loads(request.data)
         polygon = DB.session.query(func.ST_GeomFromGeoJSON(str(form_data['geom']['geometry'])))
-        print(polygon.one()[0])
+        #print(polygon.one()[0])
         zh_date = datetime.now(timezone.utc)
 
-        #select ref_geo.fct_get_area_intersection(ST_SetSRID('010300000001000000040000008978EBFCDB05054098FA795391844640904FC8CEDB180540139B8F6B438346402EAA454431F90440CAFB389A238346408978EBFCDB05054098FA795391844640'::geometry,4326),26)
-
-        # a modifier : critere_delim doit etre un multiselect
-        id_lim_list = DB.session.query(func.max(CorLimList.id_lim_list)).one()[0]+1
-        new_lim = CorLimList(id_lim_list=id_lim_list, id_lim=form_data['critere_delim'])
-        DB.session.add(new_lim)
-        DB.session.flush()
-
-        new_zh = TZH(
-            main_name = form_data['name'],
-            code = 'code',
-            create_author = info_role.id_role,
-            update_author = info_role.id_role,
-            create_date = zh_date,
-            update_date = zh_date,
-            id_lim_list = id_lim_list,
-            id_sdage = form_data['sdage'],
-            geom = polygon.one()[0]
-        )
-        DB.session.add(new_zh)
-        DB.session.commit()
-        DB.session.close()
+        try:
+            #select ref_geo.fct_get_area_intersection(ST_SetSRID('010300000001000000040000008978EBFCDB05054098FA795391844640904FC8CEDB180540139B8F6B438346402EAA454431F90440CAFB389A238346408978EBFCDB05054098FA795391844640'::geometry,4326),26)
+            # a modifier : critere_delim doit etre un multiselect
+            uuid_id_lim_list = uuid.uuid4()
+            print(uuid_id_lim_list)
+            for lim in form_data['critere_delim']:
+                DB.session.add(CorLimList(id_lim_list=uuid_id_lim_list, id_lim=lim))
+                DB.session.flush()
+            code = str(uuid.uuid4())[0:12]
+            
+            new_zh = TZH(
+                main_name = form_data['name'],
+                code = code,
+                create_author = info_role.id_role,
+                update_author = info_role.id_role,
+                create_date = zh_date,
+                update_date = zh_date,
+                id_lim_list = uuid_id_lim_list,
+                id_sdage = form_data['sdage'],
+                geom = polygon.one()[0]
+            )
+            DB.session.add(new_zh)
+            DB.session.commit()
+        except Exception as e:
+            DB.session.rollback()
+            raise ZHApiError(message=str(e), details=str(e))
+        finally:
+            DB.session.close()
         
-
     return "ok"
 
 
