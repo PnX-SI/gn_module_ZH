@@ -12,7 +12,7 @@ import uuid
 
 from geojson import FeatureCollection
 
-from sqlalchemy import func
+from sqlalchemy import func, text
 import geoalchemy2
 from datetime import datetime, timezone
 
@@ -32,7 +32,8 @@ from geonature.core.gn_permissions.tools import get_or_fetch_user_cruved
 from .models import (
     TZH, 
     Nomenclatures,
-    CorLimList
+    CorLimList,
+    CorZhArea
 )
 
 from .repositories import (
@@ -123,25 +124,28 @@ def get_tab(id_tab, info_role):
 def get_tab_data(id_tab, info_role):
     """Get form info for tabs
     """
-    print(info_role.id_role)
-    print(json.loads(request.data))
-    # get form data
-    if id_tab == 0:
-        form_data = json.loads(request.data)
-        polygon = DB.session.query(func.ST_GeomFromGeoJSON(str(form_data['geom']['geometry'])))
-        #print(polygon.one()[0])
-        zh_date = datetime.now(timezone.utc)
 
-        try:
-            #select ref_geo.fct_get_area_intersection(ST_SetSRID('010300000001000000040000008978EBFCDB05054098FA795391844640904FC8CEDB180540139B8F6B438346402EAA454431F90440CAFB389A238346408978EBFCDB05054098FA795391844640'::geometry,4326),26)
-            # a modifier : critere_delim doit etre un multiselect
+    print(json.loads(request.data))
+
+    try:
+        # get form data
+        if id_tab == 0:
+            form_data = json.loads(request.data)
+            # set geometry from coordinates
+            polygon = DB.session.query(func.ST_GeomFromGeoJSON(str(form_data['geom']['geometry']))).one()[0]
+            # set date
+            zh_date = datetime.now(timezone.utc)
+
+            # fill pr_zh.cor_lim_list
             uuid_id_lim_list = uuid.uuid4()
-            print(uuid_id_lim_list)
             for lim in form_data['critere_delim']:
                 DB.session.add(CorLimList(id_lim_list=uuid_id_lim_list, id_lim=lim))
                 DB.session.flush()
+
+            # temporary code
             code = str(uuid.uuid4())[0:12]
             
+            # create zh : fill pr_zh.t_zh
             new_zh = TZH(
                 main_name = form_data['name'],
                 code = code,
@@ -151,17 +155,31 @@ def get_tab_data(id_tab, info_role):
                 update_date = zh_date,
                 id_lim_list = uuid_id_lim_list,
                 id_sdage = form_data['sdage'],
-                geom = polygon.one()[0]
+                geom = polygon
             )
             DB.session.add(new_zh)
+            DB.session.flush()
+                            
+            # fill cor_zh_area
+            #test = DB.session.query(TZH.geom).filter(TZH.id_zh == new_zh.id_zh).one()
+            #select (ref_geo.fct_get_area_intersection(ST_SetSRID('010300000001000000040000008978EBFCDB05054098FA795391844640904FC8CEDB180540139B8F6B438346402EAA454431F90440CAFB389A238346408978EBFCDB05054098FA795391844640'::geometry,4326),25)).id_area;
+            query = """
+                SELECT (ref_geo.fct_get_area_intersection(
+                ST_SetSRID('{geom}'::geometry,4326), {type})).id_area
+                """.format(geom=str(polygon),type=25)
+            comm_list = DB.session.execute(text(query)).fetchall()
+            for comm in comm_list:
+                DB.session.add(CorZhArea(id_area=comm[0], id_zh=new_zh.id_zh))
+                DB.session.flush()
+
             DB.session.commit()
-        except Exception as e:
-            DB.session.rollback()
-            raise ZHApiError(message=str(e), details=str(e))
-        finally:
-            DB.session.close()
-        
-    return "ok"
+        return "data tab {id_tab} commited".format(id_tab=id_tab)
+    except Exception as e:
+        DB.session.rollback()
+        raise ZHApiError(message=str(e), details=str(e))
+    finally:
+        DB.session.close()
+
 
 
 @blueprint.route("/<int:id_zh>", methods=["DELETE"])

@@ -228,3 +228,19 @@ class CorLimList(DB.Model):
         ForeignKey(TNomenclatures.id_nomenclature),
         primary_key=True
         )
+
+
+class CorZhArea(DB.Model):
+    __tablename__ = "cor_zh_area"
+    __table_args__ = {"schema": "pr_zh"}
+    id_area = DB.Column(
+        DB.Integer,
+        ForeignKey("ref_geo.l_areas.id_area"),
+        primary_key=True
+        )
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+        )
+    cover = DB.Column(DB.Integer)
