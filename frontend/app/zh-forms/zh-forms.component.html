@@ -3,7 +3,7 @@
     <mat-tab-group animationDuration="0ms">
       <mat-tab>
         <ng-template mat-tab-label>
-          Renseignement généraux
+          Champs obligatoires
         </ng-template>
         <div
           class="occtax-form-content"
@@ -14,13 +14,21 @@
               class="col-xl-6 col-lg-7 col-sm-6"
               [ngStyle]="{'min-height.px': cardContentHeight}"
             >
-              <zh-form-map></zh-form-map>
+              <zh-form-map (geometry)="getGeoInfo($event)"></zh-form-map>
             </div>
             <div class="col-xl-6 col-lg-5 col-sm-6">
-              <general-info></general-info>
+              <zh-form-tab0></zh-form-tab0>
             </div>
           </div>
         </div>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          Renseignement généraux
+        </ng-template>
+        
+              <general-info></general-info>
+  
       </mat-tab>
       <mat-tab >
         <ng-template mat-tab-label>

@@ -4,8 +4,6 @@ CREATE SEQUENCE pr_zh.bib_actions_id_action_seq START WITH 1 INCREMENT BY 1;
 
 CREATE SEQUENCE pr_zh.cor_impacts_id_impacts_seq START WITH 1 INCREMENT BY 1;
 
-CREATE SEQUENCE pr_zh.cor_lim_list_seq START WITH 1 INCREMENT BY 1;
-
 CREATE SEQUENCE pr_zh.cor_main_fct_seq START WITH 1 INCREMENT BY 1;
 
 CREATE SEQUENCE pr_zh.t_activity_id_activity_seq START WITH 1 INCREMENT BY 1;
@@ -67,7 +65,7 @@ CREATE  TABLE pr_zh.cor_impact_types (
  );
 
 CREATE  TABLE pr_zh.cor_lim_list ( 
-	id_lim_list          integer  NOT NULL ,
+	id_lim_list          uuid  NOT NULL ,
 	id_lim               integer  NOT NULL ,
 	CONSTRAINT pk_cor_lim_list PRIMARY KEY ( id_lim_list, id_lim )
  );
@@ -114,8 +112,7 @@ CREATE  TABLE pr_zh.cor_zh_area (
 	id_area              integer  NOT NULL ,
 	id_zh                integer  NOT NULL ,
 	cover                integer   ,
-	CONSTRAINT pk_t_municipalities PRIMARY KEY ( id_area, id_zh ),
-	CONSTRAINT unq_t_municipalities_id_municipality UNIQUE ( id_area ) 
+	CONSTRAINT pk_t_municipalities PRIMARY KEY ( id_area, id_zh )
  );
 
 COMMENT ON COLUMN pr_zh.cor_zh_area.cover IS 'couverture de la zh par rapport à la municipalité (en pourcentage)';
@@ -185,7 +182,7 @@ CREATE  TABLE pr_zh.t_zh (
 	create_date          timestamp(0) DEFAULT CURRENT_TIMESTAMP NOT NULL ,
 	update_date          timestamp DEFAULT current_timestamp NOT NULL ,
 	geom                 geometry  NOT NULL ,
-	id_lim_list          integer  NOT NULL ,
+	id_lim_list          uuid  NOT NULL ,
 	remark_lim           varchar(2000)   ,
 	remark_lim_fs        varchar(2000)   ,
 	id_sdage             integer  NOT NULL ,
@@ -657,4 +654,3 @@ ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_t_nomenclatures_diag_bio FOREIGN K
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_sdage_t_nomenclatures FOREIGN KEY ( id_sdage ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_sage_t_nomenclatures FOREIGN KEY ( id_sage ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
-

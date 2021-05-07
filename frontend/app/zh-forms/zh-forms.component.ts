@@ -9,6 +9,7 @@ import { MapService } from "@geonature_common/map/map.service";
 export class ZhFormsComponent implements OnInit {
 
   public cardContentHeight: number;
+  public geom: any;
 
   constructor(
     private _mapService: MapService,
@@ -16,7 +17,6 @@ export class ZhFormsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-
   }
 
 
@@ -53,6 +53,11 @@ export class ZhFormsComponent implements OnInit {
   @HostListener("window:resize", ["$event"])
   onResize(event) {
     this.calcCardContentHeight();
+  }
+
+  getGeoInfo(geom) {
+    this.geom = geom;
+    console.log(this.geom);
   }
 
 
