@@ -1,7 +1,7 @@
 from flask import current_app
 from sqlalchemy import ForeignKey
 # import utiles pour déclarer les classes SQLAlchemy
-from sqlalchemy.sql import select, func, and_
+from sqlalchemy.sql import select, func, and_, cast
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -9,7 +9,8 @@ from pypnnomenclature.models import (
     TNomenclatures
 )
 
-from geoalchemy2 import Geometry
+import geoalchemy2
+from geoalchemy2.types import Geography, Geometry
 
 from pypnusershub.db.models import User
 from pypnusershub.db.tools import InsufficientRightsError
@@ -149,7 +150,7 @@ class TZH(ZhModel):
     create_date = DB.Column(DB.DateTime)
     update_date = DB.Column(DB.DateTime)
     geom = DB.Column(
-        Geometry("GEOMETRY", 4326),
+        geoalchemy2.Geometry("GEOMETRY", 4326),
         nullable=False)
     id_lim_list = DB.Column(
         UUID(as_uuid=True),
@@ -212,8 +213,15 @@ class TZH(ZhModel):
         primaryjoin=(User.id_role == create_author)
     )
 
+
     def get_geofeature(self, recursif=True, relationships=()):
         return self.as_geofeature("geom", "id_zh", recursif, relationships=relationships)
+
+    @staticmethod
+    def get_zh_area_intersected(zh_area_type, id_zh_geom):
+        if zh_area_type == 'river_basin':
+            q = DB.session.query(TRiverBasin).filter(TRiverBasin.geom.ST_Intersects(cast(id_zh_geom,Geography))).all()
+        return q
 
 
 class CorLimList(DB.Model):
@@ -244,3 +252,42 @@ class CorZhArea(DB.Model):
         primary_key=True
         )
     cover = DB.Column(DB.Integer)
+
+
+class TRiverBasin(DB.Model):
+    __tablename__ = "t_river_basin"
+    __table_args__ = {"schema": "pr_zh"}
+    id_rb = DB.Column(
+        DB.Integer,
+        primary_key=True
+        )
+    name = DB.Column(
+        DB.Unicode,
+        nullable=False
+        )
+    geom = DB.Column(
+        geoalchemy2.Geometry("GEOMETRY", 4326),
+        nullable=False)
+    id_climate_class = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature)
+    )
+    id_river_flow = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature)
+    )
+
+
+class CorZhRb(DB.Model):
+    __tablename__ = "cor_zh_rb"
+    __table_args__ = {"schema": "pr_zh"}
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    id_rb = DB.Column(
+        DB.Integer,
+        ForeignKey(TRiverBasin.id_rb),
+        primary_key=True
+    )

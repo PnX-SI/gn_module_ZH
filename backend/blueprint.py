@@ -33,7 +33,8 @@ from .models import (
     TZH, 
     Nomenclatures,
     CorLimList,
-    CorZhArea
+    CorZhArea,
+    CorZhRb
 )
 
 from .repositories import (
@@ -170,6 +171,12 @@ def get_tab_data(id_tab, info_role):
             comm_list = DB.session.execute(text(query)).fetchall()
             for comm in comm_list:
                 DB.session.add(CorZhArea(id_area=comm[0], id_zh=new_zh.id_zh))
+                DB.session.flush()
+
+            # fill cor_zh_rb
+            rbs = TZH.get_zh_area_intersected('river_basin',func.ST_GeomFromGeoJSON(str(form_data['geom']['geometry'])))
+            for rb in rbs:
+                DB.session.add(CorZhRb(id_zh=new_zh.id_zh,id_rb=rb.id_rb))
                 DB.session.flush()
 
             DB.session.commit()
