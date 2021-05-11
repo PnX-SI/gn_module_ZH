@@ -221,6 +221,10 @@ class TZH(ZhModel):
     def get_zh_area_intersected(zh_area_type, id_zh_geom):
         if zh_area_type == 'river_basin':
             q = DB.session.query(TRiverBasin).filter(TRiverBasin.geom.ST_Intersects(cast(id_zh_geom,Geography))).all()
+        if zh_area_type == 'hydro_area':
+            q = DB.session.query(THydroArea).filter(THydroArea.geom.ST_Intersects(cast(id_zh_geom,Geography))).all()
+        if zh_area_type == 'fct_area':
+            q = DB.session.query(TFctArea).filter(TFctArea.geom.ST_Intersects(cast(id_zh_geom,Geography))).all()
         return q
 
 
@@ -267,7 +271,8 @@ class TRiverBasin(DB.Model):
         )
     geom = DB.Column(
         geoalchemy2.Geometry("GEOMETRY", 4326),
-        nullable=False)
+        nullable=False
+        )
     id_climate_class = DB.Column(
         DB.Integer,
         ForeignKey(TNomenclatures.id_nomenclature)
@@ -289,5 +294,65 @@ class CorZhRb(DB.Model):
     id_rb = DB.Column(
         DB.Integer,
         ForeignKey(TRiverBasin.id_rb),
+        primary_key=True
+    )
+
+
+class THydroArea(DB.Model):
+    __tablename__ = "t_hydro_area"
+    __table_args__ = {"schema": "pr_zh"}
+    id_hydro = DB.Column(
+        DB.Integer,
+        primary_key=True
+        )
+    name = DB.Column(
+        DB.Unicode,
+        nullable=False
+        )
+    geom = DB.Column(
+        geoalchemy2.Geometry("GEOMETRY", 4326),
+        nullable=False
+        )
+
+
+class CorZhHydro(DB.Model):
+    __tablename__ = "cor_zh_hydro"
+    __table_args__ = {"schema": "pr_zh"}
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    id_hydro = DB.Column(
+        DB.Integer,
+        ForeignKey(THydroArea.id_hydro),
+        primary_key=True
+    )
+
+
+class TFctArea(DB.Model):
+    __tablename__ = "t_fct_area"
+    __table_args__ = {"schema": "pr_zh"}
+    id_fct_area = DB.Column(
+        DB.Integer,
+        primary_key=True
+        )
+    geom = DB.Column(
+        geoalchemy2.Geometry("GEOMETRY", 4326),
+        nullable=False
+        )
+
+
+class CorZhFctArea(DB.Model):
+    __tablename__ = "cor_zh_fct_area"
+    __table_args__ = {"schema": "pr_zh"}
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    id_fct_area = DB.Column(
+        DB.Integer,
+        ForeignKey(TFctArea.id_fct_area),
         primary_key=True
     )
