@@ -113,7 +113,7 @@ def get_tab(id_tab, info_role):
                 }
                 nomenc_info.update(nomenc_dict)
         else:
-            nomenc_info.update("no nomenclature in this tab")
+            nomenc_info.update({"message from server":"no nomenclature in this tab"})
 
         return nomenc_info,200
         
