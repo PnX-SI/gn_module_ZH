@@ -3,7 +3,8 @@ from flask import (
     current_app, 
     session,
     request,
-    json
+    json,
+    jsonify
 )
 
 import uuid
