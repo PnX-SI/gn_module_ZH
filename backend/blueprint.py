@@ -139,7 +139,9 @@ def get_tab_data(id_tab, info_role):
             polygon = DB.session.query(func.ST_GeomFromGeoJSON(str(form_data['geom']['geometry']))).one()[0]
             # set date
             zh_date = datetime.now(timezone.utc)
-            main_name = form_data['name']
+            # set name
+            if form_data['name'] == "":
+                return 'Empty mandatory field',400
 
             # fill pr_zh.cor_lim_list
             uuid_id_lim_list = uuid.uuid4()
