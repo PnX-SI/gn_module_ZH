@@ -356,3 +356,35 @@ class CorZhFctArea(DB.Model):
         ForeignKey(TFctArea.id_fct_area),
         primary_key=True
     )
+
+
+class TReferences(DB.Model):
+    __tablename__ = "t_references"
+    __table_args__ = {"schema": "pr_zh"}
+    id_reference = DB.Column(
+        DB.Integer,
+        primary_key=True
+    )
+    authors = DB.Column(DB.Unicode)
+    pub_year = DB.Column(DB.Integer)
+    title = DB.Column(
+        DB.Unicode,
+        nullable=False
+    )
+    editor = DB.Column(DB.Unicode)
+    editor_location = DB.Column(DB.Unicode)
+
+
+class CorZhRef(DB.Model):
+    __tablename__ = "cor_zh_ref"
+    __table_args__ = {"schema": "pr_zh"}
+    id_ref = DB.Column(
+        DB.Integer,
+        ForeignKey(TReferences.id_reference),
+        primary_key=True
+    )
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )

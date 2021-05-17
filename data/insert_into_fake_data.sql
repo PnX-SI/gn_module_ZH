@@ -60,6 +60,20 @@ INSERT INTO pr_zh.t_zh(code, main_name, create_author, update_author, geom, id_l
 ;
 
 
+INSERT INTO pr_zh.t_references(authors,pub_year,title,editor,editor_location) VALUES
+('Hamouda A', 2021, 'la zone humide en front pour les nuls', 'NS', 'Marseille'),
+('Corny J', 2020, 'les MCD de zones humides', 'bla bla editeurs', 'quelque part'),
+('Jambon A', 2021, 'comment créer sa zone humide chez soi', 'editor', 'par là')
+;
+
+
+INSERT INTO pr_zh.cor_zh_ref VALUES
+(1,1),
+(3,1),
+(2,2)
+;
+
+
 COMMIT;
 
 

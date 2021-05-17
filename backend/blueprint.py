@@ -39,7 +39,9 @@ from .models import (
     CorZhArea,
     CorZhRb,
     CorZhHydro,
-    CorZhFctArea
+    CorZhFctArea,
+    CorZhRef,
+    TReferences
 )
 
 from .repositories import (
@@ -88,8 +90,8 @@ def get_zh(info_role):
         "total_filtered": len(data),
         "page": page,
         "limit": limit,
-        "items": FeatureCollection(featureCollection),
-    }
+        "items": FeatureCollection(featureCollection)
+    },200
 
 
 @blueprint.route("/<int:id_zh>", methods=["GET"])
@@ -106,15 +108,26 @@ def get_zh_by_id(id_zh, info_role):
         id_lim_list = [id.id_lim for id in id_lims]
 
         # ref biblio
-
+        refs = DB.session.query(TReferences).join(CorZhRef).filter(CorZhRef.id_zh == id_zh).all()
+        references = [
+            {
+                "id_reference":ref.id_reference,
+                "authors":ref.authors,
+                "pub_year": ref.pub_year,
+                "editor":ref.editor,
+                "editor_location":ref.editor_location
+            } for ref in refs
+        ]
+        
         return {
-            "name": zh.main_name,
-            "otherName": zh.secondary_name,
-            "hasGrandEsemble": zh.is_id_site_space,
-            "grandEsemble": zh.id_site_space,
-            "critere_delim": id_lim_list,
-            "sdage": zh.id_sdage
-            }
+            "main_name": zh.main_name, #name
+            "secondary_name": zh.secondary_name, #otherName
+            "is_id_site_space": zh.is_id_site_space, #hasGrandEsemble
+            "id_site_space": zh.id_site_space, #grandEsemble
+            "id_lim_list": id_lim_list, #critere_delim
+            "id_sdage": zh.id_sdage,
+            "references": references
+        },200
 
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':

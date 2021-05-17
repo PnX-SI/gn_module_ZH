@@ -772,13 +772,6 @@ INSERT INTO pr_zh.bib_site_space VALUES
 ;
 
 
-INSERT INTO pr_zh.t_references(authors,pub_year,title,editor,editor_location) VALUES
-('Hamouda A', 2021, 'la zone humide en front pour les nuls', 'NS', 'Marseille'),
-('Corny J', 2020, 'les MCD de zones humides', 'bla bla editeurs', 'quelque part'),
-('Jambon A', 2021, 'comment créer sa zone humide chez soi', 'editor', 'par là')
-;
-
-
 INSERT INTO pr_zh.bib_actions VALUES
 (1, 'proposition d''action 1'),
 (2, 'proposition d''action 2'),
