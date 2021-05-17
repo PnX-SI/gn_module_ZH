@@ -99,7 +99,7 @@ def get_zh_by_id(id_zh, info_role):
     """Get zh form data by id
     """
     try:
-        zh = DB.session.query(TZH).filter(TZH.id_zh == 190).one()
+        zh = DB.session.query(TZH).filter(TZH.id_zh == id_zh).one()
 
         # get criteres delim
         id_lims = DB.session.query(CorLimList).filter(CorLimList.id_lim_list == zh.id_lim_list).all()
