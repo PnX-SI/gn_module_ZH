@@ -3,7 +3,8 @@ from flask import (
     current_app, 
     session,
     request,
-    json
+    json,
+    jsonify
 )
 
 import uuid
@@ -13,6 +14,8 @@ import uuid
 from geojson import FeatureCollection
 
 from sqlalchemy import func, text
+from sqlalchemy.orm.exc import NoResultFound
+
 import geoalchemy2
 from datetime import datetime, timezone
 
@@ -89,11 +92,44 @@ def get_zh(info_role):
     }
 
 
+@blueprint.route("/<int:id_zh>", methods=["GET"])
+@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@json_resp
+def get_zh_by_id(id_zh, info_role):
+    """Get zh form data by id
+    """
+    try:
+        zh = DB.session.query(TZH).filter(TZH.id_zh == 190).one()
+
+        # get criteres delim
+        id_lims = DB.session.query(CorLimList).filter(CorLimList.id_lim_list == zh.id_lim_list).all()
+        id_lim_list = [id.id_lim for id in id_lims]
+
+        # ref biblio
+
+        return {
+            zh.id_zh:
+                {
+                    "name": zh.main_name,
+                    "otherName": zh.secondary_name,
+                    "hasGrandEsemble": zh.is_id_site_space,
+                    "grandEsemble": zh.id_site_space,
+                    "critere_delim": id_lim_list,
+                    "sdage": zh.id_sdage
+                }
+            }
+
+    except Exception as e:
+        if e.__class__.__name__ == 'NoResultFound':
+            raise ZHApiError(message='zh id exist?', details=str(e))
+        raise ZHApiError(message=str(e), details=str(e))
+
+
 @blueprint.route("/form/<int:id_tab>", methods=["GET"])
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
 def get_tab(id_tab, info_role):
-    """Get form info for tabs
+    """Get raw form data for one tab
     """
     try:
         mnemo_nomenc_list = blueprint.config["nomenc_mnemo_by_tab"][str(id_tab)]
@@ -125,7 +161,7 @@ def get_tab(id_tab, info_role):
 @permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
 @json_resp
 def get_tab_data(id_tab, info_role):
-    """Get form info for tabs
+    """Post zh data
     """
 
     print(json.loads(request.data))
