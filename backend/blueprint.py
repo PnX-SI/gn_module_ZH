@@ -108,15 +108,12 @@ def get_zh_by_id(id_zh, info_role):
         # ref biblio
 
         return {
-            zh.id_zh:
-                {
-                    "name": zh.main_name,
-                    "otherName": zh.secondary_name,
-                    "hasGrandEsemble": zh.is_id_site_space,
-                    "grandEsemble": zh.id_site_space,
-                    "critere_delim": id_lim_list,
-                    "sdage": zh.id_sdage
-                }
+            "name": zh.main_name,
+            "otherName": zh.secondary_name,
+            "hasGrandEsemble": zh.is_id_site_space,
+            "grandEsemble": zh.id_site_space,
+            "critere_delim": id_lim_list,
+            "sdage": zh.id_sdage
             }
 
     except Exception as e:
