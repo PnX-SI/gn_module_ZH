@@ -41,8 +41,11 @@ from .models import (
     CorZhHydro,
     CorZhFctArea,
     CorZhRef,
-    TReferences
+    TReferences,
+    BibSiteSpace
 )
+
+from .nomenclatures import get_nomenc_by_tab
 
 from .repositories import (
     ZhRepository
@@ -140,30 +143,20 @@ def get_zh_by_id(id_zh, info_role):
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
 def get_tab(id_tab, info_role):
-    """Get raw form data for one tab
+    """Get form metadata for one tab
     """
     try:
-        mnemo_nomenc_list = blueprint.config["nomenc_mnemo_by_tab"][str(id_tab)]
-        nomenc_info = {}
-        if mnemo_nomenc_list:
-            for mnemo in mnemo_nomenc_list:
-                nomenc = Nomenclatures.get_nomenclature_info(mnemo)
-                nomenc_list = []
-                for i in nomenc:
-                    nomenc_list.append(
-                        {
-                            "id_nomenclature": i.id_nomenclature,
-                            "mnemonique": i.mnemonique
-                        })
-                nomenc_dict = {
-                    mnemo: nomenc_list
-                }
-                nomenc_info.update(nomenc_dict)
-        else:
-            nomenc_info.update({"message from server":"no nomenclature in this tab"})
-
-        return nomenc_info,200
-        
+        metadata = get_nomenc_by_tab(id_tab, blueprint.config["nomenc_mnemo_by_tab"])
+        if id_tab == 1:
+            bib_site_spaces = DB.session.query(BibSiteSpace).all()
+            bib_site_spaces_list = [
+                {
+                    "id_site_space": bib_site_space.id_site_space,
+                    "name": bib_site_space.name
+                } for bib_site_space in bib_site_spaces
+            ]
+            metadata["BIB_SITE_SPACE"] = bib_site_spaces_list
+        return metadata
     except Exception as e:
         raise ZHApiError(message=str(e), details=str(e))
 
