@@ -3,7 +3,8 @@ from flask import (
     current_app, 
     session,
     request,
-    json
+    json,
+    jsonify
 )
 
 import uuid
@@ -113,7 +114,7 @@ def get_tab(id_tab, info_role):
                 }
                 nomenc_info.update(nomenc_dict)
         else:
-            nomenc_info.update("no nomenclature in this tab")
+            nomenc_info.update({"message from server":"no nomenclature in this tab"})
 
         return nomenc_info,200
         
@@ -138,6 +139,9 @@ def get_tab_data(id_tab, info_role):
             polygon = DB.session.query(func.ST_GeomFromGeoJSON(str(form_data['geom']['geometry']))).one()[0]
             # set date
             zh_date = datetime.now(timezone.utc)
+            # set name
+            if form_data['name'] == "":
+                return 'Empty mandatory field',400
 
             # fill pr_zh.cor_lim_list
             uuid_id_lim_list = uuid.uuid4()
@@ -196,6 +200,10 @@ def get_tab_data(id_tab, info_role):
             DB.session.commit()
         return "data tab {id_tab} commited".format(id_tab=id_tab)
     except Exception as e:
+        if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
+            return 'Empty mandatory field',400
+        if e.__class__.__name__ == 'IntegrityError':
+            return 'ZH name already exists',400
         DB.session.rollback()
         raise ZHApiError(message=str(e), details=str(e))
     finally:
