@@ -1,8 +1,6 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, Output, EventEmitter } from "@angular/core";
+import { Component, OnInit, AfterViewInit, OnDestroy } from "@angular/core";
 import { Subscription } from "rxjs";
-import { filter, map } from "rxjs/operators";
 import { leafletDrawOption } from "@geonature_common/map/leaflet-draw.options";
-import { CommonService } from "@geonature_common/service/common.service";
 import { ModuleConfig } from "../../module.config";
 import { MapService } from '@geonature_common/map/map.service';
 
@@ -15,39 +13,31 @@ import { MapService } from '@geonature_common/map/map.service';
 })
 export class ZhFormMapComponent implements OnInit, AfterViewInit, OnDestroy {
   public leafletDrawOptions: any;
-  public firstFileLayerMessage = true;
   public zhConfig = ModuleConfig;
   private $_geojsonSub: Subscription;
-
-  public coordinates = null;
-  //public geometry:any = null;
-  public firstGeom = true;
-  @Output() geometry = new EventEmitter();
+  public geometry: any = null;
 
   constructor(
-    private _commonService: CommonService,
     private _mapService: MapService
   ) { }
-
-
 
   ngOnInit() {
     // overight the leaflet draw object to set options
     // examples: enable circle =>  leafletDrawOption.draw.circle = true;
-    leafletDrawOption.draw.circle = false;
-    leafletDrawOption.draw.rectangle = false;
     leafletDrawOption.draw.marker = false;
-    leafletDrawOption.draw.polyline = true;
-    leafletDrawOption.edit.remove = false;
+    leafletDrawOption.draw.polyline = false;
     this.leafletDrawOptions = leafletDrawOption;
     // set the input for the marker component
     // set the coord only when load data and when its edition mode (id_releve)
     // after the marker component does it by itself whith the ouput
     // when modifie the coordinates innput, it create twice the marker
 
-
     // to get geometry from filelayer
-    this._mapService.gettingGeojson$.subscribe(geojson => {
+    this.$_geojsonSub = this._mapService.gettingGeojson$.subscribe(geojson => {
+      console.log('geojson', geojson);
+
+      this.geometry = geojson;
+
     })
   }
 
@@ -72,19 +62,15 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  // display help toaster for filelayer
-  infoMessageFileLayer() {
-    if (this.firstFileLayerMessage) {
-      this._commonService.translateToaster("info", "Map.FileLayerInfoMessage");
-    }
-    this.firstFileLayerMessage = false;
+  infoMessageFileLayer(geojson) {
+    this._mapService.firstLayerFromMap = false;
+    this._mapService.setGeojsonCoord(geojson);
   }
 
-  sendGeoInfo(geojson) {
-    this.geometry.emit(geojson); 
-  }
+
+
 
   ngOnDestroy() {
-
+    this.$_geojsonSub.unsubscribe();
   }
 }

@@ -1,0 +1,15 @@
+.custom-container {
+  background-color: #fff;
+  border: 1px solid #f1f1f1;
+  border-radius: 2px;
+  padding: 0px 15px;
+  box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14),
+    0 1px 3px 0 rgba(0, 0, 0, 0.12);
+  height: 100%;
+}
+::ng-deep .mat-tab-list .mat-tab-labels .mat-tab-label-active {
+  background-color: #1d1d1d24;
+}
+::ng-deep .mat-tab-body-content {
+  overflow: hidden !important;
+}
