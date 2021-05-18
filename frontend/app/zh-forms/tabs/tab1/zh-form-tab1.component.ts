@@ -2,11 +2,11 @@ import { Component, OnInit } from "@angular/core";
 import { FormGroup, FormBuilder, FormControl } from "@angular/forms";
 
 @Component({
-  selector: "general-info",
-  templateUrl: "./general-info.component.html",
-  styleUrls: ["./general-info.component.scss"]
+  selector: "zh-form-tab1",
+  templateUrl: "./zh-form-tab1.component.html",
+  styleUrls: ["./zh-form-tab1.component.scss"]
 })
-export class GeneralInfoComponent implements OnInit {
+export class ZhFormTab1Component implements OnInit {
 
   public generalInfoForm: FormGroup;
 

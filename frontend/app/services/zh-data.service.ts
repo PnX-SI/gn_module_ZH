@@ -6,7 +6,7 @@ import { AppConfig } from "@geonature_config/app.config";
   providedIn: "root",
 })
 export class ZhDataService {
-  constructor(private _api: HttpClient) {}
+  constructor(private _api: HttpClient) { }
 
   /*
   getZhList() {
@@ -18,15 +18,12 @@ export class ZhDataService {
     return this._api.delete(`${AppConfig.API_ENDPOINT}/zones_humides/${id}`);
   }
 
-  getForm(idTab) {
-    return this._api.get<any>(`${AppConfig.API_ENDPOINT}/zones_humides/form/${idTab}`);
+  getMetaDataForm(idForm: number) {
+    return this._api.get<any>(`${AppConfig.API_ENDPOINT}/zones_humides/form/${idForm}`);
   }
 
-  postUserData(value, geom, idTab) {
-    value['geom'] = geom;
-    const urlpost = `${AppConfig.API_ENDPOINT}/zones_humides/form/${idTab}/data`
-    console.log(urlpost);
-    console.log(value);
+  postDataForm(value, idForm) {
+    const urlpost = `${AppConfig.API_ENDPOINT}/zones_humides/form/${idForm}/data`
     return this._api.post<any>(urlpost, value);
   }
 

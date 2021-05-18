@@ -1,71 +1,92 @@
-<div class="container-fluid">
-  <div class="custom-container">
-    <mat-tab-group animationDuration="0ms">
-      <mat-tab>
-        <ng-template mat-tab-label>
-          Champs obligatoires
-        </ng-template>
-        <div
-          class="occtax-form-content"
-          [ngStyle]="{'min-height.px': cardContentHeight}"
-        >
-          <div class="row">
-            <div
-              class="col-xl-6 col-lg-7 col-sm-6"
-              [ngStyle]="{'min-height.px': cardContentHeight}"
-            >
-              <zh-form-map (geometry)="getGeoInfo($event)"></zh-form-map>
-            </div>
-            <div class="col-xl-6 col-lg-5 col-sm-6">
-              <zh-form-tab0></zh-form-tab0>
+
+<div
+  class="custom-container"
+  [ngStyle]="{'min-height.px': cardContentHeight}"
+>
+  <div class="row">
+    <div
+      class="col-xl-6 col-lg-7 col-sm-6"
+      [ngStyle]="{'min-height.px': cardContentHeight}"
+    >
+      <zh-form-map ></zh-form-map>
+    </div>
+    <div class="col-xl-6 col-lg-5 col-sm-6">
+      <form>
+        <fieldset> 
+          <legend>
+            <h5 class="section-title">Champs obligatoires</h5>
+          </legend>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+                <small class="required">Nom Usuel</small>
+                <input
+                class="form-control form-control-sm"
+                type='text'
+                [formControl]="form.controls.name"
+                />
+                <small *ngIf="(form.controls.name.touched || submitted) && form.controls.name.errors?.required"
+                class="error-msg"
+                >Champ requis</small>
             </div>
           </div>
-        </div>
-      </mat-tab>
-      <mat-tab>
-        <ng-template mat-tab-label>
-          Renseignement généraux
-        </ng-template>
+          <div class="form-row">
+                <div class="form-group col-md-12">
+                    <small class="required">Critères de délimitation de la zone humide</small>
+                    <ng-multiselect-dropdown
+                    [placeholder]="'Critères utilisés'"
+                    [settings]="dropdownSettings"
+                    [data]="critDelim"
+                    [formControl]="form.controls.critere_delim"
+                  >
+                  </ng-multiselect-dropdown>
+                  <small *ngIf="(form.controls.critere_delim.touched || submitted) && form.controls.critere_delim.errors?.required"
+                  class="error-msg"
+                  >Champ requis</small>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <small  class="required" >Présentation de la zone humide et de ses milieux </small>
+                    <select 
+                        class="form-control form-control-sm" 
+                        [formControl]="form.controls.sdage">
+                        <option
+                            *ngFor="let sd of sdage"
+                            [ngValue]="sd.id_nomenclature"
+                        >
+                            {{sd.mnemonique}}</option>
+                    </select>
+                    <small *ngIf="(form.controls.sdage.touched || submitted) && form.controls.sdage.errors?.required"
+                    class="error-msg"
+                    >Champ requis</small>
+                </div>
+            </div>
+        </fieldset>
+      </form>
+      <div class="navigate-btn">
+        <button
+            type="submit"
+            mat-raised-button
+            color="warn"
+            [disabled]="posted"
+            (click)="onCancel()"
+        >
+          Annuler
+        </button>
+        <button
+          type="submit"
+          mat-raised-button
+          color=primary
+          class="ml-3"
+          [disabled]="posted"
+          (click)="onFormSubmit(form.value)"
+        >
+        <mat-spinner *ngIf="posted" [diameter]="20" ></mat-spinner>
+        Suivant
+        </button>
         
-              <general-info></general-info>
-  
-      </mat-tab>
-      <mat-tab >
-        <ng-template mat-tab-label>
-          Délimitation de la zone humide et de l'espace de fonctionnalité
-        </ng-template>
-        <zh-form-tab2></zh-form-tab2>
-      </mat-tab>
-      <mat-tab >
-        <ng-template mat-tab-label>
-          Description du bassin versant et de la zone humide
-        </ng-template>
-        <zh-form-tab3></zh-form-tab3>
-      </mat-tab>
-      <mat-tab >
-        <ng-template mat-tab-label>
-          Fonctionnement de la zone humide
-        </ng-template>
-        <zh-form-tab4></zh-form-tab4>
-      </mat-tab>
-      <mat-tab >
-        <ng-template mat-tab-label>
-          Fonctions écologiques, valeurs socio-économiques, interét patrimonial
-        </ng-template>
-        <zh-form-tab5></zh-form-tab5>
-      </mat-tab>
-      <mat-tab >
-        <ng-template mat-tab-label>
-          Statuts et getion de la zone humide
-        </ng-template>
-        <h1>Some more tab content</h1>
-      </mat-tab>
-      <mat-tab >
-        <ng-template mat-tab-label>
-          Evaluation géneral du site
-        </ng-template>
-        <h1>Some more tab content</h1>
-      </mat-tab>
-    </mat-tab-group>
+      </div>
+    </div>
   </div>
 </div>
+
