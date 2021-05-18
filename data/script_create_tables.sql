@@ -4,6 +4,8 @@ CREATE SEQUENCE pr_zh.bib_actions_id_action_seq START WITH 1 INCREMENT BY 1;
 
 CREATE SEQUENCE pr_zh.cor_impacts_id_impacts_seq START WITH 1 INCREMENT BY 1;
 
+CREATE SEQUENCE pr_zh.cor_lim_list_seq START WITH 1 INCREMENT BY 1;
+
 CREATE SEQUENCE pr_zh.cor_main_fct_seq START WITH 1 INCREMENT BY 1;
 
 CREATE SEQUENCE pr_zh.t_activity_id_activity_seq START WITH 1 INCREMENT BY 1;
@@ -370,6 +372,14 @@ COMMENT ON TABLE pr_zh.cor_zh_rb IS 'Correspondance between zh and river basin, 
 
 COMMENT ON COLUMN pr_zh.cor_zh_rb.id_rb IS 'id river basin';
 
+CREATE  TABLE pr_zh.cor_zh_ref ( 
+	id_ref               integer  NOT NULL ,
+	id_zh                integer  NOT NULL ,
+	CONSTRAINT pk_cor_zh_references PRIMARY KEY ( id_ref, id_zh )
+ );
+
+COMMENT ON TABLE pr_zh.cor_zh_ref IS 'Table de correspondance entre zh et references bibliographiques';
+
 CREATE  TABLE pr_zh.t_actions ( 
 	id_action            integer  NOT NULL ,
 	id_zh                integer  NOT NULL ,
@@ -541,7 +551,7 @@ ALTER TABLE pr_zh.cor_urban_type_range ADD CONSTRAINT fk_cor_urban_range FOREIGN
 
 ALTER TABLE pr_zh.cor_urban_type_range ADD CONSTRAINT fk_cor_urban_type FOREIGN KEY ( id_doc_type ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
-ALTER TABLE pr_zh.cor_zh_area ADD CONSTRAINT fk_cor_zh_area_l_areas FOREIGN KEY ( id_area ) REFERENCES ref_geo.l_areas( id_area )  ON UPDATE CASCADE;
+ALTER TABLE pr_zh.cor_zh_area ADD CONSTRAINT fk_cor_zh_area_id_area FOREIGN KEY ( id_area ) REFERENCES ref_geo.l_areas( id_area )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_zh_corine_cover ADD CONSTRAINT fk_cor_zh_cover_t_updates FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh ) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -566,6 +576,10 @@ ALTER TABLE pr_zh.cor_zh_protection ADD CONSTRAINT fk_cor_zh_protection_id_prote
 ALTER TABLE pr_zh.cor_zh_rb ADD CONSTRAINT fk_cor_zh_river_basin_t_river_basin FOREIGN KEY ( id_rb ) REFERENCES pr_zh.t_river_basin( id_rb ) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_zh_rb ADD CONSTRAINT fk_cor_zh_river_basin_t_zh FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh ) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.cor_zh_ref ADD CONSTRAINT fk_cor_zh_ref_t_references FOREIGN KEY ( id_ref ) REFERENCES pr_zh.t_references( id_reference )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.cor_zh_ref ADD CONSTRAINT fk_cor_zh_ref_id_zh FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.t_actions ADD CONSTRAINT fk_t_actions_bib_actions_id FOREIGN KEY ( id_action ) REFERENCES pr_zh.bib_actions( id_action )  ON UPDATE CASCADE;
 
@@ -627,8 +641,6 @@ ALTER TABLE pr_zh.t_river_basin ADD CONSTRAINT fk_t_river_basin_t_nomenclatures 
 
 ALTER TABLE pr_zh.t_river_basin ADD CONSTRAINT fk_t_river_basin_t_nomenclatures_0 FOREIGN KEY ( id_river_flow ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
-ALTER TABLE pr_zh.t_urban_planning_docs ADD CONSTRAINT fk_t_docs_t_municipalities FOREIGN KEY ( id_area ) REFERENCES pr_zh.cor_zh_area( id_area )  ON UPDATE CASCADE;
-
 ALTER TABLE pr_zh.t_urban_planning_docs ADD CONSTRAINT fk_t_docs_t_zh FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh ) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.t_urban_planning_docs ADD CONSTRAINT fk_t_urban_planning_docs FOREIGN KEY ( id_urban_type ) REFERENCES pr_zh.cor_urban_type_range( id_cor )  ON UPDATE CASCADE;
@@ -654,3 +666,4 @@ ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_t_nomenclatures_diag_bio FOREIGN K
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_sdage_t_nomenclatures FOREIGN KEY ( id_sdage ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_sage_t_nomenclatures FOREIGN KEY ( id_sage ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
+

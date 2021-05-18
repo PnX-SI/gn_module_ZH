@@ -14,6 +14,8 @@ import uuid
 from geojson import FeatureCollection
 
 from sqlalchemy import func, text
+from sqlalchemy.orm.exc import NoResultFound
+
 import geoalchemy2
 from datetime import datetime, timezone
 
@@ -37,7 +39,9 @@ from .models import (
     CorZhArea,
     CorZhRb,
     CorZhHydro,
-    CorZhFctArea
+    CorZhFctArea,
+    CorZhRef,
+    TReferences
 )
 
 from .repositories import (
@@ -86,15 +90,57 @@ def get_zh(info_role):
         "total_filtered": len(data),
         "page": page,
         "limit": limit,
-        "items": FeatureCollection(featureCollection),
-    }
+        "items": FeatureCollection(featureCollection)
+    },200
+
+
+@blueprint.route("/<int:id_zh>", methods=["GET"])
+@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@json_resp
+def get_zh_by_id(id_zh, info_role):
+    """Get zh form data by id
+    """
+    try:
+        zh = DB.session.query(TZH).filter(TZH.id_zh == id_zh).one()
+
+        # get criteres delim
+        id_lims = DB.session.query(CorLimList).filter(CorLimList.id_lim_list == zh.id_lim_list).all()
+        id_lim_list = [id.id_lim for id in id_lims]
+
+        # ref biblio
+        refs = DB.session.query(TReferences).join(CorZhRef).filter(CorZhRef.id_zh == id_zh).all()
+        references = [
+            {
+                "id_reference":ref.id_reference,
+                "authors":ref.authors,
+                "pub_year": ref.pub_year,
+                "title": ref.title,
+                "editor":ref.editor,
+                "editor_location":ref.editor_location
+            } for ref in refs
+        ]
+        
+        return {
+            "main_name": zh.main_name, #name
+            "secondary_name": zh.secondary_name, #otherName
+            "is_id_site_space": zh.is_id_site_space, #hasGrandEsemble
+            "id_site_space": zh.id_site_space, #grandEsemble
+            "id_lim_list": id_lim_list, #critere_delim
+            "id_sdage": zh.id_sdage,
+            "references": references
+        },200
+
+    except Exception as e:
+        if e.__class__.__name__ == 'NoResultFound':
+            raise ZHApiError(message='zh id exist?', details=str(e))
+        raise ZHApiError(message=str(e), details=str(e))
 
 
 @blueprint.route("/form/<int:id_tab>", methods=["GET"])
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
 def get_tab(id_tab, info_role):
-    """Get form info for tabs
+    """Get raw form data for one tab
     """
     try:
         mnemo_nomenc_list = blueprint.config["nomenc_mnemo_by_tab"][str(id_tab)]
@@ -126,7 +172,7 @@ def get_tab(id_tab, info_role):
 @permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
 @json_resp
 def get_tab_data(id_tab, info_role):
-    """Get form info for tabs
+    """Post zh data
     """
 
     print(json.loads(request.data))
