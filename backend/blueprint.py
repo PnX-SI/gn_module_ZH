@@ -9,7 +9,7 @@ from flask import (
 
 import uuid
 
-#import psycopg2
+import spacy
 
 from geojson import FeatureCollection
 
@@ -166,6 +166,15 @@ def get_tab(id_tab, info_role):
         
     except Exception as e:
         raise ZHApiError(message=str(e), details=str(e))
+
+
+@blueprint.route("/bibs", methods=["GET"])
+@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@json_resp
+def get_bibs(info_role):
+    return {
+        "test": "ok"
+    },200
 
 
 @blueprint.route("/form/<int:id_tab>/data", methods=["GET","POST"])
