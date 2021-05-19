@@ -109,16 +109,7 @@ def get_zh_by_id(id_zh, info_role):
 
         # ref biblio
         refs = DB.session.query(TReferences).join(CorZhRef).filter(CorZhRef.id_zh == id_zh).all()
-        references = [
-            {
-                "id_reference":ref.id_reference,
-                "authors":ref.authors,
-                "pub_year": ref.pub_year,
-                "title": ref.title,
-                "editor":ref.editor,
-                "editor_location":ref.editor_location
-            } for ref in refs
-        ]
+        references = [ref.as_dict() for ref in refs]
         
         return {
             "main_name": zh.main_name, #name
