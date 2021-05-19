@@ -357,7 +357,7 @@ class CorZhFctArea(DB.Model):
         primary_key=True
     )
 
-
+@serializable
 class TReferences(DB.Model):
     __tablename__ = "t_references"
     __table_args__ = {"schema": "pr_zh"}

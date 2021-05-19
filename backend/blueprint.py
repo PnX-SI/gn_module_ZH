@@ -13,7 +13,7 @@ import spacy
 
 from geojson import FeatureCollection
 
-from sqlalchemy import func, text
+from sqlalchemy import func, text, desc
 from sqlalchemy.orm.exc import NoResultFound
 
 import geoalchemy2
@@ -168,13 +168,40 @@ def get_tab(id_tab, info_role):
         raise ZHApiError(message=str(e), details=str(e))
 
 
-@blueprint.route("/bibs", methods=["GET"])
+@blueprint.route("/references/autocomplete", methods=["GET"])
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
-def get_bibs(info_role):
-    return {
-        "test": "ok"
-    },200
+def get_ref_autocomplete(info_role):
+    params = request.args
+    search_title = params.get("search_title")
+    #search_title = 'MCD'
+    q = DB.session.query(
+        TReferences,
+        func.similarity(TReferences.title, search_title).label("idx_trgm"),
+    )
+
+    #if "id_list" in params:
+    #    q = q.join(
+    #        CorListHabitat, CorListHabitat.cd_hab == AutoCompleteHabitat.cd_hab
+    #    ).filter(CorListHabitat.id_list == params.get("id_list"))
+
+    search_title = search_title.replace(" ", "%")
+    q = q.filter(
+        TReferences.title.ilike("%" + search_title + "%")
+    ).order_by(desc("idx_trgm"))
+
+    # filter by typology
+    #if "cd_typo" in params:
+    #    q = q.filter(AutoCompleteHabitat.cd_typo == params.get("cd_typo"))
+
+    limit = request.args.get("limit", 20)
+    print(q)
+
+    data = q.limit(limit).all()
+    if data:
+        return [d[0].as_dict() for d in data]
+    else:
+        return "No Result", 404
 
 
 @blueprint.route("/form/<int:id_tab>/data", methods=["GET","POST"])
