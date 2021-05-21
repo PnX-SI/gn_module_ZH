@@ -23,7 +23,7 @@ export class ZhDataService {
   }
 
   postDataForm(value, idForm) {
-    const urlpost = `${AppConfig.API_ENDPOINT}/zones_humides/form/${idForm}/data`
+    const urlpost = `${AppConfig.API_ENDPOINT}/zones_humides/form/${idForm}`
     return this._api.post<any>(urlpost, value);
   }
 

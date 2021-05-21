@@ -388,3 +388,18 @@ class CorZhRef(DB.Model):
         ForeignKey(TZH.id_zh),
         primary_key=True
     )
+
+
+class CorZhLimFs(DB.Model):
+    __tablename__ = "cor_zh_lim_fs"
+    __table_args__ = {"schema": "pr_zh"}
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    id_lim_fs = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )

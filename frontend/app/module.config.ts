@@ -1,5 +1,5 @@
 export const ModuleConfig = {
- "ID_MODULE": 7,
+ "ID_MODULE": 32,
  "MODULE_CODE": "ZONES_HUMIDES",
  "MODULE_URL": "zones_humides",
  "available_maplist_column": [

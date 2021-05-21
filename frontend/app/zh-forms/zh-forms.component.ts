@@ -25,6 +25,7 @@ export class ZhFormsComponent implements OnInit {
   private geometry: GeoJSON;
   public submitted = false;
   public posted = false;
+  public id_zh;
 
   constructor(
     private fb: FormBuilder,
@@ -109,7 +110,8 @@ export class ZhFormsComponent implements OnInit {
         });
         this.posted = true;
         this._dataService.postDataForm(formToPost, 0).subscribe(
-          () => {
+          (data) => {
+            this.id_zh = data.id_zh;
             this.form.reset();
             this.posted = false;
             this._router.navigate(["zones_humides/tabs"]);
