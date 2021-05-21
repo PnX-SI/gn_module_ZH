@@ -1,2 +1,1 @@
 # Fichier listant les librairies python à installer
-spacy==3.0.6

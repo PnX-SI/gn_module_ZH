@@ -9,8 +9,6 @@ from flask import (
 
 import uuid
 
-import spacy
-
 from geojson import FeatureCollection
 
 from sqlalchemy import func, text, desc
@@ -42,7 +40,8 @@ from .models import (
     CorZhFctArea,
     CorZhRef,
     TReferences,
-    BibSiteSpace
+    BibSiteSpace,
+    CorZhLimFs
 )
 
 from .nomenclatures import get_nomenc_by_tab
@@ -105,7 +104,7 @@ def get_zh_by_id(id_zh, info_role):
     """
     try:
         zh = DB.session.query(TZH).filter(TZH.id_zh == id_zh).one()
-
+ 
         # get criteres delim
         id_lims = DB.session.query(CorLimList).filter(CorLimList.id_lim_list == zh.id_lim_list).all()
         id_lim_list = [id.id_lim for id in id_lims]
@@ -113,6 +112,10 @@ def get_zh_by_id(id_zh, info_role):
         # ref biblio
         refs = DB.session.query(TReferences).join(CorZhRef).filter(CorZhRef.id_zh == id_zh).all()
         references = [ref.as_dict() for ref in refs]
+
+        # get criteres delim esp fonctionnalite
+        id_lims_fs = DB.session.query(CorZhLimFs).filter(CorZhLimFs.id_zh == zh.id_zh).all()
+        id_lim_fs_list = [id.id_lim_fs for id in id_lims_fs]
         
         return {
             "main_name": zh.main_name, #name
@@ -121,7 +124,10 @@ def get_zh_by_id(id_zh, info_role):
             "id_site_space": zh.id_site_space, #grandEsemble
             "id_lim_list": id_lim_list, #critere_delim
             "id_sdage": zh.id_sdage,
-            "references": references
+            "references": references,
+            "id_lim_fs": id_lim_fs_list, #critere delim esp fonct
+            "remark_lim": zh.remark_lim,
+            "remark_lim_fs": zh.remark_lim_fs
         },200
 
     except Exception as e:
@@ -188,19 +194,17 @@ def get_ref_autocomplete(info_role):
         return "No Result", 404
 
 
-@blueprint.route("/form/<int:id_tab>/data", methods=["GET","POST"])
+@blueprint.route("/form/<int:id_tab>", methods=["POST"])
 @permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
 @json_resp
 def get_tab_data(id_tab, info_role):
     """Post zh data
     """
-
-    print(json.loads(request.data))
+    form_data = request.json
 
     try:
         # get form data
         if id_tab == 0:
-            form_data = json.loads(request.data)
             # set geometry from coordinates
             polygon = DB.session.query(func.ST_GeomFromGeoJSON(str(form_data['geom']['geometry']))).one()[0]
             # set date
@@ -264,7 +268,43 @@ def get_tab_data(id_tab, info_role):
                 DB.session.flush()
 
             DB.session.commit()
-        return "data tab {id_tab} commited".format(id_tab=id_tab)
+            return {
+                "id_zh": new_zh.id_zh
+            },200
+        
+        if id_tab == 2:
+            
+            id_zh = form_data['id_zh']
+            
+            # edit criteres delim
+            uuid_lim_list = DB.session.query(TZH.id_lim_list).filter(TZH.id_zh == id_zh).one().id_lim_list
+            #query = DB.session.query(CorLimList).filter(CorLimList.id_lim_list == uuid_lim_list).all()
+            #zh_crit_delim_list = sorted([q.id_lim for q in query])
+            #new_crit_delim_list = sorted(form_data['critere_delim'])
+            #if new_crit_delim_list != zh_crit_delim_list:
+            DB.session.query(CorLimList).filter(CorLimList.id_lim_list == uuid_lim_list).delete()
+            for lim in form_data['critere_delim']:
+                DB.session.add(CorLimList(id_lim_list=uuid_lim_list, id_lim=lim))
+                DB.session.flush()
+            
+            # remarque criteres delim
+            DB.session.query(TZH).filter(TZH.id_zh == id_zh).update({TZH.remark_lim: form_data['remark_lim']})
+
+            # edit criteres delim fonctionnelles
+            DB.session.query(CorZhLimFs).filter(CorZhLimFs.id_zh == id_zh).delete()
+            for lim in form_data['critere_delim_fs']:
+                DB.session.add(CorZhLimFs(id_zh=id_zh, id_lim_fs=lim))
+                DB.session.flush()
+
+            # remarque criteres delim fonctionnelles
+            DB.session.query(TZH).filter(TZH.id_zh == id_zh).update({TZH.remark_lim_fs: form_data['remark_lim_fs']})
+
+            DB.session.commit()
+
+            return {
+                "id_zh": id_zh
+            },200
+
     except Exception as e:
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
             return 'Empty mandatory field',400
