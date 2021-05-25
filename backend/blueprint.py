@@ -203,6 +203,8 @@ def get_tab_data(id_tab, info_role):
     form_data = request.json
 
     try:
+        if id_tab == 1:
+            return {"test": "ok"},200
         # get form data
         if id_tab == 0:
             # set geometry from coordinates
@@ -271,6 +273,9 @@ def get_tab_data(id_tab, info_role):
             return {
                 "id_zh": new_zh.id_zh
             },200
+
+        if id_tab == 1:
+            print(form_data)
         
         if id_tab == 2:
             

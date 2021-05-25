@@ -28,7 +28,7 @@ import { ZhTabsComponent } from "./zh-forms/tabs/zh-tabs.component";
 const routes: Routes = [
   { path: "", component: ZhMapListComponent },
   { path: "form", component: ZhFormsComponent },
-  { path: "tabs", component: ZhTabsComponent },
+  { path: "tabs/:id", component: ZhTabsComponent },
 ];
 
 @NgModule({

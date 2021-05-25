@@ -39,6 +39,7 @@ small.required::after {
   right: 30px;
   display: flex;
   justify-content: flex-end;
+  overflow: hidden;
 }
 
 .error-msg {

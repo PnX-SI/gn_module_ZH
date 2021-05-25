@@ -34,10 +34,7 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // to get geometry from filelayer
     this.$_geojsonSub = this._mapService.gettingGeojson$.subscribe(geojson => {
-      console.log('geojson', geojson);
-
       this.geometry = geojson;
-
     })
   }
 
@@ -66,9 +63,6 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit, OnDestroy {
     this._mapService.firstLayerFromMap = false;
     this._mapService.setGeojsonCoord(geojson);
   }
-
-
-
 
   ngOnDestroy() {
     this.$_geojsonSub.unsubscribe();
