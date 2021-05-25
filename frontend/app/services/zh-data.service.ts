@@ -33,4 +33,9 @@ export class ZhDataService {
     return this._api.post<any>(urlpost, value);
   }
 
+  patchDataForm(value, idForm) {
+    const urlpost = `${AppConfig.API_ENDPOINT}/zones_humides/form/${idForm}`
+    return this._api.patch<any>(urlpost, value);
+  }
+
 }

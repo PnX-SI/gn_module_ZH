@@ -1,3 +1,5 @@
+@import "../../../app.module";
+
 .custom-container {
   background-color: #fff;
   border: 1px solid #f1f1f1;
@@ -9,13 +11,4 @@
 }
 ::ng-deep .mat-tab-list .mat-tab-labels .mat-tab-label-active {
   background-color: #1d1d1d24;
-}
-
-:host ::ng-deep .mat-tab-body-wrapper {
-  height: 600px;
-  //todo dynamic
-}
-
-:host ::ng-deep .mat-tab-body.mat-tab-body-active {
-  height: 600px;
 }

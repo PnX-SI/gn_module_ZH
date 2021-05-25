@@ -1,3 +1,5 @@
+@import "../../app.module";
+
 .custom-container {
   background-color: #fff;
   border: 1px solid #f1f1f1;
@@ -25,25 +27,6 @@ legend {
   color: #389938;
   padding: 0 8px;
   margin-top: 8px;
-}
-
-small.required::after {
-  content: "*";
-  margin-left: 4px;
-  color: red;
-}
-
-.navigate-btn {
-  position: absolute;
-  bottom: 40px;
-  right: 30px;
-  display: flex;
-  justify-content: flex-end;
-  overflow: hidden;
-}
-
-.error-msg {
-  color: #ff0000;
 }
 
 mat-spinner {

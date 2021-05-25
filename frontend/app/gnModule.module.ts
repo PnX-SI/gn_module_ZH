@@ -28,6 +28,7 @@ import { ZhTabsComponent } from "./zh-forms/tabs/zh-tabs.component";
 const routes: Routes = [
   { path: "", component: ZhMapListComponent },
   { path: "form", component: ZhFormsComponent },
+  { path: "form/:id", component: ZhFormsComponent },
   { path: "tabs/:id", component: ZhTabsComponent },
 ];
 

@@ -41,12 +41,11 @@ export class ZhTabsComponent implements OnInit {
     let tbH = document.getElementById("app-toolbar")
       ? document.getElementById("app-toolbar").offsetHeight
       : 0;
-    let height = wH - (tbH + 20);
+    let height = wH - (tbH + 80);
     this.cardContentHeight = height >= 350 ? height : 350;
     console.log(" this.cardContentHeight", this.cardContentHeight);
 
     // resize map after resize container
-    (document.querySelector('mat-tab-group') as HTMLElement).style.height = '800px !important';
     if (this._mapService.map) {
       setTimeout(() => {
         this._mapService.map.invalidateSize();
