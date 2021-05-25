@@ -10,6 +10,12 @@
 ::ng-deep .mat-tab-list .mat-tab-labels .mat-tab-label-active {
   background-color: #1d1d1d24;
 }
-::ng-deep .mat-tab-body-content {
-  overflow: hidden !important;
+
+:host ::ng-deep .mat-tab-body-wrapper {
+  height: 600px;
+  //todo dynamic
+}
+
+:host ::ng-deep .mat-tab-body.mat-tab-body-active {
+  height: 600px;
 }

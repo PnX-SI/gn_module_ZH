@@ -1,7 +1,6 @@
 
 <div
   class="custom-container"
-  [ngStyle]="{'min-height.px': cardContentHeight}"
 >
   <div class="row">
     <div
@@ -81,10 +80,11 @@
           [disabled]="posted"
           (click)="onFormSubmit(form.value)"
         >
+        <mat-icon *ngIf="!posted">save_outline</mat-icon>
         <mat-spinner *ngIf="posted" [diameter]="20" ></mat-spinner>
         Suivant
         </button>
-        
+
       </div>
     </div>
   </div>

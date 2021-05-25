@@ -9,7 +9,7 @@
                 <input
                 class="form-control form-control-sm"
                 type='text'
-                [formControl]="generalInfoForm.controls.name"
+                [formControl]="generalInfoForm.controls.main_name"
                 />
             </div>
             <div class="form-group col-md-6">
@@ -17,131 +17,27 @@
                 <input
                     class="form-control form-control-sm"
                     type='text'
-                    [formControl]="generalInfoForm.controls.otherName"
+                    [formControl]="generalInfoForm.controls.secondary_name"
                 />
             </div>
         </div>
         <div class="form-row">
             <div class="form-group col-md-6">
-                <small>Partie d'un ensemble ?</small>
-                <select 
-                    class="form-control form-control-sm" 
-                    [formControl]="generalInfoForm.controls.hasGrandEsemble">
-                    <option [ngValue]=false></option>
-                    <option [ngValue]=true>Oui</option>
-                    <option [ngValue]=false>Non</option>
-                </select>
+                <small style="display: block; margin-bottom: 8px;">Partie d'un grand ensemble ?</small>
+                <mat-label ngClass="labelBeforeSlide">Non</mat-label>
+                <mat-slide-toggle
+                [formControl]="generalInfoForm.controls.is_id_site_space">oui</mat-slide-toggle>    
             </div>
-            <div class="form-group col-md-6">
+            <div *ngIf="hasSiteSpace" class="form-group col-md-6">
                 <small>Nom du grand ensemble</small>
-                <input 
-                list="grandEnsemble"
-                 name="grandEnsemble"
-                 autocomplete="off"
-                 class="form-control form-control-sm" 
-                 [formControl]="generalInfoForm.controls.grandEsemble">
-                <datalist id="grandEnsemble">
+                <select 
+                    list="grandEnsemble"
+                    name="grandEnsemble"
+                    class="form-control form-control-sm" 
+                    [formControl]="generalInfoForm.controls.id_site_space">      
                     <option [ngValue]=null></option>
-                    <option [ngValue]=true>Ensemble 1</option>
-                    <option [ngValue]=false>Ensemble 2</option>
-                </datalist>
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-12">
-                <small>Code de la zone humide </small>
-                <input
-                class="form-control form-control-sm"
-                type='text'
-                [formControl]="generalInfoForm.controls.zhCode"
-                readonly
-                />
-            </div>
-        </div>
-    </fieldset>
-    <fieldset>
-        <legend>
-            <h5 class="section-title">Localisation</h5>
-        </legend>
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <small>Région</small>
-                <input
-                class="form-control form-control-sm"
-                    type='text'
-                    readonly
-                />
-            </div>
-            <div class="form-group col-md-6">
-                <small>Département</small>
-                <input
-                    class="form-control form-control-sm"
-                    type='text'
-                    readonly
-                />
-            </div>
-            <div class="form-group col-md-6">
-                <small>Commune</small>
-                <input
-                class="form-control form-control-sm"
-                    type='text'
-                    readonly
-                />
-            </div>
-            <div class="form-group col-md-6">
-                <small>Code INSEE</small>
-                <input
-                    class="form-control form-control-sm"
-                    type='text'
-                    readonly
-                />
-            </div>
-            <div class="form-group col-md-6">
-                <small>Couverture de la zonne humide</small>
-                <input
-                    class="form-control form-control-sm"
-                    type='text'
-                    readonly
-                />
-            </div>
-        </div>
-    </fieldset>
-    <fieldset>
-        <legend>
-            <h5 class="section-title">Auteur</h5>
-        </legend>
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <small>Auteur de la fiche</small>
-                <input
-                class="form-control form-control-sm"
-                    type='text'
-                    readonly
-                />
-            </div>
-            <div class="form-group col-md-6">
-                <small>Auteur des dernières modifications</small>
-                <input
-                    class="form-control form-control-sm"
-                    type='text'
-                    readonly
-                />
-            </div>
-            <div class="form-group col-md-6">
-                <small>Date d'établissement</small>
-                <input
-                class="form-control form-control-sm"
-                    type='text'
-                    readonly
-                />
-            </div>
-            <div class="form-group col-md-6">
-                <small>Date des dernières modifications</small>
-                <input
-                    class="form-control form-control-sm"
-                    type='text'
-                    readonly
-                />
+                    <option *ngFor="let siteSpace of siteSpaceList" [ngValue]=siteSpace.id_site_space>{{siteSpace.name}}</option>
+                </select>
             </div>
         </div>
     </fieldset>
@@ -149,7 +45,7 @@
         <legend>
             <h5 class="section-title">Principales références bibliographiques</h5>
         </legend>
-        <div class="form-row">
+        <!-- <div class="form-row">
             <div class="form-group col-md-6">
                 <small>Référence</small>
                 <input
@@ -207,6 +103,82 @@
                     readonly
                 />
             </div>
+        </div> -->
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <pnx-autocomplete
+                apiEndPoint="{{appConfig.API_ENDPOINT}}/zones_humides/references/autocomplete"
+                [searchAsParameter]="false"
+                [parentFormControl]="generalInfoForm.controls.bibRef"
+                queryParamSearch="search_title"
+                keyValue="title"
+                [formatter]="formatter"
+                label="Références bibliographiques"
+                placeholder="Tapez les premières lettres..."
+                (onChange)="onSelectLib($event)"
+                >
+                </pnx-autocomplete>
+            </div>  
+            <div class="form-group d-flex align-items-end col-md-6">
+                <button
+                    mat-raised-button
+                    color="primary"
+                    [disabled]="posted"
+                    (click)="onAddBib()"
+                >
+                    Ajouter
+                </button>
+            </div>
         </div>
+      <div *ngIf="listBib && listBib.length > 0" class="card-body table-responsive">
+        <table class="table">
+            <thead class="thead-inverse">
+                <tr>
+                    <th *ngFor="let col of cols">{{col}}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let bib of listBib">
+                    <td *ngFor="let col of cols">{{bib[col]}}</td>
+                    <td>
+                        <div>
+                            <button class="btn btn-warning btn-sm mr-2"
+                             >
+                             <i class="fa fa-pencil"></i>
+                            </button>
+                            <button 
+                              class="btn btn-danger btn-sm mr-2"
+                              (click)="onDeleteBib(bib.id_reference)"
+                               >
+                               <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
     </fieldset>
 </form>
+<div class="navigate-btn">
+    <button
+        mat-raised-button
+        color="warn"
+        [disabled]="posted"
+        (click)="onPrevious()"
+    >
+    Précédent
+    </button>
+    <button
+      type="submit"
+      mat-raised-button
+      color=primary
+      class="ml-3"
+      [disabled]="posted"
+      (click)="onFormSubmit(generalInfoForm.value)"
+    >
+    <mat-icon *ngIf="!posted">save_outline</mat-icon>
+    <mat-spinner *ngIf="posted" [diameter]="20" ></mat-spinner>
+    Suivant
+    </button>

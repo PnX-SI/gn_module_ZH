@@ -1,11 +1,11 @@
 <div class="container-fluid">
-  <div class="custom-container">
-    <mat-tab-group animationDuration="0ms">
-      <mat-tab >
+  <div class="custom-container"   [ngStyle]="{'min-height.px': cardContentHeight}">
+    <mat-tab-group  animationDuration="0ms">
+      <mat-tab>
         <ng-template mat-tab-label>
           Renseignement généraux
         </ng-template>
-              <zh-form-tab1></zh-form-tab1>
+              <zh-form-tab1 [id_zh] = id_zh></zh-form-tab1>
       </mat-tab>
       <mat-tab >
         <ng-template mat-tab-label>
