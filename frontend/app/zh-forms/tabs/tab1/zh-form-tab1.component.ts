@@ -142,7 +142,7 @@ export class ZhFormTab1Component implements OnInit {
 
   onPrevious() {
     this.generalInfoForm.reset();
-    this._router.navigate(["zones_humides/form"]);
+    this._router.navigate(["zones_humides/form", this.id_zh]);
   }
 
 

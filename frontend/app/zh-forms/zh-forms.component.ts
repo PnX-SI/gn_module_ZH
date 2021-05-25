@@ -1,7 +1,7 @@
 
 import { Component, HostListener, OnInit } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { Router } from "@angular/router";
+import { Router, ActivatedRoute } from "@angular/router";
 import { Subscription } from "rxjs";
 import { GeoJSON } from "leaflet";
 import { MapService } from '@geonature_common/map/map.service';
@@ -32,10 +32,12 @@ export class ZhFormsComponent implements OnInit {
     private _dataService: ZhDataService,
     private _mapService: MapService,
     private _router: Router,
+    private _route: ActivatedRoute,
     private _toastr: ToastrService
   ) { }
 
   ngOnInit() {
+    this.id_zh = this._route.snapshot.params['id'];
     this.dropdownSettings = {
       singleSelection: false,
       idField: 'id_nomenclature',
@@ -108,18 +110,35 @@ export class ZhFormsComponent implements OnInit {
           formToPost.critere_delim.push(critere.id_nomenclature)
         });
         this.posted = true;
-        this._dataService.postDataForm(formToPost, 0).subscribe(
-          (data) => {
+
+        if (this.id_zh) {
+          formToPost['id_zh'] = Number(this.id_zh);
+          this._dataService.patchDataForm(formToPost, 0).subscribe((data) => {
             this.id_zh = data.id_zh;
             this.form.reset();
             this.posted = false;
             this._router.navigate(["zones_humides/tabs", this.id_zh]);
           },
-          (error) => {
-            this.posted = false;
-            this._toastr.error(error.error, '', { positionClass: 'toast-top-right' });
-          }
-        );
+            (error) => {
+              this.posted = false;
+              this._toastr.error(error.error, '', { positionClass: 'toast-top-right' });
+            }
+          )
+        }
+        else {
+          this._dataService.postDataForm(formToPost, 0).subscribe(
+            (data) => {
+              this.id_zh = data.id_zh;
+              this.form.reset();
+              this.posted = false;
+              this._router.navigate(["zones_humides/tabs", this.id_zh]);
+            },
+            (error) => {
+              this.posted = false;
+              this._toastr.error(error.error, '', { positionClass: 'toast-top-right' });
+            }
+          )
+        };
       }
     }
     else {

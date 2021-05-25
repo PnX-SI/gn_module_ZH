@@ -1,3 +1,5 @@
+@import "../../../../app.module";
+
 fieldset {
   padding: 0.35em 0.625em 0.75em !important;
   border: 1px solid silver !important;
@@ -15,12 +17,6 @@ legend {
   color: #389938;
   padding: 0 8px;
   margin-top: 8px;
-}
-
-small.required::after {
-  content: "*";
-  margin-left: 4px;
-  color: red;
 }
 
 .labelBeforeSlide {

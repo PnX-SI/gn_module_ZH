@@ -132,7 +132,7 @@
         </div>
       <div *ngIf="listBib && listBib.length > 0" class="card-body table-responsive">
         <table class="table">
-            <thead class="thead-inverse">
+            <thead class="thead-inverse table-header">
                 <tr>
                     <th *ngFor="let col of cols">{{col}}</th>
                     <th></th>
@@ -143,16 +143,14 @@
                     <td *ngFor="let col of cols">{{bib[col]}}</td>
                     <td>
                         <div>
-                            <button class="btn btn-warning btn-sm mr-2"
+                            <button mat-icon-button class="mr-2"
                              >
-                             <i class="fa fa-pencil"></i>
+                             <mat-icon class="edit-icon">edit</mat-icon>
                             </button>
-                            <button 
-                              class="btn btn-danger btn-sm mr-2"
-                              (click)="onDeleteBib(bib.id_reference)"
-                               >
-                               <i class="fa fa-trash"></i>
-                            </button>
+                            <button mat-icon-button (click)="onDeleteBib(bib.id_reference)">
+                                <mat-icon class="delete-icon" >close</mat-icon>
+                              </button>
+                            
                         </div>
                     </td>
                 </tr>
