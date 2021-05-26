@@ -201,10 +201,8 @@ def get_tab_data(id_tab, info_role):
     """Post zh data
     """
     form_data = request.json
-
     try:
-        if id_tab == 1:
-            return {"test": "ok"},200
+
         # get form data
         if id_tab == 0:
             # set geometry from coordinates
@@ -275,7 +273,21 @@ def get_tab_data(id_tab, info_role):
             },200
 
         if id_tab == 1:
-            print(form_data)
+            id_zh = form_data['id_zh']
+            DB.session.query(TZH).filter(TZH.id_zh == id_zh).update({
+                TZH.main_name: form_data['main_name'],
+                TZH.secondary_name: form_data['secondary_name'],
+                TZH.is_id_site_space: form_data['is_id_site_space'],
+                TZH.id_site_space: form_data['id_site_space']
+            })
+            DB.session.query(CorZhRef).filter(CorZhRef.id_zh == id_zh).delete()
+            for ref in form_data['id_references']:
+                DB.session.add(CorZhRef(id_zh=id_zh, id_ref=ref))
+                DB.session.flush()
+            DB.session.commit()
+            return {
+                "id_zh": form_data['id_zh']
+            },200
         
         if id_tab == 2:
             
@@ -332,6 +344,7 @@ def deleteOneZh(id_zh, info_role):
 
     """
     zhRepository = ZhRepository(TZH)
+    DB.session.query(CorZhRef).filter(CorZhRef.id_zh == id_zh).delete()
     zhRepository.delete(id_zh, info_role)
 
     return {"message": "delete with success"},200
