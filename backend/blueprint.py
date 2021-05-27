@@ -125,6 +125,7 @@ def get_zh_by_id(id_zh, info_role):
             "id_zh": zh.id_zh,
             "main_name": zh.main_name,  # name
             "secondary_name": zh.secondary_name,  # otherName
+            "id_org": zh.id_org,
             "is_id_site_space": zh.is_id_site_space,  # hasGrandEsemble
             "id_site_space": zh.id_site_space,  # grandEsemble
             "id_lim_list": id_lim_list,  # critere_delim
@@ -151,9 +152,8 @@ def get_tab(info_role):
         metadata = get_nomenc(blueprint.config["nomenclatures"])
 
         bib_organismes = DB.session.query(BibOrganismes).all()
-
         bib_organismes_list = [
-            bib_site_space.as_dict() for bib_site_space in bib_organismes
+            bib_org.as_dict() for bib_org in bib_organismes if bib_org.is_op_org == True
         ]
         metadata["BIB_ORGANISMES"] = bib_organismes_list
 
@@ -161,8 +161,8 @@ def get_tab(info_role):
         bib_site_spaces_list = [
             bib_site_space.as_dict() for bib_site_space in bib_site_spaces
         ]
-
         metadata["BIB_SITE_SPACE"] = bib_site_spaces_list
+
         return metadata
     except Exception as e:
         raise ZHApiError(message=str(e), details=str(e))

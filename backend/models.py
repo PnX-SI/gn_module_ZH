@@ -120,6 +120,29 @@ class BibSiteSpace(DB.Model):
 
 
 @serializable
+class BibOrganismes(DB.Model):
+    __tablename__ = "bib_organismes"
+    __table_args__ = {"schema": "pr_zh"}
+    id_org = DB.Column(
+        DB.Integer,
+        primary_key=True
+    )
+    name = DB.Column(
+        DB.Unicode(length=6),
+        nullable=False
+    )
+    abbrevation = DB.Column(
+        DB.Unicode,
+        nullable=False
+    )
+    is_op_org = DB.Column(
+        DB.Boolean,
+        default=False,
+        nullable=False
+    )
+
+
+@serializable
 @geoserializable
 class TZH(ZhModel):
     __tablename__ = "t_zh"
@@ -140,6 +163,9 @@ class TZH(ZhModel):
     id_site_space = DB.Column(
         DB.Integer,
         ForeignKey(BibSiteSpace.id_site_space))
+    id_org = DB.Column(
+        DB.Integer,
+        ForeignKey(BibOrganismes.id_org))
     create_author = DB.Column(
         DB.Integer,
         ForeignKey(User.id_role),
@@ -406,27 +432,4 @@ class CorZhLimFs(DB.Model):
         DB.Integer,
         ForeignKey(TNomenclatures.id_nomenclature),
         primary_key=True
-    )
-
-
-@serializable
-class BibOrganismes(DB.Model):
-    __tablename__ = "bib_organismes"
-    __table_args__ = {"schema": "pr_zh"}
-    id_org = DB.Column(
-        DB.Integer,
-        primary_key=True
-    )
-    name = DB.Column(
-        DB.Unicode(length=6),
-        nullable=False
-    )
-    abbrevation = DB.Column(
-        DB.Unicode,
-        nullable=False
-    )
-    is_op_org = DB.Column(
-        DB.Boolean,
-        default=False,
-        nullable=False
     )
