@@ -44,7 +44,7 @@ from .models import (
     CorZhLimFs
 )
 
-from .nomenclatures import get_nomenc_by_tab
+from .nomenclatures import get_nomenc
 
 from .repositories import (
     ZhRepository
@@ -121,11 +121,12 @@ def get_zh_by_id(id_zh, info_role):
         id_lim_fs_list = [id.id_lim_fs for id in id_lims_fs]
 
         return {
-            "main_name": zh.main_name,  # name
-            "secondary_name": zh.secondary_name,  # otherName
-            "is_id_site_space": zh.is_id_site_space,  # hasGrandEsemble
-            "id_site_space": zh.id_site_space,  # grandEsemble
-            "id_lim_list": id_lim_list,  # critere_delim
+            "id_zh": zh.id_zh,
+            "main_name": zh.main_name, #name
+            "secondary_name": zh.secondary_name, #otherName
+            "is_id_site_space": zh.is_id_site_space, #hasGrandEsemble
+            "id_site_space": zh.id_site_space, #grandEsemble
+            "id_lim_list": id_lim_list, #critere_delim
             "id_sdage": zh.id_sdage,
             "references": references,
             "id_lim_fs": id_lim_fs_list,  # critere delim esp fonct
@@ -139,24 +140,22 @@ def get_zh_by_id(id_zh, info_role):
         raise ZHApiError(message=str(e), details=str(e))
 
 
-@blueprint.route("/form/<int:id_tab>", methods=["GET"])
+@blueprint.route("/forms", methods=["GET"])
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
-def get_tab(id_tab, info_role):
-    """Get form metadata for one tab
+def get_tab(info_role):
+    """Get form metadata for all tabs
     """
     try:
-        metadata = get_nomenc_by_tab(
-            id_tab, blueprint.config["nomenc_mnemo_by_tab"])
-        if id_tab == 1:
-            bib_site_spaces = DB.session.query(BibSiteSpace).all()
-            bib_site_spaces_list = [
-                {
-                    "id_site_space": bib_site_space.id_site_space,
-                    "name": bib_site_space.name
-                } for bib_site_space in bib_site_spaces
-            ]
-            metadata["BIB_SITE_SPACE"] = bib_site_spaces_list
+        metadata = get_nomenc(blueprint.config["nomenclatures"])
+        bib_site_spaces = DB.session.query(BibSiteSpace).all()
+        bib_site_spaces_list = [
+            {
+                "id_site_space": bib_site_space.id_site_space,
+                "name": bib_site_space.name
+            } for bib_site_space in bib_site_spaces
+        ]
+        metadata["BIB_SITE_SPACE"] = bib_site_spaces_list
         return metadata
     except Exception as e:
         raise ZHApiError(message=str(e), details=str(e))
@@ -215,7 +214,7 @@ def get_tab_data(id_tab, info_role):
             # set date
             zh_date = datetime.now(timezone.utc)
             # set name
-            if form_data['name'] == "":
+            if form_data['main_name'] == "":
                 return 'Empty mandatory field', 400
 
             if 'id_zh' not in form_data.keys():
@@ -231,7 +230,7 @@ def get_tab_data(id_tab, info_role):
 
                 # create zh : fill pr_zh.t_zh
                 new_zh = TZH(
-                    main_name=form_data['name'],
+                    main_name=form_data['main_name'],
                     code=code,
                     create_author=info_role.id_role,
                     update_author=info_role.id_role,
@@ -305,7 +304,7 @@ def get_tab_data(id_tab, info_role):
 
                 # update zh : fill pr_zh.t_zh
                 DB.session.query(TZH).filter(TZH.id_zh == form_data['id_zh']).update({
-                    TZH.main_name: form_data['name'],
+                    TZH.main_name: form_data['main_name'],
                     TZH.update_author: info_role.id_role,
                     TZH.update_date: zh_date,
                     TZH.id_sdage: form_data['sdage'],
@@ -424,7 +423,7 @@ def get_tab_data(id_tab, info_role):
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
             return 'Empty mandatory field', 400
         if e.__class__.__name__ == 'IntegrityError':
-            return 'ZH name already exists', 400
+            return 'ZH main_name already exists', 400
         DB.session.rollback()
         raise ZHApiError(message=str(e), details=str(e))
     finally:

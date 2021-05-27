@@ -1,7 +1,5 @@
 
-<div
-  class="custom-container"
->
+<div class="custom-container" >
   <div class="row">
     <div
       class="col-xl-6 col-lg-7 col-sm-6"
@@ -21,9 +19,9 @@
                 <input
                 class="form-control form-control-sm"
                 type='text'
-                [formControl]="form.controls.name"
+                [formControl]="form.controls.main_name"
                 />
-                <small *ngIf="(form.controls.name.touched || submitted) && form.controls.name.errors?.required"
+                <small *ngIf="(form.controls.main_name.touched || submitted) && form.controls.main_name.errors?.required"
                 class="error-msg"
                 >Champ requis</small>
             </div>

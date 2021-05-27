@@ -1,43 +1,46 @@
-
-import { Component, HostListener, OnInit } from "@angular/core";
+import { Component, EventEmitter, HostListener, Input, OnInit, Output } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { Router, ActivatedRoute } from "@angular/router";
+import { Router } from "@angular/router";
 import { Subscription } from "rxjs";
 import { GeoJSON } from "leaflet";
 import { MapService } from '@geonature_common/map/map.service';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { ToastrService } from 'ngx-toastr';
-import { ZhDataService } from "../services/zh-data.service";
+import { ZhDataService } from "../../../services/zh-data.service";
+
+
 
 @Component({
-  selector: "zh-forms",
-  templateUrl: "./zh-forms.component.html",
-  styleUrls: ["./zh-forms.component.scss"]
+  selector: "zh-form-tab0",
+  templateUrl: "./zh-form-tab0.component.html",
+  styleUrls: ["./zh-form-tab0.component.scss"]
 })
-export class ZhFormsComponent implements OnInit {
+export class ZhFormTab0Component implements OnInit {
 
+  @Input() formMetaData;
+  @Output() nextTab = new EventEmitter<number>();
+  @Output() activeTabs = new EventEmitter<boolean>();
+  private _currentZh: any;
   public form: FormGroup;
   public cardContentHeight: number;
   public critDelim: any;
   public sdage: any;
   public dropdownSettings: IDropdownSettings;
   private $_geojsonSub: Subscription;
+  public $_currentZhSub: Subscription;
   private geometry: GeoJSON;
   public submitted = false;
   public posted = false;
-  public id_zh: number;
 
   constructor(
     private fb: FormBuilder,
     private _dataService: ZhDataService,
     private _mapService: MapService,
     private _router: Router,
-    private _route: ActivatedRoute,
     private _toastr: ToastrService
   ) { }
 
   ngOnInit() {
-    this.id_zh = this._route.snapshot.params['id'];
     this.dropdownSettings = {
       singleSelection: false,
       idField: 'id_nomenclature',
@@ -46,16 +49,34 @@ export class ZhFormsComponent implements OnInit {
       enableCheckAll: false,
       allowSearchFilter: true
     };
+
+    this.getMetaData();
     this.createForm();
-    this.getMetaDataForm(0);
 
     this.$_geojsonSub = this._mapService.gettingGeojson$.subscribe((geojson: GeoJSON) => {
       this.geometry = geojson;
     })
+
+    this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
+      if (zh) {
+        this._currentZh = zh;
+        const selectedCritDelim = [];
+        this.critDelim.forEach(critere => {
+          if (this._currentZh.id_lim_list.includes(critere.id_nomenclature)) {
+            selectedCritDelim.push(critere);
+          }
+        });
+        this.form.patchValue({
+          main_name: this._currentZh.main_name,
+          critere_delim: selectedCritDelim,
+          sdage: this._currentZh.id_sdage,
+        });
+      }
+    })
   }
 
   ngAfterViewInit() {
-    setTimeout(() => this.calcCardContentHeight(), 500);
+    setTimeout(() => this.calcCardContentHeight(), 0);
     if (this._mapService.currentExtend) {
       this._mapService.map.setView(
         this._mapService.currentExtend.center,
@@ -72,7 +93,7 @@ export class ZhFormsComponent implements OnInit {
     let tbH = document.getElementById("app-toolbar")
       ? document.getElementById("app-toolbar").offsetHeight
       : 0;
-    let height = wH - (tbH + 40);
+    let height = wH - (tbH + 80);
     this.cardContentHeight = height >= 350 ? height : 350;
     // resize map after resize container
     if (this._mapService.map) {
@@ -87,9 +108,9 @@ export class ZhFormsComponent implements OnInit {
     this.calcCardContentHeight();
   }
 
-  createForm(patchWithDefaultValues: boolean = false): void {
+  createForm(): void {
     this.form = this.fb.group({
-      name: [null, Validators.required],
+      main_name: [null, Validators.required],
       critere_delim: [null, Validators.required],
       sdage: ["", Validators.required],
     });
@@ -98,7 +119,7 @@ export class ZhFormsComponent implements OnInit {
   onFormSubmit(formValues: any) {
     this.submitted = true;
     let formToPost = {
-      name: formValues.name,
+      main_name: formValues.main_name,
       critere_delim: [],
       sdage: formValues.sdage,
       geom: null
@@ -110,36 +131,27 @@ export class ZhFormsComponent implements OnInit {
           formToPost.critere_delim.push(critere.id_nomenclature)
         });
         this.posted = true;
-
-        if (this.id_zh) {
-          formToPost['id_zh'] = Number(this.id_zh);
-          this._dataService.patchDataForm(formToPost, 0).subscribe((data) => {
-            this.id_zh = data.id_zh;
+        if (this._currentZh) {
+          formToPost['id_zh'] = Number(this._currentZh.id_zh);
+        }
+        this._dataService.postDataForm(formToPost, 0).subscribe(
+          (data) => {
             this.form.reset();
             this.posted = false;
-            this._router.navigate(["zones_humides/tabs", this.id_zh]);
+            this._dataService.getZhById(data.id_zh).subscribe(
+              (zh: any) => {
+                this._dataService.setCurrentZh(zh);
+              }
+            );
+            this.nextTab.emit(1);
+            this.activeTabs.emit(true);
           },
-            (error) => {
-              this.posted = false;
-              this._toastr.error(error.error, '', { positionClass: 'toast-top-right' });
-            }
-          )
-        }
-        else {
-          this._dataService.postDataForm(formToPost, 0).subscribe(
-            (data) => {
-              this.id_zh = data.id_zh;
-              this.form.reset();
-              this.posted = false;
-              this._router.navigate(["zones_humides/tabs", this.id_zh]);
-            },
-            (error) => {
-              this.posted = false;
-              this._toastr.error(error.error, '', { positionClass: 'toast-top-right' });
-            }
-          )
-        };
-      }
+          (error) => {
+            this.posted = false;
+            this._toastr.error(error.error, '', { positionClass: 'toast-top-right' });
+          }
+        )
+      };
     }
     else {
       this._toastr.error('Veuillez tracer ou importer une zone humide sur la carte', '', { positionClass: 'toast-top-right' });
@@ -152,17 +164,14 @@ export class ZhFormsComponent implements OnInit {
     this._router.navigate(["zones_humides"]);
   }
 
-  getMetaDataForm(idForm: number) {
-    this._dataService.getMetaDataForm(idForm).subscribe(
-      (metaData: any) => {
-        this.critDelim = metaData['CRIT_DELIM'];
-        this.sdage = metaData['SDAGE'];
-      }
-    )
+  getMetaData() {
+    this.critDelim = this.formMetaData['CRIT_DELIM'];
+    this.sdage = this.formMetaData['SDAGE'];
   }
 
   ngOnDestroy() {
     this.$_geojsonSub.unsubscribe();
+    this.$_currentZhSub.unsubscribe();
   }
 
 }

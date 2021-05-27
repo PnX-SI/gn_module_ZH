@@ -31,12 +31,11 @@ available_maplist_column = [
 ]
 
 
-nomenc_mnemo_by_tab = {
-    "0": ['CRIT_DELIM','SDAGE'],
-    "1": [],
-    "2": ['CRIT_DELIM','CRIT_DEF_ESP_FCT'],
-    "3": ['SDAGE','SAGE','OCCUPATION_SOLS','ACTIV_HUM','LOCALISATION','IMPACTS','EVAL_GLOB_MENACES']
-}
+nomenclatures = [
+    'CRIT_DELIM','SDAGE','CRIT_DELIM','CRIT_DEF_ESP_FCT','SDAGE',
+    'SAGE','OCCUPATION_SOLS','ACTIV_HUM','LOCALISATION','IMPACTS','EVAL_GLOB_MENACES'
+]
+
 
 
 class GnModuleSchemaConf(Schema):
@@ -44,5 +43,5 @@ class GnModuleSchemaConf(Schema):
     available_maplist_column = fields.List(
         fields.Dict(), missing=available_maplist_column
     )
-    nomenc_mnemo_by_tab = fields.Dict(missing=nomenc_mnemo_by_tab)
+    nomenclatures = fields.List(fields.String, missing=nomenclatures)
 

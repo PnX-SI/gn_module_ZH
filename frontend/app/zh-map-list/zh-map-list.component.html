@@ -6,7 +6,7 @@
             mat-raised-button
             color="primary"
             class="btn-action hard-shadow button-success uppercase ml-3"
-            [routerLink]="['form']"
+            [routerLink]="['forms']"
           >
             Ajouter une zone humide
             <mat-icon>add_circle_outline</mat-icon>
@@ -80,7 +80,7 @@
             <ng-container *ngIf="row.rights.U; else disabledEditBlc">
               <a
                 class="btn btn-outline-shadow btn-no-padding btn-ghost"
-                [routerLink]="['form', row.id_zh]"
+                [routerLink]="['forms', row.id_zh]"
               >
                 <i
                   matTooltip="{{'Editer la '}} {{row.main_name}}"
