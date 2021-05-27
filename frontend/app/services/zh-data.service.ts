@@ -1,11 +1,16 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
+import { BehaviorSubject } from 'rxjs';
 import { AppConfig } from "@geonature_config/app.config";
 
 @Injectable({
   providedIn: "root",
 })
 export class ZhDataService {
+
+  private zh = new BehaviorSubject();
+  public currentZh = this.zh.asObservable();
+
   constructor(private _api: HttpClient) { }
 
   /*
@@ -14,6 +19,9 @@ export class ZhDataService {
   }
   */
 
+  setCurrentZh(zh: any) {
+    this.zh.next(zh)
+  }
 
   getZhById(id: number) {
     return this._api.get<any>(`${AppConfig.API_ENDPOINT}/zones_humides/${id}`);
@@ -24,8 +32,9 @@ export class ZhDataService {
     return this._api.delete(`${AppConfig.API_ENDPOINT}/zones_humides/${id}`);
   }
 
-  getMetaDataForm(idForm: number) {
-    return this._api.get<any>(`${AppConfig.API_ENDPOINT}/zones_humides/form/${idForm}`);
+
+  getMetaDataForms() {
+    return this._api.get<any>(`${AppConfig.API_ENDPOINT}/zones_humides/forms`);
   }
 
   postDataForm(value, idForm) {

@@ -7,53 +7,69 @@
       >
       <mat-tab>
         <ng-template mat-tab-label>
+          Champs obligatoires
+        </ng-template>
+        <zh-form-tab0
+          *ngIf="formMetaData"
+          class="d-flex flex-column"
+          [ngStyle]="{'height.px': cardContentHeight}"
+          [formMetaData] = formMetaData
+          (nextTab) = "onNext($event)"
+          (activeTabs) = "onActiveTabs($event)"
+        >
+        </zh-form-tab0>
+      </mat-tab>
+      <mat-tab [disabled]="disabledTabs">
+        <ng-template mat-tab-label>
           Renseignement généraux
         </ng-template>
         <zh-form-tab1
+          *ngIf="formMetaData"
           class="d-flex flex-column"
           [ngStyle]="{'height.px': cardContentHeight}"
-          [id_zh] = id_zh
+          [formMetaData] = formMetaData
           (nextTab) = "onNext($event)"
         >
         </zh-form-tab1>
       </mat-tab>
-      <mat-tab >
+      <mat-tab [disabled]="disabledTabs">
         <ng-template mat-tab-label>
           Délimitation de la zone humide et de l'espace de fonctionnalité
         </ng-template>
         <zh-form-tab2
+          *ngIf="formMetaData"
           class="d-flex flex-column"
           [ngStyle]="{'height.px': cardContentHeight}"
-          [id_zh] = id_zh
+          [formMetaData] = formMetaData
           (nextTab) = "onNext($event)"
           >
         </zh-form-tab2>
       </mat-tab>
-      <mat-tab >
+      <mat-tab [disabled]="disabledTabs" >
         <ng-template mat-tab-label>
           Description du bassin versant et de la zone humide
         </ng-template>
         <zh-form-tab3></zh-form-tab3>
       </mat-tab>
-      <mat-tab >
+      <mat-tab [disabled]="disabledTabs">
         <ng-template mat-tab-label>
           Fonctionnement de la zone humide
         </ng-template>
         <zh-form-tab4></zh-form-tab4>
       </mat-tab>
-      <mat-tab >
+      <mat-tab [disabled]="disabledTabs">
         <ng-template mat-tab-label>
           Fonctions écologiques, valeurs socio-économiques, interét patrimonial
         </ng-template>
         <zh-form-tab5></zh-form-tab5>
       </mat-tab>
-      <mat-tab >
+      <mat-tab [disabled]="disabledTabs">
         <ng-template mat-tab-label>
           Statuts et getion de la zone humide
         </ng-template>
         <h1>Some more tab content</h1>
       </mat-tab>
-      <mat-tab >
+      <mat-tab [disabled]="disabledTabs">
         <ng-template mat-tab-label>
           Evaluation géneral du site
         </ng-template>

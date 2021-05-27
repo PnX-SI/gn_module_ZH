@@ -44,7 +44,7 @@ from .models import (
     CorZhLimFs
 )
 
-from .nomenclatures import get_nomenc_by_tab
+from .nomenclatures import get_nomenc
 
 from .repositories import (
     ZhRepository
@@ -118,6 +118,7 @@ def get_zh_by_id(id_zh, info_role):
         id_lim_fs_list = [id.id_lim_fs for id in id_lims_fs]
         
         return {
+            "id_zh": zh.id_zh,
             "main_name": zh.main_name, #name
             "secondary_name": zh.secondary_name, #otherName
             "is_id_site_space": zh.is_id_site_space, #hasGrandEsemble
@@ -136,23 +137,22 @@ def get_zh_by_id(id_zh, info_role):
         raise ZHApiError(message=str(e), details=str(e))
 
 
-@blueprint.route("/form/<int:id_tab>", methods=["GET"])
+@blueprint.route("/forms", methods=["GET"])
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
-def get_tab(id_tab, info_role):
-    """Get form metadata for one tab
+def get_tab(info_role):
+    """Get form metadata for all tabs
     """
     try:
-        metadata = get_nomenc_by_tab(id_tab, blueprint.config["nomenc_mnemo_by_tab"])
-        if id_tab == 1:
-            bib_site_spaces = DB.session.query(BibSiteSpace).all()
-            bib_site_spaces_list = [
-                {
-                    "id_site_space": bib_site_space.id_site_space,
-                    "name": bib_site_space.name
-                } for bib_site_space in bib_site_spaces
-            ]
-            metadata["BIB_SITE_SPACE"] = bib_site_spaces_list
+        metadata = get_nomenc(blueprint.config["nomenclatures"])
+        bib_site_spaces = DB.session.query(BibSiteSpace).all()
+        bib_site_spaces_list = [
+            {
+                "id_site_space": bib_site_space.id_site_space,
+                "name": bib_site_space.name
+            } for bib_site_space in bib_site_spaces
+        ]
+        metadata["BIB_SITE_SPACE"] = bib_site_spaces_list
         return metadata
     except Exception as e:
         raise ZHApiError(message=str(e), details=str(e))
@@ -212,7 +212,7 @@ def get_tab_data(id_tab, info_role):
             # set date
             zh_date = datetime.now(timezone.utc)
             # set name
-            if form_data['name'] == "":
+            if form_data['main_name'] == "":
                 return 'Empty mandatory field',400
 
             # fill pr_zh.cor_lim_list
@@ -226,7 +226,7 @@ def get_tab_data(id_tab, info_role):
             
             # create zh : fill pr_zh.t_zh
             new_zh = TZH(
-                main_name = form_data['name'],
+                main_name = form_data['main_name'],
                 code = code,
                 create_author = info_role.id_role,
                 update_author = info_role.id_role,

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { Router } from "@angular/router";
+import { Subscription } from "rxjs";
 import { ToastrService } from 'ngx-toastr';
 import { ZhDataService } from "../../../services/zh-data.service";
 import { AppConfig } from "@geonature_config/app.config";
@@ -12,14 +12,15 @@ import { AppConfig } from "@geonature_config/app.config";
 })
 export class ZhFormTab1Component implements OnInit {
 
-  @Input() id_zh: number;
+  @Input() formMetaData;
   @Output() nextTab = new EventEmitter<number>();
   public generalInfoForm: FormGroup;
   public siteSpaceList: any[];
   public hasSiteSpace = false;
-  public currentZh: any;
   public appConfig = AppConfig;
   public cols = ['title', 'authors', 'pub_year'];
+  private _currentZh: any;
+  public $_currentZhSub: Subscription;
   listBib: any[] = [];
   submitted: boolean;
   posted: boolean;
@@ -29,25 +30,34 @@ export class ZhFormTab1Component implements OnInit {
     private fb: FormBuilder,
     private _dataService: ZhDataService,
     private _toastr: ToastrService,
-    private _router: Router
   ) { }
 
   ngOnInit() {
+    this.getMetaData();
     this.createForm();
-    this.getMetaDataForm(1);
-    this.getZhById(this.id_zh);
+
+    this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
+      if (zh) {
+        this._currentZh = zh;
+        this.generalInfoForm.patchValue({
+          main_name: this._currentZh.main_name,
+          id_zh: this._currentZh.id_zh,
+        });
+      }
+    })
   }
+
 
   createForm(): void {
     this.generalInfoForm = this.fb.group({
       main_name: [null, Validators.required],
       secondary_name: null,
-      id_zh: [{ value: this.id_zh, disabled: true }, Validators.required],
+      id_zh: [{ value: null, disabled: true }, Validators.required],
       id_site_space: null,
       is_id_site_space: false,
       bibRef: []
     });
-    this.onFormValueChanges()
+    this.onFormValueChanges();
   }
 
   onFormValueChanges(): void {
@@ -64,24 +74,10 @@ export class ZhFormTab1Component implements OnInit {
       });
   }
 
-  getMetaDataForm(idForm: number) {
-    this._dataService.getMetaDataForm(idForm).subscribe(
-      (metaData: any) => {
-        this.siteSpaceList = metaData.BIB_SITE_SPACE;
-      }
-    )
+  getMetaData() {
+    this.siteSpaceList = this.formMetaData.BIB_SITE_SPACE;
   }
 
-  getZhById(id_zh: number) {
-    this._dataService.getZhById(id_zh).subscribe(
-      (zh: any) => {
-        this.currentZh = zh;
-        this.generalInfoForm.patchValue({
-          main_name: this.currentZh.main_name
-        });
-      }
-    )
-  }
 
   formatter(item) {
     return item.title;
@@ -109,14 +105,14 @@ export class ZhFormTab1Component implements OnInit {
     this.submitted = true;
     let formToPost = {
       secondary_name: formValues.secondary_name,
-      id_zh: Number(this.id_zh),
+      id_zh: Number(this._currentZh.id_zh),
       id_site_space: formValues.id_site_space,
       is_id_site_space: formValues.is_id_site_space,
       id_references: []
     };
 
     if (this.generalInfoForm.valid) {
-      if (formValues.main_name != this.currentZh.main_name) {
+      if (formValues.main_name != this._currentZh.main_name) {
         formValues.main_name = formValues.main_name;
       }
 
@@ -125,7 +121,7 @@ export class ZhFormTab1Component implements OnInit {
       });
       this.posted = true;
       this._dataService.postDataForm(formToPost, 1).subscribe(
-        (data) => {
+        () => {
           this.generalInfoForm.reset();
           this.posted = false;
           this.nextTab.emit(2);
@@ -140,7 +136,11 @@ export class ZhFormTab1Component implements OnInit {
 
   onPrevious() {
     this.generalInfoForm.reset();
-    this._router.navigate(["zones_humides/form", this.id_zh]);
+    this.nextTab.emit(0);
+  }
+
+  ngOnDestroy() {
+    this.$_currentZhSub.unsubscribe();
   }
 
 }
