@@ -26,7 +26,6 @@ from pdb import set_trace as debug
 from sqlalchemy.inspection import inspect
 
 
-
 class ZhModel(DB.Model):
     """
         Classe abstraite permettant d'ajout des méthodes
@@ -106,11 +105,13 @@ class Nomenclatures(TNomenclatures):
     @staticmethod
     def get_nomenclature_info(bib_mnemo):
         q = TNomenclatures.query.filter_by(
-            id_type=select([func.ref_nomenclatures.get_id_nomenclature_type(bib_mnemo)])
-            ).all()
+            id_type=select(
+                [func.ref_nomenclatures.get_id_nomenclature_type(bib_mnemo)])
+        ).all()
         return q
 
 
+@serializable
 class BibSiteSpace(DB.Model):
     __tablename__ = "bib_site_space"
     __table_args__ = {"schema": "pr_zh"}
@@ -124,11 +125,11 @@ class TZH(ZhModel):
     __tablename__ = "t_zh"
     __table_args__ = {"schema": "pr_zh"}
     id_zh = DB.Column(
-        DB.Integer, 
+        DB.Integer,
         primary_key=True,
         autoincrement=True)
     zh_uuid = DB.Column(
-        UUID(as_uuid=True), 
+        UUID(as_uuid=True),
         default=select([func.uuid_generate_v4()]))
     code = DB.Column(DB.Unicode, nullable=False)
     main_name = DB.Column(DB.Unicode, nullable=False)
@@ -137,7 +138,7 @@ class TZH(ZhModel):
         DB.Boolean,
         default=False)
     id_site_space = DB.Column(
-        DB.Integer, 
+        DB.Integer,
         ForeignKey(BibSiteSpace.id_site_space))
     create_author = DB.Column(
         DB.Integer,
@@ -158,7 +159,7 @@ class TZH(ZhModel):
     remark_lim = DB.Column(DB.Unicode)
     remark_lim_fs = DB.Column(DB.Unicode)
     id_sdage = DB.Column(
-        DB.Integer, 
+        DB.Integer,
         ForeignKey(TNomenclatures.id_nomenclature),
         nullable=False)
     id_sage = DB.Column(
@@ -206,13 +207,12 @@ class TZH(ZhModel):
     remark_eval_heritage = DB.Column(DB.Unicode)
     remark_eval_thread = DB.Column(DB.Unicode)
     remark_eval_actions = DB.Column(DB.Unicode)
-    
+
     authors = DB.relationship(
         User,
         lazy="joined",
         primaryjoin=(User.id_role == create_author)
     )
-
 
     def get_geofeature(self, recursif=True, relationships=()):
         return self.as_geofeature("geom", "id_zh", recursif, relationships=relationships)
@@ -220,11 +220,14 @@ class TZH(ZhModel):
     @staticmethod
     def get_zh_area_intersected(zh_area_type, id_zh_geom):
         if zh_area_type == 'river_basin':
-            q = DB.session.query(TRiverBasin).filter(TRiverBasin.geom.ST_Intersects(cast(id_zh_geom,Geography))).all()
+            q = DB.session.query(TRiverBasin).filter(
+                TRiverBasin.geom.ST_Intersects(cast(id_zh_geom, Geography))).all()
         if zh_area_type == 'hydro_area':
-            q = DB.session.query(THydroArea).filter(THydroArea.geom.ST_Intersects(cast(id_zh_geom,Geography))).all()
+            q = DB.session.query(THydroArea).filter(
+                THydroArea.geom.ST_Intersects(cast(id_zh_geom, Geography))).all()
         if zh_area_type == 'fct_area':
-            q = DB.session.query(TFctArea).filter(TFctArea.geom.ST_Intersects(cast(id_zh_geom,Geography))).all()
+            q = DB.session.query(TFctArea).filter(
+                TFctArea.geom.ST_Intersects(cast(id_zh_geom, Geography))).all()
         return q
 
 
@@ -234,12 +237,12 @@ class CorLimList(DB.Model):
     id_lim_list = DB.Column(
         UUID(as_uuid=True),
         primary_key=True
-        )
+    )
     id_lim = DB.Column(
         DB.Integer,
         ForeignKey(TNomenclatures.id_nomenclature),
         primary_key=True
-        )
+    )
 
 
 class CorZhArea(DB.Model):
@@ -249,12 +252,12 @@ class CorZhArea(DB.Model):
         DB.Integer,
         ForeignKey("ref_geo.l_areas.id_area"),
         primary_key=True
-        )
+    )
     id_zh = DB.Column(
         DB.Integer,
         ForeignKey(TZH.id_zh),
         primary_key=True
-        )
+    )
     cover = DB.Column(DB.Integer)
 
 
@@ -264,15 +267,15 @@ class TRiverBasin(DB.Model):
     id_rb = DB.Column(
         DB.Integer,
         primary_key=True
-        )
+    )
     name = DB.Column(
         DB.Unicode,
         nullable=False
-        )
+    )
     geom = DB.Column(
         geoalchemy2.Geometry("GEOMETRY", 4326),
         nullable=False
-        )
+    )
     id_climate_class = DB.Column(
         DB.Integer,
         ForeignKey(TNomenclatures.id_nomenclature)
@@ -304,15 +307,15 @@ class THydroArea(DB.Model):
     id_hydro = DB.Column(
         DB.Integer,
         primary_key=True
-        )
+    )
     name = DB.Column(
         DB.Unicode,
         nullable=False
-        )
+    )
     geom = DB.Column(
         geoalchemy2.Geometry("GEOMETRY", 4326),
         nullable=False
-        )
+    )
 
 
 class CorZhHydro(DB.Model):
@@ -336,11 +339,11 @@ class TFctArea(DB.Model):
     id_fct_area = DB.Column(
         DB.Integer,
         primary_key=True
-        )
+    )
     geom = DB.Column(
         geoalchemy2.Geometry("GEOMETRY", 4326),
         nullable=False
-        )
+    )
 
 
 class CorZhFctArea(DB.Model):
@@ -356,6 +359,7 @@ class CorZhFctArea(DB.Model):
         ForeignKey(TFctArea.id_fct_area),
         primary_key=True
     )
+
 
 @serializable
 class TReferences(DB.Model):
@@ -402,4 +406,27 @@ class CorZhLimFs(DB.Model):
         DB.Integer,
         ForeignKey(TNomenclatures.id_nomenclature),
         primary_key=True
+    )
+
+
+@serializable
+class BibOrganismes(DB.Model):
+    __tablename__ = "bib_organismes"
+    __table_args__ = {"schema": "pr_zh"}
+    id_org = DB.Column(
+        DB.Integer,
+        primary_key=True
+    )
+    name = DB.Column(
+        DB.Unicode(length=6),
+        nullable=False
+    )
+    abbrevation = DB.Column(
+        DB.Unicode,
+        nullable=False
+    )
+    is_op_org = DB.Column(
+        DB.Boolean,
+        default=False,
+        nullable=False
     )

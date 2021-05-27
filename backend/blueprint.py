@@ -41,7 +41,8 @@ from .models import (
     CorZhRef,
     TReferences,
     BibSiteSpace,
-    CorZhLimFs
+    CorZhLimFs,
+    BibOrganismes
 )
 
 from .nomenclatures import get_nomenc
@@ -122,11 +123,11 @@ def get_zh_by_id(id_zh, info_role):
 
         return {
             "id_zh": zh.id_zh,
-            "main_name": zh.main_name, #name
-            "secondary_name": zh.secondary_name, #otherName
-            "is_id_site_space": zh.is_id_site_space, #hasGrandEsemble
-            "id_site_space": zh.id_site_space, #grandEsemble
-            "id_lim_list": id_lim_list, #critere_delim
+            "main_name": zh.main_name,  # name
+            "secondary_name": zh.secondary_name,  # otherName
+            "is_id_site_space": zh.is_id_site_space,  # hasGrandEsemble
+            "id_site_space": zh.id_site_space,  # grandEsemble
+            "id_lim_list": id_lim_list,  # critere_delim
             "id_sdage": zh.id_sdage,
             "references": references,
             "id_lim_fs": id_lim_fs_list,  # critere delim esp fonct
@@ -148,13 +149,19 @@ def get_tab(info_role):
     """
     try:
         metadata = get_nomenc(blueprint.config["nomenclatures"])
+
+        bib_organismes = DB.session.query(BibOrganismes).all()
+
+        bib_organismes_list = [
+            bib_site_space.as_dict() for bib_site_space in bib_organismes
+        ]
+        metadata["BIB_ORGANISMES"] = bib_organismes_list
+
         bib_site_spaces = DB.session.query(BibSiteSpace).all()
         bib_site_spaces_list = [
-            {
-                "id_site_space": bib_site_space.id_site_space,
-                "name": bib_site_space.name
-            } for bib_site_space in bib_site_spaces
+            bib_site_space.as_dict() for bib_site_space in bib_site_spaces
         ]
+
         metadata["BIB_SITE_SPACE"] = bib_site_spaces_list
         return metadata
     except Exception as e:
