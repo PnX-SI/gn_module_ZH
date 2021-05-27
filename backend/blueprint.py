@@ -225,6 +225,7 @@ def get_tab_data(id_tab, info_role):
                 return 'Empty mandatory field', 400
 
             if 'id_zh' not in form_data.keys():
+
                 # fill pr_zh.cor_lim_list
                 uuid_id_lim_list = uuid.uuid4()
                 for lim in form_data['critere_delim']:
@@ -239,6 +240,7 @@ def get_tab_data(id_tab, info_role):
                 new_zh = TZH(
                     main_name=form_data['main_name'],
                     code=code,
+                    id_org=form_data['id_org'],
                     create_author=info_role.id_role,
                     update_author=info_role.id_role,
                     create_date=zh_date,
@@ -312,6 +314,7 @@ def get_tab_data(id_tab, info_role):
                 # update zh : fill pr_zh.t_zh
                 DB.session.query(TZH).filter(TZH.id_zh == form_data['id_zh']).update({
                     TZH.main_name: form_data['main_name'],
+                    TZH.id_org: form_data['id_org'],
                     TZH.update_author: info_role.id_role,
                     TZH.update_date: zh_date,
                     TZH.id_sdage: form_data['sdage'],
