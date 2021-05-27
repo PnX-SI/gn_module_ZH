@@ -76,9 +76,11 @@ export class ZhFormTab1Component implements OnInit {
     this._dataService.getZhById(id_zh).subscribe(
       (zh: any) => {
         this.currentZh = zh;
+        
         this.generalInfoForm.patchValue({
           main_name: this.currentZh.main_name
         });
+        
       }
     )
   }
@@ -108,6 +110,7 @@ export class ZhFormTab1Component implements OnInit {
   onFormSubmit(formValues: any) {
     this.submitted = true;
     let formToPost = {
+      main_name: formValues.main_name,
       secondary_name: formValues.secondary_name,
       id_zh: Number(this.id_zh),
       id_site_space: formValues.id_site_space,
@@ -116,17 +119,17 @@ export class ZhFormTab1Component implements OnInit {
     };
 
     if (this.generalInfoForm.valid) {
+      
       if (formValues.main_name != this.currentZh.main_name) {
         formValues.main_name = formValues.main_name;
       }
-
       this.listBib.forEach(bib => {
         formToPost.id_references.push(bib.id_reference)
       });
       this.posted = true;
       this._dataService.postDataForm(formToPost, 1).subscribe(
         (data) => {
-          this.generalInfoForm.reset();
+          //this.generalInfoForm.reset();
           this.posted = false;
           this.nextTab.emit(2);
         },

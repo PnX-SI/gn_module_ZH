@@ -1,6 +1,6 @@
 from flask import (
-    Blueprint, 
-    current_app, 
+    Blueprint,
+    current_app,
     session,
     request,
     json,
@@ -31,7 +31,7 @@ from geonature.core.gn_permissions import decorators as permissions
 from geonature.core.gn_permissions.tools import get_or_fetch_user_cruved
 
 from .models import (
-    TZH, 
+    TZH,
     Nomenclatures,
     CorLimList,
     CorZhArea,
@@ -65,7 +65,7 @@ def get_zh(info_role):
     q = DB.session.query(TZH)
 
     parameters = request.args
-    
+
     limit = int(parameters.get("limit", 100))
     page = int(parameters.get("offset", 0))
 
@@ -78,7 +78,7 @@ def get_zh(info_role):
     )
 
     data = q.limit(limit).offset(page * limit).all()
-    
+
     featureCollection = []
     for n in data:
         releve_cruved = n.get_releve_cruved(user, user_cruved)
@@ -93,7 +93,7 @@ def get_zh(info_role):
         "page": page,
         "limit": limit,
         "items": FeatureCollection(featureCollection)
-    },200
+    }, 200
 
 
 @blueprint.route("/<int:id_zh>", methods=["GET"])
@@ -104,31 +104,34 @@ def get_zh_by_id(id_zh, info_role):
     """
     try:
         zh = DB.session.query(TZH).filter(TZH.id_zh == id_zh).one()
- 
+
         # get criteres delim
-        id_lims = DB.session.query(CorLimList).filter(CorLimList.id_lim_list == zh.id_lim_list).all()
+        id_lims = DB.session.query(CorLimList).filter(
+            CorLimList.id_lim_list == zh.id_lim_list).all()
         id_lim_list = [id.id_lim for id in id_lims]
 
         # ref biblio
-        refs = DB.session.query(TReferences).join(CorZhRef).filter(CorZhRef.id_zh == id_zh).all()
+        refs = DB.session.query(TReferences).join(
+            CorZhRef).filter(CorZhRef.id_zh == id_zh).all()
         references = [ref.as_dict() for ref in refs]
 
         # get criteres delim esp fonctionnalite
-        id_lims_fs = DB.session.query(CorZhLimFs).filter(CorZhLimFs.id_zh == zh.id_zh).all()
+        id_lims_fs = DB.session.query(CorZhLimFs).filter(
+            CorZhLimFs.id_zh == zh.id_zh).all()
         id_lim_fs_list = [id.id_lim_fs for id in id_lims_fs]
-        
+
         return {
-            "main_name": zh.main_name, #name
-            "secondary_name": zh.secondary_name, #otherName
-            "is_id_site_space": zh.is_id_site_space, #hasGrandEsemble
-            "id_site_space": zh.id_site_space, #grandEsemble
-            "id_lim_list": id_lim_list, #critere_delim
+            "main_name": zh.main_name,  # name
+            "secondary_name": zh.secondary_name,  # otherName
+            "is_id_site_space": zh.is_id_site_space,  # hasGrandEsemble
+            "id_site_space": zh.id_site_space,  # grandEsemble
+            "id_lim_list": id_lim_list,  # critere_delim
             "id_sdage": zh.id_sdage,
             "references": references,
-            "id_lim_fs": id_lim_fs_list, #critere delim esp fonct
+            "id_lim_fs": id_lim_fs_list,  # critere delim esp fonct
             "remark_lim": zh.remark_lim,
             "remark_lim_fs": zh.remark_lim_fs
-        },200
+        }, 200
 
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':
@@ -143,7 +146,8 @@ def get_tab(id_tab, info_role):
     """Get form metadata for one tab
     """
     try:
-        metadata = get_nomenc_by_tab(id_tab, blueprint.config["nomenc_mnemo_by_tab"])
+        metadata = get_nomenc_by_tab(
+            id_tab, blueprint.config["nomenc_mnemo_by_tab"])
         if id_tab == 1:
             bib_site_spaces = DB.session.query(BibSiteSpace).all()
             bib_site_spaces_list = [
@@ -170,7 +174,7 @@ def get_ref_autocomplete(info_role):
         func.similarity(TReferences.title, search_title).label("idx_trgm"),
     )
 
-    #if "id_list" in params:
+    # if "id_list" in params:
     #    q = q.join(
     #        CorListHabitat, CorListHabitat.cd_hab == AutoCompleteHabitat.cd_hab
     #    ).filter(CorListHabitat.id_list == params.get("id_list"))
@@ -181,7 +185,7 @@ def get_ref_autocomplete(info_role):
     ).order_by(desc("idx_trgm"))
 
     # filter by typology
-    #if "cd_typo" in params:
+    # if "cd_typo" in params:
     #    q = q.filter(AutoCompleteHabitat.cd_typo == params.get("cd_typo"))
 
     limit = request.args.get("limit", 20)
@@ -194,132 +198,237 @@ def get_ref_autocomplete(info_role):
         return "No Result", 404
 
 
-@blueprint.route("/form/<int:id_tab>", methods=["POST"])
+@blueprint.route("/form/<int:id_tab>", methods=["POST", "PATCH"])
 @permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
 @json_resp
 def get_tab_data(id_tab, info_role):
     """Post zh data
     """
     form_data = request.json
-
     try:
-        if id_tab == 1:
-            return {"test": "ok"},200
         # get form data
         if id_tab == 0:
+
             # set geometry from coordinates
-            polygon = DB.session.query(func.ST_GeomFromGeoJSON(str(form_data['geom']['geometry']))).one()[0]
+            polygon = DB.session.query(func.ST_GeomFromGeoJSON(
+                str(form_data['geom']['geometry']))).one()[0]
             # set date
             zh_date = datetime.now(timezone.utc)
             # set name
             if form_data['name'] == "":
-                return 'Empty mandatory field',400
+                return 'Empty mandatory field', 400
 
-            # fill pr_zh.cor_lim_list
-            uuid_id_lim_list = uuid.uuid4()
-            for lim in form_data['critere_delim']:
-                DB.session.add(CorLimList(id_lim_list=uuid_id_lim_list, id_lim=lim))
+            if 'id_zh' not in form_data.keys():
+                # fill pr_zh.cor_lim_list
+                uuid_id_lim_list = uuid.uuid4()
+                for lim in form_data['critere_delim']:
+                    DB.session.add(CorLimList(
+                        id_lim_list=uuid_id_lim_list, id_lim=lim))
+                    DB.session.flush()
+
+                # temporary code
+                code = str(uuid.uuid4())[0:12]
+
+                # create zh : fill pr_zh.t_zh
+                new_zh = TZH(
+                    main_name=form_data['name'],
+                    code=code,
+                    create_author=info_role.id_role,
+                    update_author=info_role.id_role,
+                    create_date=zh_date,
+                    update_date=zh_date,
+                    id_lim_list=uuid_id_lim_list,
+                    id_sdage=form_data['sdage'],
+                    geom=polygon
+                )
+                DB.session.add(new_zh)
                 DB.session.flush()
 
-            # temporary code
-            code = str(uuid.uuid4())[0:12]
-            
-            # create zh : fill pr_zh.t_zh
-            new_zh = TZH(
-                main_name = form_data['name'],
-                code = code,
-                create_author = info_role.id_role,
-                update_author = info_role.id_role,
-                create_date = zh_date,
-                update_date = zh_date,
-                id_lim_list = uuid_id_lim_list,
-                id_sdage = form_data['sdage'],
-                geom = polygon
-            )
-            DB.session.add(new_zh)
-            DB.session.flush()
-                            
-            # fill cor_zh_area
-            #test = DB.session.query(TZH.geom).filter(TZH.id_zh == new_zh.id_zh).one()
-            #select (ref_geo.fct_get_area_intersection(ST_SetSRID('010300000001000000040000008978EBFCDB05054098FA795391844640904FC8CEDB180540139B8F6B438346402EAA454431F90440CAFB389A238346408978EBFCDB05054098FA795391844640'::geometry,4326),25)).id_area;
-            query = """
-                SELECT (ref_geo.fct_get_area_intersection(
-                ST_SetSRID('{geom}'::geometry,4326), {type})).id_area
-                """.format(geom=str(polygon),type=25)
-            comm_list = DB.session.execute(text(query)).fetchall()
-            for comm in comm_list:
-                DB.session.add(CorZhArea(id_area=comm[0], id_zh=new_zh.id_zh))
+                # fill cor_zh_area
+                #test = DB.session.query(TZH.geom).filter(TZH.id_zh == new_zh.id_zh).one()
+                # select (ref_geo.fct_get_area_intersection(ST_SetSRID('010300000001000000040000008978EBFCDB05054098FA795391844640904FC8CEDB180540139B8F6B438346402EAA454431F90440CAFB389A238346408978EBFCDB05054098FA795391844640'::geometry,4326),25)).id_area;
+                query = """
+                    SELECT (ref_geo.fct_get_area_intersection(
+                    ST_SetSRID('{geom}'::geometry,4326), {type})).id_area
+                    """.format(geom=str(polygon), type=25)
+                comm_list = DB.session.execute(text(query)).fetchall()
+                for comm in comm_list:
+                    DB.session.add(
+                        CorZhArea(id_area=comm[0], id_zh=new_zh.id_zh))
+                    DB.session.flush()
+
+                # fill cor_zh_rb
+                rbs = TZH.get_zh_area_intersected(
+                    'river_basin', func.ST_GeomFromGeoJSON(str(form_data['geom']['geometry'])))
+                for rb in rbs:
+                    DB.session.add(CorZhRb(id_zh=new_zh.id_zh, id_rb=rb.id_rb))
+                    DB.session.flush()
+
+                # fill cor_zh_hydro
+                has = TZH.get_zh_area_intersected(
+                    'hydro_area', func.ST_GeomFromGeoJSON(str(form_data['geom']['geometry'])))
+                for ha in has:
+                    DB.session.add(CorZhHydro(
+                        id_zh=new_zh.id_zh, id_hydro=ha.id_hydro))
+                    DB.session.flush()
+
+                # fill cor_zh_fct_area
+                fas = TZH.get_zh_area_intersected(
+                    'fct_area', func.ST_GeomFromGeoJSON(str(form_data['geom']['geometry'])))
+                for fa in fas:
+                    DB.session.add(CorZhFctArea(
+                        id_zh=new_zh.id_zh, id_fct_area=fa.id_fct_area))
+                    DB.session.flush()
+
+                DB.session.commit()
+                return {
+                    "id_zh": new_zh.id_zh
+                }, 200
+
+            if 'id_zh' in form_data.keys():
+
+                if polygon != DB.session.query(TZH.geom).filter(
+                        TZH.id_zh == form_data['id_zh']).one()[0]:
+                    is_geom_new = True
+                else:
+                    is_geom_new = False
+
+                # update pr_zh.cor_lim_list
+                id_lim_list = DB.session.query(TZH.id_lim_list).filter(
+                    TZH.id_zh == form_data['id_zh']).one()[0]
+                DB.session.query(CorLimList).filter(
+                    CorLimList.id_lim_list == id_lim_list).delete()
+                for lim in form_data['critere_delim']:
+                    DB.session.add(CorLimList(
+                        id_lim_list=id_lim_list, id_lim=lim))
+                    DB.session.flush()
+
+                # update zh : fill pr_zh.t_zh
+                DB.session.query(TZH).filter(TZH.id_zh == form_data['id_zh']).update({
+                    TZH.main_name: form_data['name'],
+                    TZH.update_author: info_role.id_role,
+                    TZH.update_date: zh_date,
+                    TZH.id_sdage: form_data['sdage'],
+                    TZH.geom: polygon
+                })
                 DB.session.flush()
 
-            # fill cor_zh_rb
-            rbs = TZH.get_zh_area_intersected('river_basin',func.ST_GeomFromGeoJSON(str(form_data['geom']['geometry'])))
-            for rb in rbs:
-                DB.session.add(CorZhRb(id_zh=new_zh.id_zh,id_rb=rb.id_rb))
-                DB.session.flush()
+                if is_geom_new:
+                    # update cor_zh_area
+                    DB.session.query(CorZhArea).filter(
+                        CorZhArea.id_zh == form_data['id_zh']).delete()
+                    query = """
+                        SELECT (ref_geo.fct_get_area_intersection(
+                        ST_SetSRID('{geom}'::geometry,4326), {type})).id_area
+                        """.format(geom=str(polygon), type=25)
+                    comm_list = DB.session.execute(text(query)).fetchall()
+                    for comm in comm_list:
+                        DB.session.add(
+                            CorZhArea(id_area=comm[0], id_zh=form_data['id_zh']))
+                        DB.session.flush()
 
-            # fill cor_zh_hydro
-            has = TZH.get_zh_area_intersected('hydro_area',func.ST_GeomFromGeoJSON(str(form_data['geom']['geometry'])))
-            for ha in has:
-                DB.session.add(CorZhHydro(id_zh=new_zh.id_zh,id_hydro=ha.id_hydro))
-                DB.session.flush()
+                    # update cor_zh_rb
+                    DB.session.query(CorZhRb).filter(
+                        CorZhRb.id_zh == form_data['id_zh']).delete()
+                    rbs = TZH.get_zh_area_intersected(
+                        'river_basin', func.ST_GeomFromGeoJSON(str(form_data['geom']['geometry'])))
+                    for rb in rbs:
+                        DB.session.add(
+                            CorZhRb(id_zh=form_data['id_zh'], id_rb=rb.id_rb))
+                        DB.session.flush()
 
-            # fill cor_zh_fct_area
-            fas = TZH.get_zh_area_intersected('fct_area',func.ST_GeomFromGeoJSON(str(form_data['geom']['geometry'])))
-            for fa in fas:
-                DB.session.add(CorZhFctArea(id_zh=new_zh.id_zh,id_fct_area=fa.id_fct_area))
-                DB.session.flush()
+                    # update cor_zh_hydro
+                    DB.session.query(CorZhHydro).filter(
+                        CorZhHydro.id_zh == form_data['id_zh']).delete()
+                    has = TZH.get_zh_area_intersected(
+                        'hydro_area', func.ST_GeomFromGeoJSON(str(form_data['geom']['geometry'])))
+                    for ha in has:
+                        DB.session.add(CorZhHydro(
+                            id_zh=form_data['id_zh'], id_hydro=ha.id_hydro))
+                        DB.session.flush()
 
-            DB.session.commit()
-            return {
-                "id_zh": new_zh.id_zh
-            },200
+                    # update cor_zh_fct_area
+                    DB.session.query(CorZhFctArea).filter(
+                        CorZhFctArea.id_zh == form_data['id_zh']).delete()
+                    fas = TZH.get_zh_area_intersected(
+                        'fct_area', func.ST_GeomFromGeoJSON(str(form_data['geom']['geometry'])))
+                    for fa in fas:
+                        DB.session.add(CorZhFctArea(
+                            id_zh=form_data['id_zh'], id_fct_area=fa.id_fct_area))
+                        DB.session.flush()
+
+                DB.session.commit()
+                return {
+                    "id_zh": form_data['id_zh']
+                }, 200
 
         if id_tab == 1:
-            print(form_data)
-        
-        if id_tab == 2:
-            
             id_zh = form_data['id_zh']
-            
+            DB.session.query(TZH).filter(TZH.id_zh == id_zh).update({
+                TZH.main_name: form_data['main_name'],
+                TZH.secondary_name: form_data['secondary_name'],
+                TZH.is_id_site_space: form_data['is_id_site_space'],
+                TZH.id_site_space: form_data['id_site_space']
+            })
+            DB.session.query(CorZhRef).filter(CorZhRef.id_zh == id_zh).delete()
+            for ref in form_data['id_references']:
+                DB.session.add(CorZhRef(id_zh=id_zh, id_ref=ref))
+                DB.session.flush()
+            DB.session.commit()
+            return {
+                "id_zh": form_data['id_zh']
+            }, 200
+
+        if id_tab == 2:
+
+            id_zh = form_data['id_zh']
+
             # edit criteres delim
-            uuid_lim_list = DB.session.query(TZH.id_lim_list).filter(TZH.id_zh == id_zh).one().id_lim_list
+            uuid_lim_list = DB.session.query(TZH.id_lim_list).filter(
+                TZH.id_zh == id_zh).one().id_lim_list
             #query = DB.session.query(CorLimList).filter(CorLimList.id_lim_list == uuid_lim_list).all()
             #zh_crit_delim_list = sorted([q.id_lim for q in query])
             #new_crit_delim_list = sorted(form_data['critere_delim'])
-            #if new_crit_delim_list != zh_crit_delim_list:
-            DB.session.query(CorLimList).filter(CorLimList.id_lim_list == uuid_lim_list).delete()
+            # if new_crit_delim_list != zh_crit_delim_list:
+            DB.session.query(CorLimList).filter(
+                CorLimList.id_lim_list == uuid_lim_list).delete()
             for lim in form_data['critere_delim']:
-                DB.session.add(CorLimList(id_lim_list=uuid_lim_list, id_lim=lim))
+                DB.session.add(CorLimList(
+                    id_lim_list=uuid_lim_list, id_lim=lim))
                 DB.session.flush()
-            
+
             # remarque criteres delim
-            DB.session.query(TZH).filter(TZH.id_zh == id_zh).update({TZH.remark_lim: form_data['remark_lim']})
+            DB.session.query(TZH).filter(TZH.id_zh == id_zh).update(
+                {TZH.remark_lim: form_data['remark_lim']})
 
             # edit criteres delim fonctionnelles
-            DB.session.query(CorZhLimFs).filter(CorZhLimFs.id_zh == id_zh).delete()
+            DB.session.query(CorZhLimFs).filter(
+                CorZhLimFs.id_zh == id_zh).delete()
             for lim in form_data['critere_delim_fs']:
                 DB.session.add(CorZhLimFs(id_zh=id_zh, id_lim_fs=lim))
                 DB.session.flush()
 
             # remarque criteres delim fonctionnelles
-            DB.session.query(TZH).filter(TZH.id_zh == id_zh).update({TZH.remark_lim_fs: form_data['remark_lim_fs']})
+            DB.session.query(TZH).filter(TZH.id_zh == id_zh).update(
+                {TZH.remark_lim_fs: form_data['remark_lim_fs']})
 
             DB.session.commit()
 
             return {
                 "id_zh": id_zh
-            },200
+            }, 200
 
     except Exception as e:
+        debug()
+
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
-            return 'Empty mandatory field',400
+            return 'Empty mandatory field', 400
         if e.__class__.__name__ == 'IntegrityError':
-            return 'ZH name already exists',400
+            return 'ZH name already exists', 400
         DB.session.rollback()
         raise ZHApiError(message=str(e), details=str(e))
     finally:
         DB.session.close()
-
 
 
 @blueprint.route("/<int:id_zh>", methods=["DELETE"])
@@ -332,9 +441,10 @@ def deleteOneZh(id_zh, info_role):
 
     """
     zhRepository = ZhRepository(TZH)
+    DB.session.query(CorZhRef).filter(CorZhRef.id_zh == id_zh).delete()
     zhRepository.delete(id_zh, info_role)
 
-    return {"message": "delete with success"},200
+    return {"message": "delete with success"}, 200
 
 
 """
