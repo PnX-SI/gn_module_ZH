@@ -10,13 +10,12 @@ import { ActivatedRoute } from '@angular/router';
 export class ZhTabsComponent implements OnInit {
 
   public cardContentHeight: number;
-  public geom: any;
   public id_zh: number;
+  selectedIndex = 0;
 
   constructor(
     private _mapService: MapService,
     private _route: ActivatedRoute,
-    private _elRef: ElementRef
   ) { }
 
   ngOnInit() {
@@ -43,8 +42,6 @@ export class ZhTabsComponent implements OnInit {
       : 0;
     let height = wH - (tbH + 80);
     this.cardContentHeight = height >= 350 ? height : 350;
-    console.log(" this.cardContentHeight", this.cardContentHeight);
-
     // resize map after resize container
     if (this._mapService.map) {
       setTimeout(() => {
@@ -58,10 +55,9 @@ export class ZhTabsComponent implements OnInit {
     this.calcCardContentHeight();
   }
 
-  getGeoInfo(geom) {
-    this.geom = geom;
-    console.log(this.geom);
+  onNext(step) {
+    this.selectedIndex = step - 1;
+    console.log(this.selectedIndex);
   }
-
 
 }

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { ToastrService } from 'ngx-toastr';
@@ -13,6 +13,7 @@ import { AppConfig } from "@geonature_config/app.config";
 export class ZhFormTab1Component implements OnInit {
 
   @Input() id_zh: number;
+  @Output() nextTab = new EventEmitter<number>();
   public generalInfoForm: FormGroup;
   public siteSpaceList: any[];
   public hasSiteSpace = false;
@@ -36,8 +37,6 @@ export class ZhFormTab1Component implements OnInit {
     this.getMetaDataForm(1);
     this.getZhById(this.id_zh);
   }
-
-
 
   createForm(): void {
     this.generalInfoForm = this.fb.group({
@@ -120,17 +119,16 @@ export class ZhFormTab1Component implements OnInit {
       if (formValues.main_name != this.currentZh.main_name) {
         formValues.main_name = formValues.main_name;
       }
-      //formToPost.bibRef.push(formValues.bibRef.id_reference)
+
       this.listBib.forEach(bib => {
         formToPost.id_references.push(bib.id_reference)
       });
       this.posted = true;
-      console.log('formToPost', formToPost);
       this._dataService.postDataForm(formToPost, 1).subscribe(
         (data) => {
           this.generalInfoForm.reset();
           this.posted = false;
-          //this._router.navigate(["zones_humides/tabs", this.id_zh]);
+          this.nextTab.emit(2);
         },
         (error) => {
           this.posted = false;
@@ -144,6 +142,5 @@ export class ZhFormTab1Component implements OnInit {
     this.generalInfoForm.reset();
     this._router.navigate(["zones_humides/form", this.id_zh]);
   }
-
 
 }
