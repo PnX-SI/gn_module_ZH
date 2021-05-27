@@ -42,10 +42,16 @@ COMMENT ON COLUMN pr_zh.bib_cb.is_ch IS 'true si le Corine Biotope est utilisé 
 CREATE  TABLE pr_zh.bib_organismes ( 
 	id_org               integer  NOT NULL ,
 	name                 varchar(100)  NOT NULL ,
+	abbrevation          varchar(6) DEFAULT 'XXXXXX' NOT NULL ,
+	is_op_org            boolean DEFAULT true NOT NULL ,
 	CONSTRAINT pk_t_organismes_id_org PRIMARY KEY ( id_org )
  );
 
 COMMENT ON TABLE pr_zh.bib_organismes IS 'Liste des organismes qui assurent la gestion de zh';
+
+COMMENT ON COLUMN pr_zh.bib_organismes.abbrevation IS 'abbreviation used for creating the zh code';
+
+COMMENT ON COLUMN pr_zh.bib_organismes.is_op_org IS 'is it an operator organism (not management structure)';
 
 CREATE  TABLE pr_zh.bib_site_space ( 
 	id_site_space        integer  NOT NULL ,
@@ -181,6 +187,7 @@ CREATE  TABLE pr_zh.t_zh (
 	id_site_space        integer   ,
 	create_author        integer  NOT NULL ,
 	update_author        integer  NOT NULL ,
+	id_org               integer  NOT NULL ,
 	create_date          timestamp(0) DEFAULT CURRENT_TIMESTAMP NOT NULL ,
 	update_date          timestamp DEFAULT current_timestamp NOT NULL ,
 	geom                 geometry  NOT NULL ,
@@ -232,6 +239,8 @@ COMMENT ON COLUMN pr_zh.t_zh.is_id_site_space IS 'Partie d''un ensemble ?';
 COMMENT ON COLUMN pr_zh.t_zh.create_author IS 'Author who created the ZH in the db';
 
 COMMENT ON COLUMN pr_zh.t_zh.update_author IS 'Auteur des dernières modifications';
+
+COMMENT ON COLUMN pr_zh.t_zh.id_org IS 'organisme opérateur';
 
 COMMENT ON COLUMN pr_zh.t_zh.create_date IS 'zh creation date in database';
 
@@ -667,3 +676,4 @@ ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_sdage_t_nomenclatures FOREIGN KEY 
 
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_sage_t_nomenclatures FOREIGN KEY ( id_sage ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
+ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_id_org FOREIGN KEY ( id_org ) REFERENCES pr_zh.bib_organismes( id_org )  ON UPDATE CASCADE;

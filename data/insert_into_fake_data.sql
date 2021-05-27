@@ -34,10 +34,11 @@ INSERT INTO pr_zh.cor_lim_list VALUES
 ;
 
 
-INSERT INTO pr_zh.t_zh(code, main_name, create_author, update_author, geom, id_lim_list, remark_lim, id_sdage, total_hab_cover, id_thread, id_diag_hydro, id_diag_bio) VALUES
+INSERT INTO pr_zh.t_zh(code, main_name, id_org, create_author, update_author, geom, id_lim_list, remark_lim, id_sdage, total_hab_cover, id_thread, id_diag_hydro, id_diag_bio) VALUES
 (
     'XXXX-XX-XXXX', 
     'zone humide 1',
+    2,
     1,
     1,
      '0103000020E61000000100000005000000C102983270200540B2F1608BDD864640EEB43522188705401475E61E12844640B56E83DA6F4D05406667D13B1582464006F7031E18000540520FD1E80E864640C102983270200540B2F1608BDD864640',
@@ -52,6 +53,7 @@ INSERT INTO pr_zh.t_zh(code, main_name, create_author, update_author, geom, id_l
 (
     'XXXX-XX-XXX2', 
     'zone humide 2',
+    3,
     1,
     1,
     '0103000020E610000001000000050000009450FA42C8B90440AB4203B16C8246402F6EA301BCC50440034015376E814640F44E05DCF39C04400EDAAB8F8780464077871403249A04401897AAB4C58146409450FA42C8B90440AB4203B16C824640',
