@@ -14,6 +14,23 @@
             <h5 class="section-title">Champs obligatoires</h5>
           </legend>
           <div class="form-row">
+            <div class="form-group col-md-12">
+                <small  class="required" >Organisme de l'opérateur </small>
+                <select 
+                    class="form-control form-control-sm" 
+                    [formControl]="form.controls.id_org">
+                    <option
+                        *ngFor="let id of idOrg"
+                        [ngValue]="id.id_org"
+                    >
+                        {{id.name}}</option>
+                </select>
+                <small *ngIf="(form.controls.id_org.touched || submitted) && form.controls.id_org.errors?.required"
+                class="error-msg"
+                >Champ requis</small>
+            </div>
+        </div>
+          <div class="form-row">
             <div class="form-group col-md-6">
                 <small class="required">Nom Usuel</small>
                 <input

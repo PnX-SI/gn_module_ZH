@@ -25,6 +25,7 @@ export class ZhFormTab0Component implements OnInit {
   public cardContentHeight: number;
   public critDelim: any;
   public sdage: any;
+  public idOrg: any;
   public dropdownSettings: IDropdownSettings;
   private $_geojsonSub: Subscription;
   public $_currentZhSub: Subscription;
@@ -67,6 +68,7 @@ export class ZhFormTab0Component implements OnInit {
           }
         });
         this.form.patchValue({
+          id_org: this._currentZh.id_org,
           main_name: this._currentZh.main_name,
           critere_delim: selectedCritDelim,
           sdage: this._currentZh.id_sdage,
@@ -110,6 +112,7 @@ export class ZhFormTab0Component implements OnInit {
 
   createForm(): void {
     this.form = this.fb.group({
+      id_org: [null, Validators.required],
       main_name: [null, Validators.required],
       critere_delim: [null, Validators.required],
       sdage: ["", Validators.required],
@@ -119,6 +122,7 @@ export class ZhFormTab0Component implements OnInit {
   onFormSubmit(formValues: any) {
     this.submitted = true;
     let formToPost = {
+      id_org: formValues.id_org,
       main_name: formValues.main_name,
       critere_delim: [],
       sdage: formValues.sdage,
@@ -165,6 +169,7 @@ export class ZhFormTab0Component implements OnInit {
   }
 
   getMetaData() {
+    this.idOrg = this.formMetaData['BIB_ORGANISMES'];
     this.critDelim = this.formMetaData['CRIT_DELIM'];
     this.sdage = this.formMetaData['SDAGE'];
   }
