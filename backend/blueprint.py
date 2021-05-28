@@ -122,11 +122,11 @@ def get_zh_by_id(id_zh, info_role):
 
         return {
             "id_zh": zh.id_zh,
-            "main_name": zh.main_name, #name
-            "secondary_name": zh.secondary_name, #otherName
-            "is_id_site_space": zh.is_id_site_space, #hasGrandEsemble
-            "id_site_space": zh.id_site_space, #grandEsemble
-            "id_lim_list": id_lim_list, #critere_delim
+            "main_name": zh.main_name,  # name
+            "secondary_name": zh.secondary_name,  # otherName
+            "is_id_site_space": zh.is_id_site_space,  # hasGrandEsemble
+            "id_site_space": zh.id_site_space,  # grandEsemble
+            "id_lim_list": id_lim_list,  # critere_delim
             "id_sdage": zh.id_sdage,
             "references": references,
             "id_lim_fs": id_lim_fs_list,  # critere delim esp fonct
@@ -195,6 +195,43 @@ def get_ref_autocomplete(info_role):
         return [d[0].as_dict() for d in data]
     else:
         return "No Result", 404
+
+
+@blueprint.route("/references", methods=["POST"])
+@permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
+@json_resp
+def post_reference(info_role):
+    """create reference
+    """
+    form_data = request.json
+    new_ref = TReferences(
+        authors=form_data["authors"],
+        pub_year=form_data["pub_year"],
+        title=form_data["title"],
+        editor=form_data["editor"],
+        editor_location=form_data["editor_location"]
+    )
+    DB.session.add(new_ref)
+    DB.session.commit()
+    return form_data
+
+
+@blueprint.route("/references", methods=["PATCH"])
+@permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
+@json_resp
+def patch_reference(id_reference, info_role):
+    """edit reference
+    """
+    form_data = request.json
+    DB.session.query(TReferences).filter(TReferences.id_reference == form_data['id_reference']).update({
+        TReferences.authors: form_data["authors"],
+        TReferences.pub_year: form_data["pub_year"],
+        TReferences.title: form_data["title"],
+        TReferences.editor: form_data["editor"],
+        TReferences.editor_location: form_data["editor_location"],
+    })
+    DB.session.commit()
+    return form_data
 
 
 @blueprint.route("/form/<int:id_tab>", methods=["POST", "PATCH"])
