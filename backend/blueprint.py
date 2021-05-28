@@ -53,8 +53,6 @@ from .repositories import (
 
 from .api_error import ZHApiError
 
-from pdb import set_trace as debug
-
 blueprint = Blueprint("pr_zh", __name__)
 
 
@@ -128,6 +126,7 @@ def get_zh_by_id(id_zh, info_role):
             "id_org": zh.id_org,
             "is_id_site_space": zh.is_id_site_space,  # hasGrandEsemble
             "id_site_space": zh.id_site_space,  # grandEsemble
+            "geom": zh.get_geofeature().geometry,
             "id_lim_list": id_lim_list,  # critere_delim
             "id_sdage": zh.id_sdage,
             "references": references,
