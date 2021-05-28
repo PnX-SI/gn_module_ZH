@@ -82,9 +82,6 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     )
   }
 
-  ngOnDestroy() {
-    this.moduleSub.unsubscribe();
-  }
 
   @HostListener("window:resize", ["$event"])
   onResize(event) {
@@ -174,6 +171,11 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
       iElement.parentElement.parentElement &&
       iElement.parentElement.parentElement.blur();
     this.ngbModal.open(modal);
+  }
+
+  ngOnDestroy() {
+    this.moduleSub.unsubscribe();
+    this.ngbModal.dismissAll();
   }
 
 }

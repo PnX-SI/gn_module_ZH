@@ -13,37 +13,34 @@ export class ZhDataService {
 
   constructor(private _api: HttpClient) { }
 
-  /*
-  getZhList() {
-    return this._api.get<any>(`${AppConfig.API_ENDPOINT}/zones_humides`);
-  }
-  */
-
   setCurrentZh(zh: any) {
-    this.zh.next(zh)
+    this.zh.next(zh);
   }
 
   getZhById(id: number) {
     return this._api.get<any>(`${AppConfig.API_ENDPOINT}/zones_humides/${id}`);
   }
 
-
-  deleteOneZh(id) {
+  deleteOneZh(id: number) {
     return this._api.delete(`${AppConfig.API_ENDPOINT}/zones_humides/${id}`);
   }
-
 
   getMetaDataForms() {
     return this._api.get<any>(`${AppConfig.API_ENDPOINT}/zones_humides/forms`);
   }
 
-  postDataForm(value, idForm) {
-    const urlpost = `${AppConfig.API_ENDPOINT}/zones_humides/form/${idForm}`
+  postDataForm(value: any, idForm: number) {
+    const urlpost = `${AppConfig.API_ENDPOINT}/zones_humides/form/${idForm}`;
     return this._api.post<any>(urlpost, value);
   }
 
-  patchDataForm(value, idForm) {
-    const urlpost = `${AppConfig.API_ENDPOINT}/zones_humides/form/${idForm}`
+  postBib(value: any) {
+    const urlpost = `${AppConfig.API_ENDPOINT}/zones_humides/references`;
+    return this._api.post<any>(urlpost, value);
+  }
+
+  patchBib(value: any) {
+    const urlpost = `${AppConfig.API_ENDPOINT}/zones_humides/references`;
     return this._api.patch<any>(urlpost, value);
   }
 

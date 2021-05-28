@@ -17,7 +17,7 @@
             <div class="form-group col-md-6">
                 <small class="required">Nom Usuel</small>
                 <input
-                class="form-control form-control-sm"
+                class="form-control "
                 type='text'
                 [formControl]="form.controls.main_name"
                 />
@@ -45,7 +45,7 @@
                 <div class="form-group col-md-12">
                     <small  class="required" >Présentation de la zone humide et de ses milieux </small>
                     <select 
-                        class="form-control form-control-sm" 
+                        class="form-control " 
                         [formControl]="form.controls.sdage">
                         <option
                             *ngFor="let sd of sdage"

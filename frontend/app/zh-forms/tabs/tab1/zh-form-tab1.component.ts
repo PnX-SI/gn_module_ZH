@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { Subscription } from "rxjs";
 import { ToastrService } from 'ngx-toastr';
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { ZhDataService } from "../../../services/zh-data.service";
 import { AppConfig } from "@geonature_config/app.config";
 
@@ -15,6 +16,7 @@ export class ZhFormTab1Component implements OnInit {
   @Input() formMetaData;
   @Output() nextTab = new EventEmitter<number>();
   public generalInfoForm: FormGroup;
+  public bibForm: FormGroup;
   public siteSpaceList: any[];
   public hasSiteSpace = false;
   public appConfig = AppConfig;
@@ -23,13 +25,18 @@ export class ZhFormTab1Component implements OnInit {
   public $_currentZhSub: Subscription;
   listBib: any[] = [];
   submitted: boolean;
-  posted: boolean;
-  selectedLib: any;
+  public posted: boolean = false;
+  public postedBib: boolean = false;
+  public modalBibButtonLabel: string;
+  public modalBibTitle: string;
+  public patchBib: boolean = false;
+
 
   constructor(
     private fb: FormBuilder,
     private _dataService: ZhDataService,
     private _toastr: ToastrService,
+    public ngbModal: NgbModal,
   ) { }
 
   ngOnInit() {
@@ -83,19 +90,17 @@ export class ZhFormTab1Component implements OnInit {
     return item.title;
   }
 
-  onSelectLib(bib) {
-    this.selectedLib = bib.item;
-  }
-
-  onAddBib() {
-    if (this.selectedLib) {
-      let itemExist = this.listBib.some(item => item.id_reference == this.selectedLib.id_reference);
+  onSelectBib(seletedBib) {
+    const bib = seletedBib.item;
+    if (bib) {
+      let itemExist = this.listBib.some(item => item.id_reference == bib.id_reference);
       if (!itemExist) {
-        this.listBib.push(this.selectedLib);
-        this.generalInfoForm.get('bibRef').reset();
+        this.listBib.push(bib);
       }
     }
+    this.generalInfoForm.get('bibRef').reset();
   }
+
 
   onDeleteBib(id_reference: number) {
     this.listBib = this.listBib.filter(item => { return item.id_reference != id_reference });
@@ -135,12 +140,83 @@ export class ZhFormTab1Component implements OnInit {
   }
 
   onPrevious() {
-    this.generalInfoForm.reset();
     this.nextTab.emit(0);
+  }
+
+  onCreateBib(event, modal) {
+    this.patchBib = false;
+    this.modalBibButtonLabel = "Créer";
+    this.modalBibTitle = "Ajout d'une référence bibliographique";
+    this.bibForm = this.fb.group({
+      title: [null, Validators.required],
+      authors: null,
+      pub_year: null,
+      editor: null,
+      editor_location: null,
+    });
+    event.stopPropagation();
+    this.ngbModal.open(modal, { centered: true, size: 'lg', windowClass: 'bib-modal' });
+  }
+
+  onAddBib() {
+    if (this.bibForm.valid) {
+      this.postedBib = true;
+      this._dataService.postBib(this.bibForm.value).subscribe(
+        (bib) => {
+          this.bibForm.reset();
+          this.postedBib = false;
+          let itemExist = this.listBib.some(item => item.id_reference == bib.id_reference);
+          if (!itemExist) {
+            this.listBib.push(bib);
+          }
+          this.ngbModal.dismissAll();
+        },
+        (error) => {
+          this.postedBib = false;
+          this._toastr.error(error.error, '', { positionClass: 'toast-top-right' });
+        }
+      );
+    }
+  }
+
+  onEditBib(modal: any, bib: any) {
+    this.patchBib = true;
+    this.modalBibButtonLabel = "Modifier";
+    this.modalBibTitle = "Modifier la référence bibliographique";
+    this.bibForm = this.fb.group({
+      id_reference: [bib.id_reference, Validators.required],
+      title: [bib.title, Validators.required],
+      authors: bib.authors,
+      pub_year: bib.pub_year,
+      editor: bib.editor,
+      editor_location: bib.editor_location,
+
+    });
+    this.ngbModal.open(modal, { centered: true, size: 'lg', windowClass: 'bib-modal' });
+  }
+
+  onPatchBib() {
+    if (this.bibForm.valid) {
+      this._dataService.patchBib(this.bibForm.value).subscribe(
+        (bib) => {
+          this.bibForm.reset();
+          this.postedBib = false;
+          const index = this.listBib.findIndex(item => item.id_reference == bib.id_reference);
+          if (index > -1)
+            this.listBib.splice(index, 1, bib);
+          this.ngbModal.dismissAll();
+        },
+        (error) => {
+          this.postedBib = false;
+          this._toastr.error(error.error, '', { positionClass: 'toast-top-right' });
+        }
+      );
+    }
   }
 
   ngOnDestroy() {
     this.$_currentZhSub.unsubscribe();
+    this.ngbModal.dismissAll();
   }
 
 }

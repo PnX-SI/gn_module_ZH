@@ -1,4 +1,4 @@
-<form>
+<form [formGroup]="generalInfoForm">
     <fieldset>
         <legend>
             <h5 class="section-title">Identification</h5>
@@ -7,15 +7,18 @@
             <div class="form-group col-md-6">
                 <small class="required">Nom Usuel</small>
                 <input
-                class="form-control form-control-sm"
+                class="form-control "
                 type='text'
                 [formControl]="generalInfoForm.controls.main_name"
                 />
+                <small *ngIf="(generalInfoForm.controls.main_name.touched || submitted) && generalInfoForm.controls.main_name.errors?.required"
+                class="error-msg"
+                >Champ requis</small>
             </div>
             <div class="form-group col-md-6">
                 <small>Autre nom</small>
                 <input
-                    class="form-control form-control-sm"
+                    class="form-control "
                     type='text'
                     [formControl]="generalInfoForm.controls.secondary_name"
                 />
@@ -33,7 +36,7 @@
                 <select 
                     list="grandEnsemble"
                     name="grandEnsemble"
-                    class="form-control form-control-sm" 
+                    class="form-control " 
                     [formControl]="generalInfoForm.controls.id_site_space">      
                     <option [ngValue]=null></option>
                     <option *ngFor="let siteSpace of siteSpaceList" [ngValue]=siteSpace.id_site_space>{{siteSpace.name}}</option>
@@ -45,67 +48,8 @@
         <legend>
             <h5 class="section-title">Principales références bibliographiques</h5>
         </legend>
-        <!-- <div class="form-row">
-            <div class="form-group col-md-6">
-                <small>Référence</small>
-                <input
-                class="form-control form-control-sm"
-                    type='text'
-                />
-            </div>
-            <div class="form-group col-md-6">
-                <small>Titre du docuemnt</small>
-                <input
-                    class="form-control form-control-sm"
-                    type='text'
-                />
-            </div>
-            <div class="form-group col-md-6">
-                <small>Auteurs</small>
-                <input
-                class="form-control form-control-sm"
-                    type='text'
-                />
-            </div>
-            <div class="form-group col-md-6">
-                <small>Année de parution</small>
-                <input
-                    class="form-control form-control-sm"
-                    type='text'
-                />
-            </div>
-            <div class="form-group col-md-6">
-                <small>Editeur</small>
-                <input
-                class="form-control form-control-sm"
-                    type='text'
-                />
-            </div>
-            <div class="form-group col-md-6">
-                <small>Lieu</small>
-                <input
-                class="form-control form-control-sm"
-                    type='text'
-                />
-            </div>
-            <div class="form-group col-md-6">
-                <small>Url</small>
-                <input
-                    class="form-control form-control-sm"
-                    type='text'
-                />
-            </div>
-            <div class="form-group col-md-6">
-                <small>Bassin Versant</small>
-                <input
-                    class="form-control form-control-sm"
-                    type='text'
-                    readonly
-                />
-            </div>
-        </div> -->
         <div class="form-row">
-            <div class="form-group col-md-6">
+            <div class="form-group  col-md-6">
                 <pnx-autocomplete
                 apiEndPoint="{{appConfig.API_ENDPOINT}}/zones_humides/references/autocomplete"
                 [searchAsParameter]="false"
@@ -115,7 +59,7 @@
                 [formatter]="formatter"
                 label="Références bibliographiques"
                 placeholder="Tapez les premières lettres..."
-                (onChange)="onSelectLib($event)"
+                (onChange)="onSelectBib($event)"
                 >
                 </pnx-autocomplete>
             </div>  
@@ -123,10 +67,10 @@
                 <button
                     mat-raised-button
                     color="primary"
-                    [disabled]="posted"
-                    (click)="onAddBib()"
+                    (click)="onCreateBib($event, bibModal)"
                 >
-                    Ajouter
+                <mat-icon>add_box</mat-icon>
+                    Créer
                 </button>
             </div>
         </div>
@@ -145,12 +89,11 @@
                         <div>
                             <button mat-icon-button class="mr-2"
                              >
-                             <mat-icon class="edit-icon">edit</mat-icon>
+                             <mat-icon class="edit-icon" (click)="onEditBib(bibModal, bib)" >edit</mat-icon>
                             </button>
                             <button mat-icon-button (click)="onDeleteBib(bib.id_reference)">
                                 <mat-icon class="delete-icon" >close</mat-icon>
                               </button>
-                            
                         </div>
                     </td>
                 </tr>
@@ -181,3 +124,79 @@
     Suivant
     </button>
 </div>
+<!-- MODAL bib -->
+<ng-template
+ #bibModal
+ let-c="close"
+ let-d="dismiss"
+>
+  <div class="modal-header">
+    <h6>{{modalBibTitle}}</h6>
+    <button mat-icon-button class="closeModalBtn" (click)="c();">
+        <mat-icon class="cancel-icon">cancel</mat-icon>
+      </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="bibForm">
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <small class="required">Titre du docuemnt</small>
+                <input
+                    ngbAutofocus
+                    [formControl]="bibForm.controls.title"
+                    class="form-control "
+                    type='text'
+                />
+                <small *ngIf="(bibForm.controls.title.touched || submitted) && bibForm.controls.title.errors?.required"
+                class="error-msg"
+                >Champ requis</small>
+            </div>
+            <div class="form-group col-md-6">
+                <small>Auteurs</small>
+                <input
+                    [formControl]="bibForm.controls.authors"
+                    class="form-control "
+                    type='text'
+                />
+            </div>
+            <div class="form-group col-md-6">
+                <small>Année de parution</small>
+                <input
+                    [formControl]="bibForm.controls.pub_year"
+                    class="form-control "
+                    type='text'
+                />
+            </div>
+            <div class="form-group col-md-6">
+                <small>Editeur</small>
+                <input
+                    [formControl]="bibForm.controls.editor"
+                    class="form-control "
+                    type='text'
+                />
+            </div>
+            <div class="form-group col-md-6">
+                <small>Lieu</small>
+                <input
+                    [formControl]="bibForm.controls.editor_location"
+                    class="form-control "
+                    type='text'
+                />
+            </div>
+        </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      mat-raised-button
+      color="primary"
+      class="uppercase"
+      (click)="patchBib?  onPatchBib() : onAddBib()"
+      [disabled] ="postedBib"
+    >
+    <mat-spinner *ngIf="postedBib" [diameter]="20" ></mat-spinner>
+    {{modalBibButtonLabel}} 
+  </button>
+</div>
+
