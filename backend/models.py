@@ -96,6 +96,10 @@ class ZhModel(DB.Model):
             for action, level in user_cruved.items()
         }
 
+    def user_is_observer_or_digitiser(self, user):
+        observers = [d.id_role for d in self.observers]
+        return user.id_role == self.id_digitiser or user.id_role in observers
+
 
 @serializable
 class Nomenclatures(TNomenclatures):
@@ -257,6 +261,44 @@ class TZH(ZhModel):
         return q
 
 
+@serializable
+@geoserializable
+class ZH(TZH):
+    __abstract__ = True
+
+    def __init__(self, id_zh):
+        self.zh = DB.session.query(TZH).filter(
+            TZH.id_zh == id_zh).one()
+        self.id_lims = self.get_id_lims()
+        self.id_lims_fs = self.get_id_lims_fs()
+        self.id_references = self.get_id_references()
+
+    def get_id_lims(self):
+        lim_list = CorLimList.get_lims_by_id(self.zh.id_lim_list)
+        return {
+            "id_lims": [id.id_lim for id in lim_list]
+        }
+
+    def get_id_lims_fs(self):
+        lim_fs_list = CorZhLimFs.get_lim_fs_by_id(self.zh.id_zh)
+        return {
+            "id_lims_fs": [id.id_lim_fs for id in lim_fs_list]
+        }
+
+    def get_id_references(self):
+        ref_list = CorZhRef.get_references_by_id(self.zh.id_zh)
+        return {
+            "id_references": [ref.as_dict() for ref in ref_list]
+        }
+
+    def get_full_zh(self):
+        full_zh = self.zh.get_geofeature()
+        full_zh.properties.update(self.id_lims)
+        full_zh.properties.update(self.id_lims_fs)
+        full_zh.properties.update(self.id_references)
+        return full_zh
+
+
 class CorLimList(DB.Model):
     __tablename__ = "cor_lim_list"
     __table_args__ = {"schema": "pr_zh"}
@@ -269,6 +311,10 @@ class CorLimList(DB.Model):
         ForeignKey(TNomenclatures.id_nomenclature),
         primary_key=True
     )
+
+    def get_lims_by_id(id):
+        return DB.session.query(CorLimList).filter(
+            CorLimList.id_lim_list == id).all()
 
 
 class CorZhArea(DB.Model):
@@ -419,6 +465,10 @@ class CorZhRef(DB.Model):
         primary_key=True
     )
 
+    def get_references_by_id(id_zh):
+        return DB.session.query(TReferences).join(
+            CorZhRef).filter(CorZhRef.id_zh == id_zh).all()
+
 
 class CorZhLimFs(DB.Model):
     __tablename__ = "cor_zh_lim_fs"
@@ -433,3 +483,7 @@ class CorZhLimFs(DB.Model):
         ForeignKey(TNomenclatures.id_nomenclature),
         primary_key=True
     )
+
+    def get_lim_fs_by_id(id_zh):
+        return DB.session.query(CorZhLimFs).filter(
+            CorZhLimFs.id_zh == id_zh).all()

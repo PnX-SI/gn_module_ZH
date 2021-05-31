@@ -42,7 +42,8 @@ from .models import (
     TReferences,
     BibSiteSpace,
     CorZhLimFs,
-    BibOrganismes
+    BibOrganismes,
+    ZH
 )
 
 from .nomenclatures import get_nomenc
@@ -52,6 +53,8 @@ from .repositories import (
 )
 
 from .api_error import ZHApiError
+
+import pdb
 
 blueprint = Blueprint("pr_zh", __name__)
 
@@ -102,38 +105,8 @@ def get_zh_by_id(id_zh, info_role):
     """Get zh form data by id
     """
     try:
-        zh = DB.session.query(TZH).filter(TZH.id_zh == id_zh).one()
-
-        # get criteres delim
-        id_lims = DB.session.query(CorLimList).filter(
-            CorLimList.id_lim_list == zh.id_lim_list).all()
-        id_lim_list = [id.id_lim for id in id_lims]
-
-        # ref biblio
-        refs = DB.session.query(TReferences).join(
-            CorZhRef).filter(CorZhRef.id_zh == id_zh).all()
-        references = [ref.as_dict() for ref in refs]
-
-        # get criteres delim esp fonctionnalite
-        id_lims_fs = DB.session.query(CorZhLimFs).filter(
-            CorZhLimFs.id_zh == zh.id_zh).all()
-        id_lim_fs_list = [id.id_lim_fs for id in id_lims_fs]
-
-        return {
-            "id_zh": zh.id_zh,
-            "main_name": zh.main_name,  # name
-            "secondary_name": zh.secondary_name,  # otherName
-            "id_org": zh.id_org,
-            "is_id_site_space": zh.is_id_site_space,  # hasGrandEsemble
-            "id_site_space": zh.id_site_space,  # grandEsemble
-            "geom": zh.get_geofeature().geometry,
-            "id_lim_list": id_lim_list,  # critere_delim
-            "id_sdage": zh.id_sdage,
-            "references": references,
-            "id_lim_fs": id_lim_fs_list,  # critere delim esp fonct
-            "remark_lim": zh.remark_lim,
-            "remark_lim_fs": zh.remark_lim_fs
-        }, 200
+        full_zh = ZH(id_zh).get_full_zh()
+        return full_zh
 
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':
@@ -427,8 +400,6 @@ def get_tab_data(id_tab, info_role):
             }, 200
 
     except Exception as e:
-        debug()
-
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
             return 'Empty mandatory field', 400
         if e.__class__.__name__ == 'IntegrityError':
