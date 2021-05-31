@@ -67,6 +67,7 @@ export class ZhTabsComponent implements OnInit {
       (zh: any) => {
         this._dataService.setCurrentZh(zh);
         this.disabledTabs = false;
+        console.log(zh);
       }
     )
   }

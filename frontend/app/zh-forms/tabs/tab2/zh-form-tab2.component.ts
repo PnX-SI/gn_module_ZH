@@ -47,22 +47,22 @@ export class ZhFormTab2Component implements OnInit {
         this._currentZh = zh;
         const selectedCritDelim = [];
         this.critDelim.forEach(critere => {
-          if (this._currentZh.id_lim_list.includes(critere.id_nomenclature)) {
+          if (this._currentZh.properties.id_lims.includes(critere.id_nomenclature)) {
             selectedCritDelim.push(critere);
           }
         });
         const selectedCritDelimFs = [];
         this.critDelimFct.forEach(critere => {
-          if (this._currentZh.id_lim_fs.includes(critere.id_nomenclature)) {
+          if (this._currentZh.properties.id_lims_fs.includes(critere.id_nomenclature)) {
             selectedCritDelimFs.push(critere);
           }
         });
         this.formTab2.patchValue({
           critere_delim: selectedCritDelim,
-          id_zh: this._currentZh.id_zh,
-          remark_lim: this._currentZh.remark_lim,
+          id_zh: this._currentZh.properties.id_zh,
+          remark_lim: this._currentZh.properties.remark_lim,
           critere_delim_fs: selectedCritDelimFs,
-          remark_lim_fs: this._currentZh.remark_lim_fs,
+          remark_lim_fs: this._currentZh.properties.remark_lim_fs,
         });
       }
     })
@@ -88,7 +88,7 @@ export class ZhFormTab2Component implements OnInit {
     this.submitted = true;
     let formToPost = {
       critere_delim: [],
-      id_zh: Number(this._currentZh.id_zh),
+      id_zh: Number(this._currentZh.properties.id_zh),
       remark_lim_fs: formValues.remark_lim_fs,
       remark_lim: formValues.remark_lim_fs,
       critere_delim_fs: []

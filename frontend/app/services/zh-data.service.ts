@@ -20,7 +20,7 @@ export class ZhDataService {
   */
 
   setCurrentZh(zh: any) {
-    this.zh.next(zh)
+    this.zh.next(zh);
   }
 
   getZhById(id: number) {

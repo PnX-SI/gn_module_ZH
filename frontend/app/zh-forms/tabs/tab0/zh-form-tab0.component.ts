@@ -61,17 +61,18 @@ export class ZhFormTab0Component implements OnInit {
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
         this._currentZh = zh;
+        console.log(this._currentZh);
         const selectedCritDelim = [];
         this.critDelim.forEach(critere => {
-          if (this._currentZh.id_lim_list.includes(critere.id_nomenclature)) {
+          if (this._currentZh.properties.id_lims.includes(critere.id_nomenclature)) {
             selectedCritDelim.push(critere);
           }
         });
         this.form.patchValue({
-          id_org: this._currentZh.id_org,
-          main_name: this._currentZh.main_name,
+          id_org: this._currentZh.properties.id_org,
+          main_name: this._currentZh.properties.main_name,
           critere_delim: selectedCritDelim,
-          sdage: this._currentZh.id_sdage,
+          sdage: this._currentZh.properties.id_sdage,
         });
       }
     })
@@ -136,7 +137,7 @@ export class ZhFormTab0Component implements OnInit {
         });
         this.posted = true;
         if (this._currentZh) {
-          formToPost['id_zh'] = Number(this._currentZh.id_zh);
+          formToPost['id_zh'] = Number(this._currentZh.properties.id_zh);
         }
         this._dataService.postDataForm(formToPost, 0).subscribe(
           (data) => {
