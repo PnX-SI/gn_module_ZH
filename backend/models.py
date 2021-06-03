@@ -11,6 +11,7 @@ from pypnnomenclature.models import (
 
 import geoalchemy2
 from geoalchemy2.types import Geography, Geometry
+from geoalchemy2.shape import to_shape
 
 from pypnusershub.db.models import User
 from pypnusershub.db.tools import InsufficientRightsError
@@ -22,7 +23,9 @@ from utils_flask_sqla_geo.serializers import geoserializable
 # instance de la BDD
 from geonature.utils.env import DB
 
-from pdb import set_trace as debug
+from geonature.core.ref_geo.models import LAreas
+
+import pdb
 from sqlalchemy.inspection import inspect
 
 
@@ -144,6 +147,11 @@ class BibOrganismes(DB.Model):
         default=False,
         nullable=False
     )
+
+    def get_abbrevation(id_org):
+        org = DB.session.query(BibOrganismes).filter(
+            BibOrganismes.id_org == id_org).one()
+        return org.abbrevation
 
 
 @serializable
@@ -299,6 +307,46 @@ class ZH(TZH):
         return full_zh
 
 
+class Code(ZH):
+    def __init__(self, id_zh, id_org, zh_geom):
+        self.id_zh = id_zh
+        self.id_org = id_org
+        self.zh_geom = zh_geom
+        self.dep = self.get_departments()
+        self.organism = self.get_organism()
+        self.number = self.get_number()
+
+    def get_departments(self):
+        departments = CorZhArea.get_departments(self.id_zh)
+        area = 0
+        main_dep = ''
+        my_geom = DB.session.query(cast(TZH.geom, Geography)).filter(
+            TZH.id_zh == self.id_zh).one()[0]
+        for dep in departments:
+            print(dep.LAreas.area_code)
+            # dep_geo = DB.session.query(dep.LAreas.geom.ST_Transform(4326).ST_Intersection(my_geom)).one()[0]
+            pdb.set_trace()
+
+            # .ST_Area()).one()[0])
+            # print(DB.session.query(dep_geo).ST_Intersection(my_geom))
+            # DB.session.query(dep.LAreas.geom.ST_Intersects(cast(id_zh_geom),)
+            # DB.session.query(dep.LAreas.geom.ST_Transform(4326).ST_Intersection(self.zh_geom.ST_Transform(4326)).one()[0]
+            if DB.session.query(dep.LAreas.geom.ST_Area()).one()[0] > area:
+                area = DB.session.query(dep.LAreas.geom.ST_Area()).one()[0]
+                main_dep = dep.LAreas.area_code
+        pdb.set_trace()
+        return main_dep
+
+    def get_organism(self):
+        return BibOrganismes.get_abbrevation(self.id_org)
+
+    def get_number(self):
+        return '01'
+
+    def __repr__(self):
+        return f'{self.dep}-{self.organism}-{self.number}'
+
+
 class CorLimList(DB.Model):
     __tablename__ = "cor_lim_list"
     __table_args__ = {"schema": "pr_zh"}
@@ -331,6 +379,10 @@ class CorZhArea(DB.Model):
         primary_key=True
     )
     cover = DB.Column(DB.Integer)
+
+    def get_departments(id_zh):
+        return DB.session.query(CorZhArea, LAreas).join(LAreas).filter(
+            CorZhArea.id_zh == id_zh, LAreas.id_type == 26).all()
 
 
 class TRiverBasin(DB.Model):
@@ -433,7 +485,7 @@ class CorZhFctArea(DB.Model):
     )
 
 
-@serializable
+@ serializable
 class TReferences(DB.Model):
     __tablename__ = "t_references"
     __table_args__ = {"schema": "pr_zh"}

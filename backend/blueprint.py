@@ -43,7 +43,8 @@ from .models import (
     BibSiteSpace,
     CorZhLimFs,
     BibOrganismes,
-    ZH
+    ZH,
+    Code
 )
 
 from .nomenclatures import get_nomenc
@@ -224,9 +225,7 @@ def get_tab_data(id_tab, info_role):
                 DB.session.add(new_zh)
                 DB.session.flush()
 
-                # fill cor_zh_area
-                #test = DB.session.query(TZH.geom).filter(TZH.id_zh == new_zh.id_zh).one()
-                # select (ref_geo.fct_get_area_intersection(ST_SetSRID('010300000001000000040000008978EBFCDB05054098FA795391844640904FC8CEDB180540139B8F6B438346402EAA454431F90440CAFB389A238346408978EBFCDB05054098FA795391844640'::geometry,4326),25)).id_area;
+                # fill cor_zh_area for municipalities
                 query = """
                     SELECT (ref_geo.fct_get_area_intersection(
                     ST_SetSRID('{geom}'::geometry,4326), {type})).id_area
@@ -235,6 +234,17 @@ def get_tab_data(id_tab, info_role):
                 for comm in comm_list:
                     DB.session.add(
                         CorZhArea(id_area=comm[0], id_zh=new_zh.id_zh))
+                    DB.session.flush()
+
+                # fill cor_zh_area for departements
+                query = """
+                    SELECT (ref_geo.fct_get_area_intersection(
+                    ST_SetSRID('{geom}'::geometry,4326), {type})).id_area
+                    """.format(geom=str(polygon), type=26)
+                dep_list = DB.session.execute(text(query)).fetchall()
+                for dep in dep_list:
+                    DB.session.add(
+                        CorZhArea(id_area=dep[0], id_zh=new_zh.id_zh))
                     DB.session.flush()
 
                 # fill cor_zh_rb
@@ -259,6 +269,12 @@ def get_tab_data(id_tab, info_role):
                     DB.session.add(CorZhFctArea(
                         id_zh=new_zh.id_zh, id_fct_area=fa.id_fct_area))
                     DB.session.flush()
+
+                # create zh code
+                # pdb.set_trace()
+                #code = Code(new_zh.id_zh, new_zh.id_org, new_zh.geom)
+                # pdb.set_trace()
+                #new_zh.code = code
 
                 DB.session.commit()
                 return {
