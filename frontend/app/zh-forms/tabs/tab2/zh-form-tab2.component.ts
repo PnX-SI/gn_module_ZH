@@ -116,6 +116,13 @@ export class ZhFormTab2Component implements OnInit {
     }
   }
 
+
+  openDeleteModal(event, modal, iElement, row) {
+
+    event.stopPropagation();
+
+  }
+
   ngOnDestroy() {
     this.$_currentZhSub.unsubscribe();
   }

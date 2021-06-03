@@ -6,3 +6,21 @@
   margin-right: 0.5rem;
   margin-bottom: 0.5rem;
 }
+
+.cancel-icon {
+  color: red;
+}
+
+.modal-header {
+  border: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+::ng-deep .bib-modal {
+  .modal-content {
+    border: 5px solid #167e42;
+    border-radius: 9px;
+  }
+}

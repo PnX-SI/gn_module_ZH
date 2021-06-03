@@ -213,13 +213,13 @@ def post_reference(info_role):
     )
     DB.session.add(new_ref)
     DB.session.commit()
-    return form_data
+    return new_ref.as_dict()
 
 
 @blueprint.route("/references", methods=["PATCH"])
 @permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
 @json_resp
-def patch_reference(id_reference, info_role):
+def patch_reference(info_role):
     """edit reference
     """
     form_data = request.json
