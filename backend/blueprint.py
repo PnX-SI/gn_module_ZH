@@ -41,7 +41,10 @@ from .models import (
     CorZhRef,
     TReferences,
     BibSiteSpace,
-    CorZhLimFs
+    CorZhLimFs,
+    BibOrganismes,
+    ZH,
+    Code
 )
 
 from .nomenclatures import get_nomenc
@@ -52,7 +55,7 @@ from .repositories import (
 
 from .api_error import ZHApiError
 
-from pdb import set_trace as debug
+import pdb
 
 blueprint = Blueprint("pr_zh", __name__)
 
@@ -103,36 +106,8 @@ def get_zh_by_id(id_zh, info_role):
     """Get zh form data by id
     """
     try:
-        zh = DB.session.query(TZH).filter(TZH.id_zh == id_zh).one()
-
-        # get criteres delim
-        id_lims = DB.session.query(CorLimList).filter(
-            CorLimList.id_lim_list == zh.id_lim_list).all()
-        id_lim_list = [id.id_lim for id in id_lims]
-
-        # ref biblio
-        refs = DB.session.query(TReferences).join(
-            CorZhRef).filter(CorZhRef.id_zh == id_zh).all()
-        references = [ref.as_dict() for ref in refs]
-
-        # get criteres delim esp fonctionnalite
-        id_lims_fs = DB.session.query(CorZhLimFs).filter(
-            CorZhLimFs.id_zh == zh.id_zh).all()
-        id_lim_fs_list = [id.id_lim_fs for id in id_lims_fs]
-
-        return {
-            "id_zh": zh.id_zh,
-            "main_name": zh.main_name,  # name
-            "secondary_name": zh.secondary_name,  # otherName
-            "is_id_site_space": zh.is_id_site_space,  # hasGrandEsemble
-            "id_site_space": zh.id_site_space,  # grandEsemble
-            "id_lim_list": id_lim_list,  # critere_delim
-            "id_sdage": zh.id_sdage,
-            "references": references,
-            "id_lim_fs": id_lim_fs_list,  # critere delim esp fonct
-            "remark_lim": zh.remark_lim,
-            "remark_lim_fs": zh.remark_lim_fs
-        }, 200
+        full_zh = ZH(id_zh).get_full_zh()
+        return full_zh
 
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':
@@ -148,14 +123,19 @@ def get_tab(info_role):
     """
     try:
         metadata = get_nomenc(blueprint.config["nomenclatures"])
+
+        bib_organismes = DB.session.query(BibOrganismes).all()
+        bib_organismes_list = [
+            bib_org.as_dict() for bib_org in bib_organismes if bib_org.is_op_org == True
+        ]
+        metadata["BIB_ORGANISMES"] = bib_organismes_list
+
         bib_site_spaces = DB.session.query(BibSiteSpace).all()
         bib_site_spaces_list = [
-            {
-                "id_site_space": bib_site_space.id_site_space,
-                "name": bib_site_space.name
-            } for bib_site_space in bib_site_spaces
+            bib_site_space.as_dict() for bib_site_space in bib_site_spaces
         ]
         metadata["BIB_SITE_SPACE"] = bib_site_spaces_list
+
         return metadata
     except Exception as e:
         raise ZHApiError(message=str(e), details=str(e))
@@ -255,6 +235,7 @@ def get_tab_data(id_tab, info_role):
                 return 'Empty mandatory field', 400
 
             if 'id_zh' not in form_data.keys():
+
                 # fill pr_zh.cor_lim_list
                 uuid_id_lim_list = uuid.uuid4()
                 for lim in form_data['critere_delim']:
@@ -269,6 +250,7 @@ def get_tab_data(id_tab, info_role):
                 new_zh = TZH(
                     main_name=form_data['main_name'],
                     code=code,
+                    id_org=form_data['id_org'],
                     create_author=info_role.id_role,
                     update_author=info_role.id_role,
                     create_date=zh_date,
@@ -280,9 +262,7 @@ def get_tab_data(id_tab, info_role):
                 DB.session.add(new_zh)
                 DB.session.flush()
 
-                # fill cor_zh_area
-                #test = DB.session.query(TZH.geom).filter(TZH.id_zh == new_zh.id_zh).one()
-                # select (ref_geo.fct_get_area_intersection(ST_SetSRID('010300000001000000040000008978EBFCDB05054098FA795391844640904FC8CEDB180540139B8F6B438346402EAA454431F90440CAFB389A238346408978EBFCDB05054098FA795391844640'::geometry,4326),25)).id_area;
+                # fill cor_zh_area for municipalities
                 query = """
                     SELECT (ref_geo.fct_get_area_intersection(
                     ST_SetSRID('{geom}'::geometry,4326), {type})).id_area
@@ -291,6 +271,17 @@ def get_tab_data(id_tab, info_role):
                 for comm in comm_list:
                     DB.session.add(
                         CorZhArea(id_area=comm[0], id_zh=new_zh.id_zh))
+                    DB.session.flush()
+
+                # fill cor_zh_area for departements
+                query = """
+                    SELECT (ref_geo.fct_get_area_intersection(
+                    ST_SetSRID('{geom}'::geometry,4326), {type})).id_area
+                    """.format(geom=str(polygon), type=26)
+                dep_list = DB.session.execute(text(query)).fetchall()
+                for dep in dep_list:
+                    DB.session.add(
+                        CorZhArea(id_area=dep[0], id_zh=new_zh.id_zh))
                     DB.session.flush()
 
                 # fill cor_zh_rb
@@ -315,6 +306,12 @@ def get_tab_data(id_tab, info_role):
                     DB.session.add(CorZhFctArea(
                         id_zh=new_zh.id_zh, id_fct_area=fa.id_fct_area))
                     DB.session.flush()
+
+                # create zh code
+                # pdb.set_trace()
+                #code = Code(new_zh.id_zh, new_zh.id_org, new_zh.geom)
+                # pdb.set_trace()
+                #new_zh.code = code
 
                 DB.session.commit()
                 return {
@@ -342,6 +339,7 @@ def get_tab_data(id_tab, info_role):
                 # update zh : fill pr_zh.t_zh
                 DB.session.query(TZH).filter(TZH.id_zh == form_data['id_zh']).update({
                     TZH.main_name: form_data['main_name'],
+                    TZH.id_org: form_data['id_org'],
                     TZH.update_author: info_role.id_role,
                     TZH.update_date: zh_date,
                     TZH.id_sdage: form_data['sdage'],
@@ -455,8 +453,6 @@ def get_tab_data(id_tab, info_role):
             }, 200
 
     except Exception as e:
-        debug()
-
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
             return 'Empty mandatory field', 400
         if e.__class__.__name__ == 'IntegrityError':

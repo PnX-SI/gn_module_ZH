@@ -47,8 +47,8 @@ export class ZhFormTab1Component implements OnInit {
       if (zh) {
         this._currentZh = zh;
         this.generalInfoForm.patchValue({
-          main_name: this._currentZh.main_name,
-          id_zh: this._currentZh.id_zh,
+          main_name: this._currentZh.properties.main_name,
+          id_zh: this._currentZh.properties.id_zh,
         });
       }
     })
@@ -111,14 +111,14 @@ export class ZhFormTab1Component implements OnInit {
     let formToPost = {
       main_name: formValues.main_name,
       secondary_name: formValues.secondary_name,
-      id_zh: Number(this._currentZh.id_zh),
+      id_zh: Number(this._currentZh.properties.id_zh),
       id_site_space: formValues.id_site_space,
       is_id_site_space: formValues.is_id_site_space,
       id_references: []
     };
 
     if (this.generalInfoForm.valid) {
-      if (formValues.main_name != this._currentZh.main_name) {
+      if (formValues.main_name != this._currentZh.properties.main_name) {
         formValues.main_name = formValues.main_name;
       }
       this.listBib.forEach(bib => {

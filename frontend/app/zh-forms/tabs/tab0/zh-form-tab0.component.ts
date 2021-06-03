@@ -25,6 +25,7 @@ export class ZhFormTab0Component implements OnInit {
   public cardContentHeight: number;
   public critDelim: any;
   public sdage: any;
+  public idOrg: any;
   public dropdownSettings: IDropdownSettings;
   private $_geojsonSub: Subscription;
   public $_currentZhSub: Subscription;
@@ -60,16 +61,18 @@ export class ZhFormTab0Component implements OnInit {
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
         this._currentZh = zh;
+        console.log(this._currentZh);
         const selectedCritDelim = [];
         this.critDelim.forEach(critere => {
-          if (this._currentZh.id_lim_list.includes(critere.id_nomenclature)) {
+          if (this._currentZh.properties.id_lims.includes(critere.id_nomenclature)) {
             selectedCritDelim.push(critere);
           }
         });
         this.form.patchValue({
-          main_name: this._currentZh.main_name,
+          id_org: this._currentZh.properties.id_org,
+          main_name: this._currentZh.properties.main_name,
           critere_delim: selectedCritDelim,
-          sdage: this._currentZh.id_sdage,
+          sdage: this._currentZh.properties.id_sdage,
         });
       }
     })
@@ -110,6 +113,7 @@ export class ZhFormTab0Component implements OnInit {
 
   createForm(): void {
     this.form = this.fb.group({
+      id_org: [null, Validators.required],
       main_name: [null, Validators.required],
       critere_delim: [null, Validators.required],
       sdage: ["", Validators.required],
@@ -119,6 +123,7 @@ export class ZhFormTab0Component implements OnInit {
   onFormSubmit(formValues: any) {
     this.submitted = true;
     let formToPost = {
+      id_org: formValues.id_org,
       main_name: formValues.main_name,
       critere_delim: [],
       sdage: formValues.sdage,
@@ -132,7 +137,7 @@ export class ZhFormTab0Component implements OnInit {
         });
         this.posted = true;
         if (this._currentZh) {
-          formToPost['id_zh'] = Number(this._currentZh.id_zh);
+          formToPost['id_zh'] = Number(this._currentZh.properties.id_zh);
         }
         this._dataService.postDataForm(formToPost, 0).subscribe(
           (data) => {
@@ -165,6 +170,7 @@ export class ZhFormTab0Component implements OnInit {
   }
 
   getMetaData() {
+    this.idOrg = this.formMetaData['BIB_ORGANISMES'];
     this.critDelim = this.formMetaData['CRIT_DELIM'];
     this.sdage = this.formMetaData['SDAGE'];
   }

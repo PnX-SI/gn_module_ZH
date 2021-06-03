@@ -759,9 +759,9 @@ INSERT INTO pr_zh.cor_protection_level_type VALUES
 
 
 INSERT INTO pr_zh.bib_organismes VALUES
-(1, 'organisme 1'),
-(2, 'organisme 2'),
-(3, 'organisme 3')
+(1, 'organisme 1', 'GE1', false),
+(2, 'organisme 2', 'GE2', true),
+(3, 'organisme 3', 'GE3', true)
 ;
 
 
