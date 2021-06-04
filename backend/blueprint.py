@@ -309,7 +309,13 @@ def get_tab_data(id_tab, info_role):
 
                 # create zh code
                 code = Code(new_zh.id_zh, new_zh.id_org, new_zh.geom)
-                new_zh.code = str(code)
+                # pdb.set_trace()
+                if code.is_valid_number:
+                    new_zh.code = str(code)
+                else:
+                    return {
+                        "code error": "zh_number_greater_than_9999"
+                    }, 500
 
                 DB.session.commit()
                 return {
@@ -451,7 +457,6 @@ def get_tab_data(id_tab, info_role):
             }, 200
 
     except Exception as e:
-        pdb.set_trace()
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
             return 'Empty mandatory field', 400
         if e.__class__.__name__ == 'IntegrityError':

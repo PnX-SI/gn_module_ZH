@@ -315,6 +315,7 @@ class Code(ZH):
         self.dep = self.get_departments()
         self.organism = self.get_organism()
         self.number = self.get_number()
+        self.is_valid_number = self.set_valid_number()
 
     def get_departments(self):
         departments = CorZhArea.get_departments(self.id_zh)
@@ -335,6 +336,11 @@ class Code(ZH):
         q = DB.session.query(CorZhArea).join(LAreas, LAreas.id_area == CorZhArea.id_area).join(
             TZH, TZH.id_zh == CorZhArea.id_zh).filter(TZH.id_org == self.id_org, LAreas.area_code == self.get_departments()).count()
         return q
+
+    def set_valid_number(self):
+        if self.number > 9999:
+            return False
+        return True
 
     def __repr__(self):
         return f'{self.dep}-{self.organism}-{self.number}'
