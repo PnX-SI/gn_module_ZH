@@ -308,10 +308,8 @@ def get_tab_data(id_tab, info_role):
                     DB.session.flush()
 
                 # create zh code
-                # pdb.set_trace()
-                #code = Code(new_zh.id_zh, new_zh.id_org, new_zh.geom)
-                # pdb.set_trace()
-                #new_zh.code = code
+                code = Code(new_zh.id_zh, new_zh.id_org, new_zh.geom)
+                new_zh.code = str(code)
 
                 DB.session.commit()
                 return {
@@ -453,6 +451,7 @@ def get_tab_data(id_tab, info_role):
             }, 200
 
     except Exception as e:
+        pdb.set_trace()
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
             return 'Empty mandatory field', 400
         if e.__class__.__name__ == 'IntegrityError':
@@ -474,6 +473,7 @@ def deleteOneZh(id_zh, info_role):
     """
     zhRepository = ZhRepository(TZH)
     DB.session.query(CorZhRef).filter(CorZhRef.id_zh == id_zh).delete()
+    DB.session.query(CorZhArea).filter(CorZhArea.id_zh == id_zh).delete()
     zhRepository.delete(id_zh, info_role)
 
     return {"message": "delete with success"}, 200
