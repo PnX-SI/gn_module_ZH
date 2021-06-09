@@ -32,16 +32,15 @@ available_maplist_column = [
 
 
 nomenclatures = [
-    'CRIT_DELIM','SDAGE','CRIT_DELIM','CRIT_DEF_ESP_FCT','SDAGE',
-    'SAGE','OCCUPATION_SOLS','ACTIV_HUM','LOCALISATION','IMPACTS','EVAL_GLOB_MENACES'
+    'SDAGE-SAGE', 'SDAGE', 'CRIT_DELIM', 'CRIT_DELIM', 'CRIT_DEF_ESP_FCT',
+    'OCCUPATION_SOLS', 'ACTIV_HUM', 'LOCALISATION', 'IMPACTS', 'EVAL_GLOB_MENACES'
 ]
 
 
-
 class GnModuleSchemaConf(Schema):
-    default_maplist_columns = fields.List(fields.Dict(), missing=default_map_list_conf)
+    default_maplist_columns = fields.List(
+        fields.Dict(), missing=default_map_list_conf)
     available_maplist_column = fields.List(
         fields.Dict(), missing=available_maplist_column
     )
     nomenclatures = fields.List(fields.String, missing=nomenclatures)
-

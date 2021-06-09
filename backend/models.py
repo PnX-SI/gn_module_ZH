@@ -540,3 +540,26 @@ class CorZhLimFs(DB.Model):
     def get_lim_fs_by_id(id_zh):
         return DB.session.query(CorZhLimFs).filter(
             CorZhLimFs.id_zh == id_zh).all()
+
+
+class CorSdageSage(DB.Model):
+    __tablename__ = "cor_sdage_sage"
+    __table_args__ = {"schema": "pr_zh"}
+    id_sdage = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+    id_sage = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+
+    def get_id_sdage_list():
+        q_id_sdages = DB.session.query(
+            func.distinct(CorSdageSage.id_sdage)).all()
+        return [id[0] for id in q_id_sdages]
+
+    def get_sage_by_id(id):
+        return DB.session.query(CorSdageSage, TNomenclatures).join(TNomenclatures, TNomenclatures.id_nomenclature == CorSdageSage.id_sage).filter(CorSdageSage.id_sdage == id).all()
