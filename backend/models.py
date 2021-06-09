@@ -9,6 +9,10 @@ from pypnnomenclature.models import (
     TNomenclatures
 )
 
+from pypn_habref_api.models import (
+    Habref
+)
+
 import geoalchemy2
 from geoalchemy2.types import Geography, Geometry
 from geoalchemy2.shape import to_shape
@@ -563,3 +567,24 @@ class CorSdageSage(DB.Model):
 
     def get_sage_by_id(id):
         return DB.session.query(CorSdageSage, TNomenclatures).join(TNomenclatures, TNomenclatures.id_nomenclature == CorSdageSage.id_sage).filter(CorSdageSage.id_sdage == id).all()
+
+
+class BibCb(DB.Model):
+    __tablename__ = "bib_cb"
+    __table_args__ = {"schema": "pr_zh"}
+    lb_code = DB.Column(
+        DB.Unicode,
+        primary_key=True
+    )
+    humidity = DB.Column(
+        DB.Unicode,
+        nullable=False
+    )
+    is_ch = DB.Column(
+        DB.Boolean,
+        nullable=False
+    )
+
+    def get_label():
+        return DB.session.query(BibCb, Habref).join(
+            Habref, BibCb.lb_code == Habref.lb_code).filter(Habref.cd_typo == 22).all()
