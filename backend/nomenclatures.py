@@ -1,10 +1,9 @@
 from .models import (
     Nomenclatures,
     CorSdageSage,
-    BibCb
+    BibCb,
+    CorImpactTypes
 )
-
-import pdb
 
 
 def get_sage_list():
@@ -20,7 +19,9 @@ def get_sage_list():
                     "mnemonique": sage.TNomenclatures.mnemonique
                 }
             )
-        list_by_sdage.append({int(sage.CorSdageSage.id_sdage): nomenc_list})
+        list_by_sdage.append(
+            {int(sage.CorSdageSage.id_sdage): nomenc_list}
+        )
     return list_by_sdage
 
 
@@ -38,10 +39,34 @@ def get_corine_biotope():
     return nomenc_list
 
 
+def get_impact_list():
+    list_by_impact_type = []
+    id_impact_type_list = CorImpactTypes.get_impact_type_list()
+    for id_type in id_impact_type_list:
+        nomenc_list = []
+        impacts = CorImpactTypes.get_impact_by_type(id_type)
+        for impact in impacts:
+            nomenc_list.append(
+                {
+                    "id_nomenclature": impact.CorImpactTypes.id_impact,
+                    "mnemonique": impact.TNomenclatures.mnemonique
+                }
+            )
+        type_mnemo = CorImpactTypes.get_mnemo_type(id_type)
+        if type_mnemo != '':
+            list_by_impact_type.append({type_mnemo.mnemonique: nomenc_list})
+        else:
+            list_by_impact_type.append({type_mnemo: nomenc_list})
+    return list_by_impact_type
+
+
 def get_nomenc(config):
     nomenc_info = {}
     for mnemo in config:
-        if mnemo == 'CORINE_BIO':
+        if mnemo == 'IMPACTS':
+            nomenc_list = get_impact_list()
+            nomenc_info.update({mnemo: nomenc_list})
+        elif mnemo == 'CORINE_BIO':
             nomenc_list = get_corine_biotope()
             nomenc_info.update({mnemo: nomenc_list})
         elif mnemo == 'SDAGE-SAGE':

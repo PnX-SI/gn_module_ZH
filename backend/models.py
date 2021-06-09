@@ -588,3 +588,42 @@ class BibCb(DB.Model):
     def get_label():
         return DB.session.query(BibCb, Habref).join(
             Habref, BibCb.lb_code == Habref.lb_code).filter(Habref.cd_typo == 22).all()
+
+
+class CorImpactTypes(DB.Model):
+    __tablename__ = "cor_impact_types"
+    __table_args__ = {"schema": "pr_zh"}
+    id_cor_impact_types = DB.Column(
+        DB.Integer,
+        primary_key=True
+    )
+    id_impact = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        nullable=False
+    )
+    id_impact_type = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature)
+    )
+    active = DB.Column(
+        DB.Integer,
+        nullable=False
+    )
+
+    def get_impact_type_list():
+        q_id_types = DB.session.query(
+            func.distinct(CorImpactTypes.id_impact_type)).all()
+        return [id[0] for id in q_id_types]
+
+    def get_impact_by_type(id_type):
+        return DB.session.query(CorImpactTypes, TNomenclatures).join(
+            TNomenclatures, TNomenclatures.id_nomenclature == CorImpactTypes.id_impact).filter(
+                CorImpactTypes.id_impact_type == id_type).all()
+
+    def get_mnemo_type(id_type):
+        if id_type:
+            return DB.session.query(TNomenclatures).filter(
+                TNomenclatures.id_nomenclature == id_type).one()
+        else:
+            return ''
