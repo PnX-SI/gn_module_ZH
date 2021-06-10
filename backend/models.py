@@ -619,7 +619,7 @@ class CorImpactTypes(DB.Model):
     def get_impact_by_type(id_type):
         return DB.session.query(CorImpactTypes, TNomenclatures).join(
             TNomenclatures, TNomenclatures.id_nomenclature == CorImpactTypes.id_impact).filter(
-                CorImpactTypes.id_impact_type == id_type).all()
+                and_(CorImpactTypes.id_impact_type == id_type, CorImpactTypes.active)).all()
 
     def get_mnemo_type(id_type):
         if id_type:
