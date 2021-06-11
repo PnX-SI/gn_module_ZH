@@ -50,24 +50,16 @@ export const ModuleConfig = {
    "prop": "create_date"
   }
  ],
- "nomenc_mnemo_by_tab": {
-  "0": [
-   "CRIT_DELIM",
-   "SDAGE"
-  ],
-  "1": [],
-  "2": [
-   "CRIT_DELIM",
-   "CRIT_DEF_ESP_FCT"
-  ],
-  "3": [
-   "SDAGE",
-   "SAGE",
-   "OCCUPATION_SOLS",
-   "ACTIV_HUM",
-   "LOCALISATION",
-   "IMPACTS",
-   "EVAL_GLOB_MENACES"
-  ]
- }
+ "nomenclatures": [
+  "CRIT_DELIM",
+  "SDAGE",
+  "SAGE",
+  "CRIT_DELIM",
+  "CRIT_DEF_ESP_FCT",
+  "OCCUPATION_SOLS",
+  "ACTIV_HUM",
+  "LOCALISATION",
+  "IMPACTS",
+  "EVAL_GLOB_MENACES"
+ ]
 }

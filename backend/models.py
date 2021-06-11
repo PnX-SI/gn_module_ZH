@@ -9,6 +9,10 @@ from pypnnomenclature.models import (
     TNomenclatures
 )
 
+from pypn_habref_api.models import (
+    Habref
+)
+
 import geoalchemy2
 from geoalchemy2.types import Geography, Geometry
 from geoalchemy2.shape import to_shape
@@ -539,3 +543,86 @@ class CorZhLimFs(DB.Model):
     def get_lim_fs_by_id(id_zh):
         return DB.session.query(CorZhLimFs).filter(
             CorZhLimFs.id_zh == id_zh).all()
+
+
+class CorSdageSage(DB.Model):
+    __tablename__ = "cor_sdage_sage"
+    __table_args__ = {"schema": "pr_zh"}
+    id_sdage = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+    id_sage = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+
+    def get_id_sdage_list():
+        q_id_sdages = DB.session.query(
+            func.distinct(CorSdageSage.id_sdage)).all()
+        return [id[0] for id in q_id_sdages]
+
+    def get_sage_by_id(id):
+        return DB.session.query(CorSdageSage, TNomenclatures).join(TNomenclatures, TNomenclatures.id_nomenclature == CorSdageSage.id_sage).filter(CorSdageSage.id_sdage == id).all()
+
+
+class BibCb(DB.Model):
+    __tablename__ = "bib_cb"
+    __table_args__ = {"schema": "pr_zh"}
+    lb_code = DB.Column(
+        DB.Unicode,
+        primary_key=True
+    )
+    humidity = DB.Column(
+        DB.Unicode,
+        nullable=False
+    )
+    is_ch = DB.Column(
+        DB.Boolean,
+        nullable=False
+    )
+
+    def get_label():
+        return DB.session.query(BibCb, Habref).join(
+            Habref, BibCb.lb_code == Habref.lb_code).filter(Habref.cd_typo == 22).all()
+
+
+class CorImpactTypes(DB.Model):
+    __tablename__ = "cor_impact_types"
+    __table_args__ = {"schema": "pr_zh"}
+    id_cor_impact_types = DB.Column(
+        DB.Integer,
+        primary_key=True
+    )
+    id_impact = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        nullable=False
+    )
+    id_impact_type = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature)
+    )
+    active = DB.Column(
+        DB.Integer,
+        nullable=False
+    )
+
+    def get_impact_type_list():
+        q_id_types = DB.session.query(
+            func.distinct(CorImpactTypes.id_impact_type)).all()
+        return [id[0] for id in q_id_types]
+
+    def get_impact_by_type(id_type):
+        return DB.session.query(CorImpactTypes, TNomenclatures).join(
+            TNomenclatures, TNomenclatures.id_nomenclature == CorImpactTypes.id_impact).filter(
+                and_(CorImpactTypes.id_impact_type == id_type, CorImpactTypes.active)).all()
+
+    def get_mnemo_type(id_type):
+        if id_type:
+            return DB.session.query(TNomenclatures).filter(
+                TNomenclatures.id_nomenclature == id_type).one()
+        else:
+            return ''
