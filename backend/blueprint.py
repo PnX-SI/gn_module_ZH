@@ -308,10 +308,14 @@ def get_tab_data(id_tab, info_role):
                     DB.session.flush()
 
                 # create zh code
+                code = Code(new_zh.id_zh, new_zh.id_org, new_zh.geom)
                 # pdb.set_trace()
-                #code = Code(new_zh.id_zh, new_zh.id_org, new_zh.geom)
-                # pdb.set_trace()
-                #new_zh.code = code
+                if code.is_valid_number:
+                    new_zh.code = str(code)
+                else:
+                    return {
+                        "code error": "zh_number_greater_than_9999"
+                    }, 500
 
                 DB.session.commit()
                 return {
@@ -474,6 +478,7 @@ def deleteOneZh(id_zh, info_role):
     """
     zhRepository = ZhRepository(TZH)
     DB.session.query(CorZhRef).filter(CorZhRef.id_zh == id_zh).delete()
+    DB.session.query(CorZhArea).filter(CorZhArea.id_zh == id_zh).delete()
     zhRepository.delete(id_zh, info_role)
 
     return {"message": "delete with success"}, 200

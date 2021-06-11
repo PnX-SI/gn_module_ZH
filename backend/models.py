@@ -315,33 +315,32 @@ class Code(ZH):
         self.dep = self.get_departments()
         self.organism = self.get_organism()
         self.number = self.get_number()
+        self.is_valid_number = self.set_valid_number()
 
     def get_departments(self):
         departments = CorZhArea.get_departments(self.id_zh)
         area = 0
-        main_dep = ''
-        my_geom = DB.session.query(cast(TZH.geom, Geography)).filter(
-            TZH.id_zh == self.id_zh).one()[0]
+        my_geom = DB.session.query(func.ST_Transform(func.ST_SetSRID(
+            TZH.geom, 4326), 2154)).filter(TZH.id_zh == self.id_zh).one()[0]
         for dep in departments:
-            print(dep.LAreas.area_code)
-            # dep_geo = DB.session.query(dep.LAreas.geom.ST_Transform(4326).ST_Intersection(my_geom)).one()[0]
-            pdb.set_trace()
-
-            # .ST_Area()).one()[0])
-            # print(DB.session.query(dep_geo).ST_Intersection(my_geom))
-            # DB.session.query(dep.LAreas.geom.ST_Intersects(cast(id_zh_geom),)
-            # DB.session.query(dep.LAreas.geom.ST_Transform(4326).ST_Intersection(self.zh_geom.ST_Transform(4326)).one()[0]
-            if DB.session.query(dep.LAreas.geom.ST_Area()).one()[0] > area:
-                area = DB.session.query(dep.LAreas.geom.ST_Area()).one()[0]
+            if DB.session.scalar(dep.LAreas.geom.ST_Intersection(my_geom).ST_Area()) > area:
+                area = DB.session.scalar(
+                    dep.LAreas.geom.ST_Intersection(my_geom).ST_Area())
                 main_dep = dep.LAreas.area_code
-        pdb.set_trace()
         return main_dep
 
     def get_organism(self):
         return BibOrganismes.get_abbrevation(self.id_org)
 
     def get_number(self):
-        return '01'
+        q = DB.session.query(CorZhArea).join(LAreas, LAreas.id_area == CorZhArea.id_area).join(
+            TZH, TZH.id_zh == CorZhArea.id_zh).filter(TZH.id_org == self.id_org, LAreas.area_code == self.get_departments()).count()
+        return q
+
+    def set_valid_number(self):
+        if self.number > 9999:
+            return False
+        return True
 
     def __repr__(self):
         return f'{self.dep}-{self.organism}-{self.number}'
@@ -381,8 +380,8 @@ class CorZhArea(DB.Model):
     cover = DB.Column(DB.Integer)
 
     def get_departments(id_zh):
-        return DB.session.query(CorZhArea, LAreas).join(LAreas).filter(
-            CorZhArea.id_zh == id_zh, LAreas.id_type == 26).all()
+        return DB.session.query(CorZhArea, LAreas, TZH).join(LAreas).filter(
+            CorZhArea.id_zh == id_zh, LAreas.id_type == 26, TZH.id_zh == id_zh).all()
 
 
 class TRiverBasin(DB.Model):
