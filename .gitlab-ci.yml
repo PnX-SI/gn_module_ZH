@@ -4,7 +4,7 @@ stages:
 deploy_dev:
   stage: deploy_dev
   script:
-    - cd /opt/geonature-ansible && ansible -i hosts -m ping all
+    - cd /opt/geonature-ansible && ansible-playbook -i hosts deploy_biodiversitydata.yml
   only:
     - dev
   tags:
