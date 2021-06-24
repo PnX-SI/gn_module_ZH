@@ -626,3 +626,39 @@ class CorImpactTypes(DB.Model):
                 TNomenclatures.id_nomenclature == id_type).one()
         else:
             return ''
+
+
+class CorMainFct(DB.Model):
+    __tablename__ = "cor_main_fct"
+    __table_args__ = {"schema": "pr_zh"}
+    id_function = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+    id_main_function = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        nullable=False
+    )
+    active = DB.Column(
+        DB.Integer,
+        nullable=False
+    )
+
+    def get_main_function_list(ids):
+        q_id_types = DB.session.query(
+            func.distinct(CorMainFct.id_main_function)).all()
+        return [id[0] for id in q_id_types if id[0] in ids]
+
+    def get_function_by_main_function(id_main):
+        return DB.session.query(CorMainFct, TNomenclatures).join(
+            TNomenclatures, TNomenclatures.id_nomenclature == CorMainFct.id_function).filter(
+                and_(CorMainFct.id_main_function == id_main, CorMainFct.active)).all()
+
+    def get_mnemo_type(id_type):
+        if id_type:
+            return DB.session.query(TNomenclatures).filter(
+                TNomenclatures.id_nomenclature == id_type).one()
+        else:
+            return ''
