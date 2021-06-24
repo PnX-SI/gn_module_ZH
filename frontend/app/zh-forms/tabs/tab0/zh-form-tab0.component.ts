@@ -1,22 +1,27 @@
-import { Component, EventEmitter, HostListener, Input, OnInit, Output } from "@angular/core";
+import {
+  Component,
+  EventEmitter,
+  HostListener,
+  Input,
+  OnInit,
+  Output,
+} from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { Subscription } from "rxjs";
 import { GeoJSON } from "leaflet";
-import { MapService } from '@geonature_common/map/map.service';
-import { IDropdownSettings } from 'ng-multiselect-dropdown';
-import { ToastrService } from 'ngx-toastr';
+import * as L from "leaflet";
+import { MapService } from "@geonature_common/map/map.service";
+import { IDropdownSettings } from "ng-multiselect-dropdown";
+import { ToastrService } from "ngx-toastr";
 import { ZhDataService } from "../../../services/zh-data.service";
-
-
 
 @Component({
   selector: "zh-form-tab0",
   templateUrl: "./zh-form-tab0.component.html",
-  styleUrls: ["./zh-form-tab0.component.scss"]
+  styleUrls: ["./zh-form-tab0.component.scss"],
 })
 export class ZhFormTab0Component implements OnInit {
-
   @Input() formMetaData;
   @Output() nextTab = new EventEmitter<number>();
   @Output() activeTabs = new EventEmitter<boolean>();
@@ -39,32 +44,35 @@ export class ZhFormTab0Component implements OnInit {
     private _mapService: MapService,
     private _router: Router,
     private _toastr: ToastrService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.dropdownSettings = {
       singleSelection: false,
-      idField: 'id_nomenclature',
-      textField: 'mnemonique',
-      searchPlaceholderText: 'Rechercher',
+      idField: "id_nomenclature",
+      textField: "mnemonique",
+      searchPlaceholderText: "Rechercher",
       enableCheckAll: false,
-      allowSearchFilter: true
+      allowSearchFilter: true,
     };
 
     this.getMetaData();
     this.createForm();
 
-    this.$_geojsonSub = this._mapService.gettingGeojson$.subscribe((geojson: GeoJSON) => {
-      this.geometry = geojson;
-    })
+    this.$_geojsonSub = this._mapService.gettingGeojson$.subscribe(
+      (geojson: GeoJSON) => {
+        this.geometry = geojson;
+      }
+    );
 
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
         this._currentZh = zh;
-        console.log(this._currentZh);
         const selectedCritDelim = [];
-        this.critDelim.forEach(critere => {
-          if (this._currentZh.properties.id_lims.includes(critere.id_nomenclature)) {
+        this.critDelim.forEach((critere) => {
+          if (
+            this._currentZh.properties.id_lims.includes(critere.id_nomenclature)
+          ) {
             selectedCritDelim.push(critere);
           }
         });
@@ -74,21 +82,27 @@ export class ZhFormTab0Component implements OnInit {
           critere_delim: selectedCritDelim,
           sdage: this._currentZh.properties.id_sdage,
         });
+        setTimeout(() => {
+          this._mapService.loadGeometryReleve(this._currentZh, false);
+          const coordinates = this._currentZh.geometry.coordinates;
+          const myLatLong = coordinates[0].map((point) => {
+            return L.latLng(point[1], point[0]);
+          });
+          let layer = L.polygon(myLatLong);
+          this.geometry = layer.toGeoJSON();
+          if (this._mapService.map) {
+            setTimeout(() => {
+              this._mapService.map.fitBounds(layer.getBounds());
+            }, 10);
+          }
+          this._mapService.map.invalidateSize();
+        }, 0);
       }
-    })
+    });
   }
 
   ngAfterViewInit() {
     setTimeout(() => this.calcCardContentHeight(), 0);
-    if (this._mapService.currentExtend) {
-      this._mapService.map.setView(
-        this._mapService.currentExtend.center,
-        this._mapService.currentExtend.zoom
-      )
-    }
-    this._mapService.removeLayerFeatureGroups(
-      [this._mapService.fileLayerFeatureGroup]
-    )
   }
 
   calcCardContentHeight() {
@@ -127,41 +141,43 @@ export class ZhFormTab0Component implements OnInit {
       main_name: formValues.main_name,
       critere_delim: [],
       sdage: formValues.sdage,
-      geom: null
+      geom: null,
     };
     if (this.geometry) {
       formToPost.geom = this.geometry;
       if (this.form.valid) {
-        formValues.critere_delim.forEach(critere => {
-          formToPost.critere_delim.push(critere.id_nomenclature)
+        formValues.critere_delim.forEach((critere) => {
+          formToPost.critere_delim.push(critere.id_nomenclature);
         });
         this.posted = true;
         if (this._currentZh) {
-          formToPost['id_zh'] = Number(this._currentZh.properties.id_zh);
+          formToPost["id_zh"] = Number(this._currentZh.properties.id_zh);
         }
         this._dataService.postDataForm(formToPost, 0).subscribe(
           (data) => {
             this.form.reset();
             this.posted = false;
-            this._dataService.getZhById(data.id_zh).subscribe(
-              (zh: any) => {
-                this._dataService.setCurrentZh(zh);
-              }
-            );
+            this._dataService.getZhById(data.id_zh).subscribe((zh: any) => {
+              this._dataService.setCurrentZh(zh);
+            });
             this.nextTab.emit(1);
             this.activeTabs.emit(true);
           },
           (error) => {
             this.posted = false;
-            this._toastr.error(error.error, '', { positionClass: 'toast-top-right' });
+            this._toastr.error(error.error, "", {
+              positionClass: "toast-top-right",
+            });
           }
-        )
-      };
+        );
+      }
+    } else {
+      this._toastr.error(
+        "Veuillez tracer ou importer une zone humide sur la carte",
+        "",
+        { positionClass: "toast-top-right" }
+      );
     }
-    else {
-      this._toastr.error('Veuillez tracer ou importer une zone humide sur la carte', '', { positionClass: 'toast-top-right' });
-    };
-
   }
 
   onCancel() {
@@ -170,14 +186,13 @@ export class ZhFormTab0Component implements OnInit {
   }
 
   getMetaData() {
-    this.idOrg = this.formMetaData['BIB_ORGANISMES'];
-    this.critDelim = this.formMetaData['CRIT_DELIM'];
-    this.sdage = this.formMetaData['SDAGE'];
+    this.idOrg = this.formMetaData["BIB_ORGANISMES"];
+    this.critDelim = this.formMetaData["CRIT_DELIM"];
+    this.sdage = this.formMetaData["SDAGE"];
   }
 
   ngOnDestroy() {
     this.$_geojsonSub.unsubscribe();
     this.$_currentZhSub.unsubscribe();
   }
-
 }
