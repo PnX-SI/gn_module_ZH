@@ -1,14 +1,13 @@
 import { Component, HostListener, OnInit } from "@angular/core";
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from "@angular/router";
 import { ZhDataService } from "../../services/zh-data.service";
 
 @Component({
   selector: "zh-tabs",
   templateUrl: "./zh-tabs.component.html",
-  styleUrls: ["./zh-tabs.component.scss"]
+  styleUrls: ["./zh-tabs.component.scss"],
 })
 export class ZhTabsComponent implements OnInit {
-
   public cardContentHeight: number;
   public id_zh: number;
   public disabledTabs = true;
@@ -17,11 +16,11 @@ export class ZhTabsComponent implements OnInit {
 
   constructor(
     private _route: ActivatedRoute,
-    private _dataService: ZhDataService,
-  ) { }
+    private _dataService: ZhDataService
+  ) {}
 
   ngOnInit() {
-    this.id_zh = this._route.snapshot.params['id'];
+    this.id_zh = this._route.snapshot.params["id"];
     this.getMetaDataForms();
     if (this.id_zh) {
       this.getZhById(this.id_zh);
@@ -55,25 +54,19 @@ export class ZhTabsComponent implements OnInit {
   }
 
   getMetaDataForms() {
-    this._dataService.getMetaDataForms().subscribe(
-      (metaData: any) => {
-        this.formMetaData = metaData
-      }
-    )
+    this._dataService.getMetaDataForms().subscribe((metaData: any) => {
+      this.formMetaData = metaData;
+    });
   }
 
   getZhById(id_zh: number) {
-    this._dataService.getZhById(id_zh).subscribe(
-      (zh: any) => {
-        this._dataService.setCurrentZh(zh);
-        this.disabledTabs = false;
-        console.log(zh);
-      }
-    )
+    this._dataService.getZhById(id_zh).subscribe((zh: any) => {
+      this._dataService.setCurrentZh(zh);
+      this.disabledTabs = false;
+    });
   }
 
   ngOnDestroy() {
     this._dataService.setCurrentZh(null);
   }
-
 }
