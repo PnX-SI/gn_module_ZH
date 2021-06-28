@@ -22,6 +22,8 @@ from pypnnomenclature.models import (
     BibNomenclaturesTypes
 )
 
+from geonature.core.ref_geo.models import LAreas, BibAreasTypes
+
 from geonature.utils.utilssqlalchemy import json_resp
 from geonature.utils.env import DB
 #from geonature.utils.env import get_id_module
@@ -82,6 +84,20 @@ def get_zh(info_role):
 
     data = q.limit(limit).offset(page * limit).all()
 
+    # check if municipalities and dep in ref_geo
+    id_type_com = DB.session.query(BibAreasTypes).filter(
+        BibAreasTypes.type_code == 'COM').one().id_type
+    id_type_dep = DB.session.query(BibAreasTypes).filter(
+        BibAreasTypes.type_code == 'DEP').one().id_type
+    n_com = DB.session.query(LAreas).filter(
+        LAreas.id_type == id_type_com).count()
+    n_dep = DB.session.query(LAreas).filter(
+        LAreas.id_type == id_type_dep).count()
+    if n_com == 0 or n_dep == 0:
+        is_ref_geo = False
+    else:
+        is_ref_geo = True
+
     featureCollection = []
     for n in data:
         releve_cruved = n.get_releve_cruved(user, user_cruved)
@@ -95,7 +111,8 @@ def get_zh(info_role):
         "total_filtered": len(data),
         "page": page,
         "limit": limit,
-        "items": FeatureCollection(featureCollection)
+        "items": FeatureCollection(featureCollection),
+        "check_ref_geo": is_ref_geo
     }, 200
 
 
