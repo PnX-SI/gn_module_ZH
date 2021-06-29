@@ -2,8 +2,19 @@ from .models import (
     Nomenclatures,
     CorSdageSage,
     BibCb,
-    CorImpactTypes
+    CorImpactTypes,
+    CorMainFct
 )
+
+from pypnnomenclature.models import (
+    TNomenclatures,
+    BibNomenclaturesTypes
+)
+
+from geonature.utils.env import DB
+
+
+import pdb
 
 
 def get_sage_list():
@@ -60,10 +71,46 @@ def get_impact_list():
     return list_by_impact_type
 
 
+def get_function_list(mnemo):
+
+    # get id_type of mnemo (ex : 'FONCTIONS_HYDRO') in BibNomenclatureTypes
+    id_type_main_function = DB.session.query(BibNomenclaturesTypes).filter(
+        BibNomenclaturesTypes.mnemonique == mnemo).one().id_type
+
+    # get list of TNomenclatures ids by id_type
+    nomenclature_ids = [nomenc.id_nomenclature for nomenc in DB.session.query(TNomenclatures).filter(
+        TNomenclatures.id_type == id_type_main_function).all()]
+
+    # get mnemo main_functions
+    main_functions_ids = CorMainFct.get_main_function_list(nomenclature_ids)
+
+    # get list of functions by mnemo main function
+    list_by_main_function = []
+    for main_function_id in main_functions_ids:
+        nomenc_list = []
+        functions = CorMainFct.get_function_by_main_function(main_function_id)
+        for function in functions:
+            nomenc_list.append(
+                {
+                    "id_nomenclature": function.CorMainFct.id_function,
+                    "mnemonique": function.TNomenclatures.mnemonique
+                }
+            )
+        type_mnemo = CorMainFct.get_mnemo_type(main_function_id)
+        if type_mnemo != '':
+            list_by_main_function.append({type_mnemo.mnemonique: nomenc_list})
+        else:
+            list_by_main_function.append({type_mnemo: nomenc_list})
+    return list_by_main_function
+
+
 def get_nomenc(config):
     nomenc_info = {}
     for mnemo in config:
-        if mnemo == 'IMPACTS':
+        if mnemo in ['FONCTIONS_HYDRO', 'FONCTIONS_BIO', 'INTERET_PATRIM']:
+            nomenc_list = get_function_list(mnemo)
+            nomenc_info.update({mnemo: nomenc_list})
+        elif mnemo == 'IMPACTS':
             nomenc_list = get_impact_list()
             nomenc_info.update({mnemo: nomenc_list})
         elif mnemo == 'CORINE_BIO':

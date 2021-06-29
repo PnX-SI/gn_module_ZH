@@ -11,7 +11,7 @@ import uuid
 
 from geojson import FeatureCollection
 
-from sqlalchemy import func, text, desc
+from sqlalchemy import func, text, desc, and_
 from sqlalchemy.orm.exc import NoResultFound
 
 import geoalchemy2
@@ -22,9 +22,14 @@ from pypnnomenclature.models import (
     BibNomenclaturesTypes
 )
 
+from pypn_habref_api.models import (
+    Habref,
+    CorespHab
+)
+
 from geonature.utils.utilssqlalchemy import json_resp
 from geonature.utils.env import DB
-#from geonature.utils.env import get_id_module
+# from geonature.utils.env import get_id_module
 
 # import des fonctions utiles depuis le sous-module d'authentification
 from geonature.core.gn_permissions import decorators as permissions
@@ -141,13 +146,39 @@ def get_tab(info_role):
         raise ZHApiError(message=str(e), details=str(e))
 
 
-@blueprint.route("/references/autocomplete", methods=["GET"])
+@blueprint.route("/forms/cahierhab/<string:lb_code>", methods=["GET"])
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
+def get_cahier_hab(info_role, lb_code):
+    """Get form metadata for all tabs
+    """
+    try:
+        # get cd_hab_sortie from lb_code of selected Corine Biotope
+        cd_hab_sortie = DB.session.query(Habref).filter(
+            and_(Habref.lb_code == lb_code, Habref.cd_typo == 22)).one().cd_hab
+        # get all cd_hab_entre corresponding to cd_hab_sortie
+        q_cd_hab_entre = DB.session.query(CorespHab).filter(
+            CorespHab.cd_hab_sortie == cd_hab_sortie).all()
+        # get list of cd_hab_entre/lb_code/lb_hab_fr for each cahier habitat
+        ch = []
+        for q in q_cd_hab_entre:
+            ch.append({
+                "cd_hab": q.cd_hab_entre,
+                "lb_code": DB.session.query(Habref).filter(Habref.cd_hab == q.cd_hab_entre).one().lb_code,
+                "lb_hab_fr": DB.session.query(Habref).filter(Habref.cd_hab == q.cd_hab_entre).one().lb_hab_fr
+            })
+        return ch
+    except Exception as e:
+        raise ZHApiError(message=str(e), details=str(e))
+
+
+@ blueprint.route("/references/autocomplete", methods=["GET"])
+@ permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@ json_resp
 def get_ref_autocomplete(info_role):
     params = request.args
     search_title = params.get("search_title")
-    #search_title = 'MCD'
+    # search_title = 'MCD'
     q = DB.session.query(
         TReferences,
         func.similarity(TReferences.title, search_title).label("idx_trgm"),
@@ -177,9 +208,9 @@ def get_ref_autocomplete(info_role):
         return "No Result", 404
 
 
-@blueprint.route("/references", methods=["POST"])
-@permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
-@json_resp
+@ blueprint.route("/references", methods=["POST"])
+@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
+@ json_resp
 def post_reference(info_role):
     """create reference
     """
@@ -196,9 +227,9 @@ def post_reference(info_role):
     return new_ref.as_dict()
 
 
-@blueprint.route("/references", methods=["PATCH"])
-@permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
-@json_resp
+@ blueprint.route("/references", methods=["PATCH"])
+@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
+@ json_resp
 def patch_reference(info_role):
     """edit reference
     """
@@ -214,9 +245,9 @@ def patch_reference(info_role):
     return form_data
 
 
-@blueprint.route("/form/<int:id_tab>", methods=["POST", "PATCH"])
-@permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
-@json_resp
+@ blueprint.route("/form/<int:id_tab>", methods=["POST", "PATCH"])
+@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
+@ json_resp
 def get_tab_data(id_tab, info_role):
     """Post zh data
     """
@@ -424,9 +455,9 @@ def get_tab_data(id_tab, info_role):
             # edit criteres delim
             uuid_lim_list = DB.session.query(TZH.id_lim_list).filter(
                 TZH.id_zh == id_zh).one().id_lim_list
-            #query = DB.session.query(CorLimList).filter(CorLimList.id_lim_list == uuid_lim_list).all()
-            #zh_crit_delim_list = sorted([q.id_lim for q in query])
-            #new_crit_delim_list = sorted(form_data['critere_delim'])
+            # query = DB.session.query(CorLimList).filter(CorLimList.id_lim_list == uuid_lim_list).all()
+            # zh_crit_delim_list = sorted([q.id_lim for q in query])
+            # new_crit_delim_list = sorted(form_data['critere_delim'])
             # if new_crit_delim_list != zh_crit_delim_list:
             DB.session.query(CorLimList).filter(
                 CorLimList.id_lim_list == uuid_lim_list).delete()
@@ -467,9 +498,9 @@ def get_tab_data(id_tab, info_role):
         DB.session.close()
 
 
-@blueprint.route("/<int:id_zh>", methods=["DELETE"])
-@permissions.check_cruved_scope("D", True, module_code="ZONES_HUMIDES")
-@json_resp
+@ blueprint.route("/<int:id_zh>", methods=["DELETE"])
+@ permissions.check_cruved_scope("D", True, module_code="ZONES_HUMIDES")
+@ json_resp
 def deleteOneZh(id_zh, info_role):
     """Delete one zh
 
@@ -505,7 +536,7 @@ def get_sensitive_view(info_role):
 """
 
 
-@blueprint.errorhandler(ZHApiError)
+@ blueprint.errorhandler(ZHApiError)
 def handle_geonature_zh_api(error):
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
