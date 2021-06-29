@@ -1,17 +1,16 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject } from "rxjs";
 import { AppConfig } from "@geonature_config/app.config";
 
 @Injectable({
   providedIn: "root",
 })
 export class ZhDataService {
-
   private zh = new BehaviorSubject(null);
   public currentZh = this.zh.asObservable();
 
-  constructor(private _api: HttpClient) { }
+  constructor(private _api: HttpClient) {}
 
   setCurrentZh(zh: any) {
     this.zh.next(zh);
@@ -44,4 +43,9 @@ export class ZhDataService {
     return this._api.patch<any>(urlpost, value);
   }
 
+  checkRefGeo() {
+    return this._api.get<any>(
+      `${AppConfig.API_ENDPOINT}/zones_humides/check_ref_geo`
+    );
+  }
 }
