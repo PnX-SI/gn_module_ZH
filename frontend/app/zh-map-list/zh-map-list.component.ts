@@ -1,4 +1,10 @@
-import { Component, HostListener, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  OnInit,
+  OnDestroy,
+  AfterViewInit,
+} from "@angular/core";
 import { MapListService } from "@geonature_common/map-list/map-list.service";
 import { MapService } from "@geonature_common/map/map.service";
 import { ModuleConfig } from "../module.config";
@@ -8,14 +14,14 @@ import { ZhDataService } from "../services/zh-data.service";
 import { CommonService } from "@geonature_common/service/common.service";
 import { Subscription } from "rxjs/Subscription";
 import { GlobalSubService } from "@geonature/services/global-sub.service";
+import { ToastrService } from "ngx-toastr";
 
 @Component({
-  selector: 'zh-map-list',
-  templateUrl: './zh-map-list.component.html',
-  styleUrls: ['./zh-map-list.component.scss']
+  selector: "zh-map-list",
+  templateUrl: "./zh-map-list.component.html",
+  styleUrls: ["./zh-map-list.component.scss"],
 })
 export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
-
   public userCruved: any;
   public displayColumns: Array<any>;
   public availableColumns: Array<any>;
@@ -32,8 +38,9 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     private _zhService: ZhDataService,
     public ngbModal: NgbModal,
     public globalSub: GlobalSubService,
-    private _commonService: CommonService
-  ) { }
+    private _commonService: CommonService,
+    private _toastr: ToastrService
+  ) {}
 
   ngOnInit() {
     this.mapListService.zoomOnLayer = true;
@@ -41,7 +48,20 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.zhConfig = ModuleConfig;
     this.idName = "id_zh";
     this.apiEndPoint = this.zhConfig.MODULE_URL;
-
+    this._zhService.checkRefGeo().subscribe(
+      (status) => {
+        if (!status.check_ref_geo) {
+          this._toastr.error(
+            "Le module est inutilisable : Votre instance GeoNature ne contient aucune référence géographique concernant les communes et/ou les départements - Veuillez remplir la table l_areas du schéma ref_geo dans la base de données",
+            "",
+            { timeOut: 10000, positionClass: "toast-bottom-right" }
+          );
+        }
+      },
+      (err) => {
+        this._commonService.translateToaster("error", err.message);
+      }
+    );
     // get user cruved
     this.moduleSub = this.globalSub.currentModuleSub
       // filter undefined or null
@@ -54,7 +74,8 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     // columns to be default displayed
     this.mapListService.displayColumns = this.zhConfig.default_maplist_columns;
     // columns available for display
-    this.mapListService.availableColumns = this.zhConfig.available_maplist_column;
+    this.mapListService.availableColumns =
+      this.zhConfig.available_maplist_column;
 
     this.mapListService.idName = this.idName;
     // FETCH THE DATA
@@ -68,20 +89,18 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     // end OnInit
   }
 
-
   ngAfterViewInit() {
     setTimeout(() => this.calcCardContentHeight(), 500);
     if (this._mapService.currentExtend) {
       this._mapService.map.setView(
         this._mapService.currentExtend.center,
         this._mapService.currentExtend.zoom
-      )
+      );
     }
-    this._mapService.removeLayerFeatureGroups(
-      [this._mapService.fileLayerFeatureGroup]
-    )
+    this._mapService.removeLayerFeatureGroups([
+      this._mapService.fileLayerFeatureGroup,
+    ]);
   }
-
 
   @HostListener("window:resize", ["$event"])
   onResize(event) {
@@ -123,21 +142,27 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   displayAuthorName(element) {
-    return element.nom_complet
+    return element.nom_complet;
   }
 
   displayDate(element): string {
-    return moment(element).format("DD-MM-YYYY")
+    return moment(element).format("DD-MM-YYYY");
   }
 
   zhCustomCallBack(feature): any {
+    console.log("feature", this.mapListService.geojsonData);
+
     // set Author name
-    feature["properties"]["author"] = this.displayAuthorName(feature["properties"]["authors"]);
+    feature["properties"]["author"] = this.displayAuthorName(
+      feature["properties"]["authors"]
+    );
 
     // format Date
-    feature["properties"]["create_date"] = this.displayDate(feature["properties"]["create_date"]);
+    feature["properties"]["create_date"] = this.displayDate(
+      feature["properties"]["create_date"]
+    );
 
-    return feature
+    return feature;
   }
 
   deleteOneZh(row) {
@@ -157,7 +182,6 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       }
     );
-
   }
 
   openDeleteModal(event, modal, iElement, row) {
@@ -177,5 +201,4 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.moduleSub.unsubscribe();
     this.ngbModal.dismissAll();
   }
-
 }
