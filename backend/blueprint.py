@@ -116,6 +116,32 @@ def get_zh(info_role):
     }, 200
 
 
+# Route pour afficher liste des zones humides
+@blueprint.route("/check_ref_geo", methods=["GET"])
+@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@json_resp
+def check_ref_geo(info_role):
+    try:
+        # check if municipalities and dep in ref_geo
+        id_type_com = DB.session.query(BibAreasTypes).filter(
+            BibAreasTypes.type_code == 'COM').one().id_type
+        id_type_dep = DB.session.query(BibAreasTypes).filter(
+            BibAreasTypes.type_code == 'DEP').one().id_type
+        n_com = DB.session.query(LAreas).filter(
+            LAreas.id_type == id_type_com).count()
+        n_dep = DB.session.query(LAreas).filter(
+            LAreas.id_type == id_type_dep).count()
+        if n_com == 0 or n_dep == 0:
+            is_ref_geo = False
+        else:
+            is_ref_geo = True
+        return {
+            "check_ref_geo": is_ref_geo
+        }, 200
+    except Exception as e:
+        raise ZHApiError(message=str(e), details=str(e))
+
+
 @blueprint.route("/<int:id_zh>", methods=["GET"])
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
