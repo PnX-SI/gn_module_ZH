@@ -43,20 +43,18 @@ def get_impact_list():
     list_by_impact_type = []
     id_impact_type_list = CorImpactTypes.get_impact_type_list()
     for id_type in id_impact_type_list:
-        nomenc_list = []
         impacts = CorImpactTypes.get_impact_by_type(id_type)
-        for impact in impacts:
-            nomenc_list.append(
-                {
-                    "id_nomenclature": impact.CorImpactTypes.id_impact,
-                    "mnemonique": impact.TNomenclatures.mnemonique
-                }
-            )
         type_mnemo = CorImpactTypes.get_mnemo_type(id_type)
         if type_mnemo != '':
-            list_by_impact_type.append({type_mnemo.mnemonique: nomenc_list})
-        else:
-            list_by_impact_type.append({type_mnemo: nomenc_list})
+            type_mnemo = type_mnemo.mnemonique
+        for impact in impacts:
+            list_by_impact_type.append(
+                {
+                    "id_nomenclature": impact.CorImpactTypes.id_impact,
+                    "mnemonique": impact.TNomenclatures.mnemonique,
+                    "category": type_mnemo
+                }
+            )
     return list_by_impact_type
 
 
