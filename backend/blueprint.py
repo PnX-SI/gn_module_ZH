@@ -442,6 +442,7 @@ def get_tab_data(id_tab, info_role):
             }, 200
 
     except Exception as e:
+        pdb.set_trace()
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
             return 'Empty mandatory field', 400
         if e.__class__.__name__ == 'IntegrityError':
