@@ -337,9 +337,9 @@ class Code(ZH):
         return BibOrganismes.get_abbrevation(self.id_org)
 
     def get_number(self):
-        q = DB.session.query(CorZhArea).join(LAreas, LAreas.id_area == CorZhArea.id_area).join(
+        number = DB.session.query(CorZhArea).join(LAreas, LAreas.id_area == CorZhArea.id_area).join(
             TZH, TZH.id_zh == CorZhArea.id_zh).filter(TZH.id_org == self.id_org, LAreas.area_code == self.get_departments()).count()
-        return q
+        return number+1
 
     def set_valid_number(self):
         if self.number > 9999:
