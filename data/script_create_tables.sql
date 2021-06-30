@@ -133,6 +133,14 @@ CREATE  TABLE pr_zh.t_fct_area (
 
 COMMENT ON TABLE pr_zh.t_fct_area IS 'Espaces de fonctionnalités';
 
+CREATE  TABLE pr_zh.cor_zh_cb ( 
+	id_zh                integer  NOT NULL ,
+	lb_code              varchar(50)  NOT NULL ,
+	CONSTRAINT pk_cor_zh_cb PRIMARY KEY ( id_zh, lb_code )
+ );
+
+COMMENT ON TABLE pr_zh.cor_zh_cb IS 'Correspondance zh et corine biotope';
+
 CREATE  TABLE pr_zh.t_hydro_area ( 
 	id_hydro             integer  NOT NULL ,
 	name                 varchar(100)  NOT NULL ,
@@ -561,6 +569,10 @@ ALTER TABLE pr_zh.cor_urban_type_range ADD CONSTRAINT fk_cor_urban_range FOREIGN
 ALTER TABLE pr_zh.cor_urban_type_range ADD CONSTRAINT fk_cor_urban_type FOREIGN KEY ( id_doc_type ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_zh_area ADD CONSTRAINT fk_cor_zh_area_id_area FOREIGN KEY ( id_area ) REFERENCES ref_geo.l_areas( id_area )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.cor_zh_cb ADD CONSTRAINT fk_cor_zh_cb_id_zh FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.cor_zh_cb ADD CONSTRAINT fk_cor_zh_cb_lb_code FOREIGN KEY ( lb_code ) REFERENCES pr_zh.bib_cb( lb_code )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_zh_corine_cover ADD CONSTRAINT fk_cor_zh_cover_t_updates FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh ) ON DELETE CASCADE ON UPDATE CASCADE;
 
