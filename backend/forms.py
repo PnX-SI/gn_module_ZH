@@ -123,3 +123,67 @@ def post_cor_zh_fct_area(geom, id_zh):
         DB.session.add(CorZhFctArea(
             id_zh=id_zh, id_fct_area=fa.id_fct_area))
         DB.session.flush()
+
+
+def update_zh_tab0(form_data, polygon, info_role, zh_date):
+    is_geom_new = check_polygon(polygon, form_data['id_zh'])
+
+    # update pr_zh.cor_lim_list
+    id_lim_list = DB.session.query(TZH.id_lim_list).filter(
+        TZH.id_zh == form_data['id_zh']).one()[0]
+    DB.session.query(CorLimList).filter(
+        CorLimList.id_lim_list == id_lim_list).delete()
+    post_cor_lim_list(id_lim_list, form_data['critere_delim'])
+
+    # update zh : fill pr_zh.t_zh
+    DB.session.query(TZH).filter(TZH.id_zh == form_data['id_zh']).update({
+        TZH.main_name: form_data['main_name'],
+        TZH.id_org: form_data['id_org'],
+        TZH.update_author: info_role.id_role,
+        TZH.update_date: zh_date,
+        TZH.id_sdage: form_data['sdage'],
+        TZH.geom: polygon
+    })
+    DB.session.flush()
+
+    if is_geom_new:
+        update_cor_zh_area(polygon, form_data['id_zh'])
+        update_cor_zh_rb(form_data['geom']['geometry'], form_data['id_zh'])
+        update_cor_zh_hydro(form_data['geom']['geometry'], form_data['id_zh'])
+        update_cor_zh_fct_area(
+            form_data['geom']['geometry'], form_data['id_zh'])
+
+    DB.session.commit()
+    return form_data['id_zh']
+
+
+def check_polygon(polygon, id_zh):
+    if polygon != str(DB.session.query(TZH.geom).filter(TZH.id_zh == id_zh).one()[0]).upper():
+        return True
+    return False
+
+
+def update_cor_zh_area(polygon, id_zh):
+    update_cor_zh_area(polygon, id_zh)
+    DB.session.query(CorZhArea).filter(
+        CorZhArea.id_zh == id_zh).delete()
+    post_cor_zh_area(polygon, id_zh, 25)
+    post_cor_zh_area(polygon, id_zh, 26)
+
+
+def update_cor_zh_rb(geom, id_zh):
+    DB.session.query(CorZhRb).filter(
+        CorZhRb.id_zh == id_zh).delete()
+    post_cor_zh_rb(geom, id_zh)
+
+
+def update_cor_zh_hydro(geom, id_zh):
+    DB.session.query(CorZhHydro).filter(
+        CorZhHydro.id_zh == id_zh).delete()
+    post_cor_zh_hydro(geom, id_zh)
+
+
+def update_cor_zh_fct_area(geom, id_zh):
+    DB.session.query(CorZhFctArea).filter(
+        CorZhFctArea.id_zh == id_zh).delete()
+    post_cor_zh_fct_area(geom, id_zh)

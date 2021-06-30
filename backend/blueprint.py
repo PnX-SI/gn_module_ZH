@@ -50,7 +50,10 @@ from .models import (
 
 from .nomenclatures import get_nomenc
 
-from .forms import create_zh
+from .forms import (
+    create_zh,
+    update_zh_tab0
+)
 
 from .repositories import (
     ZhRepository
@@ -154,7 +157,6 @@ def get_zh_by_id(id_zh, info_role):
         return full_zh
 
     except Exception as e:
-        pdb.set_trace()
         if e.__class__.__name__ == 'NoResultFound':
             raise ZHApiError(message='zh id exist?', details=str(e))
         raise ZHApiError(message=str(e), details=str(e))
@@ -293,9 +295,7 @@ def get_tab_data(id_tab, info_role):
     """
     form_data = request.json
     try:
-        # get form data
         if id_tab == 0:
-
             # set geometry from coordinates
             polygon = DB.session.query(func.ST_GeomFromGeoJSON(
                 str(form_data['geom']['geometry']))).one()[0]
@@ -307,83 +307,10 @@ def get_tab_data(id_tab, info_role):
 
             if 'id_zh' not in form_data.keys():
                 zh = create_zh(form_data, info_role, zh_date, polygon)
-                return {"id_zh": zh}, 200
             else:
-                if polygon != DB.session.query(TZH.geom).filter(
-                        TZH.id_zh == form_data['id_zh']).one()[0]:
-                    is_geom_new = True
-                else:
-                    is_geom_new = False
+                zh = update_zh_tab0(form_data, polygon, info_role, zh_date)
 
-                # update pr_zh.cor_lim_list
-                id_lim_list = DB.session.query(TZH.id_lim_list).filter(
-                    TZH.id_zh == form_data['id_zh']).one()[0]
-                DB.session.query(CorLimList).filter(
-                    CorLimList.id_lim_list == id_lim_list).delete()
-                for lim in form_data['critere_delim']:
-                    DB.session.add(CorLimList(
-                        id_lim_list=id_lim_list, id_lim=lim))
-                    DB.session.flush()
-
-                # update zh : fill pr_zh.t_zh
-                DB.session.query(TZH).filter(TZH.id_zh == form_data['id_zh']).update({
-                    TZH.main_name: form_data['main_name'],
-                    TZH.id_org: form_data['id_org'],
-                    TZH.update_author: info_role.id_role,
-                    TZH.update_date: zh_date,
-                    TZH.id_sdage: form_data['sdage'],
-                    TZH.geom: polygon
-                })
-                DB.session.flush()
-
-                if is_geom_new:
-                    # update cor_zh_area
-                    DB.session.query(CorZhArea).filter(
-                        CorZhArea.id_zh == form_data['id_zh']).delete()
-                    query = """
-                        SELECT (ref_geo.fct_get_area_intersection(
-                        ST_SetSRID('{geom}'::geometry,4326), {type})).id_area
-                        """.format(geom=str(polygon), type=25)
-                    comm_list = DB.session.execute(text(query)).fetchall()
-                    for comm in comm_list:
-                        DB.session.add(
-                            CorZhArea(id_area=comm[0], id_zh=form_data['id_zh']))
-                        DB.session.flush()
-
-                    # update cor_zh_rb
-                    DB.session.query(CorZhRb).filter(
-                        CorZhRb.id_zh == form_data['id_zh']).delete()
-                    rbs = TZH.get_zh_area_intersected(
-                        'river_basin', func.ST_GeomFromGeoJSON(str(form_data['geom']['geometry'])))
-                    for rb in rbs:
-                        DB.session.add(
-                            CorZhRb(id_zh=form_data['id_zh'], id_rb=rb.id_rb))
-                        DB.session.flush()
-
-                    # update cor_zh_hydro
-                    DB.session.query(CorZhHydro).filter(
-                        CorZhHydro.id_zh == form_data['id_zh']).delete()
-                    has = TZH.get_zh_area_intersected(
-                        'hydro_area', func.ST_GeomFromGeoJSON(str(form_data['geom']['geometry'])))
-                    for ha in has:
-                        DB.session.add(CorZhHydro(
-                            id_zh=form_data['id_zh'], id_hydro=ha.id_hydro))
-                        DB.session.flush()
-
-                    # update cor_zh_fct_area
-                    DB.session.query(CorZhFctArea).filter(
-                        CorZhFctArea.id_zh == form_data['id_zh']).delete()
-                    fas = TZH.get_zh_area_intersected(
-                        'fct_area', func.ST_GeomFromGeoJSON(str(form_data['geom']['geometry'])))
-                    for fa in fas:
-                        DB.session.add(CorZhFctArea(
-                            id_zh=form_data['id_zh'], id_fct_area=fa.id_fct_area))
-                        DB.session.flush()
-
-                DB.session.commit()
-                return {
-                    "id_zh": form_data['id_zh']
-                }, 200
+            return {"id_zh": zh}, 200
 
         if id_tab == 1:
             id_zh = form_data['id_zh']
