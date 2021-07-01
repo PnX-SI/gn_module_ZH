@@ -356,6 +356,7 @@ def update_zh_tab4(data):
         TZH.id_spread: data['id_spread'],
         TZH.id_connexion: data['id_connexion'],
         TZH.id_diag_hydro: data['id_diag_hydro'],
-        TZH.id_diag_bio: data['id_diag_bio']
+        TZH.id_diag_bio: data['id_diag_bio'],
+        TZH.remark_diag: data['remark_diag']
     })
     DB.session.flush()
