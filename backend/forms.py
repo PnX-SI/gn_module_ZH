@@ -24,7 +24,7 @@ from .models import (
     CorZhRef,
     # TReferences,
     # BibSiteSpace,
-    # CorZhLimFs,
+    CorZhLimFs,
     # BibOrganismes,
     # ZH,
     Code,
@@ -273,4 +273,38 @@ def post_corine_landcover(id_zh, covers):
     for id in covers:
         DB.session.add(CorZhCorineCover(
             id_zh=id_zh, id_cover=id))
+        DB.session.flush()
+
+
+def update_zh_tab2(data):
+    DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
+        TZH.remark_lim: data['remark_lim'],
+        TZH.remark_lim_fs: data['remark_lim_fs']
+    })
+
+
+def update_delim(id_zh, criteria):
+    uuid_lim_list = DB.session.query(TZH.id_lim_list).filter(
+        TZH.id_zh == id_zh).one().id_lim_list
+    DB.session.query(CorLimList).filter(
+        CorLimList.id_lim_list == uuid_lim_list).delete()
+    post_delim(uuid_lim_list, criteria)
+
+
+def post_delim(uuid_lim, criteria):
+    for lim in criteria:
+        DB.session.add(CorLimList(
+            id_lim_list=uuid_lim, id_lim=lim))
+        DB.session.flush()
+
+
+def update_fct_delim(id_zh, criteria):
+    DB.session.query(CorZhLimFs).filter(
+        CorZhLimFs.id_zh == id_zh).delete()
+    post_fct_delim(id_zh, criteria)
+
+
+def post_fct_delim(id_zh, criteria):
+    for lim in criteria:
+        DB.session.add(CorZhLimFs(id_zh=id_zh, id_lim_fs=lim))
         DB.session.flush()

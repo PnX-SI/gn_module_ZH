@@ -57,7 +57,11 @@ from .forms import (
     update_refs,
     update_activities,
     update_zh_tab3,
-    update_corine_biotopes
+    update_corine_biotopes,
+    update_corine_landcover,
+    update_delim,
+    update_fct_delim,
+    update_zh_tab2
 )
 
 from .repositories import (
@@ -326,43 +330,11 @@ def get_tab_data(id_tab, info_role):
             return {"id_zh": form_data['id_zh']}, 200
 
         if id_tab == 2:
-
-            id_zh = form_data['id_zh']
-
-            # edit criteres delim
-            uuid_lim_list = DB.session.query(TZH.id_lim_list).filter(
-                TZH.id_zh == id_zh).one().id_lim_list
-            # query = DB.session.query(CorLimList).filter(CorLimList.id_lim_list == uuid_lim_list).all()
-            # zh_crit_delim_list = sorted([q.id_lim for q in query])
-            # new_crit_delim_list = sorted(form_data['critere_delim'])
-            # if new_crit_delim_list != zh_crit_delim_list:
-            DB.session.query(CorLimList).filter(
-                CorLimList.id_lim_list == uuid_lim_list).delete()
-            for lim in form_data['critere_delim']:
-                DB.session.add(CorLimList(
-                    id_lim_list=uuid_lim_list, id_lim=lim))
-                DB.session.flush()
-
-            # remarque criteres delim
-            DB.session.query(TZH).filter(TZH.id_zh == id_zh).update(
-                {TZH.remark_lim: form_data['remark_lim']})
-
-            # edit criteres delim fonctionnelles
-            DB.session.query(CorZhLimFs).filter(
-                CorZhLimFs.id_zh == id_zh).delete()
-            for lim in form_data['critere_delim_fs']:
-                DB.session.add(CorZhLimFs(id_zh=id_zh, id_lim_fs=lim))
-                DB.session.flush()
-
-            # remarque criteres delim fonctionnelles
-            DB.session.query(TZH).filter(TZH.id_zh == id_zh).update(
-                {TZH.remark_lim_fs: form_data['remark_lim_fs']})
-
+            update_zh_tab2(form_data)
+            update_delim(form_data['id_zh'], form_data['critere_delim'])
+            update_fct_delim(form_data)
             DB.session.commit()
-
-            return {
-                "id_zh": id_zh
-            }, 200
+            return {"id_zh": form_data['id_zh']}, 200
 
         if id_tab == 3:
             update_zh_tab3(form_data)
@@ -371,6 +343,7 @@ def get_tab_data(id_tab, info_role):
             update_activities(
                 form_data['id_zh'], form_data['activities'], form_data['id_cor_impact_types'])
             DB.session.commit()
+            return {"id_zh": form_data['id_zh']}, 200
 
     except Exception as e:
         pdb.set_trace()
