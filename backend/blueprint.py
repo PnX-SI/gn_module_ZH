@@ -54,7 +54,10 @@ from .forms import (
     create_zh,
     update_zh_tab0,
     update_zh_tab1,
-    update_refs
+    update_refs,
+    update_activities,
+    update_zh_tab3,
+    update_corine_biotopes
 )
 
 from .repositories import (
@@ -312,6 +315,8 @@ def get_tab_data(id_tab, info_role):
             else:
                 zh = update_zh_tab0(form_data, polygon, info_role, zh_date)
 
+            DB.session.commit()
+
             return {"id_zh": zh}, 200
 
         if id_tab == 1:
@@ -360,41 +365,11 @@ def get_tab_data(id_tab, info_role):
             }, 200
 
         if id_tab == 3:
-
-            DB.session.query(TZH).filter(TZH.id_zh == form_data['id_zh']).update({
-                TZH.id_sdage: form_data['id_sdage'],
-                TZH.id_sage: form_data['id_sage'],
-                TZH.remark_pres: form_data['remark_pres'],
-                TZH.id_thread: form_data['id_thread'],
-                TZH.global_remark_activity: form_data['global_remark_activity']
-            })
-            DB.session.flush()
-
-            # corine biotope
-            DB.session.query(CorZhCb).filter(
-                CorZhCb.id_zh == form_data['id_zh']).delete()
-            for lb_code in form_data['corine_bio']:
-                DB.session.add(CorZhCb(
-                    id_zh=form_data['id_zh'], lb_code=lb_code))
-                DB.session.flush()
-
-            # corine landcover
-            DB.session.query(CorZhCorineCover).filter(
-                CorZhCorineCover.id_zh == form_data['id_zh']).delete()
-            for id in form_data['id_covers']:
-                DB.session.add(CorZhCorineCover(
-                    id_zh=form_data['id_zh'], id_cover=id))
-                DB.session.flush()
-
-            # activities
-            # tester si ça delete en cascade dans cor_impact_list
-            DB.session.query(TActivity).filter(
-                TActivity.id_zh == form_data['id_zh']).delete()
-            # for activity in form_data['activities']:
-            #    DB.session.query(CorZhCorineCover).filter(
-            #    CorZhCorineCover.id_zh == form_data['id_zh']).delete()
-            #    update
-
+            update_zh_tab3(form_data)
+            update_corine_biotopes(form_data['id_zh'], form_data['corine_bio'])
+            update_corine_landcover(form_data['id_zh'], form_data['id_covers'])
+            update_activities(
+                form_data['id_zh'], form_data['activities'], form_data['id_cor_impact_types'])
             DB.session.commit()
 
     except Exception as e:

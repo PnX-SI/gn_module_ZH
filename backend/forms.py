@@ -6,10 +6,14 @@ from sqlalchemy import (
     # desc,
     # and_
 )
+from sqlalchemy.sql.expression import delete
 
 from geonature.utils.env import DB
 
 from .models import (
+    CorImpactList,
+    CorImpactTypes,
+    TActivity,
     TZH,
     # Nomenclatures,
     CorLimList,
@@ -23,7 +27,9 @@ from .models import (
     # CorZhLimFs,
     # BibOrganismes,
     # ZH,
-    Code
+    Code,
+    CorZhCb,
+    CorZhCorineCover
 )
 
 from .api_error import ZHApiError
@@ -75,7 +81,7 @@ def create_zh(form_data, info_role, zh_date, polygon):
             "code error": "zh_number_greater_than_9999"
         }, 500
 
-    DB.session.commit()
+    DB.session.flush()
     return new_zh.id_zh
 
 
@@ -153,7 +159,7 @@ def update_zh_tab0(form_data, polygon, info_role, zh_date):
         update_cor_zh_fct_area(
             form_data['geom']['geometry'], form_data['id_zh'])
 
-    DB.session.commit()
+    DB.session.flush()
     return form_data['id_zh']
 
 
@@ -203,4 +209,68 @@ def update_refs(form_data):
         CorZhRef.id_zh == form_data['id_zh']).delete()
     for ref in form_data['id_references']:
         DB.session.add(CorZhRef(id_zh=form_data['id_zh'], id_ref=ref))
+        DB.session.flush()
+
+
+def post_activities(activities, impacts):
+    for activity in activities:
+        uuid_activity = uuid.uuid4()
+        DB.session.query(TActivity).update({
+            TActivity.id_activity: activity['id_activity'],
+            TActivity.id_zh: activity['id_zh'],
+            TActivity.id_position: activity['id_position'],
+            TActivity.id_impact_list: uuid_activity,
+            TActivity.remark_activity: activity['remark_activity']
+        })
+        DB.session.flush()
+        for impact in impacts:
+            DB.session.query(CorImpactList).update({
+                CorImpactList.id_impact_list: uuid_activity,
+                CorImpactList.id_cor_impact_types: impact
+            })
+            DB.session.flush()
+
+
+def update_activities(id_zh, activities, impacts):
+    # delete cascade t_activity and cor_impact_list with id_zh
+    DB.session.query(TActivity).filter(
+        TActivity.id_zh == id_zh).delete()
+    # post new activities
+    post_activities(activities, impacts)
+
+
+def update_zh_tab3(data):
+    DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
+        TZH.id_sdage: data['id_sdage'],
+        TZH.id_sage: data['id_sage'],
+        TZH.remark_pres: data['remark_pres'],
+        TZH.id_thread: data['id_thread'],
+        TZH.global_remark_activity: data['global_remark_activity']
+    })
+    DB.session.flush()
+
+
+def update_corine_biotopes(id_zh, corine_bio):
+    DB.session.query(CorZhCb).filter(
+        CorZhCb.id_zh == id_zh).delete()
+    post_corine_biotopes(id_zh, corine_bio)
+
+
+def post_corine_biotopes(id_zh, corine_bio):
+    for lb_code in corine_bio:
+        DB.session.add(CorZhCb(
+            id_zh=id_zh, lb_code=lb_code))
+        DB.session.flush()
+
+
+def update_corine_landcover(id_zh, ids_cover):
+    DB.session.query(CorZhCorineCover).filter(
+        CorZhCorineCover.id_zh == id_zh).delete()
+    post_corine_landcover(id_zh, ids_cover)
+
+
+def post_corine_landcover(id_zh, covers):
+    for id in covers:
+        DB.session.add(CorZhCorineCover(
+            id_zh=id_zh, id_cover=id))
         DB.session.flush()
