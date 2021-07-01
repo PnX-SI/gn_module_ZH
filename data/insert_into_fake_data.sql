@@ -25,62 +25,11 @@ INSERT INTO pr_zh.t_fct_area VALUES
 ;
 
 
-INSERT INTO pr_zh.cor_lim_list VALUES
-('1a321aa2-2675-4d5a-9bcd-0012042ee74c',579),
-('1a321aa2-2675-4d5a-9bcd-0012042ee74c',582),
-('1a321aa2-2675-4d5a-9bcd-0012042ee74c',584),
-('e30e88e5-1e4a-4cc6-94b8-36c65dafc83a',584),
-('e30e88e5-1e4a-4cc6-94b8-36c65dafc83a',585)
-;
-
-
-INSERT INTO pr_zh.t_zh(code, main_name, id_org, create_author, update_author, geom, id_lim_list, remark_lim, id_sdage, total_hab_cover, id_thread, id_diag_hydro, id_diag_bio) VALUES
-(
-    'XXXX-XX-XXXX', 
-    'zone humide 1',
-    2,
-    1,
-    1,
-     '0103000020E61000000100000005000000C102983270200540B2F1608BDD864640EEB43522188705401475E61E12844640B56E83DA6F4D05406667D13B1582464006F7031E18000540520FD1E80E864640C102983270200540B2F1608BDD864640',
-    '1a321aa2-2675-4d5a-9bcd-0012042ee74c',
-    'ma remarque lim',
-    944,
-    10,
-    700,
-    747,
-    752
-),
-(
-    'XXXX-XX-XXX2', 
-    'zone humide 2',
-    3,
-    1,
-    1,
-    '0103000020E610000001000000050000009450FA42C8B90440AB4203B16C8246402F6EA301BCC50440034015376E814640F44E05DCF39C04400EDAAB8F8780464077871403249A04401897AAB4C58146409450FA42C8B90440AB4203B16C824640',
-    'e30e88e5-1e4a-4cc6-94b8-36c65dafc83a',
-    'ma remarque lim sur zh2',
-    945,
-    15,
-    701,
-    748,
-    751
-)
-;
-
-
 INSERT INTO pr_zh.t_references(authors,pub_year,title,editor,editor_location) VALUES
 ('Hamouda A', 2021, 'la zone humide en front pour les nuls', 'NS', 'Marseille'),
 ('Corny J', 2020, 'les MCD de zones humides', 'bla bla editeurs', 'quelque part'),
 ('Jambon A', 2021, 'comment créer sa zone humide chez soi', 'editor', 'par là')
 ;
-
-
-INSERT INTO pr_zh.cor_zh_ref VALUES
-(1,1),
-(3,1),
-(2,2)
-;
-
 
 COMMIT;
 
