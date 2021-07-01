@@ -29,7 +29,9 @@ from .models import (
     # ZH,
     Code,
     CorZhCb,
-    CorZhCorineCover
+    CorZhCorineCover,
+    TOutflow,
+    TInflow
 )
 
 from .api_error import ZHApiError
@@ -308,3 +310,52 @@ def post_fct_delim(id_zh, criteria):
     for lim in criteria:
         DB.session.add(CorZhLimFs(id_zh=id_zh, id_lim_fs=lim))
         DB.session.flush()
+
+
+def update_outflow(id_zh, outflows):
+    DB.session.query(TOutflow).filter(
+        TOutflow.id_zh == id_zh).delete()
+    post_outflow(id_zh, outflows)
+
+
+def post_outflow(id_zh, outflows):
+    for outflow in outflows:
+        DB.session.add(
+            TOutflow(
+                id_outflow=outflow['id_outflow'],
+                id_zh=outflow['id_zh'],
+                id_permanance=outflow['id_permanance'],
+                topo=outflow['topo']
+            )
+        )
+        DB.session.flush()
+
+
+def update_inflow(id_zh, inflows):
+    DB.session.query(TInflow).filter(
+        TInflow.id_zh == id_zh).delete()
+    post_inflow(id_zh, inflows)
+
+
+def post_inflow(id_zh, inflows):
+    for inflow in inflows:
+        DB.session.add(
+            TInflow(
+                id_outflow=inflow['id_outflow'],
+                id_zh=inflow['id_zh'],
+                id_permanance=inflow['id_permanance'],
+                topo=inflow['topo']
+            )
+        )
+        DB.session.flush()
+
+
+def update_zh_tab4(data):
+    DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
+        TZH.id_frequency: data['id_frequency'],
+        TZH.id_spread: data['id_spread'],
+        TZH.id_connexion: data['id_connexion'],
+        TZH.id_diag_hydro: data['id_diag_hydro'],
+        TZH.id_diag_bio: data['id_diag_bio']
+    })
+    DB.session.flush()

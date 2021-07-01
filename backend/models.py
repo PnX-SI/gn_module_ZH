@@ -735,3 +735,49 @@ class TActivity(DB.Model):
         DB.Unicode
     )
     child = relationship(CorImpactList, backref="parent", passive_deletes=True)
+
+
+class TOutflow(DB.Model):
+    __tablename__ = "t_outflow"
+    __table_args__ = {"schema": "pr_zh"}
+    id_outflow = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    id_permanance = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        default=TNomenclatures.get_default_nomenclature("PERMANENCE_SORTIE"),
+    )
+    topo = DB.Column(
+        DB.Unicode
+    )
+
+
+class TInflow(DB.Model):
+    __tablename__ = "t_inflow"
+    __table_args__ = {"schema": "pr_zh"}
+    id_inflow = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    id_permanance = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        default=TNomenclatures.get_default_nomenclature("PERMANENCE_ENTREE"),
+    )
+    topo = DB.Column(
+        DB.Unicode
+    )

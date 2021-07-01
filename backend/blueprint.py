@@ -61,7 +61,10 @@ from .forms import (
     update_corine_landcover,
     update_delim,
     update_fct_delim,
-    update_zh_tab2
+    update_zh_tab2,
+    update_outflow,
+    update_inflow,
+    update_zh_tab4
 )
 
 from .repositories import (
@@ -342,6 +345,13 @@ def get_tab_data(id_tab, info_role):
             update_corine_landcover(form_data['id_zh'], form_data['id_covers'])
             update_activities(
                 form_data['id_zh'], form_data['activities'], form_data['id_cor_impact_types'])
+            DB.session.commit()
+            return {"id_zh": form_data['id_zh']}, 200
+
+        if id_tab == 4:
+            update_outflow(form_data['id_zh'], form_data['outflows'])
+            update_inflow(form_data['id_zh'], form_data['inflows'])
+            update_zh_tab4(form_data)
             DB.session.commit()
             return {"id_zh": form_data['id_zh']}, 200
 
