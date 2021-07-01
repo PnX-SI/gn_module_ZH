@@ -51,22 +51,24 @@ def get_corine_biotope():
 
 
 def get_impact_list():
-    list_by_impact_type = []
-    id_impact_type_list = CorImpactTypes.get_impact_type_list()
-    for id_type in id_impact_type_list:
-        impacts = CorImpactTypes.get_impact_by_type(id_type)
-        type_mnemo = CorImpactTypes.get_mnemo_type(id_type)
-        if type_mnemo != '':
-            type_mnemo = type_mnemo.mnemonique
-        for impact in impacts:
-            list_by_impact_type.append(
-                {
-                    "id_nomenclature": impact.CorImpactTypes.id_impact,
-                    "mnemonique": impact.TNomenclatures.mnemonique,
-                    "category": type_mnemo
-                }
-            )
-    return list_by_impact_type
+    impacts = CorImpactTypes.get_impacts()
+    impacts_list = []
+    for impact in impacts:
+        # get mnemonique of id_impact_type
+        if impact.CorImpactTypes.id_impact_type is not None:
+            category = DB.session.query(TNomenclatures).filter(
+                TNomenclatures.id_nomenclature == impact.CorImpactTypes.id_impact_type).one().mnemonique
+        else:
+            category = ""
+        # list of impact ids and mnemoniques
+        impacts_list.append({
+            "id_cor_impact_types": impact.CorImpactTypes.id_cor_impact_types,
+            "id_nomenclature": impact.CorImpactTypes.id_impact,
+            "mnemonique": impact.TNomenclatures.mnemonique,
+            "id_category": impact.CorImpactTypes.id_impact_type,
+            "category": category
+        })
+    return impacts_list
 
 
 def get_function_list(mnemo):
