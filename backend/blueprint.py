@@ -9,6 +9,8 @@ from flask import (
 
 import uuid
 
+from sqlalchemy.sql.expression import delete
+
 from geojson import FeatureCollection
 
 from sqlalchemy import func, text, desc, and_
@@ -32,27 +34,27 @@ from geonature.core.gn_permissions import decorators as permissions
 from geonature.core.gn_permissions.tools import get_or_fetch_user_cruved
 
 from .models import (
+    TActivity,
     TZH,
-    Nomenclatures,
     CorLimList,
     CorZhArea,
-    CorZhRb,
-    CorZhHydro,
-    CorZhFctArea,
     CorZhRef,
     TReferences,
     BibSiteSpace,
     CorZhLimFs,
     BibOrganismes,
     ZH,
-    Code
+    CorZhCb,
+    CorZhCorineCover
 )
 
 from .nomenclatures import get_nomenc
 
 from .forms import (
     create_zh,
-    update_zh_tab0
+    update_zh_tab0,
+    update_zh_tab1,
+    update_refs
 )
 
 from .repositories import (
@@ -313,21 +315,10 @@ def get_tab_data(id_tab, info_role):
             return {"id_zh": zh}, 200
 
         if id_tab == 1:
-            id_zh = form_data['id_zh']
-            DB.session.query(TZH).filter(TZH.id_zh == id_zh).update({
-                TZH.main_name: form_data['main_name'],
-                TZH.secondary_name: form_data['secondary_name'],
-                TZH.is_id_site_space: form_data['is_id_site_space'],
-                TZH.id_site_space: form_data['id_site_space']
-            })
-            DB.session.query(CorZhRef).filter(CorZhRef.id_zh == id_zh).delete()
-            for ref in form_data['id_references']:
-                DB.session.add(CorZhRef(id_zh=id_zh, id_ref=ref))
-                DB.session.flush()
+            update_zh_tab1(form_data)
+            update_refs(form_data)
             DB.session.commit()
-            return {
-                "id_zh": form_data['id_zh']
-            }, 200
+            return {"id_zh": form_data['id_zh']}, 200
 
         if id_tab == 2:
 
@@ -368,6 +359,44 @@ def get_tab_data(id_tab, info_role):
                 "id_zh": id_zh
             }, 200
 
+        if id_tab == 3:
+
+            DB.session.query(TZH).filter(TZH.id_zh == form_data['id_zh']).update({
+                TZH.id_sdage: form_data['id_sdage'],
+                TZH.id_sage: form_data['id_sage'],
+                TZH.remark_pres: form_data['remark_pres'],
+                TZH.id_thread: form_data['id_thread'],
+                TZH.global_remark_activity: form_data['global_remark_activity']
+            })
+            DB.session.flush()
+
+            # corine biotope
+            DB.session.query(CorZhCb).filter(
+                CorZhCb.id_zh == form_data['id_zh']).delete()
+            for lb_code in form_data['corine_bio']:
+                DB.session.add(CorZhCb(
+                    id_zh=form_data['id_zh'], lb_code=lb_code))
+                DB.session.flush()
+
+            # corine landcover
+            DB.session.query(CorZhCorineCover).filter(
+                CorZhCorineCover.id_zh == form_data['id_zh']).delete()
+            for id in form_data['id_covers']:
+                DB.session.add(CorZhCorineCover(
+                    id_zh=form_data['id_zh'], id_cover=id))
+                DB.session.flush()
+
+            # activities
+            # tester si ça delete en cascade dans cor_impact_list
+            DB.session.query(TActivity).filter(
+                TActivity.id_zh == form_data['id_zh']).delete()
+            # for activity in form_data['activities']:
+            #    DB.session.query(CorZhCorineCover).filter(
+            #    CorZhCorineCover.id_zh == form_data['id_zh']).delete()
+            #    update
+
+            DB.session.commit()
+
     except Exception as e:
         pdb.set_trace()
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
@@ -391,7 +420,7 @@ def deleteOneZh(id_zh, info_role):
     """
     zhRepository = ZhRepository(TZH)
     DB.session.query(CorZhRef).filter(CorZhRef.id_zh == id_zh).delete()
-    DB.session.query(CorZhArea).filter(CorZhArea.id_zh == id_zh).delete()
+    #DB.session.query(CorZhArea).filter(CorZhArea.id_zh == id_zh).delete()
     zhRepository.delete(id_zh, info_role)
 
     return {"message": "delete with success"}, 200

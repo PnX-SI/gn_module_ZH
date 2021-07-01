@@ -17,7 +17,7 @@ from .models import (
     CorZhRb,
     CorZhHydro,
     CorZhFctArea,
-    # CorZhRef,
+    CorZhRef,
     # TReferences,
     # BibSiteSpace,
     # CorZhLimFs,
@@ -79,9 +79,9 @@ def create_zh(form_data, info_role, zh_date, polygon):
     return new_zh.id_zh
 
 
-def post_cor_lim_list(uuid_lim, crit):
+def post_cor_lim_list(uuid_lim, criteria):
     # fill pr_zh.cor_lim_list
-    for lim in crit:
+    for lim in criteria:
         DB.session.add(CorLimList(
             id_lim_list=uuid_lim, id_lim=lim))
         DB.session.flush()
@@ -164,7 +164,6 @@ def check_polygon(polygon, id_zh):
 
 
 def update_cor_zh_area(polygon, id_zh):
-    update_cor_zh_area(polygon, id_zh)
     DB.session.query(CorZhArea).filter(
         CorZhArea.id_zh == id_zh).delete()
     post_cor_zh_area(polygon, id_zh, 25)
@@ -187,3 +186,21 @@ def update_cor_zh_fct_area(geom, id_zh):
     DB.session.query(CorZhFctArea).filter(
         CorZhFctArea.id_zh == id_zh).delete()
     post_cor_zh_fct_area(geom, id_zh)
+
+
+def update_zh_tab1(data):
+    DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
+        TZH.main_name: data['main_name'],
+        TZH.secondary_name: data['secondary_name'],
+        TZH.is_id_site_space: data['is_id_site_space'],
+        TZH.id_site_space: data['id_site_space']
+    })
+    DB.session.flush()
+
+
+def update_refs(form_data):
+    DB.session.query(CorZhRef).filter(
+        CorZhRef.id_zh == form_data['id_zh']).delete()
+    for ref in form_data['id_references']:
+        DB.session.add(CorZhRef(id_zh=form_data['id_zh'], id_ref=ref))
+        DB.session.flush()

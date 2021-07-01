@@ -274,6 +274,26 @@ class TZH(ZhModel):
 
 
 @serializable
+class CorZhArea(DB.Model):
+    __tablename__ = "cor_zh_area"
+    __table_args__ = {"schema": "pr_zh"}
+    id_area = DB.Column(
+        DB.Integer,
+        ForeignKey("ref_geo.l_areas.id_area"),
+        primary_key=True
+    )
+    id_zh = DB.Column(
+        DB.Integer,
+        primary_key=True
+    )
+    cover = DB.Column(DB.Integer)
+
+    def get_departments(id_zh):
+        return DB.session.query(CorZhArea, LAreas, TZH).join(LAreas).filter(
+            CorZhArea.id_zh == id_zh, LAreas.id_type == 26, TZH.id_zh == id_zh).all()
+
+
+@serializable
 @geoserializable
 class ZH(TZH):
     __abstract__ = True
@@ -366,26 +386,6 @@ class CorLimList(DB.Model):
     def get_lims_by_id(id):
         return DB.session.query(CorLimList).filter(
             CorLimList.id_lim_list == id).all()
-
-
-class CorZhArea(DB.Model):
-    __tablename__ = "cor_zh_area"
-    __table_args__ = {"schema": "pr_zh"}
-    id_area = DB.Column(
-        DB.Integer,
-        ForeignKey("ref_geo.l_areas.id_area"),
-        primary_key=True
-    )
-    id_zh = DB.Column(
-        DB.Integer,
-        ForeignKey(TZH.id_zh),
-        primary_key=True
-    )
-    cover = DB.Column(DB.Integer)
-
-    def get_departments(id_zh):
-        return DB.session.query(CorZhArea, LAreas, TZH).join(LAreas).filter(
-            CorZhArea.id_zh == id_zh, LAreas.id_type == 26, TZH.id_zh == id_zh).all()
 
 
 class TRiverBasin(DB.Model):
@@ -662,3 +662,76 @@ class CorMainFct(DB.Model):
                 TNomenclatures.id_nomenclature == id_type).one()
         else:
             return ''
+
+
+class CorZhCb(DB.Model):
+    __tablename__ = "cor_zh_cb"
+    __table_args__ = {"schema": "pr_zh"}
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    lb_code = DB.Column(
+        DB.Integer,
+        ForeignKey(BibCb.lb_code),
+        primary_key=True
+    )
+
+
+class CorZhCorineCover(DB.Model):
+    __tablename__ = "cor_zh_corine_cover"
+    __table_args__ = {"schema": "pr_zh"}
+    id_cover = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+
+
+class CorImpactList(DB.Model):
+    __tablename__ = "cor_impact_list"
+    __table_args__ = {"schema": "pr_zh"}
+    id_impact_list = DB.Column(
+        UUID(as_uuid=True),
+        ForeignKey("pr_zh.t_activity.id_impact_list", ondelete='CASCADE'),
+        primary_key=True
+    )
+    id_cor_impact_types = DB.Column(
+        DB.Integer,
+        ForeignKey(CorImpactTypes.id_cor_impact_types),
+        primary_key=True
+    )
+
+
+class TActivity(DB.Model):
+    __tablename__ = "t_activity"
+    __table_args__ = {"schema": "pr_zh"}
+    id_activity = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    id_position = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        nullable=False
+    )
+    id_impact_list = DB.Column(
+        UUID(as_uuid=True),
+        nullable=False
+    )
+    remark_activity = DB.Column(
+        DB.Unicode
+    )
+    child = relationship(CorImpactList, backref="parent", passive_deletes=True)
