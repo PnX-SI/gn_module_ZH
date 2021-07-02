@@ -214,31 +214,31 @@ def update_refs(form_data):
         DB.session.flush()
 
 
-def post_activities(activities, impacts):
+def post_activities(id_zh, activities):
     for activity in activities:
         uuid_activity = uuid.uuid4()
         DB.session.query(TActivity).update({
-            TActivity.id_activity: activity['id_activity'],
-            TActivity.id_zh: activity['id_zh'],
-            TActivity.id_position: activity['id_position'],
+            TActivity.id_activity: activity['human_activity']['id_nomenclature'],
+            TActivity.id_zh: id_zh,
+            TActivity.id_position: activity['localisation']['id_nomenclature'],
             TActivity.id_impact_list: uuid_activity,
             TActivity.remark_activity: activity['remark_activity']
         })
         DB.session.flush()
-        for impact in impacts:
+        for impact in activity['impacts']:
             DB.session.query(CorImpactList).update({
                 CorImpactList.id_impact_list: uuid_activity,
-                CorImpactList.id_cor_impact_types: impact
+                CorImpactList.id_cor_impact_types: impact.id_cor_impact_types
             })
             DB.session.flush()
 
 
-def update_activities(id_zh, activities, impacts):
+def update_activities(id_zh, activities):
     # delete cascade t_activity and cor_impact_list with id_zh
     DB.session.query(TActivity).filter(
         TActivity.id_zh == id_zh).delete()
     # post new activities
-    post_activities(activities, impacts)
+    post_activities(id_zh, activities)
 
 
 def update_zh_tab3(data):
@@ -252,16 +252,16 @@ def update_zh_tab3(data):
     DB.session.flush()
 
 
-def update_corine_biotopes(id_zh, corine_bio):
+def update_corine_biotopes(id_zh, corine_biotopes):
     DB.session.query(CorZhCb).filter(
         CorZhCb.id_zh == id_zh).delete()
-    post_corine_biotopes(id_zh, corine_bio)
+    post_corine_biotopes(id_zh, corine_biotopes)
 
 
-def post_corine_biotopes(id_zh, corine_bio):
-    for lb_code in corine_bio:
+def post_corine_biotopes(id_zh, corine_biotopes):
+    for corine_biotope in corine_biotopes:
         DB.session.add(CorZhCb(
-            id_zh=id_zh, lb_code=lb_code))
+            id_zh=id_zh, lb_code=corine_biotope.CB_code))
         DB.session.flush()
 
 
@@ -271,8 +271,8 @@ def update_corine_landcover(id_zh, ids_cover):
     post_corine_landcover(id_zh, ids_cover)
 
 
-def post_corine_landcover(id_zh, covers):
-    for id in covers:
+def post_corine_landcover(id_zh, ids_cover):
+    for id in ids_cover:
         DB.session.add(CorZhCorineCover(
             id_zh=id_zh, id_cover=id))
         DB.session.flush()
@@ -323,7 +323,7 @@ def post_outflow(id_zh, outflows):
         DB.session.add(
             TOutflow(
                 id_outflow=outflow['id_outflow'],
-                id_zh=outflow['id_zh'],
+                id_zh=id_zh,
                 id_permanance=outflow['id_permanance'],
                 topo=outflow['topo']
             )
@@ -342,7 +342,7 @@ def post_inflow(id_zh, inflows):
         DB.session.add(
             TInflow(
                 id_outflow=inflow['id_outflow'],
-                id_zh=inflow['id_zh'],
+                id_zh=id_zh,
                 id_permanance=inflow['id_permanance'],
                 topo=inflow['topo']
             )

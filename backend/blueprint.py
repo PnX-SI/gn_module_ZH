@@ -341,10 +341,12 @@ def get_tab_data(id_tab, info_role):
 
         if id_tab == 3:
             update_zh_tab3(form_data)
-            update_corine_biotopes(form_data['id_zh'], form_data['corine_bio'])
-            update_corine_landcover(form_data['id_zh'], form_data['id_covers'])
+            update_corine_biotopes(
+                form_data['id_zh'], form_data['corine_biotopes'])
+            update_corine_landcover(
+                form_data['id_zh'], form_data['id_corine_landcovers'])
             update_activities(
-                form_data['id_zh'], form_data['activities'], form_data['id_cor_impact_types'])
+                form_data['id_zh'], form_data['activities'])  # , form_data['id_cor_impact_types'])
             DB.session.commit()
             return {"id_zh": form_data['id_zh']}, 200
 

@@ -304,6 +304,9 @@ class ZH(TZH):
         self.id_lims = self.get_id_lims()
         self.id_lims_fs = self.get_id_lims_fs()
         self.id_references = self.get_id_references()
+        self.CB_codes_corine_biotope = self.get_CB_codes()
+        self.id_corine_landcovers = self.get_corine_landcovers()
+        self.activities = self.get_activities()
 
     def get_id_lims(self):
         lim_list = CorLimList.get_lims_by_id(self.zh.id_lim_list)
@@ -323,11 +326,40 @@ class ZH(TZH):
             "id_references": [ref.as_dict() for ref in ref_list]
         }
 
+    def get_CB_codes(self):
+        corine_biotopes = CorZhCb.get_cb_by_id(self.zh.id_zh)
+        return {
+            "CB_codes_corine_biotope": [CB_code.lb_code for CB_code in corine_biotopes]
+        }
+
+    def get_corine_landcovers(self):
+        landcovers = CorZhCorineCover.get_landcovers_by_id(self.zh.id_zh)
+        return {
+            "id_corine_landcovers": [landcover.id_cover for landcover in landcovers]
+        }
+
+    def get_activities(self):
+        q_activities = TActivity.get_activites_by_id(self.zh.id_zh)
+        activities = []
+        for activity in q_activities:
+            activities.append({
+                'id_human_activity': activity.id_activity,
+                'id_localisation': activity.id_position,
+                'ids_impact': [impact.id_cor_impact_types for impact in CorImpactList.get_impacts_by_uuid(activity.id_impact_list)],
+                'remark_activity': activity.remark_activity
+            })
+        return {
+            "activities": activities
+        }
+
     def get_full_zh(self):
         full_zh = self.zh.get_geofeature()
         full_zh.properties.update(self.id_lims)
         full_zh.properties.update(self.id_lims_fs)
         full_zh.properties.update(self.id_references)
+        full_zh.properties.update(self.CB_codes_corine_biotope)
+        full_zh.properties.update(self.id_corine_landcovers)
+        full_zh.properties.update(self.activities)
         return full_zh
 
 
@@ -678,6 +710,10 @@ class CorZhCb(DB.Model):
         primary_key=True
     )
 
+    def get_cb_by_id(id_zh):
+        return DB.session.query(CorZhCb).filter(
+            CorZhCb.id_zh == id_zh).all()
+
 
 class CorZhCorineCover(DB.Model):
     __tablename__ = "cor_zh_corine_cover"
@@ -693,6 +729,10 @@ class CorZhCorineCover(DB.Model):
         primary_key=True
     )
 
+    def get_landcovers_by_id(id_zh):
+        return DB.session.query(CorZhCorineCover).filter(
+            CorZhCorineCover.id_zh == id_zh).all()
+
 
 class CorImpactList(DB.Model):
     __tablename__ = "cor_impact_list"
@@ -707,6 +747,10 @@ class CorImpactList(DB.Model):
         ForeignKey(CorImpactTypes.id_cor_impact_types),
         primary_key=True
     )
+
+    def get_impacts_by_uuid(uuid_activity):
+        return DB.session.query(CorImpactList).filter(
+            CorImpactList.id_impact_list == uuid_activity).all()
 
 
 class TActivity(DB.Model):
@@ -735,6 +779,10 @@ class TActivity(DB.Model):
         DB.Unicode
     )
     child = relationship(CorImpactList, backref="parent", passive_deletes=True)
+
+    def get_activites_by_id(id_zh):
+        return DB.session.query(TActivity).filter(
+            TActivity.id_zh == id_zh).all()
 
 
 class TOutflow(DB.Model):
