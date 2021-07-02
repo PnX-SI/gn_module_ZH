@@ -304,9 +304,10 @@ class ZH(TZH):
         self.id_lims = self.get_id_lims()
         self.id_lims_fs = self.get_id_lims_fs()
         self.id_references = self.get_id_references()
-        self.CB_codes_corine_biotope = self.get_CB_codes()
+        self.cb_codes_corine_biotope = self.get_cb_codes()
         self.id_corine_landcovers = self.get_corine_landcovers()
         self.activities = self.get_activities()
+        self.flows = self.get_flows()
 
     def get_id_lims(self):
         lim_list = CorLimList.get_lims_by_id(self.zh.id_lim_list)
@@ -326,10 +327,10 @@ class ZH(TZH):
             "id_references": [ref.as_dict() for ref in ref_list]
         }
 
-    def get_CB_codes(self):
+    def get_cb_codes(self):
         corine_biotopes = CorZhCb.get_cb_by_id(self.zh.id_zh)
         return {
-            "CB_codes_corine_biotope": [CB_code.lb_code for CB_code in corine_biotopes]
+            "cb_codes_corine_biotope": [cb_code.lb_code for cb_code in corine_biotopes]
         }
 
     def get_corine_landcovers(self):
@@ -352,14 +353,43 @@ class ZH(TZH):
             "activities": activities
         }
 
+    def get_flows(self):
+        q_outflows = TOutflow().get_outflows_by_id(self.zh.id_zh)
+        q_inflows = TInflow().get_inflows_by_id(self.zh.id_zh)
+        flows = []
+        outflows = []
+        inflows = []
+        for flow in q_outflows:
+            outflows.append({
+                "id_outflow": flow['id_outflow'],
+                "id_permanance": flow['id_permanance'],
+                "topo": flow['topo']
+            })
+        flows.append({
+            "outflows": outflows
+        })
+        for flow in q_inflows:
+            inflows.append({
+                "id_inflow": flow['id_inflow'],
+                "id_permanance": flow['id_permanance'],
+                "topo": flow['topo']
+            })
+        flows.append({
+            "inflows": inflows
+        })
+        return {
+            "flows": flows
+        }
+
     def get_full_zh(self):
         full_zh = self.zh.get_geofeature()
         full_zh.properties.update(self.id_lims)
         full_zh.properties.update(self.id_lims_fs)
         full_zh.properties.update(self.id_references)
-        full_zh.properties.update(self.CB_codes_corine_biotope)
+        full_zh.properties.update(self.cb_codes_corine_biotope)
         full_zh.properties.update(self.id_corine_landcovers)
         full_zh.properties.update(self.activities)
+        full_zh.properties.update(self.flows)
         return full_zh
 
 
@@ -807,6 +837,10 @@ class TOutflow(DB.Model):
         DB.Unicode
     )
 
+    def get_outflows_by_id(id_zh):
+        return DB.session.query(TOutflow).filter(
+            TOutflow.id_zh == id_zh).all()
+
 
 class TInflow(DB.Model):
     __tablename__ = "t_inflow"
@@ -829,3 +863,7 @@ class TInflow(DB.Model):
     topo = DB.Column(
         DB.Unicode
     )
+
+    def get_inflows_by_id(id_zh):
+        return DB.session.query(TInflow).filter(
+            TInflow.id_zh == id_zh).all()
