@@ -354,8 +354,8 @@ class ZH(TZH):
         }
 
     def get_flows(self):
-        q_outflows = TOutflow().get_outflows_by_id(self.zh.id_zh)
-        q_inflows = TInflow().get_inflows_by_id(self.zh.id_zh)
+        q_outflows = TOutflow.get_outflows_by_id(self.zh.id_zh)
+        q_inflows = TInflow.get_inflows_by_id(self.zh.id_zh)
         flows = []
         outflows = []
         inflows = []
