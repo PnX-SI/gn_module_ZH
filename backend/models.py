@@ -672,22 +672,28 @@ class CorImpactTypes(DB.Model):
         nullable=False
     )
 
-    def get_impact_type_list():
-        q_id_types = DB.session.query(
-            func.distinct(CorImpactTypes.id_impact_type)).all()
-        return [id[0] for id in q_id_types]
-
-    def get_impact_by_type(id_type):
+    def get_impacts():
         return DB.session.query(CorImpactTypes, TNomenclatures).join(
             TNomenclatures, TNomenclatures.id_nomenclature == CorImpactTypes.id_impact).filter(
-                and_(CorImpactTypes.id_impact_type == id_type, CorImpactTypes.active)).all()
+                CorImpactTypes.active).all()
 
-    def get_mnemo_type(id_type):
-        if id_type:
-            return DB.session.query(TNomenclatures).filter(
-                TNomenclatures.id_nomenclature == id_type).one()
-        else:
-            return ''
+    #            and_(CorImpactTypes.id_impact_type == id_type, CorImpactTypes.active)).all()
+    # def get_impact_type_list():
+    #    q_id_types = DB.session.query(
+    #        func.distinct(CorImpactTypes.id_impact_type)).all()
+    #    return [id[0] for id in q_id_types]
+
+    # def get_impact_by_type(id_type):
+    #    return DB.session.query(CorImpactTypes, TNomenclatures).join(
+    #        TNomenclatures, TNomenclatures.id_nomenclature == CorImpactTypes.id_impact).filter(
+    #            and_(CorImpactTypes.id_impact_type == id_type, CorImpactTypes.active)).all()
+
+    # def get_mnemo_type(id_type):
+    #    if id_type:
+    #        return DB.session.query(TNomenclatures).filter(
+    #            TNomenclatures.id_nomenclature == id_type).one()
+    #    else:
+    #        return ''
 
 
 class CorMainFct(DB.Model):

@@ -1,5 +1,5 @@
 export const ModuleConfig = {
- "ID_MODULE": 32,
+ "ID_MODULE": 11,
  "MODULE_CODE": "ZONES_HUMIDES",
  "MODULE_URL": "zones_humides",
  "available_maplist_column": [
@@ -51,9 +51,10 @@ export const ModuleConfig = {
   }
  ],
  "nomenclatures": [
-  "CRIT_DELIM",
+  "SDAGE-SAGE",
   "SDAGE",
-  "SAGE",
+  "CORINE_BIO",
+  "CRIT_DELIM",
   "CRIT_DELIM",
   "CRIT_DEF_ESP_FCT",
   "OCCUPATION_SOLS",
