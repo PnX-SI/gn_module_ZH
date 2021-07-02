@@ -4,6 +4,7 @@ import { ZhDataService } from "../../../services/zh-data.service";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { Subscription, Observable } from "rxjs";
 import { debounceTime, distinctUntilChanged, map } from "rxjs/operators";
+import { ToastrService } from "ngx-toastr";
 
 @Component({
   selector: "zh-form-tab3",
@@ -12,34 +13,45 @@ import { debounceTime, distinctUntilChanged, map } from "rxjs/operators";
 })
 export class ZhFormTab3Component implements OnInit {
   @Input() formMetaData;
-  public form: FormGroup;
-  sdage: any;
+  form: FormGroup;
   sage: any;
   allSage: any;
   $_currentZhSub: Subscription;
   private _currentZh: any;
   corinBioMetaData: any;
-  public corinTableCol = [
+  corinTableCol = [
     { name: "CB_code", label: "Code corine Biotope" },
     { name: "CB_label", label: "Libellé corine biotope" },
     { name: "CB_humidity", label: "Humidité" },
   ];
+  activityTableCol = [
+    { name: "human_activity", label: "Activités humaines" },
+    { name: "localisation", label: "Localisation" },
+    {
+      name: "impacts",
+      label: "Impacts (facteurs influençant l'évolution de la zone)",
+    },
+    { name: "remark_activity", label: "Remarques" },
+  ];
   listCorinBio = [];
-  solOccupation: any;
+  posted: boolean = false;
+  patchActivity: boolean = false;
   dropdownSettings: any;
   activityForm: FormGroup;
   modalButtonLabel: string;
-  patchActivity: boolean;
   modalTitle: string;
 
-  itemList = [];
   selectedItems = [];
   settings = {};
+  listActivity: any = [];
+  activitiesInput: any = [];
+  submitted: boolean;
 
   constructor(
     private fb: FormBuilder,
     private _dataService: ZhDataService,
-    public ngbModal: NgbModal
+    public ngbModal: NgbModal,
+    private _toastr: ToastrService
   ) {}
 
   ngOnInit() {
@@ -52,27 +64,13 @@ export class ZhFormTab3Component implements OnInit {
       allowSearchFilter: true,
     };
 
-    this.itemList = [
-      { id: 1, itemName: "India", category: "asia" },
-      { id: 2, itemName: "Singapore", category: "asia pacific" },
-      { id: 3, itemName: "Germany", category: "Europe" },
-      { id: 4, itemName: "France", category: "Europe" },
-      { id: 5, itemName: "South Korea", category: "asia" },
-      { id: 6, itemName: "Sweden", category: "Europe" },
-    ];
-
-    this.selectedItems = [
-      { id: 1, itemName: "India" },
-      { id: 2, itemName: "Singapore" },
-      { id: 4, itemName: "Canada" },
-    ];
-
     this.settings = {
-      singleSelection: false,
-      text: "Select Fields",
-      searchPlaceholderText: "Search Fields",
+      enableCheckAll: false,
+      text: "Selectionner",
+      labelKey: "mnemonique",
+      primaryKey: "id_nomenclature",
+      searchPlaceholderText: "Rechercher",
       enableSearchFilter: true,
-      badgeShowLimit: 5,
       groupBy: "category",
     };
 
@@ -89,15 +87,14 @@ export class ZhFormTab3Component implements OnInit {
   }
 
   getMetaData() {
-    this.sdage = this.formMetaData["SDAGE"];
-    this.allSage = this.formMetaData["SDAGE-SAGE"];
-    this.corinBioMetaData = this.formMetaData["CORINE_BIO"];
-    this.solOccupation = this.formMetaData["OCCUPATION_SOLS"];
+    this.allSage = [...this.formMetaData["SDAGE-SAGE"]];
+    this.corinBioMetaData = [...this.formMetaData["CORINE_BIO"]];
+    this.activitiesInput = [...this.formMetaData["ACTIV_HUM"]];
   }
 
   onFormValueChanges(): void {
-    this.form.get("sdage").valueChanges.subscribe((val: number) => {
-      this.form.get("sage").reset();
+    this.form.get("id_sdage").valueChanges.subscribe((val: number) => {
+      this.form.get("id_sage").reset();
       this.allSage.forEach((item) => {
         if (val in item) {
           this.sage = Object.values(item)[0];
@@ -108,18 +105,16 @@ export class ZhFormTab3Component implements OnInit {
 
   createForm(): void {
     this.form = this.fb.group({
-      sdage: [null, Validators.required],
-      sage: null,
+      id_sdage: [null, Validators.required],
+      id_sage: null,
       corinBio: null,
+      id_corine_landcovers: null,
+      remark_pres: null,
+      id_thread: null,
+      global_remark_activity: null,
     });
     this.onFormValueChanges();
   }
-
-  ngOnDestroy() {
-    this.$_currentZhSub.unsubscribe();
-  }
-
-  public model: any;
 
   search = (text$: Observable<string>) =>
     text$.pipe(
@@ -141,13 +136,16 @@ export class ZhFormTab3Component implements OnInit {
   formatter = (result: any) => `${result.CB_code} ${result.CB_label}`;
 
   onAddCorinBio() {
-    let itemExist = this.listCorinBio.some(
-      (item) => item.CB_code == this.form.value.corinBio.CB_code
-    );
-    if (!itemExist && this.form.value.corinBio.CB_code) {
-      this.listCorinBio.push(this.form.value.corinBio);
+    //corine_biotopes
+    if (this.form.value.corinBio) {
+      let itemExist = this.listCorinBio.some(
+        (item) => item.CB_code == this.form.value.corinBio.CB_code
+      );
+      if (!itemExist && this.form.value.corinBio.CB_code) {
+        this.listCorinBio.push(this.form.value.corinBio);
+      }
+      this.form.get("corinBio").reset();
     }
-    this.form.get("corinBio").reset();
   }
 
   onDeleteCorin(CB_code: string) {
@@ -161,11 +159,11 @@ export class ZhFormTab3Component implements OnInit {
     this.modalButtonLabel = "Ajouter";
     this.modalTitle = "Ajout d'une activié humaine";
     this.activityForm = this.fb.group({
-      humainActivity: [null, Validators.required],
+      human_activity: [null, Validators.required],
       localisation: null,
-      pub_year: null,
-      editor: null,
-      editor_location: null,
+      impacts: null,
+      remark_activity: null,
+      frontId: null,
     });
     event.stopPropagation();
     this.ngbModal.open(modal, {
@@ -173,5 +171,125 @@ export class ZhFormTab3Component implements OnInit {
       size: "lg",
       windowClass: "bib-modal",
     });
+  }
+
+  onPostActivity() {
+    if (this.activityForm.valid) {
+      let activity = this.activityForm.value;
+      let itemExist = this.listActivity.some(
+        (item) =>
+          item.human_activity.id_nomenclature ==
+          activity.human_activity.id_nomenclature
+      );
+      if (!itemExist) {
+        let impactNames = activity.impacts.map((item) => {
+          return item["mnemonique"];
+        });
+        this.listActivity.push({
+          frontId: Date.now(),
+          human_activity: activity.human_activity,
+          localisation: activity.localisation,
+          impacts: {
+            impacts: activity.impacts,
+            mnemonique: impactNames.join("\r\n"),
+          },
+          remark_activity: activity.remark_activity,
+        });
+      }
+      /*       this.activitiesInput = this.activitiesInput.filter((item) => {
+        return item.id_nomenclature != activity.human_activity.id_nomenclature;
+      }); */
+      this.ngbModal.dismissAll();
+      this.activityForm.reset();
+      this.selectedItems = [];
+    }
+  }
+
+  onEditActivity(modal: any, activity: any) {
+    this.patchActivity = true;
+    this.modalButtonLabel = "Modifier";
+    this.modalTitle = "Modifier l'activié humaine";
+    this.selectedItems = activity.impacts.impacts;
+    this.activityForm.patchValue({
+      human_activity: activity.human_activity,
+      localisation: activity.localisation,
+      impacts: activity.impacts.impacts,
+      remark_activity: activity.remark_activity,
+      frontId: activity.frontId,
+    });
+    this.ngbModal.open(modal, {
+      centered: true,
+      size: "lg",
+      windowClass: "bib-modal",
+    });
+  }
+
+  onPatchActivity() {
+    this.patchActivity = false;
+    if (this.activityForm.valid) {
+      let activity = this.activityForm.value;
+      let impactNames = activity.impacts.map((item) => {
+        return item["mnemonique"];
+      });
+      activity.impacts = {
+        impacts: activity.impacts,
+        mnemonique: impactNames.join("\r\n"),
+      };
+      this.listActivity = this.listActivity.map((item) =>
+        item.frontId != activity.frontId ? item : activity
+      );
+
+      this.ngbModal.dismissAll();
+      this.activityForm.reset();
+      this.selectedItems = [];
+    }
+  }
+
+  onDeleteActivity(activity: any) {
+    this.listActivity = this.listActivity.filter((item) => {
+      return item.frontId != activity.frontId;
+    });
+    /*  console.log('del',activity.human_activity); 
+    this.activitiesInput.push(activity.human_activity);
+    console.log('del push',this.activitiesInput); */
+  }
+
+  onFormSubmit() {
+    if (this.form.valid) {
+      this.submitted = true;
+
+      let formToPost = {
+        id_zh: Number(this._currentZh.properties.id_zh),
+        id_sdage: this.form.value.id_sdage,
+        id_sage: this.form.value.id_sdage,
+        id_corine_landcovers: [],
+        corine_biotopes: this.listCorinBio,
+        remark_pres: this.form.value.remark_pres,
+        id_thread: this.form.value.id_thread,
+        global_remark_activity: this.form.value.global_remark_activity,
+        activities: this.listActivity,
+      };
+      this.form.value.id_corine_landcovers?.forEach((item) => {
+        formToPost.id_corine_landcovers.push(item.id_nomenclature);
+      });
+      console.log("formToPost", formToPost);
+      this.posted = true;
+      this._dataService.postDataForm(formToPost, 3).subscribe(
+        () => {
+          this.form.reset();
+          this.posted = false;
+        },
+        (error) => {
+          this.posted = false;
+          this._toastr.error(error.error, "", {
+            positionClass: "toast-top-right",
+          });
+        }
+      );
+    }
+  }
+
+  ngOnDestroy() {
+    this.$_currentZhSub.unsubscribe();
   }
 }
