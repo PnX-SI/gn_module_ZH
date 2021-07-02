@@ -59,7 +59,7 @@ def get_impact_list():
             category = DB.session.query(TNomenclatures).filter(
                 TNomenclatures.id_nomenclature == impact.CorImpactTypes.id_impact_type).one().mnemonique
         else:
-            category = ""
+            category = "Aucun"
         # list of impact ids and mnemoniques
         impacts_list.append({
             "id_cor_impact_types": impact.CorImpactTypes.id_cor_impact_types,
