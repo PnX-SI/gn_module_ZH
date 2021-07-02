@@ -269,9 +269,11 @@ export class ZhFormTab3Component implements OnInit {
         global_remark_activity: this.form.value.global_remark_activity,
         activities: this.listActivity,
       };
-      this.form.value.id_corine_landcovers?.forEach((item) => {
-        formToPost.id_corine_landcovers.push(item.id_nomenclature);
-      });
+      if (this.form.value.id_corine_landcovers) {
+        this.form.value.id_corine_landcovers.forEach((item) => {
+          formToPost.id_corine_landcovers.push(item.id_nomenclature);
+        });
+      }
       console.log("formToPost", formToPost);
       this.posted = true;
       this._dataService.postDataForm(formToPost, 3).subscribe(

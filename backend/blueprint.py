@@ -335,7 +335,7 @@ def get_tab_data(id_tab, info_role):
         if id_tab == 2:
             update_zh_tab2(form_data)
             update_delim(form_data['id_zh'], form_data['critere_delim'])
-            update_fct_delim(form_data)
+            update_fct_delim(form_data['id_zh'], form_data['critere_delim_fs'])
             DB.session.commit()
             return {"id_zh": form_data['id_zh']}, 200
 
@@ -379,9 +379,18 @@ def deleteOneZh(id_zh, info_role):
 
     """
     zhRepository = ZhRepository(TZH)
+    # delete references
     DB.session.query(CorZhRef).filter(CorZhRef.id_zh == id_zh).delete()
-    #DB.session.query(CorZhArea).filter(CorZhArea.id_zh == id_zh).delete()
+    # delete criteres delim
+    id_lim_list = DB.session.query(TZH).filter(
+        TZH.id_zh == id_zh).one().id_lim_list
+    DB.session.query(CorLimList).filter(
+        CorLimList.id_lim_list == id_lim_list).delete()
+    # delete cor_zh_area
+    DB.session.query(CorZhArea).filter(CorZhArea.id_zh == id_zh).delete()
+
     zhRepository.delete(id_zh, info_role)
+    DB.session.commit()
 
     return {"message": "delete with success"}, 200
 
