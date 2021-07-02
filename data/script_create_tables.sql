@@ -569,7 +569,7 @@ ALTER TABLE pr_zh.cor_urban_type_range ADD CONSTRAINT fk_cor_urban_type FOREIGN 
 
 ALTER TABLE pr_zh.cor_zh_area ADD CONSTRAINT fk_cor_zh_area_id_area FOREIGN KEY ( id_area ) REFERENCES ref_geo.l_areas( id_area )  ON UPDATE CASCADE;
 
-ALTER TABLE pr_zh.cor_zh_cb ADD CONSTRAINT fk_cor_zh_cb_id_zh FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh )  ON UPDATE CASCADE;
+ALTER TABLE pr_zh.cor_zh_cb ADD CONSTRAINT fk_cor_zh_cb_id_zh FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh )  ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_zh_cb ADD CONSTRAINT fk_cor_zh_cb_lb_code FOREIGN KEY ( lb_code ) REFERENCES pr_zh.bib_cb( lb_code )  ON UPDATE CASCADE;
 

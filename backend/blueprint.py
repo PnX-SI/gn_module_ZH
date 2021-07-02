@@ -378,21 +378,32 @@ def deleteOneZh(id_zh, info_role):
     :params int id_zh: ID of the zh to delete
 
     """
-    zhRepository = ZhRepository(TZH)
-    # delete references
-    DB.session.query(CorZhRef).filter(CorZhRef.id_zh == id_zh).delete()
-    # delete criteres delim
-    id_lim_list = DB.session.query(TZH).filter(
-        TZH.id_zh == id_zh).one().id_lim_list
-    DB.session.query(CorLimList).filter(
-        CorLimList.id_lim_list == id_lim_list).delete()
-    # delete cor_zh_area
-    DB.session.query(CorZhArea).filter(CorZhArea.id_zh == id_zh).delete()
+    try:
+        zhRepository = ZhRepository(TZH)
+        # delete references
+        DB.session.query(CorZhRef).filter(CorZhRef.id_zh == id_zh).delete()
+        # delete criteres delim
+        id_lim_list = DB.session.query(TZH).filter(
+            TZH.id_zh == id_zh).one().id_lim_list
+        DB.session.query(CorLimList).filter(
+            CorLimList.id_lim_list == id_lim_list).delete()
+        # delete cor_zh_area
+        DB.session.query(CorZhArea).filter(CorZhArea.id_zh == id_zh).delete()
 
-    zhRepository.delete(id_zh, info_role)
-    DB.session.commit()
+        zhRepository.delete(id_zh, info_role)
+        DB.session.commit()
 
-    return {"message": "delete with success"}, 200
+        return {"message": "delete with success"}, 200
+    except Exception as e:
+        pdb.set_trace()
+        if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
+            return 'Empty mandatory field', 400
+        if e.__class__.__name__ == 'IntegrityError':
+            return 'ZH main_name already exists', 400
+        DB.session.rollback()
+        raise ZHApiError(message=str(e), details=str(e))
+    finally:
+        DB.session.close()
 
 
 """
