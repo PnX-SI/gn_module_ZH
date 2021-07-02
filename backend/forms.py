@@ -217,19 +217,19 @@ def update_refs(form_data):
 def post_activities(id_zh, activities):
     for activity in activities:
         uuid_activity = uuid.uuid4()
-        DB.session.query(TActivity).update({
-            TActivity.id_activity: activity['human_activity']['id_nomenclature'],
-            TActivity.id_zh: id_zh,
-            TActivity.id_position: activity['localisation']['id_nomenclature'],
-            TActivity.id_impact_list: uuid_activity,
-            TActivity.remark_activity: activity['remark_activity']
-        })
+        DB.session.add(TActivity(
+            id_activity=activity['human_activity']['id_nomenclature'],
+            id_zh=id_zh,
+            id_position=activity['localisation']['id_nomenclature'],
+            id_impact_list=uuid_activity,
+            remark_activity=activity['remark_activity']
+        ))
         DB.session.flush()
-        for impact in activity['impacts']:
-            DB.session.query(CorImpactList).update({
-                CorImpactList.id_impact_list: uuid_activity,
-                CorImpactList.id_cor_impact_types: impact.id_cor_impact_types
-            })
+        for impact in activity['impacts']['impacts']:
+            DB.session.add(CorImpactList(
+                id_impact_list=uuid_activity,
+                id_cor_impact_types=impact['id_cor_impact_types']
+            ))
             DB.session.flush()
 
 
@@ -261,7 +261,7 @@ def update_corine_biotopes(id_zh, corine_biotopes):
 def post_corine_biotopes(id_zh, corine_biotopes):
     for corine_biotope in corine_biotopes:
         DB.session.add(CorZhCb(
-            id_zh=id_zh, lb_code=corine_biotope.CB_code))
+            id_zh=id_zh, lb_code=corine_biotope['CB_code']))
         DB.session.flush()
 
 

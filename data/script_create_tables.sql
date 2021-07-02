@@ -309,8 +309,7 @@ COMMENT ON COLUMN pr_zh.t_zh.remark_eval_actions IS 'remarque sur les orientatio
 CREATE  TABLE pr_zh.cor_impact_list ( 
 	id_impact_list       uuid NOT NULL ,
 	id_cor_impact_types  integer  NOT NULL ,
-	CONSTRAINT pk_cor_activity_impact PRIMARY KEY ( id_impact_list, id_cor_impact_types ),
-	CONSTRAINT unq_t_impacts_id_impacts UNIQUE ( id_impact_list ) 
+	CONSTRAINT pk_cor_activity_impact PRIMARY KEY ( id_impact_list, id_cor_impact_types )
  );
 
 COMMENT ON TABLE pr_zh.cor_impact_list IS 'liste des impacts liés aux activités';
