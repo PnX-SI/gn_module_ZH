@@ -231,6 +231,7 @@
             <option
               *ngFor="let activity of activitiesInput"
               [ngValue]="activity"
+              [disabled]="activity.disabled"
             >
               {{ activity.mnemonique }}
             </option>

@@ -46,6 +46,7 @@ export class ZhFormTab3Component implements OnInit {
   listActivity: any = [];
   activitiesInput: any = [];
   submitted: boolean;
+  $_humanActivitySub: Subscription;
 
   constructor(
     private fb: FormBuilder,
@@ -90,6 +91,9 @@ export class ZhFormTab3Component implements OnInit {
     this.allSage = [...this.formMetaData["SDAGE-SAGE"]];
     this.corinBioMetaData = [...this.formMetaData["CORINE_BIO"]];
     this.activitiesInput = [...this.formMetaData["ACTIV_HUM"]];
+    this.activitiesInput.map((item) => {
+      item.disabled = false;
+    });
   }
 
   onFormValueChanges(): void {
@@ -196,9 +200,11 @@ export class ZhFormTab3Component implements OnInit {
           remark_activity: activity.remark_activity,
         });
       }
-      /*       this.activitiesInput = this.activitiesInput.filter((item) => {
-        return item.id_nomenclature != activity.human_activity.id_nomenclature;
-      }); */
+      this.activitiesInput.map((item) => {
+        if (item.id_nomenclature == activity.human_activity.id_nomenclature) {
+          item.disabled = true;
+        }
+      });
       this.ngbModal.dismissAll();
       this.activityForm.reset();
       this.selectedItems = [];
@@ -217,6 +223,15 @@ export class ZhFormTab3Component implements OnInit {
       remark_activity: activity.remark_activity,
       frontId: activity.frontId,
     });
+    this.$_humanActivitySub = this.activityForm
+      .get("human_activity")
+      .valueChanges.subscribe(() => {
+        this.activitiesInput.map((item) => {
+          if (item.id_nomenclature == activity.human_activity.id_nomenclature) {
+            item.disabled = false;
+          }
+        });
+      });
     this.ngbModal.open(modal, {
       centered: true,
       size: "lg",
@@ -238,10 +253,15 @@ export class ZhFormTab3Component implements OnInit {
       this.listActivity = this.listActivity.map((item) =>
         item.frontId != activity.frontId ? item : activity
       );
-
+      this.activitiesInput.map((item) => {
+        if (item.id_nomenclature == activity.human_activity.id_nomenclature) {
+          item.disabled = true;
+        }
+      });
       this.ngbModal.dismissAll();
       this.activityForm.reset();
       this.selectedItems = [];
+      this.$_humanActivitySub.unsubscribe();
     }
   }
 
@@ -249,9 +269,11 @@ export class ZhFormTab3Component implements OnInit {
     this.listActivity = this.listActivity.filter((item) => {
       return item.frontId != activity.frontId;
     });
-    /*  console.log('del',activity.human_activity); 
-    this.activitiesInput.push(activity.human_activity);
-    console.log('del push',this.activitiesInput); */
+    this.activitiesInput.map((item) => {
+      if (item.id_nomenclature == activity.human_activity.id_nomenclature) {
+        item.disabled = false;
+      }
+    });
   }
 
   onFormSubmit() {
@@ -269,9 +291,11 @@ export class ZhFormTab3Component implements OnInit {
         global_remark_activity: this.form.value.global_remark_activity,
         activities: this.listActivity,
       };
-      this.form.value.id_corine_landcovers?.forEach((item) => {
-        formToPost.id_corine_landcovers.push(item.id_nomenclature);
-      });
+      if (this.form.value.id_corine_landcovers) {
+        this.form.value.id_corine_landcovers.forEach((item) => {
+          formToPost.id_corine_landcovers.push(item.id_nomenclature);
+        });
+      }
       console.log("formToPost", formToPost);
       this.posted = true;
       this._dataService.postDataForm(formToPost, 3).subscribe(
