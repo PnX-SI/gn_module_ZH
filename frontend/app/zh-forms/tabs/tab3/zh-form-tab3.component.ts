@@ -189,16 +189,20 @@ export class ZhFormTab3Component implements OnInit {
         let impactNames = activity.impacts.map((item) => {
           return item["mnemonique"];
         });
-        this.listActivity.push({
+        let acrivityToAdd = {
           frontId: Date.now(),
           human_activity: activity.human_activity,
           localisation: activity.localisation,
-          impacts: {
+          remark_activity: activity.remark_activity,
+          impacts: null,
+        };
+        if (activity.impacts && activity.impacts.length > 0) {
+          acrivityToAdd.impacts = {
             impacts: activity.impacts,
             mnemonique: impactNames.join("\r\n"),
-          },
-          remark_activity: activity.remark_activity,
-        });
+          };
+        }
+        this.listActivity.push(acrivityToAdd);
       }
       this.activitiesInput.map((item) => {
         if (item.id_nomenclature == activity.human_activity.id_nomenclature) {
@@ -276,6 +280,10 @@ export class ZhFormTab3Component implements OnInit {
     });
   }
 
+  onDeSelectAll() {
+    this.activityForm.get("impacts").setValue([]);
+  }
+
   onFormSubmit() {
     if (this.form.valid) {
       this.submitted = true;
@@ -296,7 +304,6 @@ export class ZhFormTab3Component implements OnInit {
           formToPost.id_corine_landcovers.push(item.id_nomenclature);
         });
       }
-      console.log("formToPost", formToPost);
       this.posted = true;
       this._dataService.postDataForm(formToPost, 3).subscribe(
         () => {
