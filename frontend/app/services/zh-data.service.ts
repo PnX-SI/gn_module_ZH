@@ -38,6 +38,12 @@ export class ZhDataService {
     return this._api.post<any>(urlpost, value);
   }
 
+  autocompletBib(search_title: string) {
+    return this._api.get<any>(
+      `${AppConfig.API_ENDPOINT}/zones_humides/references/autocomplete?search_title=${search_title}`
+    );
+  }
+
   patchBib(value: any) {
     const urlpost = `${AppConfig.API_ENDPOINT}/zones_humides/references`;
     return this._api.patch<any>(urlpost, value);
