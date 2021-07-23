@@ -53,7 +53,7 @@
           *ngIf="formMetaData"
           class="d-flex flex-column"
           [formMetaData]="formMetaData"
-          (nextTab)="onNext($event)"
+          (canChangeTab)="onCanChangeTab($event)"
         >
         </zh-form-tab3>
       </mat-tab>
