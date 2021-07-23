@@ -166,7 +166,6 @@ export class ZhFormTab3Component implements OnInit {
   formatter = (result: any) => `${result.CB_code} ${result.CB_label}`;
 
   onAddCorinBio() {
-    //corine_biotopes
     if (this.form.value.corinBio) {
       let itemExist = this.listCorinBio.some(
         (item) => item.CB_code == this.form.value.corinBio.CB_code

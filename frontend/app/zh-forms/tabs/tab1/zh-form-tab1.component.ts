@@ -55,7 +55,7 @@ export class ZhFormTab1Component implements OnInit {
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
       this.$_fromChangeSub.unsubscribe();
       if (tabPosition == 1) {
-        //  this.initTab();
+        this.initTab();
       }
     });
   }
