@@ -194,20 +194,20 @@
       </div>
     </fieldset>
   </form>
-</div>
-<div class="navigate-btn">
-  <button
-    type="submit"
-    mat-raised-button
-    color="primary"
-    class="ml-3"
-    [disabled]="posted"
-    (click)="onFormSubmit()"
-  >
-    <mat-icon *ngIf="!posted">save_outline</mat-icon>
-    <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
-    Enregister
-  </button>
+  <div class="footer-btn">
+    <button
+      type="submit"
+      mat-raised-button
+      color="primary"
+      class="ml-3"
+      [disabled]="posted"
+      (click)="onFormSubmit()"
+    >
+      <mat-icon *ngIf="!posted">save_outline</mat-icon>
+      <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
+      Enregister
+    </button>
+  </div>
 </div>
 
 <!-- MODAL humain activity -->
@@ -231,6 +231,7 @@
             <option
               *ngFor="let activity of activitiesInput"
               [ngValue]="activity"
+              [disabled]="activity.disabled"
             >
               {{ activity.mnemonique }}
             </option>
@@ -265,6 +266,7 @@
             [(ngModel)]="selectedItems"
             [formControl]="activityForm.controls.impacts"
             [settings]="settings"
+            (onDeSelectAll)="onDeSelectAll($event)"
           >
           </angular2-multiselect>
         </div>
