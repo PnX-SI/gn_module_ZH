@@ -1,6 +1,9 @@
-import { Component, HostListener, OnInit } from "@angular/core";
+import { Component, HostListener, OnInit, ViewChild } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { ZhDataService } from "../../services/zh-data.service";
+import { MatTabGroup } from "@angular/material";
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { TabsService } from "../../services/tabs.service";
 
 @Component({
   selector: "zh-tabs",
@@ -12,11 +15,22 @@ export class ZhTabsComponent implements OnInit {
   public id_zh: number;
   public disabledTabs = true;
   public selectedIndex = 0;
+  public currentTab = 0;
+  public clickedTabIndex = 0;
   public formMetaData: any;
+  @ViewChild("tabs") tabs: MatTabGroup;
+  @ViewChild("tabsChangeModal") tabsChangeModal: any;
+
+  canChangeTab: boolean = false;
+  repeatTab: boolean = false;
+  nextTabPostion: number = 0;
+  modalReference: any;
 
   constructor(
     private _route: ActivatedRoute,
-    private _dataService: ZhDataService
+    public ngbModal: NgbModal,
+    private _dataService: ZhDataService,
+    private _tabService: TabsService
   ) {}
 
   ngOnInit() {
@@ -29,6 +43,34 @@ export class ZhTabsComponent implements OnInit {
 
   ngAfterViewInit() {
     setTimeout(() => this.calcCardContentHeight(), 0);
+  }
+
+  selectedIndexChange(nextPosition: number) {
+    if (this.canChangeTab) {
+      this.currentTab = nextPosition;
+      this._tabService.setTabChange(nextPosition);
+    } else {
+      if (nextPosition != this.currentTab) this.clickedTabIndex = nextPosition;
+      this.tabs.selectedIndex = this.currentTab;
+      setTimeout(() => {
+        this.openTabsModal(this.tabsChangeModal);
+      }, 200);
+    }
+  }
+
+  openTabsModal(modal) {
+    this.modalReference = this.ngbModal.open(modal, {
+      centered: true,
+    });
+  }
+
+  onChangeTab(status: boolean) {
+    if (status) {
+      this.canChangeTab = true;
+      this.tabs.selectedIndex = this.clickedTabIndex;
+      this._tabService.setTabChange(this.clickedTabIndex);
+    }
+    this.ngbModal.dismissAll(status);
   }
 
   calcCardContentHeight() {
@@ -51,6 +93,10 @@ export class ZhTabsComponent implements OnInit {
 
   onActiveTabs(activatedTabs: boolean) {
     this.disabledTabs = !activatedTabs;
+  }
+  // todo check current tab event ?
+  onCanChangeTab(status: boolean) {
+    this.canChangeTab = status;
   }
 
   getMetaDataForms() {

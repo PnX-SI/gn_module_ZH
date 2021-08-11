@@ -1,77 +1,71 @@
 <form>
-    <fieldset>
-        <legend>
-            <h5 class="section-title">Critères de délimitation de la zone humide</h5>
-        </legend>
-        <div class="form-row">
-            <div class="form-group col-md-12">
-                <small class="required">Critères utilisés</small>
-                <ng-multiselect-dropdown
-                    [placeholder]="'Critères utilisés'"
-                    [settings]="dropdownSettings"
-                    [data]="critDelim"
-                    [formControl]="formTab2.controls.critere_delim"
-                >
-                </ng-multiselect-dropdown>
-            </div>
-            <div class="form-group col-md-12">
-                <small>Remarque</small>
-                <textarea
-                    class="form-control form-control-sm"
-                    rows="3"
-                    [formControl]="formTab2.controls.remark_lim"
-                >
-                </textarea>
-            </div>
-        </div>
-    </fieldset>
-    <fieldset>
-        <legend>
-            <h5 class="section-title">Critères de délimitation de l'espace de fonctionalité</h5>
-        </legend>
-        <div class="form-row">
-            <div class="form-group col-md-12">
-                <small>Critères utilisés</small> 
-                <ng-multiselect-dropdown
-                    [placeholder]="'Critères utilisés'"
-                    [settings]="dropdownSettings"
-                    [data]="critDelimFct"
-                    [formControl]="formTab2.controls.critere_delim_fs"
-                >
-                </ng-multiselect-dropdown>
-            </div>
-            <div class="form-group col-md-12">
-                <small>Remarque</small>
-                <textarea
-                    class="form-control form-control-sm"
-                    rows="3"
-                    [formControl]="formTab2.controls.remark_lim_fs"
-                >
-                </textarea>
-            </div>
-        </div>
-    </fieldset>
+  <fieldset>
+    <legend>
+      <h5 class="section-title">Critères de délimitation de la zone humide</h5>
+    </legend>
+    <div class="form-row">
+      <div class="form-group col-md-12">
+        <small class="required">Critères utilisés</small>
+        <ng-multiselect-dropdown
+          [placeholder]="'Critères utilisés'"
+          [settings]="dropdownSettings"
+          [data]="critDelim"
+          [formControl]="formTab2.controls.critere_delim"
+        >
+        </ng-multiselect-dropdown>
+      </div>
+      <div class="form-group col-md-12">
+        <small>Remarque</small>
+        <textarea
+          class="form-control form-control-sm"
+          rows="3"
+          [formControl]="formTab2.controls.remark_lim"
+        >
+        </textarea>
+      </div>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>
+      <h5 class="section-title">
+        Critères de délimitation de l'espace de fonctionalité
+      </h5>
+    </legend>
+    <div class="form-row">
+      <div class="form-group col-md-12">
+        <small>Critères utilisés</small>
+        <ng-multiselect-dropdown
+          [placeholder]="'Critères utilisés'"
+          [settings]="dropdownSettings"
+          [data]="critDelimFct"
+          [formControl]="formTab2.controls.critere_delim_fs"
+        >
+        </ng-multiselect-dropdown>
+      </div>
+      <div class="form-group col-md-12">
+        <small>Remarque</small>
+        <textarea
+          class="form-control form-control-sm"
+          rows="3"
+          [formControl]="formTab2.controls.remark_lim_fs"
+        >
+        </textarea>
+      </div>
+    </div>
+  </fieldset>
 </form>
 
-<div class="navigate-btn">
-    <button
-        mat-raised-button
-        color="warn"
-        [disabled]="posted"
-        (click)="onPrevious()"
-    >
-    Précédent
-    </button>
-    <button
-      type="submit"
-      mat-raised-button
-      color=primary
-      class="ml-3"
-      [disabled]="posted"
-      (click)="onFormSubmit(formTab2.value)"
-    >
+<div class="footer-btn">
+  <button
+    type="submit"
+    mat-raised-button
+    color="primary"
+    class="ml-3"
+    [disabled]="posted"
+    (click)="onFormSubmit(formTab2.value)"
+  >
     <mat-icon *ngIf="!posted">save_outline</mat-icon>
-    <mat-spinner *ngIf="posted" [diameter]="20" ></mat-spinner>
-    Suivant
-    </button>
+    <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
+    Enregistrer
+  </button>
 </div>

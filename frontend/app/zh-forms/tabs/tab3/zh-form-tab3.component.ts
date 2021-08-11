@@ -1,10 +1,11 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, EventEmitter, OnInit, Input, Output } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { ZhDataService } from "../../../services/zh-data.service";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { Subscription, Observable } from "rxjs";
 import { debounceTime, distinctUntilChanged, map } from "rxjs/operators";
 import { ToastrService } from "ngx-toastr";
+import { TabsService } from "../../../services/tabs.service";
 
 @Component({
   selector: "zh-form-tab3",
@@ -13,10 +14,12 @@ import { ToastrService } from "ngx-toastr";
 })
 export class ZhFormTab3Component implements OnInit {
   @Input() formMetaData;
+  @Output() canChangeTab = new EventEmitter<boolean>();
   form: FormGroup;
   sage: any;
   allSage: any;
   $_currentZhSub: Subscription;
+  $_fromChangeSub: Subscription;
   private _currentZh: any;
   corinBioMetaData: any;
   corinTableCol = [
@@ -46,11 +49,13 @@ export class ZhFormTab3Component implements OnInit {
   listActivity: any = [];
   activitiesInput: any = [];
   submitted: boolean;
+  formImpactSubmitted: boolean;
   $_humanActivitySub: Subscription;
 
   constructor(
     private fb: FormBuilder,
     private _dataService: ZhDataService,
+    private _tabService: TabsService,
     public ngbModal: NgbModal,
     private _toastr: ToastrService
   ) {}
@@ -77,13 +82,34 @@ export class ZhFormTab3Component implements OnInit {
 
     this.getMetaData();
     this.createForm();
+    this.initTab();
+
+    this._tabService.getTabChange().subscribe((tabPosition: number) => {
+      this.$_fromChangeSub.unsubscribe();
+      if (tabPosition == 3) {
+        this.initTab();
+      }
+    });
+  }
+
+  initTab() {
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
         this._currentZh = zh;
         this.form.patchValue({
-          sdage: this._currentZh.properties.id_sdage,
+          id_sdage: this._currentZh.properties.id_sdage,
+          id_sage: this._currentZh.properties.id_sage,
+          id_corine_landcovers: this._currentZh.properties.id_corine_landcovers,
+          remark_pres: this._currentZh.properties.remark_pres,
+          id_thread: this._currentZh.properties.id_thread,
+          global_remark_activity:
+            this._currentZh.properties.global_remark_activity,
         });
       }
+
+      this.$_fromChangeSub = this.form.valueChanges.subscribe(() => {
+        this.canChangeTab.emit(false);
+      });
     });
   }
 
@@ -140,7 +166,6 @@ export class ZhFormTab3Component implements OnInit {
   formatter = (result: any) => `${result.CB_code} ${result.CB_label}`;
 
   onAddCorinBio() {
-    //corine_biotopes
     if (this.form.value.corinBio) {
       let itemExist = this.listCorinBio.some(
         (item) => item.CB_code == this.form.value.corinBio.CB_code
@@ -149,6 +174,7 @@ export class ZhFormTab3Component implements OnInit {
         this.listCorinBio.push(this.form.value.corinBio);
       }
       this.form.get("corinBio").reset();
+      this.canChangeTab.emit(false);
     }
   }
 
@@ -156,6 +182,7 @@ export class ZhFormTab3Component implements OnInit {
     this.listCorinBio = this.listCorinBio.filter((item) => {
       return item.CB_code != CB_code;
     });
+    this.canChangeTab.emit(false);
   }
 
   onAddActivity(event, modal) {
@@ -164,8 +191,8 @@ export class ZhFormTab3Component implements OnInit {
     this.modalTitle = "Ajout d'une activié humaine";
     this.activityForm = this.fb.group({
       human_activity: [null, Validators.required],
-      localisation: null,
-      impacts: null,
+      localisation: [null, Validators.required],
+      impacts: [null, Validators.required],
       remark_activity: null,
       frontId: null,
     });
@@ -178,6 +205,7 @@ export class ZhFormTab3Component implements OnInit {
   }
 
   onPostActivity() {
+    this.formImpactSubmitted = true;
     if (this.activityForm.valid) {
       let activity = this.activityForm.value;
       let itemExist = this.listActivity.some(
@@ -212,6 +240,8 @@ export class ZhFormTab3Component implements OnInit {
       this.ngbModal.dismissAll();
       this.activityForm.reset();
       this.selectedItems = [];
+      this.canChangeTab.emit(false);
+      this.formImpactSubmitted = false;
     }
   }
 
@@ -245,6 +275,7 @@ export class ZhFormTab3Component implements OnInit {
 
   onPatchActivity() {
     this.patchActivity = false;
+    this.formImpactSubmitted = true;
     if (this.activityForm.valid) {
       let activity = this.activityForm.value;
       let impactNames = activity.impacts.map((item) => {
@@ -266,6 +297,8 @@ export class ZhFormTab3Component implements OnInit {
       this.activityForm.reset();
       this.selectedItems = [];
       this.$_humanActivitySub.unsubscribe();
+      this.canChangeTab.emit(false);
+      this.formImpactSubmitted = false;
     }
   }
 
@@ -278,6 +311,7 @@ export class ZhFormTab3Component implements OnInit {
         item.disabled = false;
       }
     });
+    this.canChangeTab.emit(false);
   }
 
   onDeSelectAll() {
@@ -307,8 +341,11 @@ export class ZhFormTab3Component implements OnInit {
       this.posted = true;
       this._dataService.postDataForm(formToPost, 3).subscribe(
         () => {
-          this.form.reset();
           this.posted = false;
+          this.canChangeTab.emit(true);
+          this._toastr.success("Vos données sont bien enregistrées", "", {
+            positionClass: "toast-top-right",
+          });
         },
         (error) => {
           this.posted = false;
@@ -322,5 +359,6 @@ export class ZhFormTab3Component implements OnInit {
 
   ngOnDestroy() {
     this.$_currentZhSub.unsubscribe();
+    this.$_fromChangeSub.unsubscribe();
   }
 }

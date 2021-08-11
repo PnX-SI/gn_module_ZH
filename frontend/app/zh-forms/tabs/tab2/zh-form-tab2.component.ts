@@ -1,20 +1,21 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { ToastrService } from 'ngx-toastr';
+import { ToastrService } from "ngx-toastr";
 import { Subscription } from "rxjs";
+import { TabsService } from "../../../services/tabs.service";
 import { ZhDataService } from "../../../services/zh-data.service";
 
 @Component({
   selector: "zh-form-tab2",
   templateUrl: "./zh-form-tab2.component.html",
-  styleUrls: ["./zh-form-tab2.component.scss"]
+  styleUrls: ["./zh-form-tab2.component.scss"],
 })
 export class ZhFormTab2Component implements OnInit {
-
   @Input() formMetaData;
-  @Output() nextTab = new EventEmitter<number>();
+  @Output() canChangeTab = new EventEmitter<boolean>();
   private _currentZh: any;
   public $_currentZhSub: Subscription;
+  public $_fromChangeSub: Subscription;
   public formTab2: FormGroup;
   public critDelim: any;
   public critDelimFct: any;
@@ -27,33 +28,50 @@ export class ZhFormTab2Component implements OnInit {
     private fb: FormBuilder,
     private _dataService: ZhDataService,
     private _toastr: ToastrService,
-  ) { }
+    private _tabService: TabsService
+  ) {}
 
   ngOnInit() {
     this.dropdownSettings = {
       singleSelection: false,
-      idField: 'id_nomenclature',
-      textField: 'mnemonique',
-      searchPlaceholderText: 'Rechercher',
+      idField: "id_nomenclature",
+      textField: "mnemonique",
+      searchPlaceholderText: "Rechercher",
       enableCheckAll: false,
-      allowSearchFilter: true
+      allowSearchFilter: true,
     };
 
     this.getMetaData();
     this.createForm();
+    this.initTab();
 
+    this._tabService.getTabChange().subscribe((tabPosition: number) => {
+      this.$_fromChangeSub.unsubscribe();
+      if (tabPosition == 2) {
+        this.initTab();
+      }
+    });
+  }
+
+  initTab() {
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
         this._currentZh = zh;
         const selectedCritDelim = [];
-        this.critDelim.forEach(critere => {
-          if (this._currentZh.properties.id_lims.includes(critere.id_nomenclature)) {
+        this.critDelim.forEach((critere) => {
+          if (
+            this._currentZh.properties.id_lims.includes(critere.id_nomenclature)
+          ) {
             selectedCritDelim.push(critere);
           }
         });
         const selectedCritDelimFs = [];
-        this.critDelimFct.forEach(critere => {
-          if (this._currentZh.properties.id_lims_fs.includes(critere.id_nomenclature)) {
+        this.critDelimFct.forEach((critere) => {
+          if (
+            this._currentZh.properties.id_lims_fs.includes(
+              critere.id_nomenclature
+            )
+          ) {
             selectedCritDelimFs.push(critere);
           }
         });
@@ -64,8 +82,11 @@ export class ZhFormTab2Component implements OnInit {
           critere_delim_fs: selectedCritDelimFs,
           remark_lim_fs: this._currentZh.properties.remark_lim_fs,
         });
+        this.$_fromChangeSub = this.formTab2.valueChanges.subscribe(() => {
+          this.canChangeTab.emit(false);
+        });
       }
-    })
+    });
   }
 
   createForm(): void {
@@ -81,7 +102,6 @@ export class ZhFormTab2Component implements OnInit {
   getMetaData() {
     this.critDelim = this.formMetaData.CRIT_DELIM;
     this.critDelimFct = this.formMetaData.CRIT_DEF_ESP_FCT;
-
   }
 
   onFormSubmit(formValues: any) {
@@ -91,40 +111,37 @@ export class ZhFormTab2Component implements OnInit {
       id_zh: Number(this._currentZh.properties.id_zh),
       remark_lim_fs: formValues.remark_lim_fs,
       remark_lim: formValues.remark_lim_fs,
-      critere_delim_fs: []
+      critere_delim_fs: [],
     };
 
     if (this.formTab2.valid) {
-      formValues.critere_delim.forEach(critere => {
-        formToPost.critere_delim.push(critere.id_nomenclature)
+      formValues.critere_delim.forEach((critere) => {
+        formToPost.critere_delim.push(critere.id_nomenclature);
       });
-      formValues.critere_delim_fs.forEach(critere => {
-        formToPost.critere_delim_fs.push(critere.id_nomenclature)
+      formValues.critere_delim_fs.forEach((critere) => {
+        formToPost.critere_delim_fs.push(critere.id_nomenclature);
       });
       this.posted = true;
       this._dataService.postDataForm(formToPost, 2).subscribe(
         () => {
-          this.formTab2.reset();
           this.posted = false;
-          this.nextTab.emit(3);
+          this.canChangeTab.emit(true);
+          this._toastr.success("Vos données sont bien enregistrées", "", {
+            positionClass: "toast-top-right",
+          });
         },
         (error) => {
           this.posted = false;
-          this._toastr.error(error.error, '', { positionClass: 'toast-top-right' });
+          this._toastr.error(error.error, "", {
+            positionClass: "toast-top-right",
+          });
         }
       );
     }
   }
 
-
-  openDeleteModal(event, modal, iElement, row) {
-
-    event.stopPropagation();
-
-  }
-
   ngOnDestroy() {
     this.$_currentZhSub.unsubscribe();
+    this.$_fromChangeSub.unsubscribe();
   }
-
 }

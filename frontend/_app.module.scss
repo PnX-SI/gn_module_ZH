@@ -166,12 +166,10 @@ small.required::after {
   color: red;
 }
 
-.navigate-btn {
-  position: absolute;
-  bottom: 40px;
-  right: 30px;
+.footer-btn {
   display: flex;
   justify-content: flex-end;
+  margin-top: 16px;
   overflow: hidden;
 }
 

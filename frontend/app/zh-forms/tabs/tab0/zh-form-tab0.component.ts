@@ -15,6 +15,7 @@ import { MapService } from "@geonature_common/map/map.service";
 import { IDropdownSettings } from "ng-multiselect-dropdown";
 import { ToastrService } from "ngx-toastr";
 import { ZhDataService } from "../../../services/zh-data.service";
+import { TabsService } from "../../../services/tabs.service";
 
 @Component({
   selector: "zh-form-tab0",
@@ -23,8 +24,8 @@ import { ZhDataService } from "../../../services/zh-data.service";
 })
 export class ZhFormTab0Component implements OnInit {
   @Input() formMetaData;
-  @Output() nextTab = new EventEmitter<number>();
   @Output() activeTabs = new EventEmitter<boolean>();
+  @Output() canChangeTab = new EventEmitter<boolean>();
   private _currentZh: any;
   public form: FormGroup;
   public cardContentHeight: number;
@@ -32,7 +33,7 @@ export class ZhFormTab0Component implements OnInit {
   public sdage: any;
   public idOrg: any;
   public dropdownSettings: IDropdownSettings;
-  private $_geojsonSub: Subscription;
+  public $_geojsonSub: Subscription;
   public $_currentZhSub: Subscription;
   private geometry: GeoJSON;
   public submitted = false;
@@ -41,6 +42,7 @@ export class ZhFormTab0Component implements OnInit {
   constructor(
     private fb: FormBuilder,
     private _dataService: ZhDataService,
+    private _tabService: TabsService,
     private _mapService: MapService,
     private _router: Router,
     private _toastr: ToastrService
@@ -61,10 +63,30 @@ export class ZhFormTab0Component implements OnInit {
 
     this.$_geojsonSub = this._mapService.gettingGeojson$.subscribe(
       (geojson: GeoJSON) => {
+        if (
+          this.geometry &&
+          JSON.stringify(this.geometry) != JSON.stringify(geojson)
+        ) {
+          this.canChangeTab.emit(false);
+        }
         this.geometry = geojson;
       }
     );
 
+    this.intiTab();
+
+    this._tabService.getTabChange().subscribe((tabPosition: number) => {
+      if (tabPosition == 0) {
+        this.intiTab();
+      }
+    });
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => this.calcCardContentHeight(), 0);
+  }
+
+  intiTab() {
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
         this._currentZh = zh;
@@ -97,12 +119,9 @@ export class ZhFormTab0Component implements OnInit {
           }
           this._mapService.map.invalidateSize();
         }, 0);
+        this.canChangeTab.emit(true);
       }
     });
-  }
-
-  ngAfterViewInit() {
-    setTimeout(() => this.calcCardContentHeight(), 0);
   }
 
   calcCardContentHeight() {
@@ -110,7 +129,7 @@ export class ZhFormTab0Component implements OnInit {
     let tbH = document.getElementById("app-toolbar")
       ? document.getElementById("app-toolbar").offsetHeight
       : 0;
-    let height = wH - (tbH + 80);
+    let height = wH - (tbH + 81);
     this.cardContentHeight = height >= 350 ? height : 350;
     // resize map after resize container
     if (this._mapService.map) {
@@ -131,6 +150,9 @@ export class ZhFormTab0Component implements OnInit {
       main_name: [null, Validators.required],
       critere_delim: [null, Validators.required],
       sdage: ["", Validators.required],
+    });
+    this.form.valueChanges.subscribe(() => {
+      this.canChangeTab.emit(false);
     });
   }
 
@@ -155,13 +177,15 @@ export class ZhFormTab0Component implements OnInit {
         }
         this._dataService.postDataForm(formToPost, 0).subscribe(
           (data) => {
-            this.form.reset();
             this.posted = false;
             this._dataService.getZhById(data.id_zh).subscribe((zh: any) => {
               this._dataService.setCurrentZh(zh);
             });
-            this.nextTab.emit(1);
             this.activeTabs.emit(true);
+            this.canChangeTab.emit(true);
+            this._toastr.success("Vos données sont bien enregistrées", "", {
+              positionClass: "toast-top-right",
+            });
           },
           (error) => {
             this.posted = false;

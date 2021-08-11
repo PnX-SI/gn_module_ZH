@@ -224,7 +224,7 @@
         <div class="form-group col-md-6">
           <small class="required">Activités humaines</small>
           <select
-            class="form-control"
+            class="form-control activities-select"
             ngbAutofocus
             [formControl]="activityForm.controls.human_activity"
           >
@@ -238,7 +238,8 @@
           </select>
           <small
             *ngIf="
-              (activityForm.controls.human_activity.touched || submitted) &&
+              (activityForm.controls.human_activity.touched ||
+                formImpactSubmitted) &&
               activityForm.controls.human_activity.errors?.required
             "
             class="error-msg"
@@ -246,7 +247,7 @@
           >
         </div>
         <div class="form-group col-md-6">
-          <small>Localisation</small>
+          <small class="required">Localisation</small>
           <select
             class="form-control"
             [formControl]="activityForm.controls.localisation"
@@ -258,9 +259,18 @@
               {{ localisation.mnemonique }}
             </option>
           </select>
+          <small
+            *ngIf="
+              (activityForm.controls.localisation.touched ||
+                formImpactSubmitted) &&
+              activityForm.controls.localisation.errors?.required
+            "
+            class="error-msg"
+            >Champ requis</small
+          >
         </div>
         <div class="form-group col-md-12">
-          <small>Impacts</small>
+          <small class="required">Impacts</small>
           <angular2-multiselect
             [data]="formMetaData.IMPACTS"
             [(ngModel)]="selectedItems"
@@ -269,6 +279,14 @@
             (onDeSelectAll)="onDeSelectAll($event)"
           >
           </angular2-multiselect>
+          <small
+            *ngIf="
+              (activityForm.controls.impacts.touched || formImpactSubmitted) &&
+              activityForm.controls.impacts.errors?.required
+            "
+            class="error-msg"
+            >Champ requis</small
+          >
         </div>
         <div class="form-group col-md-12">
           <small>Remarques</small>
