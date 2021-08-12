@@ -358,16 +358,17 @@ def get_tab_data(id_tab, info_role):
             return {"id_zh": form_data['id_zh']}, 200
 
         if id_tab == 5:
-            update_hydro_fct(form_data['id_zh'], form_data['hydro_fct'])
-            update_bio_fct(form_data['id_zh'], form_data['bio_fct'])
+            update_fonctions_hydro(
+                form_data['id_zh'], form_data['fonctions_hydro'])
+            update_fonctions_bio(
+                form_data['id_zh'], form_data['fonctions_bio'])
             # is_carto_hab / nb_hab / total_hab_cover / nb_flora_sp / nb_vertebrate_sp / nb_invertebrate_sp
             update_zh_tab5(form_data)
-            update_heritage_interest(
-                form_data['id_zh'], form_data['heritage_interest'])
-            update_heritage_hab(form_data['id_zh'], form_data['heritage_hab'])
-            update_heritage_biodiv(
-                form_data['id_zh'], form_data['heritage_biodiv'])
-            update_eco_interest(form_data['id_zh'], form_data['eco_interest'])
+            update_interet_patrim(
+                form_data['id_zh'], form_data['interet_patrim'])
+            update_corine_bio_patrim(
+                form_data['id_zh'], form_data['corine_bio_patrim'])
+            update_val_soc_eco(form_data['id_zh'], form_data['val_soc_eco'])
             DB.session.commit()
             return {"id_zh": form_data['id_zh']}, 200
 
