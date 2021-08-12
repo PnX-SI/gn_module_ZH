@@ -357,6 +357,20 @@ def get_tab_data(id_tab, info_role):
             DB.session.commit()
             return {"id_zh": form_data['id_zh']}, 200
 
+        if id_tab == 5:
+            update_hydro_fct(form_data['id_zh'], form_data['hydro_fct'])
+            update_bio_fct(form_data['id_zh'], form_data['bio_fct'])
+            # is_carto_hab / nb_hab / total_hab_cover / nb_flora_sp / nb_vertebrate_sp / nb_invertebrate_sp
+            update_zh_tab5(form_data)
+            update_heritage_interest(
+                form_data['id_zh'], form_data['heritage_interest'])
+            update_heritage_hab(form_data['id_zh'], form_data['heritage_hab'])
+            update_heritage_biodiv(
+                form_data['id_zh'], form_data['heritage_biodiv'])
+            update_eco_interest(form_data['id_zh'], form_data['eco_interest'])
+            DB.session.commit()
+            return {"id_zh": form_data['id_zh']}, 200
+
     except Exception as e:
         pdb.set_trace()
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
