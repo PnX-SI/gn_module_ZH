@@ -873,3 +873,32 @@ class TInflow(DB.Model):
     def get_inflows_by_id(id_zh):
         return DB.session.query(TInflow).filter(
             TInflow.id_zh == id_zh).all()
+
+
+class TFunctions(DB.Model):
+    __tablename__ = "t_functions"
+    __table_args__ = {"schema": "pr_zh"}
+    id_function = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    justification = DB.Column(
+        DB.Unicode(length=2000)
+    )
+    id_qualification = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        default=TNomenclatures.get_default_nomenclature("FONCTIONS_QUALIF"),
+    )
+    id_knowledge = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        default=TNomenclatures.get_default_nomenclature(
+            "FONCTIONS_CONNAISSANCE"),
+    )
