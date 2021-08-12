@@ -2,10 +2,11 @@ import uuid
 
 from sqlalchemy import (
     func,
-    text
+    text,
     # desc,
-    # and_
+    and_
 )
+
 from sqlalchemy.sql.expression import delete
 
 from geonature.utils.env import DB
@@ -15,7 +16,7 @@ from .models import (
     CorImpactTypes,
     TActivity,
     TZH,
-    # Nomenclatures,
+    Nomenclatures,
     CorLimList,
     CorZhArea,
     CorZhRb,
@@ -31,7 +32,12 @@ from .models import (
     CorZhCb,
     CorZhCorineCover,
     TOutflow,
-    TInflow
+    TInflow,
+    TFunctions
+)
+
+from pypnnomenclature.models import (
+    TNomenclatures
 )
 
 from .api_error import ZHApiError
@@ -358,5 +364,39 @@ def update_zh_tab4(data):
         TZH.id_diag_hydro: data['id_diag_hydro'],
         TZH.id_diag_bio: data['id_diag_bio'],
         TZH.remark_diag: data['remark_diag']
+    })
+    DB.session.flush()
+
+
+def post_functions(id_zh, functions):
+    for function in functions:
+        DB.session.add(TFunctions(
+            id_function=function['id_function'],
+            id_zh=id_zh,
+            justification=function['justification'],
+            id_qualification=function['id_qualification'],
+            id_knowledge=function['id_knowledge']
+        ))
+        DB.session.flush()
+
+
+def update_functions(id_zh, functions, function_type):
+    #function_type = 'FONCTIONS_HYDRO'
+    id_function_list = [
+        nomenclature.id_nomenclature for nomenclature in Nomenclatures.get_nomenclature_info(function_type)
+    ]
+    DB.session.query(TFunctions).filter(TFunctions.id_zh == id_zh).filter(
+        TFunctions.id_function.in_(id_function_list)).delete()
+    post_functions(id_zh, functions)
+
+
+def update_zh_tab5(data):
+    DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
+        TZH.is_carto_hab: data['is_carto_hab'],
+        TZH.nb_hab: data['nb_hab'],
+        TZH.total_hab_cover: data['total_hab_cover'],
+        TZH.nb_flora_sp: data['nb_flora_sp'],
+        TZH.nb_vertebrate_sp: data['nb_vertebrate_sp'],
+        TZH.nb_invertebrate_sp: data['nb_invertebrate_sp']
     })
     DB.session.flush()
