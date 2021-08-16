@@ -434,8 +434,8 @@ COMMENT ON TABLE pr_zh.t_functions IS 'liste des fonctions par type pour les zh'
 
 CREATE  TABLE pr_zh.t_hab_heritage ( 
 	id_zh                integer  NOT NULL ,
-	id_corine_bio        integer  NOT NULL ,
-	id_cahier_hab        integer  NOT NULL ,
+	id_corine_bio        varchar(50)  NOT NULL ,
+	id_cahier_hab        varchar(50)  NOT NULL ,
 	id_preservation_state integer DEFAULT ref_nomenclatures.get_default_nomenclature_value('ETAT_CONSERVATION') NOT NULL ,
 	hab_cover            varchar(3) DEFAULT 999 NOT NULL ,
 	CONSTRAINT pk_t_hab PRIMARY KEY ( id_zh, id_corine_bio, id_cahier_hab )
@@ -625,7 +625,7 @@ ALTER TABLE pr_zh.t_hab_heritage ADD CONSTRAINT fk_t_hab_t_zh FOREIGN KEY ( id_z
 
 ALTER TABLE pr_zh.t_hab_heritage ADD CONSTRAINT fk_t_hab_t_nomenclatures FOREIGN KEY ( id_preservation_state ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
-ALTER TABLE pr_zh.t_hab_heritage ADD CONSTRAINT fk_t_hab_heritage_cor_list_habitat FOREIGN KEY ( id_corine_bio ) REFERENCES ref_habitats.cor_list_habitat( id_cor_list ) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE pr_zh.t_hab_heritage ADD CONSTRAINT fk_t_hab_heritage_lb_code FOREIGN KEY ( id_corine_bio ) REFERENCES pr_zh.bib_cb( lb_code ) ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.t_inflow ADD CONSTRAINT fk_t_inflow_t_nomenclatures FOREIGN KEY ( id_inflow ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 

@@ -10,7 +10,8 @@ from pypnnomenclature.models import (
 )
 
 from pypn_habref_api.models import (
-    Habref
+    Habref,
+    CorespHab
 )
 
 import geoalchemy2
@@ -650,6 +651,23 @@ class BibCb(DB.Model):
         return DB.session.query(BibCb, Habref).join(
             Habref, BibCb.lb_code == Habref.lb_code).filter(Habref.cd_typo == 22).all()
 
+    def get_ch(lb_code):
+        # get cd_hab_sortie from lb_code of selected Corine Biotope
+        cd_hab_sortie = DB.session.query(Habref).filter(
+            and_(Habref.lb_code == lb_code, Habref.cd_typo == 22)).one().cd_hab
+        # get all cd_hab_entre corresponding to cd_hab_sortie
+        q_cd_hab_entre = DB.session.query(CorespHab).filter(
+            CorespHab.cd_hab_sortie == cd_hab_sortie).all()
+        # get list of cd_hab_entre/lb_code/lb_hab_fr for each cahier habitat
+        ch = []
+        for q in q_cd_hab_entre:
+            ch.append({
+                "cd_hab": q.cd_hab_entre,
+                "lb_code": DB.session.query(Habref).filter(Habref.cd_hab == q.cd_hab_entre).one().lb_code,
+                "lb_hab_fr": DB.session.query(Habref).filter(Habref.cd_hab == q.cd_hab_entre).one().lb_hab_fr
+            })
+        return ch
+
 
 class CorImpactTypes(DB.Model):
     __tablename__ = "cor_impact_types"
@@ -901,4 +919,32 @@ class TFunctions(DB.Model):
         ForeignKey(TNomenclatures.id_nomenclature),
         default=TNomenclatures.get_default_nomenclature(
             "FONCTIONS_CONNAISSANCE"),
+    )
+
+
+class THabHeritage(DB.Model):
+    __tablename__ = "t_hab_heritage"
+    __table_args__ = {"schema": "pr_zh"}
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    id_corine_bio = DB.Column(
+        DB.Unicode,
+        ForeignKey(BibCb.lb_code),
+        primary_key=True
+    )
+    id_cahier_hab = DB.Column(
+        DB.Unicode,
+        primary_key=True
+    )
+    id_preservation_state = DB.Column(
+        DB.Unicode,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        default=TNomenclatures.get_default_nomenclature("ETAT_CONSERVATION")
+    )
+    hab_cover = DB.Column(
+        DB.Unicode,
+        nullable=False
     )

@@ -66,7 +66,8 @@ from .forms import (
     update_inflow,
     update_zh_tab4,
     update_functions,
-    update_zh_tab5
+    update_zh_tab5,
+    update_hab_heritages
 )
 
 from .repositories import (
@@ -309,7 +310,6 @@ def get_tab_data(id_tab, info_role):
     """
     form_data = request.json
     try:
-        update_functions()
         if id_tab == 0:
             # set geometry from coordinates
             polygon = DB.session.query(func.ST_GeomFromGeoJSON(
@@ -369,12 +369,9 @@ def get_tab_data(id_tab, info_role):
                 form_data['id_zh'], form_data['interet_patrim'], 'INTERET_PATRIM')
             update_functions(form_data['id_zh'],
                              form_data['val_soc_eco'], 'VAL_SOC_ECO')
-
-            # is_carto_hab / nb_hab / total_hab_cover / nb_flora_sp / nb_vertebrate_sp / nb_invertebrate_sp
             update_zh_tab5(form_data)
-
-            update_corine_bio_patrim(
-                form_data['id_zh'], form_data['corine_bio_patrim'])
+            update_hab_heritages(
+                form_data['id_zh'], form_data['hab_heritages'])
             DB.session.commit()
             return {"id_zh": form_data['id_zh']}, 200
 

@@ -33,7 +33,8 @@ from .models import (
     CorZhCorineCover,
     TOutflow,
     TInflow,
-    TFunctions
+    TFunctions,
+    THabHeritage
 )
 
 from pypnnomenclature.models import (
@@ -400,3 +401,22 @@ def update_zh_tab5(data):
         TZH.nb_invertebrate_sp: data['nb_invertebrate_sp']
     })
     DB.session.flush()
+
+
+def update_hab_heritages(id_zh, hab_heritages):
+    # delete cascade t_hab_heritages
+    DB.session.query(THabHeritage).filter(
+        THabHeritage.id_zh == id_zh).delete()
+    # post new hab_heritages
+    post_hab_heritages(id_zh, hab_heritages)
+
+
+def post_hab_heritages(id_zh, hab_heritages):
+    for hab_heritage in hab_heritages:
+        DB.session.add(THabHeritage(
+            id_zh=id_zh,
+            id_corine_bio=hab_heritage['id_corine_bio'],
+            id_cahier_hab=hab_heritage['id_cahier_hab'],
+            id_preservation_state=hab_heritage['id_preservation_state'],
+            hab_cover=hab_heritage['hab_cover']
+        ))
