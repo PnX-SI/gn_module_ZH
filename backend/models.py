@@ -402,6 +402,20 @@ class ZH(TZH):
             category: functions
         }
 
+    def get_hab_heritages(self):
+        q_hab_heritages = THabHeritage.get_hab_heritage_by_id(self.zh.id_zh)
+        hab_heritages = []
+        for hab_heritage in q_hab_heritages:
+            hab_heritages.append({
+                'id_corine_bio': hab_heritage.id_corine_bio,
+                'id_cahier_hab': hab_heritage.id_cahier_hab,
+                'id_preservation_state': hab_heritage.id_preservation_state,
+                'hab_cover': hab_heritage.hab_cover
+            })
+        return {
+            "hab_heritages": hab_heritages
+        }
+
     def get_full_zh(self):
         full_zh = self.zh.get_geofeature()
         full_zh.properties.update(self.id_lims)
@@ -981,3 +995,7 @@ class THabHeritage(DB.Model):
         DB.Unicode,
         nullable=False
     )
+
+    def get_hab_heritage_by_id(id_zh):
+        return DB.session.query(THabHeritage).filter(
+            THabHeritage.id_zh == id_zh).all()
