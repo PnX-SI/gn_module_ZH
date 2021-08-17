@@ -901,3 +901,40 @@ class CorUrbanTypeRange(DB.Model):
                 "mnemonique": DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == range.id_doc_type).one().mnemonique
             })
         return ranges
+
+
+class CorProtectionLevelType(DB.Model):
+    __tablename__ = "cor_protection_level_type"
+    __table_args__ = {"schema": "pr_zh"}
+    id_protection = DB.Column(
+        DB.Integer,
+        primary_key=True
+    )
+    id_protection_status = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        nullable=False
+    )
+    id_protection_type = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature)
+    )
+    id_protection_level = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        nullable=False
+    )
+
+    def get_status_by_type(type_id):
+        q_protection_types = DB.session.query(CorProtectionLevelType).filter(
+            CorProtectionLevelType.id_protection_type == type_id).all()
+        protection_status = []
+        for protection in q_protection_types:
+            protection_status.append({
+                "id_protection_status": protection.id_protection_status,
+                "mnemonique_status": DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == protection.id_protection_status).one().mnemonique,
+                "id_protection_level": protection.id_protection_level,
+                "mnemonique_level": DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == protection.id_protection_level).one().mnemonique
+
+            })
+        return protection_status
