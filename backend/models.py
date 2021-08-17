@@ -274,6 +274,26 @@ class TZH(ZhModel):
 
 
 @serializable
+class CorZhArea(DB.Model):
+    __tablename__ = "cor_zh_area"
+    __table_args__ = {"schema": "pr_zh"}
+    id_area = DB.Column(
+        DB.Integer,
+        ForeignKey("ref_geo.l_areas.id_area"),
+        primary_key=True
+    )
+    id_zh = DB.Column(
+        DB.Integer,
+        primary_key=True
+    )
+    cover = DB.Column(DB.Integer)
+
+    def get_departments(id_zh):
+        return DB.session.query(CorZhArea, LAreas, TZH).join(LAreas).filter(
+            CorZhArea.id_zh == id_zh, LAreas.id_type == 26, TZH.id_zh == id_zh).all()
+
+
+@serializable
 @geoserializable
 class ZH(TZH):
     __abstract__ = True
@@ -284,6 +304,10 @@ class ZH(TZH):
         self.id_lims = self.get_id_lims()
         self.id_lims_fs = self.get_id_lims_fs()
         self.id_references = self.get_id_references()
+        self.cb_codes_corine_biotope = self.get_cb_codes()
+        self.id_corine_landcovers = self.get_corine_landcovers()
+        self.activities = self.get_activities()
+        self.flows = self.get_flows()
 
     def get_id_lims(self):
         lim_list = CorLimList.get_lims_by_id(self.zh.id_lim_list)
@@ -303,11 +327,69 @@ class ZH(TZH):
             "id_references": [ref.as_dict() for ref in ref_list]
         }
 
+    def get_cb_codes(self):
+        corine_biotopes = CorZhCb.get_cb_by_id(self.zh.id_zh)
+        return {
+            "cb_codes_corine_biotope": [cb_code.lb_code for cb_code in corine_biotopes]
+        }
+
+    def get_corine_landcovers(self):
+        landcovers = CorZhCorineCover.get_landcovers_by_id(self.zh.id_zh)
+        return {
+            "id_corine_landcovers": [landcover.id_cover for landcover in landcovers]
+        }
+
+    def get_activities(self):
+        q_activities = TActivity.get_activites_by_id(self.zh.id_zh)
+        activities = []
+        for activity in q_activities:
+            activities.append({
+                'id_human_activity': activity.id_activity,
+                'id_localisation': activity.id_position,
+                'ids_impact': [impact.id_cor_impact_types for impact in CorImpactList.get_impacts_by_uuid(activity.id_impact_list)],
+                'remark_activity': activity.remark_activity
+            })
+        return {
+            "activities": activities
+        }
+
+    def get_flows(self):
+        q_outflows = TOutflow.get_outflows_by_id(self.zh.id_zh)
+        q_inflows = TInflow.get_inflows_by_id(self.zh.id_zh)
+        flows = []
+        outflows = []
+        inflows = []
+        for flow in q_outflows:
+            outflows.append({
+                "id_outflow": flow['id_outflow'],
+                "id_permanance": flow['id_permanance'],
+                "topo": flow['topo']
+            })
+        flows.append({
+            "outflows": outflows
+        })
+        for flow in q_inflows:
+            inflows.append({
+                "id_inflow": flow['id_inflow'],
+                "id_permanance": flow['id_permanance'],
+                "topo": flow['topo']
+            })
+        flows.append({
+            "inflows": inflows
+        })
+        return {
+            "flows": flows
+        }
+
     def get_full_zh(self):
         full_zh = self.zh.get_geofeature()
         full_zh.properties.update(self.id_lims)
         full_zh.properties.update(self.id_lims_fs)
         full_zh.properties.update(self.id_references)
+        full_zh.properties.update(self.cb_codes_corine_biotope)
+        full_zh.properties.update(self.id_corine_landcovers)
+        full_zh.properties.update(self.activities)
+        full_zh.properties.update(self.flows)
         return full_zh
 
 
@@ -337,9 +419,9 @@ class Code(ZH):
         return BibOrganismes.get_abbrevation(self.id_org)
 
     def get_number(self):
-        q = DB.session.query(CorZhArea).join(LAreas, LAreas.id_area == CorZhArea.id_area).join(
+        number = DB.session.query(CorZhArea).join(LAreas, LAreas.id_area == CorZhArea.id_area).join(
             TZH, TZH.id_zh == CorZhArea.id_zh).filter(TZH.id_org == self.id_org, LAreas.area_code == self.get_departments()).count()
-        return q
+        return number+1
 
     def set_valid_number(self):
         if self.number > 9999:
@@ -366,26 +448,6 @@ class CorLimList(DB.Model):
     def get_lims_by_id(id):
         return DB.session.query(CorLimList).filter(
             CorLimList.id_lim_list == id).all()
-
-
-class CorZhArea(DB.Model):
-    __tablename__ = "cor_zh_area"
-    __table_args__ = {"schema": "pr_zh"}
-    id_area = DB.Column(
-        DB.Integer,
-        ForeignKey("ref_geo.l_areas.id_area"),
-        primary_key=True
-    )
-    id_zh = DB.Column(
-        DB.Integer,
-        ForeignKey(TZH.id_zh),
-        primary_key=True
-    )
-    cover = DB.Column(DB.Integer)
-
-    def get_departments(id_zh):
-        return DB.session.query(CorZhArea, LAreas, TZH).join(LAreas).filter(
-            CorZhArea.id_zh == id_zh, LAreas.id_type == 26, TZH.id_zh == id_zh).all()
 
 
 class TRiverBasin(DB.Model):
@@ -610,15 +672,57 @@ class CorImpactTypes(DB.Model):
         nullable=False
     )
 
-    def get_impact_type_list():
-        q_id_types = DB.session.query(
-            func.distinct(CorImpactTypes.id_impact_type)).all()
-        return [id[0] for id in q_id_types]
-
-    def get_impact_by_type(id_type):
+    def get_impacts():
         return DB.session.query(CorImpactTypes, TNomenclatures).join(
             TNomenclatures, TNomenclatures.id_nomenclature == CorImpactTypes.id_impact).filter(
-                and_(CorImpactTypes.id_impact_type == id_type, CorImpactTypes.active)).all()
+                CorImpactTypes.active).all()
+
+    #            and_(CorImpactTypes.id_impact_type == id_type, CorImpactTypes.active)).all()
+    # def get_impact_type_list():
+    #    q_id_types = DB.session.query(
+    #        func.distinct(CorImpactTypes.id_impact_type)).all()
+    #    return [id[0] for id in q_id_types]
+
+    # def get_impact_by_type(id_type):
+    #    return DB.session.query(CorImpactTypes, TNomenclatures).join(
+    #        TNomenclatures, TNomenclatures.id_nomenclature == CorImpactTypes.id_impact).filter(
+    #            and_(CorImpactTypes.id_impact_type == id_type, CorImpactTypes.active)).all()
+
+    # def get_mnemo_type(id_type):
+    #    if id_type:
+    #        return DB.session.query(TNomenclatures).filter(
+    #            TNomenclatures.id_nomenclature == id_type).one()
+    #    else:
+    #        return ''
+
+
+class CorMainFct(DB.Model):
+    __tablename__ = "cor_main_fct"
+    __table_args__ = {"schema": "pr_zh"}
+    id_function = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+    id_main_function = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        nullable=False
+    )
+    active = DB.Column(
+        DB.Integer,
+        nullable=False
+    )
+
+    def get_main_function_list(ids):
+        q_id_types = DB.session.query(
+            func.distinct(CorMainFct.id_main_function)).all()
+        return [id[0] for id in q_id_types if id[0] in ids]
+
+    def get_function_by_main_function(id_main):
+        return DB.session.query(CorMainFct, TNomenclatures).join(
+            TNomenclatures, TNomenclatures.id_nomenclature == CorMainFct.id_function).filter(
+                and_(CorMainFct.id_main_function == id_main, CorMainFct.active)).all()
 
     def get_mnemo_type(id_type):
         if id_type:
@@ -626,3 +730,146 @@ class CorImpactTypes(DB.Model):
                 TNomenclatures.id_nomenclature == id_type).one()
         else:
             return ''
+
+
+class CorZhCb(DB.Model):
+    __tablename__ = "cor_zh_cb"
+    __table_args__ = {"schema": "pr_zh"}
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    lb_code = DB.Column(
+        DB.Integer,
+        ForeignKey(BibCb.lb_code),
+        primary_key=True
+    )
+
+    def get_cb_by_id(id_zh):
+        return DB.session.query(CorZhCb).filter(
+            CorZhCb.id_zh == id_zh).all()
+
+
+class CorZhCorineCover(DB.Model):
+    __tablename__ = "cor_zh_corine_cover"
+    __table_args__ = {"schema": "pr_zh"}
+    id_cover = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+
+    def get_landcovers_by_id(id_zh):
+        return DB.session.query(CorZhCorineCover).filter(
+            CorZhCorineCover.id_zh == id_zh).all()
+
+
+class CorImpactList(DB.Model):
+    __tablename__ = "cor_impact_list"
+    __table_args__ = {"schema": "pr_zh"}
+    id_impact_list = DB.Column(
+        UUID(as_uuid=True),
+        ForeignKey("pr_zh.t_activity.id_impact_list", ondelete='CASCADE'),
+        primary_key=True
+    )
+    id_cor_impact_types = DB.Column(
+        DB.Integer,
+        ForeignKey(CorImpactTypes.id_cor_impact_types),
+        primary_key=True
+    )
+
+    def get_impacts_by_uuid(uuid_activity):
+        return DB.session.query(CorImpactList).filter(
+            CorImpactList.id_impact_list == uuid_activity).all()
+
+
+class TActivity(DB.Model):
+    __tablename__ = "t_activity"
+    __table_args__ = {"schema": "pr_zh"}
+    id_activity = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    id_position = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        nullable=False
+    )
+    id_impact_list = DB.Column(
+        UUID(as_uuid=True),
+        nullable=False
+    )
+    remark_activity = DB.Column(
+        DB.Unicode
+    )
+    child = relationship(CorImpactList, backref="parent", passive_deletes=True)
+
+    def get_activites_by_id(id_zh):
+        return DB.session.query(TActivity).filter(
+            TActivity.id_zh == id_zh).all()
+
+
+class TOutflow(DB.Model):
+    __tablename__ = "t_outflow"
+    __table_args__ = {"schema": "pr_zh"}
+    id_outflow = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    id_permanance = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        default=TNomenclatures.get_default_nomenclature("PERMANENCE_SORTIE"),
+    )
+    topo = DB.Column(
+        DB.Unicode
+    )
+
+    def get_outflows_by_id(id_zh):
+        return DB.session.query(TOutflow).filter(
+            TOutflow.id_zh == id_zh).all()
+
+
+class TInflow(DB.Model):
+    __tablename__ = "t_inflow"
+    __table_args__ = {"schema": "pr_zh"}
+    id_inflow = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    id_permanance = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        default=TNomenclatures.get_default_nomenclature("PERMANENCE_ENTREE"),
+    )
+    topo = DB.Column(
+        DB.Unicode
+    )
+
+    def get_inflows_by_id(id_zh):
+        return DB.session.query(TInflow).filter(
+            TInflow.id_zh == id_zh).all()

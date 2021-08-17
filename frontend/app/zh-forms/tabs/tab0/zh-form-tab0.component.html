@@ -1,107 +1,123 @@
-
-<div class="custom-container" >
+<div class="custom-container">
   <div class="row">
     <div
       class="col-xl-6 col-lg-7 col-sm-6"
-      [ngStyle]="{'min-height.px': cardContentHeight}"
+      [ngStyle]="{ 'min-height.px': cardContentHeight }"
     >
-      <zh-form-map ></zh-form-map>
+      <zh-form-map></zh-form-map>
     </div>
     <div class="col-xl-6 col-lg-5 col-sm-6">
       <form>
-        <fieldset> 
+        <fieldset>
           <legend>
             <h5 class="section-title">Champs obligatoires</h5>
           </legend>
           <div class="form-row">
             <div class="form-group col-md-12">
-                <small  class="required" >Organisme de l'opérateur </small>
-                <select 
-                    class="form-control form-control-sm" 
-                    [formControl]="form.controls.id_org">
-                    <option
-                        *ngFor="let id of idOrg"
-                        [ngValue]="id.id_org"
-                    >
-                        {{id.name}}</option>
-                </select>
-                <small *ngIf="(form.controls.id_org.touched || submitted) && form.controls.id_org.errors?.required"
+              <small class="required">Organisme de l'opérateur </small>
+              <select
+                class="form-control form-control-sm"
+                [formControl]="form.controls.id_org"
+              >
+                <option *ngFor="let id of idOrg" [ngValue]="id.id_org">
+                  {{ id.name }}
+                </option>
+              </select>
+              <small
+                *ngIf="
+                  (form.controls.id_org.touched || submitted) &&
+                  form.controls.id_org.errors?.required
+                "
                 class="error-msg"
-                >Champ requis</small>
-            </div>
-        </div>
-          <div class="form-row">
-            <div class="form-group col-md-6">
-                <small class="required">Nom Usuel</small>
-                <input
-                class="form-control "
-                type='text'
-                [formControl]="form.controls.main_name"
-                />
-                <small *ngIf="(form.controls.main_name.touched || submitted) && form.controls.main_name.errors?.required"
-                class="error-msg"
-                >Champ requis</small>
+                >Champ requis</small
+              >
             </div>
           </div>
           <div class="form-row">
-                <div class="form-group col-md-12">
-                    <small class="required">Critères de délimitation de la zone humide</small>
-                    <ng-multiselect-dropdown
-                    [placeholder]="'Critères utilisés'"
-                    [settings]="dropdownSettings"
-                    [data]="critDelim"
-                    [formControl]="form.controls.critere_delim"
-                  >
-                  </ng-multiselect-dropdown>
-                  <small *ngIf="(form.controls.critere_delim.touched || submitted) && form.controls.critere_delim.errors?.required"
-                  class="error-msg"
-                  >Champ requis</small>
-                </div>
+            <div class="form-group col-md-6">
+              <small class="required">Nom Usuel</small>
+              <input
+                class="form-control"
+                type="text"
+                [formControl]="form.controls.main_name"
+              />
+              <small
+                *ngIf="
+                  (form.controls.main_name.touched || submitted) &&
+                  form.controls.main_name.errors?.required
+                "
+                class="error-msg"
+                >Champ requis</small
+              >
             </div>
-            <div class="form-row">
-                <div class="form-group col-md-12">
-                    <small  class="required" >Présentation de la zone humide et de ses milieux </small>
-                    <select 
-                        class="form-control " 
-                        [formControl]="form.controls.sdage">
-                        <option
-                            *ngFor="let sd of sdage"
-                            [ngValue]="sd.id_nomenclature"
-                        >
-                            {{sd.mnemonique}}</option>
-                    </select>
-                    <small *ngIf="(form.controls.sdage.touched || submitted) && form.controls.sdage.errors?.required"
-                    class="error-msg"
-                    >Champ requis</small>
-                </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-12">
+              <small class="required"
+                >Critères de délimitation de la zone humide</small
+              >
+              <ng-multiselect-dropdown
+                [placeholder]="'Critères utilisés'"
+                [settings]="dropdownSettings"
+                [data]="critDelim"
+                [formControl]="form.controls.critere_delim"
+              >
+              </ng-multiselect-dropdown>
+              <small
+                *ngIf="
+                  (form.controls.critere_delim.touched || submitted) &&
+                  form.controls.critere_delim.errors?.required
+                "
+                class="error-msg"
+                >Champ requis</small
+              >
             </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-12">
+              <small class="required"
+                >Présentation de la zone humide et de ses milieux
+              </small>
+              <select class="form-control" [formControl]="form.controls.sdage">
+                <option *ngFor="let sd of sdage" [ngValue]="sd.id_nomenclature">
+                  {{ sd.mnemonique }}
+                </option>
+              </select>
+              <small
+                *ngIf="
+                  (form.controls.sdage.touched || submitted) &&
+                  form.controls.sdage.errors?.required
+                "
+                class="error-msg"
+                >Champ requis</small
+              >
+            </div>
+          </div>
         </fieldset>
       </form>
-      <div class="navigate-btn">
+      <div class="footer-btn">
         <button
-            type="submit"
-            mat-raised-button
-            color="warn"
-            [disabled]="posted"
-            (click)="onCancel()"
+          type="submit"
+          mat-raised-button
+          color="warn"
+          [disabled]="posted"
+          (click)="onCancel()"
         >
-          Annuler
+          Quitter
         </button>
         <button
           type="submit"
           mat-raised-button
-          color=primary
+          color="primary"
           class="ml-3"
           [disabled]="posted"
           (click)="onFormSubmit(form.value)"
         >
-        <mat-icon *ngIf="!posted">save_outline</mat-icon>
-        <mat-spinner *ngIf="posted" [diameter]="20" ></mat-spinner>
-        Suivant
+          <mat-icon *ngIf="!posted">save_outline</mat-icon>
+          <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
+          Enregistrer
         </button>
-
       </div>
     </div>
   </div>
 </div>
-

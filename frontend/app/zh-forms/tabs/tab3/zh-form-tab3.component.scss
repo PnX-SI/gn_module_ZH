@@ -1,1 +1,21 @@
 @import "../../../../app.module";
+.backToLigne {
+  white-space: pre;
+}
+.footer-btn {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 36px;
+  margin-bottom: 36px;
+}
+
+select.activities-select option:disabled {
+  color: #d9d9d9;
+}
+
+::ng-deep angular2-multiselect.ng-invalid {
+  border-left: none !important;
+  .cuppa-dropdown {
+    border-left: 5px solid #ff0000 !important;
+  }
+}

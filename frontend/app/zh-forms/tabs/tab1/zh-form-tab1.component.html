@@ -1,189 +1,209 @@
-<form [formGroup]="generalInfoForm">
+<div>
+  <form [formGroup]="generalInfoForm">
     <fieldset>
-        <legend>
-            <h5 class="section-title">Identification</h5>
-        </legend>
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <small class="required">Nom Usuel</small>
-                <input
-                class="form-control "
-                type='text'
-                [formControl]="generalInfoForm.controls.main_name"
-                />
-                <small *ngIf="(generalInfoForm.controls.main_name.touched || submitted) && generalInfoForm.controls.main_name.errors?.required"
-                class="error-msg"
-                >Champ requis</small>
-            </div>
-            <div class="form-group col-md-6">
-                <small>Autre nom</small>
-                <input
-                    class="form-control "
-                    type='text'
-                    [formControl]="generalInfoForm.controls.secondary_name"
-                />
-            </div>
+      <legend>
+        <h5 class="section-title">Identification</h5>
+      </legend>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <small class="required">Nom Usuel</small>
+          <input
+            class="form-control"
+            type="text"
+            [formControl]="generalInfoForm.controls.main_name"
+          />
+          <small
+            *ngIf="
+              (generalInfoForm.controls.main_name.touched || submitted) &&
+              generalInfoForm.controls.main_name.errors?.required
+            "
+            class="error-msg"
+            >Champ requis</small
+          >
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <small style="display: block; margin-bottom: 8px;">Partie d'un grand ensemble ?</small>
-                <mat-label ngClass="labelBeforeSlide">Non</mat-label>
-                <mat-slide-toggle
-                [formControl]="generalInfoForm.controls.is_id_site_space">oui</mat-slide-toggle>    
-            </div>
-            <div *ngIf="hasSiteSpace" class="form-group col-md-6">
-                <small>Nom du grand ensemble</small>
-                <select 
-                    list="grandEnsemble"
-                    name="grandEnsemble"
-                    class="form-control " 
-                    [formControl]="generalInfoForm.controls.id_site_space">      
-                    <option [ngValue]=null></option>
-                    <option *ngFor="let siteSpace of siteSpaceList" [ngValue]=siteSpace.id_site_space>{{siteSpace.name}}</option>
-                </select>
-            </div>
+        <div class="form-group col-md-6">
+          <small>Autre nom</small>
+          <input
+            class="form-control"
+            type="text"
+            [formControl]="generalInfoForm.controls.secondary_name"
+          />
         </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <small style="display: block; margin-bottom: 8px"
+            >Partie d'un grand ensemble ?</small
+          >
+          <mat-label ngClass="labelBeforeSlide">Non</mat-label>
+          <mat-slide-toggle
+            [formControl]="generalInfoForm.controls.is_id_site_space"
+            >oui</mat-slide-toggle
+          >
+        </div>
+        <div *ngIf="hasSiteSpace" class="form-group col-md-6">
+          <small>Nom du grand ensemble</small>
+          <select
+            list="grandEnsemble"
+            name="grandEnsemble"
+            class="form-control"
+            [formControl]="generalInfoForm.controls.id_site_space"
+          >
+            <option [ngValue]="null"></option>
+            <option
+              *ngFor="let siteSpace of siteSpaceList"
+              [ngValue]="siteSpace.id_site_space"
+            >
+              {{ siteSpace.name }}
+            </option>
+          </select>
+        </div>
+      </div>
     </fieldset>
     <fieldset>
-        <legend>
-            <h5 class="section-title">Principales références bibliographiques</h5>
-        </legend>
-        <div class="form-row">
-            <div class="form-group  col-md-6">
-                <pnx-autocomplete
-                apiEndPoint="{{appConfig.API_ENDPOINT}}/zones_humides/references/autocomplete"
-                [searchAsParameter]="false"
-                [parentFormControl]="generalInfoForm.controls.bibRef"
-                queryParamSearch="search_title"
-                keyValue="title"
-                [formatter]="formatter"
-                label="Références bibliographiques"
-                placeholder="Tapez les premières lettres..."
-                (onChange)="onSelectBib($event)"
-                >
-                </pnx-autocomplete>
-            </div>  
-            <div class="form-group d-flex align-items-end col-md-6">
-                <button
-                    mat-raised-button
-                    color="primary"
-                    (click)="onCreateBib($event, bibModal)"
-                >
-                <mat-icon>add_box</mat-icon>
-                    Créer
-                </button>
-            </div>
+      <legend>
+        <h5 class="section-title">Principales références bibliographiques</h5>
+      </legend>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <small>Références bibliographiques</small>
+          <input
+            id="typeahead-basic"
+            type="text"
+            class="form-control"
+            placeholder="Tapez les premières lettres..."
+            [(ngModel)]="autocompleteBib"
+            [ngModelOptions]="{ standalone: true }"
+            [resultFormatter]="formatter"
+            [inputFormatter]="formatter"
+            [ngbTypeahead]="search"
+            (selectItem)="onSelectBib($event)"
+          />
         </div>
-      <div *ngIf="listBib && listBib.length > 0" class="card-body table-responsive">
+        <div class="form-group d-flex align-items-end col-md-6">
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="onCreateBib($event, bibModal)"
+          >
+            <mat-icon>add_box</mat-icon>
+            Créer
+          </button>
+        </div>
+      </div>
+      <div
+        *ngIf="listBib && listBib.length > 0"
+        class="card-body table-responsive"
+      >
         <table class="table">
-            <thead class="thead-inverse table-header">
-                <tr>
-                    <th *ngFor="let col of cols">{{col}}</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let bib of listBib">
-                    <td *ngFor="let col of cols">{{bib[col]}}</td>
-                    <td>
-                        <div>
-                            <button mat-icon-button class="mr-2"
-                             >
-                             <mat-icon class="edit-icon" (click)="onEditBib(bibModal, bib)" >edit</mat-icon>
-                            </button>
-                            <button mat-icon-button (click)="onDeleteBib(bib.id_reference)">
-                                <mat-icon class="delete-icon" >close</mat-icon>
-                              </button>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
+          <thead class="thead-inverse table-header">
+            <tr>
+              <th *ngFor="let col of cols">{{ col }}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let bib of listBib">
+              <td *ngFor="let col of cols">{{ bib[col] }}</td>
+              <td>
+                <div>
+                  <button mat-icon-button class="mr-2">
+                    <mat-icon
+                      class="edit-icon"
+                      (click)="onEditBib(bibModal, bib)"
+                      >edit</mat-icon
+                    >
+                  </button>
+                  <button
+                    mat-icon-button
+                    (click)="onDeleteBib(bib.id_reference)"
+                  >
+                    <mat-icon class="delete-icon">close</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
         </table>
-    </div>
+      </div>
     </fieldset>
-</form>
-<div class="navigate-btn">
-    <button
-        mat-raised-button
-        color="warn"
-        [disabled]="posted"
-        (click)="onPrevious()"
-    >
-    Précédent
-    </button>
+  </form>
+  <div class="footer-btn">
     <button
       type="submit"
       mat-raised-button
-      color=primary
+      color="primary"
       class="ml-3"
       [disabled]="posted"
       (click)="onFormSubmit(generalInfoForm.value)"
     >
-    <mat-icon *ngIf="!posted">save_outline</mat-icon>
-    <mat-spinner *ngIf="posted" [diameter]="20" ></mat-spinner>
-    Suivant
+      <mat-icon *ngIf="!posted">save_outline</mat-icon>
+      <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
+      Enregistrer
     </button>
+  </div>
 </div>
 <!-- MODAL bib -->
-<ng-template
- #bibModal
- let-c="close"
- let-d="dismiss"
->
+<ng-template #bibModal let-c="close" let-d="dismiss">
   <div class="modal-header">
-    <h6>{{modalBibTitle}}</h6>
-    <button mat-icon-button class="closeModalBtn" (click)="c();">
-        <mat-icon class="cancel-icon">cancel</mat-icon>
-      </button>
+    <h6>{{ modalBibTitle }}</h6>
+    <button mat-icon-button class="closeModalBtn" (click)="c()">
+      <mat-icon class="cancel-icon">cancel</mat-icon>
+    </button>
   </div>
   <div class="modal-body">
     <form [formGroup]="bibForm">
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <small class="required">Titre du docuemnt</small>
-                <input
-                    ngbAutofocus
-                    [formControl]="bibForm.controls.title"
-                    class="form-control "
-                    type='text'
-                />
-                <small *ngIf="(bibForm.controls.title.touched || submitted) && bibForm.controls.title.errors?.required"
-                class="error-msg"
-                >Champ requis</small>
-            </div>
-            <div class="form-group col-md-6">
-                <small>Auteurs</small>
-                <input
-                    [formControl]="bibForm.controls.authors"
-                    class="form-control "
-                    type='text'
-                />
-            </div>
-            <div class="form-group col-md-6">
-                <small>Année de parution</small>
-                <input
-                    [formControl]="bibForm.controls.pub_year"
-                    class="form-control "
-                    type='text'
-                />
-            </div>
-            <div class="form-group col-md-6">
-                <small>Editeur</small>
-                <input
-                    [formControl]="bibForm.controls.editor"
-                    class="form-control "
-                    type='text'
-                />
-            </div>
-            <div class="form-group col-md-6">
-                <small>Lieu</small>
-                <input
-                    [formControl]="bibForm.controls.editor_location"
-                    class="form-control "
-                    type='text'
-                />
-            </div>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <small class="required">Titre du docuemnt</small>
+          <input
+            ngbAutofocus
+            [formControl]="bibForm.controls.title"
+            class="form-control"
+            type="text"
+          />
+          <small
+            *ngIf="
+              (bibForm.controls.title.touched || submitted) &&
+              bibForm.controls.title.errors?.required
+            "
+            class="error-msg"
+            >Champ requis</small
+          >
         </div>
+        <div class="form-group col-md-6">
+          <small>Auteurs</small>
+          <input
+            [formControl]="bibForm.controls.authors"
+            class="form-control"
+            type="text"
+          />
+        </div>
+        <div class="form-group col-md-6">
+          <small>Année de parution</small>
+          <input
+            [formControl]="bibForm.controls.pub_year"
+            class="form-control"
+            type="text"
+          />
+        </div>
+        <div class="form-group col-md-6">
+          <small>Editeur</small>
+          <input
+            [formControl]="bibForm.controls.editor"
+            class="form-control"
+            type="text"
+          />
+        </div>
+        <div class="form-group col-md-6">
+          <small>Lieu</small>
+          <input
+            [formControl]="bibForm.controls.editor_location"
+            class="form-control"
+            type="text"
+          />
+        </div>
+      </div>
     </form>
   </div>
   <div class="modal-footer">
@@ -192,11 +212,11 @@
       mat-raised-button
       color="primary"
       class="uppercase"
-      (click)="patchBib?  onPatchBib() : onAddBib()"
-      [disabled] ="postedBib"
+      (click)="patchBib ? onPatchBib() : onAddBib()"
+      [disabled]="postedBib"
     >
-    <mat-spinner *ngIf="postedBib" [diameter]="20" ></mat-spinner>
-    {{modalBibButtonLabel}} 
-  </button>
-</div>
-
+      <mat-spinner *ngIf="postedBib" [diameter]="20"></mat-spinner>
+      {{ modalBibButtonLabel }}
+    </button>
+  </div>
+</ng-template>

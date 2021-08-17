@@ -2,8 +2,6 @@ CREATE SCHEMA IF NOT EXISTS pr_zh;
 
 CREATE SEQUENCE pr_zh.bib_actions_id_action_seq START WITH 1 INCREMENT BY 1;
 
-CREATE SEQUENCE pr_zh.cor_impacts_id_impacts_seq START WITH 1 INCREMENT BY 1;
-
 CREATE SEQUENCE pr_zh.cor_lim_list_seq START WITH 1 INCREMENT BY 1;
 
 CREATE SEQUENCE pr_zh.cor_main_fct_seq START WITH 1 INCREMENT BY 1;
@@ -132,6 +130,14 @@ CREATE  TABLE pr_zh.t_fct_area (
  );
 
 COMMENT ON TABLE pr_zh.t_fct_area IS 'Espaces de fonctionnalités';
+
+CREATE  TABLE pr_zh.cor_zh_cb ( 
+	id_zh                integer  NOT NULL ,
+	lb_code              varchar(50)  NOT NULL ,
+	CONSTRAINT pk_cor_zh_cb PRIMARY KEY ( id_zh, lb_code )
+ );
+
+COMMENT ON TABLE pr_zh.cor_zh_cb IS 'Correspondance zh et corine biotope';
 
 CREATE  TABLE pr_zh.t_hydro_area ( 
 	id_hydro             integer  NOT NULL ,
@@ -301,10 +307,9 @@ COMMENT ON COLUMN pr_zh.t_zh.remark_eval_thread IS 'remarque sur les menaces et 
 COMMENT ON COLUMN pr_zh.t_zh.remark_eval_actions IS 'remarque sur les orientations d''actions de la zh dans l''evaluation generale du site. 7.4';
 
 CREATE  TABLE pr_zh.cor_impact_list ( 
-	id_impact_list       integer DEFAULT nextval('pr_zh.cor_impacts_id_impacts_seq'::regclass) NOT NULL ,
+	id_impact_list       uuid NOT NULL ,
 	id_cor_impact_types  integer  NOT NULL ,
-	CONSTRAINT pk_cor_activity_impact PRIMARY KEY ( id_impact_list, id_cor_impact_types ),
-	CONSTRAINT unq_t_impacts_id_impacts UNIQUE ( id_impact_list ) 
+	CONSTRAINT pk_cor_activity_impact PRIMARY KEY ( id_impact_list, id_cor_impact_types )
  );
 
 COMMENT ON TABLE pr_zh.cor_impact_list IS 'liste des impacts liés aux activités';
@@ -403,7 +408,7 @@ CREATE  TABLE pr_zh.t_activity (
 	id_activity          integer  NOT NULL ,
 	id_zh                integer  NOT NULL ,
 	id_position          integer  NOT NULL ,
-	id_impact_list       integer   ,
+	id_impact_list       uuid NOT NULL UNIQUE  ,
 	remark_activity      varchar(2000)   ,
 	CONSTRAINT pk_t_activity PRIMARY KEY ( id_activity, id_zh )
  );
@@ -528,6 +533,8 @@ COMMENT ON COLUMN pr_zh.t_management_plans.duration IS 'en année';
 
 ALTER TABLE pr_zh.cor_impact_list ADD CONSTRAINT fk_cor_activity_id_impact FOREIGN KEY ( id_cor_impact_types ) REFERENCES pr_zh.cor_impact_types( id_cor_impact_types )  ON UPDATE CASCADE;
 
+ALTER TABLE pr_zh.cor_impact_list ADD CONSTRAINT fk_id_impact_list FOREIGN KEY ( id_impact_list ) REFERENCES pr_zh.t_activity( id_impact_list )  ON UPDATE CASCADE ON DELETE CASCADE;
+
 ALTER TABLE pr_zh.cor_impact_types ADD CONSTRAINT fk_cor_impact_types_id_impact FOREIGN KEY ( id_impact ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_impact_types ADD CONSTRAINT fk_cor_impact_types_id_impact_type FOREIGN KEY ( id_impact_type ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
@@ -561,6 +568,10 @@ ALTER TABLE pr_zh.cor_urban_type_range ADD CONSTRAINT fk_cor_urban_range FOREIGN
 ALTER TABLE pr_zh.cor_urban_type_range ADD CONSTRAINT fk_cor_urban_type FOREIGN KEY ( id_doc_type ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_zh_area ADD CONSTRAINT fk_cor_zh_area_id_area FOREIGN KEY ( id_area ) REFERENCES ref_geo.l_areas( id_area )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.cor_zh_cb ADD CONSTRAINT fk_cor_zh_cb_id_zh FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh )  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.cor_zh_cb ADD CONSTRAINT fk_cor_zh_cb_lb_code FOREIGN KEY ( lb_code ) REFERENCES pr_zh.bib_cb( lb_code )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_zh_corine_cover ADD CONSTRAINT fk_cor_zh_cover_t_updates FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh ) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -601,8 +612,6 @@ ALTER TABLE pr_zh.t_activity ADD CONSTRAINT fk_t_activity FOREIGN KEY ( id_activ
 ALTER TABLE pr_zh.t_activity ADD CONSTRAINT fk_t_activity_t_zh FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh ) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.t_activity ADD CONSTRAINT fk_t_activity_position_t_nomenclatures FOREIGN KEY ( id_position ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
-
-ALTER TABLE pr_zh.t_activity ADD CONSTRAINT fk_t_activity_t_impacts FOREIGN KEY ( id_impact_list ) REFERENCES pr_zh.cor_impact_list( id_impact_list )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.t_functions ADD CONSTRAINT fk_t_functions_t_nomenclatures_qualification FOREIGN KEY ( id_qualification ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 

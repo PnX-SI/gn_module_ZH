@@ -11,4 +11,20 @@
 }
 ::ng-deep .mat-tab-list .mat-tab-labels .mat-tab-label-active {
   background-color: #1d1d1d24;
+  opacity: 1 !important;
+}
+::ng-deep .mat-tab-list .mat-tab-labels .cdk-program-focused {
+  background-color: rgba(0, 0, 0, 0) !important;
+  opacity: 0.6 !important;
+}
+.modal-body {
+  padding: 20px;
+}
+
+.modal-header {
+  padding: 10px;
+  color: rgb(128, 46, 46);
+  display: flex;
+  justify-content: center;
+  background-color: #ffcc00;
 }
