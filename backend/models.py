@@ -873,3 +873,31 @@ class TInflow(DB.Model):
     def get_inflows_by_id(id_zh):
         return DB.session.query(TInflow).filter(
             TInflow.id_zh == id_zh).all()
+
+
+class CorUrbanTypeRange(DB.Model):
+    __tablename__ = "cor_urban_type_range"
+    __table_args__ = {"schema": "pr_zh"}
+    id_cor = DB.Column(
+        DB.Integer,
+        primary_key=True
+    )
+    id_range_type = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature)
+    )
+    id_doc_type = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature)
+    )
+
+    def get_range_by_doc(doc_id):
+        q_ranges = DB.session.query(CorUrbanTypeRange).filter(
+            CorUrbanTypeRange.id_range_type == doc_id).all()
+        ranges = []
+        for range in q_ranges:
+            ranges.append({
+                "id_nomenclature": range.id_doc_type,
+                "mnemonique": DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == range.id_doc_type).one().mnemonique
+            })
+        return ranges

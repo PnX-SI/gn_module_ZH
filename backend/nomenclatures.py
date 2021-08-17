@@ -3,7 +3,8 @@ from .models import (
     CorSdageSage,
     BibCb,
     CorImpactTypes,
-    CorMainFct
+    CorMainFct,
+    CorUrbanTypeRange
 )
 
 from pypnnomenclature.models import (
@@ -104,6 +105,18 @@ def get_function_list(mnemo):
     return list_by_main_function
 
 
+def get_urban_docs(mnemo):
+    q_urban_docs = Nomenclatures.get_nomenclature_info("TYP_DOC_COMM")
+    urban_docs = []
+    for doc in q_urban_docs:
+        urban_docs.append({
+            "id_nomenclature": doc.id_nomenclature,
+            "mnemonique": doc.mnemonique,
+            "type_classement": CorUrbanTypeRange.get_range_by_doc(doc.id_nomenclature)
+        })
+    return urban_docs
+
+
 def get_nomenc(config):
     nomenc_info = {}
     for mnemo in config:
@@ -119,6 +132,9 @@ def get_nomenc(config):
         elif mnemo == 'SDAGE-SAGE':
             list_by_sdage = get_sage_list()
             nomenc_info.update({mnemo: list_by_sdage})
+        elif mnemo == 'TYP_DOC_COMM':
+            nomenc_list = get_urban_docs(mnemo)
+            nomenc_info.update({mnemo: nomenc_list})
         else:
             nomenc = Nomenclatures.get_nomenclature_info(mnemo)
             nomenc_list = []
