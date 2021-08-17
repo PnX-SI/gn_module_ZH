@@ -309,6 +309,11 @@ class ZH(TZH):
         self.id_corine_landcovers = self.get_corine_landcovers()
         self.activities = self.get_activities()
         self.flows = self.get_flows()
+        self.fonctions_hydro = self.get_functions('FONCTIONS_HYDRO')
+        self.fonctions_bio = self.get_functions('FONCTIONS_BIO')
+        self.interet_patrim = self.get_functions('INTERET_PATRIM')
+        self.val_soc_eco = self.get_functions('VAL_SOC_ECO')
+        self.hab_heritages = self.get_hab_heritages()
 
     def get_id_lims(self):
         lim_list = CorLimList.get_lims_by_id(self.zh.id_lim_list)
@@ -382,6 +387,21 @@ class ZH(TZH):
             "flows": flows
         }
 
+    def get_functions(self, category):
+        q_functions = TFunctions.get_functions_by_id_and_category(
+            self.zh.id_zh, category)
+        functions = []
+        for function in functions:
+            function.append({
+                'id_function': function.id_function,
+                'justification': function.justification,
+                'id_qualification': function.id_qualification,
+                'id_knowledge': function.id_knowledge
+            })
+        return {
+            category: functions
+        }
+
     def get_full_zh(self):
         full_zh = self.zh.get_geofeature()
         full_zh.properties.update(self.id_lims)
@@ -391,6 +411,11 @@ class ZH(TZH):
         full_zh.properties.update(self.id_corine_landcovers)
         full_zh.properties.update(self.activities)
         full_zh.properties.update(self.flows)
+        full_zh.properties.update(self.fonctions_hydro)
+        full_zh.properties.update(self.fonctions_bio)
+        full_zh.properties.update(self.interet_patrim)
+        full_zh.properties.update(self.val_soc_eco)
+        full_zh.properties.update(self.hab_heritages)
         return full_zh
 
 
@@ -920,6 +945,14 @@ class TFunctions(DB.Model):
         default=TNomenclatures.get_default_nomenclature(
             "FONCTIONS_CONNAISSANCE"),
     )
+
+    def get_functions_by_id_and_category(id_zh, category):
+        id_function_list = [
+            nomenclature.id_nomenclature for nomenclature in Nomenclatures.get_nomenclature_info(category)
+        ]
+        return DB.session.query(TFunctions).filter(
+            TFunctions.id_zh == id_zh).filter(
+                TFunctions.id_function.in_(id_function_list)).all()
 
 
 class THabHeritage(DB.Model):
