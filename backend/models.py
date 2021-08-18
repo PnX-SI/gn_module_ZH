@@ -129,6 +129,13 @@ class BibSiteSpace(DB.Model):
     id_site_space = DB.Column(DB.Integer, primary_key=True)
     name = DB.Column(DB.Unicode)
 
+    def get_bib_site_spaces():
+        bib_site_spaces = DB.session.query(BibSiteSpace).all()
+        bib_site_spaces_list = [
+            bib_site_space.as_dict() for bib_site_space in bib_site_spaces
+        ]
+        return bib_site_spaces_list
+
 
 @serializable
 class BibOrganismes(DB.Model):
@@ -156,6 +163,19 @@ class BibOrganismes(DB.Model):
         org = DB.session.query(BibOrganismes).filter(
             BibOrganismes.id_org == id_org).one()
         return org.abbrevation
+
+    def get_bib_organisms(org_type):
+        bib_organismes = DB.session.query(BibOrganismes).all()
+        if org_type == "operator":
+            is_op_org = True
+        elif org_type == "management_structure":
+            is_op_org = False
+        else:
+            return "error in org type", 500
+        bib_organismes_list = [
+            bib_org.as_dict() for bib_org in bib_organismes if bib_org.is_op_org == is_op_org
+        ]
+        return bib_organismes_list
 
 
 @serializable
@@ -932,9 +952,11 @@ class CorProtectionLevelType(DB.Model):
         for protection in q_protection_types:
             protection_status.append({
                 "id_protection_status": protection.id_protection_status,
-                "mnemonique_status": DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == protection.id_protection_status).one().mnemonique,
+                "mnemonique_status": DB.session.query(TNomenclatures).filter(
+                    TNomenclatures.id_nomenclature == protection.id_protection_status).one().mnemonique,
                 "id_protection_level": protection.id_protection_level,
-                "mnemonique_level": DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == protection.id_protection_level).one().mnemonique
+                "mnemonique_level": DB.session.query(TNomenclatures).filter(
+                    TNomenclatures.id_nomenclature == protection.id_protection_level).one().mnemonique
 
             })
         return protection_status
