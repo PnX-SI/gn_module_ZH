@@ -80,6 +80,14 @@ export class ZhFormTab3Component implements OnInit {
       groupBy: "category",
     };
 
+    this.activityForm = this.fb.group({
+      human_activity: [null, Validators.required],
+      localisation: [null, Validators.required],
+      impacts: [null, Validators.required],
+      remark_activity: null,
+      frontId: null,
+    });
+
     this.getMetaData();
     this.createForm();
     this.initTab();
@@ -93,13 +101,77 @@ export class ZhFormTab3Component implements OnInit {
   }
 
   initTab() {
+    this.listActivity = [];
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
         this._currentZh = zh;
+        this.listActivity = [];
+        const corineLandcovers = [];
+        this.formMetaData.OCCUPATION_SOLS.forEach((critere) => {
+          if (
+            this._currentZh.properties.id_corine_landcovers.includes(
+              critere.id_nomenclature
+            )
+          ) {
+            corineLandcovers.push(critere);
+          }
+        });
+        if (
+          this._currentZh.properties.cb_codes_corine_biotope &&
+          this._currentZh.properties.cb_codes_corine_biotope.length > 0
+        ) {
+          this.listCorinBio = this.corinBioMetaData.filter((v) =>
+            this._currentZh.properties.cb_codes_corine_biotope.includes(
+              v.CB_code
+            )
+          );
+          this._currentZh.properties.activities.forEach((activity) => {
+            let impacts = [];
+            activity.ids_impact.forEach((impact) => {
+              impacts.push(
+                this.formMetaData["IMPACTS"].find((item) => {
+                  return item.id_cor_impact_types == impact;
+                })
+              );
+            });
+            let impactNames = impacts.map((item) => {
+              return item["mnemonique"];
+            });
+
+            this.listActivity.push({
+              frontId: activity.id_human_activity,
+              human_activity: {
+                id_nomenclature: activity.id_human_activity,
+                mnemonique: this.formMetaData["ACTIV_HUM"].find((item) => {
+                  return item.id_nomenclature == activity.id_human_activity;
+                }).mnemonique,
+              },
+              localisation: {
+                id_nomenclature: activity.id_localisation,
+                mnemonique: this.formMetaData["LOCALISATION"].find((item) => {
+                  return item.id_nomenclature == activity.id_localisation;
+                }).mnemonique,
+              },
+              remark_activity: activity.remark_activity,
+              impacts: {
+                impacts: impacts,
+                mnemonique: impactNames.join("\r\n"),
+              },
+            });
+
+            this.activitiesInput.map((item) => {
+              if (item.id_nomenclature == activity.id_human_activity) {
+                item.disabled = true;
+              }
+            });
+          });
+        }
+        console.log("  this.listActivity", this.listActivity);
+
         this.form.patchValue({
           id_sdage: this._currentZh.properties.id_sdage,
           id_sage: this._currentZh.properties.id_sage,
-          id_corine_landcovers: this._currentZh.properties.id_corine_landcovers,
+          id_corine_landcovers: corineLandcovers,
           remark_pres: this._currentZh.properties.remark_pres,
           id_thread: this._currentZh.properties.id_thread,
           global_remark_activity:
@@ -189,13 +261,6 @@ export class ZhFormTab3Component implements OnInit {
     this.patchActivity = false;
     this.modalButtonLabel = "Ajouter";
     this.modalTitle = "Ajout d'une activié humaine";
-    this.activityForm = this.fb.group({
-      human_activity: [null, Validators.required],
-      localisation: [null, Validators.required],
-      impacts: [null, Validators.required],
-      remark_activity: null,
-      frontId: null,
-    });
     event.stopPropagation();
     this.ngbModal.open(modal, {
       centered: true,
@@ -218,7 +283,7 @@ export class ZhFormTab3Component implements OnInit {
           return item["mnemonique"];
         });
         let acrivityToAdd = {
-          frontId: Date.now(),
+          frontId: activity.human_activity.id_nomenclature,
           human_activity: activity.human_activity,
           localisation: activity.localisation,
           remark_activity: activity.remark_activity,
@@ -250,9 +315,15 @@ export class ZhFormTab3Component implements OnInit {
     this.modalButtonLabel = "Modifier";
     this.modalTitle = "Modifier l'activié humaine";
     this.selectedItems = activity.impacts.impacts;
+    const selectedActivity = this.activitiesInput.find(
+      (item) => item.id_nomenclature == activity.human_activity.id_nomenclature
+    );
+    const selecteLocalisation = this.formMetaData["LOCALISATION"].find(
+      (item) => item.id_nomenclature == activity.localisation.id_nomenclature
+    );
     this.activityForm.patchValue({
-      human_activity: activity.human_activity,
-      localisation: activity.localisation,
+      human_activity: selectedActivity,
+      localisation: selecteLocalisation,
       impacts: activity.impacts.impacts,
       remark_activity: activity.remark_activity,
       frontId: activity.frontId,
@@ -321,11 +392,10 @@ export class ZhFormTab3Component implements OnInit {
   onFormSubmit() {
     if (this.form.valid) {
       this.submitted = true;
-
       let formToPost = {
         id_zh: Number(this._currentZh.properties.id_zh),
         id_sdage: this.form.value.id_sdage,
-        id_sage: this.form.value.id_sdage,
+        id_sage: this.form.value.id_sage,
         id_corine_landcovers: [],
         corine_biotopes: this.listCorinBio,
         remark_pres: this.form.value.remark_pres,
@@ -339,13 +409,19 @@ export class ZhFormTab3Component implements OnInit {
         });
       }
       this.posted = true;
+
       this._dataService.postDataForm(formToPost, 3).subscribe(
         () => {
-          this.posted = false;
-          this.canChangeTab.emit(true);
-          this._toastr.success("Vos données sont bien enregistrées", "", {
-            positionClass: "toast-top-right",
-          });
+          this._dataService
+            .getZhById(this._currentZh.properties.id_zh)
+            .subscribe((zh: any) => {
+              this._dataService.setCurrentZh(zh);
+              this.posted = false;
+              this.canChangeTab.emit(true);
+              this._toastr.success("Vos données sont bien enregistrées", "", {
+                positionClass: "toast-top-right",
+              });
+            });
         },
         (error) => {
           this.posted = false;

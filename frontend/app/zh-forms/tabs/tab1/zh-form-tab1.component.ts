@@ -53,7 +53,7 @@ export class ZhFormTab1Component implements OnInit {
     this.createForm();
     this.initTab();
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
-      this.$_fromChangeSub.unsubscribe();
+      if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
       if (tabPosition == 1) {
         this.initTab();
       }
@@ -153,11 +153,16 @@ export class ZhFormTab1Component implements OnInit {
       this.posted = true;
       this._dataService.postDataForm(formToPost, 1).subscribe(
         () => {
-          this.posted = false;
-          this.canChangeTab.emit(true);
-          this._toastr.success("Vos données sont bien enregistrées", "", {
-            positionClass: "toast-top-right",
-          });
+          this._dataService
+            .getZhById(this._currentZh.properties.id_zh)
+            .subscribe((zh: any) => {
+              this._dataService.setCurrentZh(zh);
+              this.posted = false;
+              this.canChangeTab.emit(true);
+              this._toastr.success("Vos données sont bien enregistrées", "", {
+                positionClass: "toast-top-right",
+              });
+            });
         },
         (error) => {
           this.posted = false;
