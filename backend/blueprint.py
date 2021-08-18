@@ -185,7 +185,7 @@ def get_tab(info_role):
         metadata["BIB_ORGANISMES"] = BibOrganismes.get_bib_organisms(
             "operator")
         metadata["BIB_SITE_SPACE"] = BibSiteSpace.get_bib_site_spaces()
-        metadata["MANAGEMENT_STRUCTURES"] = BibOrganismes.get_bib_organisms(
+        metadata["BIB_MANAGEMENT_STRUCTURES"] = BibOrganismes.get_bib_organisms(
             "management_structure")
         return metadata
     except Exception as e:
