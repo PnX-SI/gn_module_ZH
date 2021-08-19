@@ -45,7 +45,8 @@ from .models import (
     BibOrganismes,
     ZH,
     CorZhCb,
-    CorZhCorineCover
+    CorZhCorineCover,
+    BibActions
 )
 
 from .nomenclatures import get_nomenc
@@ -187,6 +188,7 @@ def get_tab(info_role):
         metadata["BIB_SITE_SPACE"] = BibSiteSpace.get_bib_site_spaces()
         metadata["BIB_MANAGEMENT_STRUCTURES"] = BibOrganismes.get_bib_organisms(
             "management_structure")
+        metadata["BIB_ACTIONS"] = BibActions.get_bib_actions()
         return metadata
     except Exception as e:
         raise ZHApiError(message=str(e), details=str(e))
