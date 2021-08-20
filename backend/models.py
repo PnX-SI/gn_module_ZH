@@ -391,8 +391,8 @@ class ZH(TZH):
         q_functions = TFunctions.get_functions_by_id_and_category(
             self.zh.id_zh, category)
         functions = []
-        for function in functions:
-            function.append({
+        for function in q_functions:
+            functions.append({
                 'id_function': function.id_function,
                 'justification': function.justification,
                 'id_qualification': function.id_qualification,
