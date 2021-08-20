@@ -51,25 +51,7 @@ from .models import (
 
 from .nomenclatures import get_nomenc
 
-from .forms import (
-    create_zh,
-    update_zh_tab0,
-    update_zh_tab1,
-    update_refs,
-    update_activities,
-    update_zh_tab3,
-    update_corine_biotopes,
-    update_corine_landcover,
-    update_delim,
-    update_fct_delim,
-    update_zh_tab2,
-    update_outflow,
-    update_inflow,
-    update_zh_tab4,
-    update_functions,
-    update_zh_tab5,
-    update_hab_heritages
-)
+from .forms import *
 
 from .repositories import (
     ZhRepository
@@ -382,6 +364,13 @@ def get_tab_data(id_tab, info_role):
             update_zh_tab5(form_data)
             update_hab_heritages(
                 form_data['id_zh'], form_data['hab_heritages'])
+            DB.session.commit()
+            return {"id_zh": form_data['id_zh']}, 200
+
+        if id_tab == 7:
+            update_zh_tab7(form_data)
+            update_actions(
+                form_data['id_zh'], form_data['actions'])
             DB.session.commit()
             return {"id_zh": form_data['id_zh']}, 200
 
