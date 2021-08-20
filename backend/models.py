@@ -334,6 +334,7 @@ class ZH(TZH):
         self.interet_patrim = self.get_functions('INTERET_PATRIM')
         self.val_soc_eco = self.get_functions('VAL_SOC_ECO')
         self.hab_heritages = self.get_hab_heritages()
+        self.actions = self.get_actions()
         self.eval_fonctions_hydro = self.get_functions(
             'FONCTIONS_HYDRO', is_eval=True)
         self.eval_fonctions_bio = self.get_functions(
@@ -443,6 +444,19 @@ class ZH(TZH):
             "hab_heritages": hab_heritages
         }
 
+    def get_actions(self):
+        q_actions = TActions.get_actions_by_id(self.zh.id_zh)
+        actions = []
+        for action in q_actions:
+            actions.append({
+                'id_action': action.id_action,
+                'id_priority_level': action.id_priority_level,
+                'remark': action.remark
+            })
+        return {
+            "actions": actions
+        }
+
     def get_fauna_nb(self):
         try:
             vertebrates = int(self.zh.as_dict()['nb_vertebrate_sp'])
@@ -468,6 +482,7 @@ class ZH(TZH):
         full_zh.properties.update(self.interet_patrim)
         full_zh.properties.update(self.val_soc_eco)
         full_zh.properties.update(self.hab_heritages)
+        full_zh.properties.update(self.actions)
         return full_zh
 
     def get_eval(self):
@@ -1153,3 +1168,30 @@ class BibActions(DB.Model):
             bib_action.as_dict() for bib_action in q_bib_actions
         ]
         return bib_actions_list
+
+
+@serializable
+class TActions(DB.Model):
+    __tablename__ = "t_actions"
+    __table_args__ = {"schema": "pr_zh"}
+    id_action = DB.Column(
+        DB.Integer,
+        ForeignKey(BibActions.id_action),
+        primary_key=True
+    )
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    id_priority_level = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature)
+    )
+    remark = DB.Column(
+        DB.Unicode(length=2000)
+    )
+
+    def get_actions_by_id(id_zh):
+        return DB.session.query(TActions).filter(
+            TActions.id_zh == id_zh).all()
