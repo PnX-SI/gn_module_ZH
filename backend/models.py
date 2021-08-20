@@ -426,11 +426,11 @@ class ZH(TZH):
     def get_fauna_nb(self):
         try:
             vertebrates = int(self.zh.as_dict()['nb_vertebrate_sp'])
-        except:
+        except TypeError:
             vertebrates = 0
         try:
             invertebrates = int(self.zh.as_dict()['nb_invertebrate_sp'])
-        except:
+        except TypeError:
             invertebrates = 0
         return vertebrates+invertebrates
 
