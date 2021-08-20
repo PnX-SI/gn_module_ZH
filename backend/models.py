@@ -960,3 +960,24 @@ class CorProtectionLevelType(DB.Model):
 
             })
         return protection_status
+
+
+@serializable
+class BibActions(DB.Model):
+    __tablename__ = "bib_actions"
+    __table_args__ = {"schema": "pr_zh"}
+    id_action = DB.Column(
+        DB.Integer,
+        primary_key=True
+    )
+    name = DB.Column(
+        DB.Unicode(length=100),
+        nullable=False
+    )
+
+    def get_bib_actions():
+        q_bib_actions = DB.session.query(BibActions).all()
+        bib_actions_list = [
+            bib_action.as_dict() for bib_action in q_bib_actions
+        ]
+        return bib_actions_list
