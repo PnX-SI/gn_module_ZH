@@ -10,7 +10,8 @@ from pypnnomenclature.models import (
 )
 
 from pypn_habref_api.models import (
-    Habref
+    Habref,
+    CorespHab
 )
 
 import geoalchemy2
@@ -328,6 +329,19 @@ class ZH(TZH):
         self.id_corine_landcovers = self.get_corine_landcovers()
         self.activities = self.get_activities()
         self.flows = self.get_flows()
+        self.fonctions_hydro = self.get_functions('FONCTIONS_HYDRO')
+        self.fonctions_bio = self.get_functions('FONCTIONS_BIO')
+        self.interet_patrim = self.get_functions('INTERET_PATRIM')
+        self.val_soc_eco = self.get_functions('VAL_SOC_ECO')
+        self.hab_heritages = self.get_hab_heritages()
+        self.actions = self.get_actions()
+        self.eval_fonctions_hydro = self.get_functions(
+            'FONCTIONS_HYDRO', is_eval=True)
+        self.eval_fonctions_bio = self.get_functions(
+            'FONCTIONS_BIO', is_eval=True)
+        self.eval_interet_patrim = self.get_functions(
+            'INTERET_PATRIM', is_eval=True)
+        self.eval_val_soc_eco = self.get_functions('VAL_SOC_ECO', is_eval=True)
 
     def get_id_lims(self):
         lim_list = CorLimList.get_lims_by_id(self.zh.id_lim_list)
@@ -401,6 +415,59 @@ class ZH(TZH):
             "flows": flows
         }
 
+    def get_functions(self, category, is_eval=False):
+        q_functions = TFunctions.get_functions_by_id_and_category(
+            self.zh.id_zh, category, is_eval)
+        functions = []
+        for function in q_functions:
+            functions.append({
+                'id_function': function.id_function,
+                'justification': function.justification,
+                'id_qualification': function.id_qualification,
+                'id_knowledge': function.id_knowledge
+            })
+        return {
+            category.lower(): functions
+        }
+
+    def get_hab_heritages(self):
+        q_hab_heritages = THabHeritage.get_hab_heritage_by_id(self.zh.id_zh)
+        hab_heritages = []
+        for hab_heritage in q_hab_heritages:
+            hab_heritages.append({
+                'id_corine_bio': hab_heritage.id_corine_bio,
+                'id_cahier_hab': hab_heritage.id_cahier_hab,
+                'id_preservation_state': hab_heritage.id_preservation_state,
+                'hab_cover': hab_heritage.hab_cover
+            })
+        return {
+            "hab_heritages": hab_heritages
+        }
+
+    def get_actions(self):
+        q_actions = TActions.get_actions_by_id(self.zh.id_zh)
+        actions = []
+        for action in q_actions:
+            actions.append({
+                'id_action': action.id_action,
+                'id_priority_level': action.id_priority_level,
+                'remark': action.remark
+            })
+        return {
+            "actions": actions
+        }
+
+    def get_fauna_nb(self):
+        try:
+            vertebrates = int(self.zh.as_dict()['nb_vertebrate_sp'])
+        except TypeError:
+            vertebrates = 0
+        try:
+            invertebrates = int(self.zh.as_dict()['nb_invertebrate_sp'])
+        except TypeError:
+            invertebrates = 0
+        return vertebrates+invertebrates
+
     def get_full_zh(self):
         full_zh = self.zh.get_geofeature()
         full_zh.properties.update(self.id_lims)
@@ -410,7 +477,30 @@ class ZH(TZH):
         full_zh.properties.update(self.id_corine_landcovers)
         full_zh.properties.update(self.activities)
         full_zh.properties.update(self.flows)
+        full_zh.properties.update(self.fonctions_hydro)
+        full_zh.properties.update(self.fonctions_bio)
+        full_zh.properties.update(self.interet_patrim)
+        full_zh.properties.update(self.val_soc_eco)
+        full_zh.properties.update(self.hab_heritages)
+        full_zh.properties.update(self.actions)
         return full_zh
+
+    def get_eval(self):
+        eval = {}
+        eval.update(self.eval_fonctions_hydro)
+        eval.update(self.eval_fonctions_bio)
+        eval.update(self.eval_interet_patrim)
+        eval.update(self.eval_val_soc_eco)
+        eval.update({
+            "nb_flora_sp": self.zh.as_dict()['nb_flora_sp'],
+            "nb_hab": self.zh.as_dict()['nb_flora_sp'],
+            "nb_fauna_sp": self.get_fauna_nb(),
+            "total_hab_cover": self.zh.as_dict()['nb_flora_sp'],
+            "id_thread": self.zh.as_dict()['id_thread'],
+            "id_diag_hydro": self.zh.as_dict()['id_diag_hydro'],
+            "id_diag_bio": self.zh.as_dict()['id_diag_bio']
+        })
+        return eval
 
 
 class Code(ZH):
@@ -670,6 +760,23 @@ class BibCb(DB.Model):
         return DB.session.query(BibCb, Habref).join(
             Habref, BibCb.lb_code == Habref.lb_code).filter(Habref.cd_typo == 22).all()
 
+    def get_ch(lb_code):
+        # get cd_hab_sortie from lb_code of selected Corine Biotope
+        cd_hab_sortie = DB.session.query(Habref).filter(
+            and_(Habref.lb_code == lb_code, Habref.cd_typo == 22)).one().cd_hab
+        # get all cd_hab_entre corresponding to cd_hab_sortie
+        q_cd_hab_entre = DB.session.query(CorespHab).filter(
+            CorespHab.cd_hab_sortie == cd_hab_sortie).all()
+        # get list of cd_hab_entre/lb_code/lb_hab_fr for each cahier habitat
+        ch = []
+        for q in q_cd_hab_entre:
+            ch.append({
+                "cd_hab": q.cd_hab_entre,
+                "lb_code": DB.session.query(Habref).filter(Habref.cd_hab == q.cd_hab_entre).one().lb_code,
+                "lb_hab_fr": DB.session.query(Habref).filter(Habref.cd_hab == q.cd_hab_entre).one().lb_hab_fr
+            })
+        return ch
+
 
 class CorImpactTypes(DB.Model):
     __tablename__ = "cor_impact_types"
@@ -895,6 +1002,86 @@ class TInflow(DB.Model):
             TInflow.id_zh == id_zh).all()
 
 
+class TFunctions(DB.Model):
+    __tablename__ = "t_functions"
+    __table_args__ = {"schema": "pr_zh"}
+    id_function = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    justification = DB.Column(
+        DB.Unicode(length=2000)
+    )
+    id_qualification = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        default=TNomenclatures.get_default_nomenclature("FONCTIONS_QUALIF"),
+    )
+    id_knowledge = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        default=TNomenclatures.get_default_nomenclature(
+            "FONCTIONS_CONNAISSANCE"),
+    )
+
+    def get_functions_by_id_and_category(id_zh, category, is_eval=False):
+        eval_qualification = ['Moyenne', 'Forte']
+        function_ids = [
+            nomenclature.id_nomenclature for nomenclature in Nomenclatures.get_nomenclature_info(category)
+        ]
+        if is_eval:
+            qualif_ids = [
+                nomenclature.id_nomenclature for nomenclature in Nomenclatures.get_nomenclature_info('FONCTIONS_QUALIF') if nomenclature.mnemonique in eval_qualification
+            ]
+        else:
+            qualif_ids = [
+                nomenclature.id_nomenclature for nomenclature in Nomenclatures.get_nomenclature_info('FONCTIONS_QUALIF')
+            ]
+
+        return DB.session.query(TFunctions).filter(
+            TFunctions.id_zh == id_zh).filter(
+                TFunctions.id_function.in_(function_ids)).filter(
+                    TFunctions.id_qualification.in_(qualif_ids)).all()
+
+
+class THabHeritage(DB.Model):
+    __tablename__ = "t_hab_heritage"
+    __table_args__ = {"schema": "pr_zh"}
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    id_corine_bio = DB.Column(
+        DB.Unicode,
+        ForeignKey(BibCb.lb_code),
+        primary_key=True
+    )
+    id_cahier_hab = DB.Column(
+        DB.Unicode,
+        primary_key=True
+    )
+    id_preservation_state = DB.Column(
+        DB.Unicode,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        default=TNomenclatures.get_default_nomenclature("ETAT_CONSERVATION")
+    )
+    hab_cover = DB.Column(
+        DB.Unicode,
+        nullable=False
+    )
+
+    def get_hab_heritage_by_id(id_zh):
+        return DB.session.query(THabHeritage).filter(
+            THabHeritage.id_zh == id_zh).all()
+
+
 class CorUrbanTypeRange(DB.Model):
     __tablename__ = "cor_urban_type_range"
     __table_args__ = {"schema": "pr_zh"}
@@ -981,3 +1168,30 @@ class BibActions(DB.Model):
             bib_action.as_dict() for bib_action in q_bib_actions
         ]
         return bib_actions_list
+
+
+@serializable
+class TActions(DB.Model):
+    __tablename__ = "t_actions"
+    __table_args__ = {"schema": "pr_zh"}
+    id_action = DB.Column(
+        DB.Integer,
+        ForeignKey(BibActions.id_action),
+        primary_key=True
+    )
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    id_priority_level = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature)
+    )
+    remark = DB.Column(
+        DB.Unicode(length=2000)
+    )
+
+    def get_actions_by_id(id_zh):
+        return DB.session.query(TActions).filter(
+            TActions.id_zh == id_zh).all()

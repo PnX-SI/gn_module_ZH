@@ -51,22 +51,7 @@ from .models import (
 
 from .nomenclatures import get_nomenc
 
-from .forms import (
-    create_zh,
-    update_zh_tab0,
-    update_zh_tab1,
-    update_refs,
-    update_activities,
-    update_zh_tab3,
-    update_corine_biotopes,
-    update_corine_landcover,
-    update_delim,
-    update_fct_delim,
-    update_zh_tab2,
-    update_outflow,
-    update_inflow,
-    update_zh_tab4
-)
+from .forms import *
 
 from .repositories import (
     ZhRepository
@@ -168,6 +153,22 @@ def get_zh_by_id(id_zh, info_role):
     try:
         full_zh = ZH(id_zh).get_full_zh()
         return full_zh
+
+    except Exception as e:
+        if e.__class__.__name__ == 'NoResultFound':
+            raise ZHApiError(message='zh id exist?', details=str(e))
+        raise ZHApiError(message=str(e), details=str(e))
+
+
+@blueprint.route("/eval/<int:id_zh>", methods=["GET"])
+@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@json_resp
+def get_zh_eval(id_zh, info_role):
+    """Get zh form data by id
+    """
+    try:
+        zh_eval = ZH(id_zh).get_eval()
+        return zh_eval
 
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':
@@ -348,6 +349,28 @@ def get_tab_data(id_tab, info_role):
             update_outflow(form_data['id_zh'], form_data['outflows'])
             update_inflow(form_data['id_zh'], form_data['inflows'])
             update_zh_tab4(form_data)
+            DB.session.commit()
+            return {"id_zh": form_data['id_zh']}, 200
+
+        if id_tab == 5:
+            update_functions(
+                form_data['id_zh'], form_data['fonctions_hydro'], 'FONCTIONS_HYDRO')
+            update_functions(
+                form_data['id_zh'], form_data['fonctions_bio'], 'FONCTIONS_BIO')
+            update_functions(
+                form_data['id_zh'], form_data['interet_patrim'], 'INTERET_PATRIM')
+            update_functions(form_data['id_zh'],
+                             form_data['val_soc_eco'], 'VAL_SOC_ECO')
+            update_zh_tab5(form_data)
+            update_hab_heritages(
+                form_data['id_zh'], form_data['hab_heritages'])
+            DB.session.commit()
+            return {"id_zh": form_data['id_zh']}, 200
+
+        if id_tab == 7:
+            update_zh_tab7(form_data)
+            update_actions(
+                form_data['id_zh'], form_data['actions'])
             DB.session.commit()
             return {"id_zh": form_data['id_zh']}, 200
 
