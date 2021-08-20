@@ -399,7 +399,7 @@ class ZH(TZH):
                 'id_knowledge': function.id_knowledge
             })
         return {
-            category: functions
+            category.lower(): functions
         }
 
     def get_hab_heritages(self):
