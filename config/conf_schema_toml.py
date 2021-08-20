@@ -41,6 +41,11 @@ nomenclatures = [
 ]
 
 
+eval_mnemonique = [
+    'Moyenne', 'Forte'
+]
+
+
 class GnModuleSchemaConf(Schema):
     default_maplist_columns = fields.List(
         fields.Dict(), missing=default_map_list_conf)

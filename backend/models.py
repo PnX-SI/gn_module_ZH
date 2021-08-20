@@ -314,6 +314,13 @@ class ZH(TZH):
         self.interet_patrim = self.get_functions('INTERET_PATRIM')
         self.val_soc_eco = self.get_functions('VAL_SOC_ECO')
         self.hab_heritages = self.get_hab_heritages()
+        self.eval_fonctions_hydro = self.get_functions(
+            'FONCTIONS_HYDRO', is_eval=True)
+        self.eval_fonctions_bio = self.get_functions(
+            'FONCTIONS_BIO', is_eval=True)
+        self.eval_interet_patrim = self.get_functions(
+            'INTERET_PATRIM', is_eval=True)
+        self.eval_val_soc_eco = self.get_functions('VAL_SOC_ECO', is_eval=True)
 
     def get_id_lims(self):
         lim_list = CorLimList.get_lims_by_id(self.zh.id_lim_list)
@@ -387,9 +394,9 @@ class ZH(TZH):
             "flows": flows
         }
 
-    def get_functions(self, category):
+    def get_functions(self, category, is_eval=False):
         q_functions = TFunctions.get_functions_by_id_and_category(
-            self.zh.id_zh, category)
+            self.zh.id_zh, category, is_eval)
         functions = []
         for function in q_functions:
             functions.append({
@@ -416,6 +423,17 @@ class ZH(TZH):
             "hab_heritages": hab_heritages
         }
 
+    def get_fauna_nb(self):
+        try:
+            vertebrates = int(self.zh.as_dict()['nb_vertebrate_sp'])
+        except:
+            vertebrates = 0
+        try:
+            invertebrates = int(self.zh.as_dict()['nb_invertebrate_sp'])
+        except:
+            invertebrates = 0
+        return vertebrates+invertebrates
+
     def get_full_zh(self):
         full_zh = self.zh.get_geofeature()
         full_zh.properties.update(self.id_lims)
@@ -431,6 +449,23 @@ class ZH(TZH):
         full_zh.properties.update(self.val_soc_eco)
         full_zh.properties.update(self.hab_heritages)
         return full_zh
+
+    def get_eval(self):
+        eval = {}
+        eval.update(self.eval_fonctions_hydro)
+        eval.update(self.eval_fonctions_bio)
+        eval.update(self.eval_interet_patrim)
+        eval.update(self.eval_val_soc_eco)
+        eval.update({
+            "nb_flora_sp": self.zh.as_dict()['nb_flora_sp'],
+            "nb_hab": self.zh.as_dict()['nb_flora_sp'],
+            "nb_fauna_sp": self.get_fauna_nb(),
+            "total_hab_cover": self.zh.as_dict()['nb_flora_sp'],
+            "id_thread": self.zh.as_dict()['id_thread'],
+            "id_diag_hydro": self.zh.as_dict()['id_diag_hydro'],
+            "id_diag_bio": self.zh.as_dict()['id_diag_bio']
+        })
+        return eval
 
 
 class Code(ZH):
@@ -960,13 +995,24 @@ class TFunctions(DB.Model):
             "FONCTIONS_CONNAISSANCE"),
     )
 
-    def get_functions_by_id_and_category(id_zh, category):
-        id_function_list = [
+    def get_functions_by_id_and_category(id_zh, category, is_eval=False):
+        eval_qualification = ['Moyenne', 'Forte']
+        function_ids = [
             nomenclature.id_nomenclature for nomenclature in Nomenclatures.get_nomenclature_info(category)
         ]
+        if is_eval:
+            qualif_ids = [
+                nomenclature.id_nomenclature for nomenclature in Nomenclatures.get_nomenclature_info('FONCTIONS_QUALIF') if nomenclature.mnemonique in eval_qualification
+            ]
+        else:
+            qualif_ids = [
+                nomenclature.id_nomenclature for nomenclature in Nomenclatures.get_nomenclature_info('FONCTIONS_QUALIF')
+            ]
+
         return DB.session.query(TFunctions).filter(
             TFunctions.id_zh == id_zh).filter(
-                TFunctions.id_function.in_(id_function_list)).all()
+                TFunctions.id_function.in_(function_ids)).filter(
+                    TFunctions.id_qualification.in_(qualif_ids)).all()
 
 
 class THabHeritage(DB.Model):

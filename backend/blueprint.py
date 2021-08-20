@@ -177,6 +177,22 @@ def get_zh_by_id(id_zh, info_role):
         raise ZHApiError(message=str(e), details=str(e))
 
 
+@blueprint.route("/eval/<int:id_zh>", methods=["GET"])
+@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@json_resp
+def get_zh_eval(id_zh, info_role):
+    """Get zh form data by id
+    """
+    try:
+        zh_eval = ZH(id_zh).get_eval()
+        return zh_eval
+
+    except Exception as e:
+        if e.__class__.__name__ == 'NoResultFound':
+            raise ZHApiError(message='zh id exist?', details=str(e))
+        raise ZHApiError(message=str(e), details=str(e))
+
+
 @blueprint.route("/forms", methods=["GET"])
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
