@@ -3,7 +3,9 @@ from .models import (
     CorSdageSage,
     BibCb,
     CorImpactTypes,
-    CorMainFct
+    CorMainFct,
+    CorUrbanTypeRange,
+    CorProtectionLevelType
 )
 
 from pypnnomenclature.models import (
@@ -78,7 +80,6 @@ def get_impact_list():
 
 
 def get_function_list(mnemo):
-
     # get id_type of mnemo (ex : 'FONCTIONS_HYDRO') in BibNomenclatureTypes
     id_type_main_function = DB.session.query(BibNomenclaturesTypes).filter(
         BibNomenclaturesTypes.mnemonique == mnemo).one().id_type
@@ -110,6 +111,30 @@ def get_function_list(mnemo):
     return list_by_main_function
 
 
+def get_urban_docs():
+    q_urban_docs = Nomenclatures.get_nomenclature_info("TYP_DOC_COMM")
+    urban_docs = []
+    for doc in q_urban_docs:
+        urban_docs.append({
+            "id_nomenclature": doc.id_nomenclature,
+            "mnemonique": doc.mnemonique,
+            "type_classement": CorUrbanTypeRange.get_range_by_doc(doc.id_nomenclature)
+        })
+    return urban_docs
+
+
+def get_protections():
+    q_protection_types = Nomenclatures.get_nomenclature_info("PROTECTION_TYP")
+    protections = []
+    for q_protection_type in q_protection_types:
+        protections.append({
+            "id_protection_type": q_protection_type.id_nomenclature,
+            "mnemonique_type": q_protection_type.mnemonique,
+            "protection_status": CorProtectionLevelType.get_status_by_type(q_protection_type.id_nomenclature)
+        })
+    return protections
+
+
 def get_nomenc(config):
     nomenc_info = {}
     for mnemo in config:
@@ -125,6 +150,12 @@ def get_nomenc(config):
         elif mnemo == 'SDAGE-SAGE':
             list_by_sdage = get_sage_list()
             nomenc_info.update({mnemo: list_by_sdage})
+        elif mnemo == 'TYP_DOC_COMM':
+            nomenc_list = get_urban_docs()
+            nomenc_info.update({mnemo: nomenc_list})
+        elif mnemo == 'PROTECTIONS':
+            nomenc_list = get_protections()
+            nomenc_info.update({mnemo: nomenc_list})
         else:
             nomenc = Nomenclatures.get_nomenclature_info(mnemo)
             nomenc_list = []

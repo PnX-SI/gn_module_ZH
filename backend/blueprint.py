@@ -45,7 +45,8 @@ from .models import (
     BibOrganismes,
     ZH,
     CorZhCb,
-    CorZhCorineCover
+    CorZhCorineCover,
+    BibActions
 )
 
 from .nomenclatures import get_nomenc
@@ -201,19 +202,12 @@ def get_tab(info_role):
     """
     try:
         metadata = get_nomenc(blueprint.config["nomenclatures"])
-
-        bib_organismes = DB.session.query(BibOrganismes).all()
-        bib_organismes_list = [
-            bib_org.as_dict() for bib_org in bib_organismes if bib_org.is_op_org == True
-        ]
-        metadata["BIB_ORGANISMES"] = bib_organismes_list
-
-        bib_site_spaces = DB.session.query(BibSiteSpace).all()
-        bib_site_spaces_list = [
-            bib_site_space.as_dict() for bib_site_space in bib_site_spaces
-        ]
-        metadata["BIB_SITE_SPACE"] = bib_site_spaces_list
-
+        metadata["BIB_ORGANISMES"] = BibOrganismes.get_bib_organisms(
+            "operator")
+        metadata["BIB_SITE_SPACE"] = BibSiteSpace.get_bib_site_spaces()
+        metadata["BIB_MANAGEMENT_STRUCTURES"] = BibOrganismes.get_bib_organisms(
+            "management_structure")
+        metadata["BIB_ACTIONS"] = BibActions.get_bib_actions()
         return metadata
     except Exception as e:
         raise ZHApiError(message=str(e), details=str(e))

@@ -130,6 +130,13 @@ class BibSiteSpace(DB.Model):
     id_site_space = DB.Column(DB.Integer, primary_key=True)
     name = DB.Column(DB.Unicode)
 
+    def get_bib_site_spaces():
+        bib_site_spaces = DB.session.query(BibSiteSpace).all()
+        bib_site_spaces_list = [
+            bib_site_space.as_dict() for bib_site_space in bib_site_spaces
+        ]
+        return bib_site_spaces_list
+
 
 @serializable
 class BibOrganismes(DB.Model):
@@ -157,6 +164,19 @@ class BibOrganismes(DB.Model):
         org = DB.session.query(BibOrganismes).filter(
             BibOrganismes.id_org == id_org).one()
         return org.abbrevation
+
+    def get_bib_organisms(org_type):
+        bib_organismes = DB.session.query(BibOrganismes).all()
+        if org_type == "operator":
+            is_op_org = True
+        elif org_type == "management_structure":
+            is_op_org = False
+        else:
+            return "error in org type", 500
+        bib_organismes_list = [
+            bib_org.as_dict() for bib_org in bib_organismes if bib_org.is_op_org == is_op_org
+        ]
+        return bib_organismes_list
 
 
 @serializable
@@ -1045,3 +1065,91 @@ class THabHeritage(DB.Model):
     def get_hab_heritage_by_id(id_zh):
         return DB.session.query(THabHeritage).filter(
             THabHeritage.id_zh == id_zh).all()
+
+
+class CorUrbanTypeRange(DB.Model):
+    __tablename__ = "cor_urban_type_range"
+    __table_args__ = {"schema": "pr_zh"}
+    id_cor = DB.Column(
+        DB.Integer,
+        primary_key=True
+    )
+    id_range_type = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature)
+    )
+    id_doc_type = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature)
+    )
+
+    def get_range_by_doc(doc_id):
+        q_ranges = DB.session.query(CorUrbanTypeRange).filter(
+            CorUrbanTypeRange.id_range_type == doc_id).all()
+        ranges = []
+        for range in q_ranges:
+            ranges.append({
+                "id_nomenclature": range.id_doc_type,
+                "mnemonique": DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == range.id_doc_type).one().mnemonique
+            })
+        return ranges
+
+
+class CorProtectionLevelType(DB.Model):
+    __tablename__ = "cor_protection_level_type"
+    __table_args__ = {"schema": "pr_zh"}
+    id_protection = DB.Column(
+        DB.Integer,
+        primary_key=True
+    )
+    id_protection_status = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        nullable=False
+    )
+    id_protection_type = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature)
+    )
+    id_protection_level = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        nullable=False
+    )
+
+    def get_status_by_type(type_id):
+        q_protection_types = DB.session.query(CorProtectionLevelType).filter(
+            CorProtectionLevelType.id_protection_type == type_id).all()
+        protection_status = []
+        for protection in q_protection_types:
+            protection_status.append({
+                "id_protection_status": protection.id_protection_status,
+                "mnemonique_status": DB.session.query(TNomenclatures).filter(
+                    TNomenclatures.id_nomenclature == protection.id_protection_status).one().mnemonique,
+                "id_protection_level": protection.id_protection_level,
+                "mnemonique_level": DB.session.query(TNomenclatures).filter(
+                    TNomenclatures.id_nomenclature == protection.id_protection_level).one().mnemonique
+
+            })
+        return protection_status
+
+
+@serializable
+class BibActions(DB.Model):
+    __tablename__ = "bib_actions"
+    __table_args__ = {"schema": "pr_zh"}
+    id_action = DB.Column(
+        DB.Integer,
+        primary_key=True
+    )
+    name = DB.Column(
+        DB.Unicode(length=100),
+        nullable=False
+    )
+
+    def get_bib_actions():
+        q_bib_actions = DB.session.query(BibActions).all()
+        bib_actions_list = [
+            bib_action.as_dict() for bib_action in q_bib_actions
+        ]
+        return bib_actions_list
