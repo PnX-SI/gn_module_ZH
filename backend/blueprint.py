@@ -176,6 +176,23 @@ def get_zh_eval(id_zh, info_role):
         raise ZHApiError(message=str(e), details=str(e))
 
 
+@blueprint.route("/municipalities/<int:id_zh>", methods=["GET"])
+@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@json_resp
+def get_municipalities(id_zh, info_role):
+    """Get municipalities by zh id
+    """
+    try:
+        q_municipalities = CorZhArea.get_municipalities(id_zh)
+        municipalities = [
+            municipality.LAreas.area_name for municipality in q_municipalities]
+        return {"municipalities": municipalities}, 200
+    except Exception as e:
+        if e.__class__.__name__ == 'NoResultFound':
+            raise ZHApiError(message='zh id exist?', details=str(e))
+        raise ZHApiError(message=str(e), details=str(e))
+
+
 @blueprint.route("/forms", methods=["GET"])
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp

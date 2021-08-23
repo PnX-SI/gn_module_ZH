@@ -313,6 +313,10 @@ class CorZhArea(DB.Model):
         return DB.session.query(CorZhArea, LAreas, TZH).join(LAreas).filter(
             CorZhArea.id_zh == id_zh, LAreas.id_type == 26, TZH.id_zh == id_zh).all()
 
+    def get_municipalities(id_zh):
+        return DB.session.query(CorZhArea, LAreas, TZH).join(LAreas).filter(
+            CorZhArea.id_zh == id_zh, LAreas.id_type == 25, TZH.id_zh == id_zh).all()
+
 
 @serializable
 @geoserializable
