@@ -368,11 +368,13 @@ def get_tab_data(id_tab, info_role):
             return {"id_zh": form_data['id_zh']}, 200
 
         if id_tab == 6:
-            # {"ownerships": [{"id_status":id_status1,"remark":remark1},{"id_status":id_status2,"remark":remark2},...]
+            # {"ownerships": [{"id_status":id_status1,"remark":remark1},{"id_status":id_status2,"remark":remark2}, ...]
             update_ownerships(
                 form_data['id_zh'], form_data['ownerships'])
+            # {"instruments": [{"id_instrument":id_instrument1,"instrument_date":date1},{"id_instrument":id_instrument2,"instrument_date":date2}, ...]
             update_instruments(
                 form_data['id_zh'], form_data['instruments'])
+            # {"protections": [id_protection1, id_protection2, ...]
             update_protections(
                 form_data['id_zh'], form_data['protections'])
 

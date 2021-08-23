@@ -461,7 +461,7 @@ def update_protections(id_zh, protections):
     post_instruments(id_zh, protections)
 
 
-def post_instruments(id_zh, protections):
+def post_protections(id_zh, protections):
     for protection in protections:
         DB.session.add(
             CorZhProtection(
