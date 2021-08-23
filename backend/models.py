@@ -1195,3 +1195,47 @@ class TActions(DB.Model):
     def get_actions_by_id(id_zh):
         return DB.session.query(TActions).filter(
             TActions.id_zh == id_zh).all()
+
+
+class TInstruments(DB.Model):
+    __tablename__ = "t_instruments"
+    __table_args__ = {"schema": "pr_zh"}
+    id_instrument = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    instrument_date = DB.Column(
+        DB.DateTime
+    )
+
+    def get_instruments_by_id(id_zh):
+        return DB.session.query(TInstruments).filter(
+            TInstruments.id_zh == id_zh).all()
+
+
+class TOwnership(DB.Model):
+    __tablename__ = "t_ownership"
+    __table_args__ = {"schema": "pr_zh"}
+    id_ownership = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    remark = DB.Column(
+        DB.Unicode(length=2000)
+    )
+
+    def get_ownerships_by_id(id_zh):
+        return DB.session.query(TOwnership).filter(
+            TOwnership.id_zh == id_zh).all()

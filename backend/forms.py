@@ -416,6 +416,45 @@ def post_hab_heritages(id_zh, hab_heritages):
         ))
 
 
+# tab 6
+
+
+def update_ownerships(id_zh, ownerships):
+    DB.session.query(TOwnership).filter(
+        TOwnership.id_zh == id_zh).delete()
+    post_ownerships(id_zh, ownerships)
+
+
+def post_ownerships(id_zh, ownerships):
+    for ownership in ownerships:
+        DB.session.add(
+            TOwnership(
+                id_status=ownership.id_status,
+                id_zh=id_zh,
+                remark=ownership.remark
+            )
+        )
+        DB.session.flush()
+
+
+def update_instruments(id_zh, instruments):
+    DB.session.query(TInstruments).filter(
+        TInstruments.id_zh == id_zh).delete()
+    post_ownerships(id_zh, instruments)
+
+
+def post_ownerships(id_zh, instruments):
+    for instrument in instruments:
+        DB.session.add(
+            TInstruments(
+                id_instrument=instrument.id_instrument,
+                id_zh=id_zh,
+                instrument_date=instrument.instrument_date
+            )
+        )
+        DB.session.flush()
+
+
 # tab 7
 
 

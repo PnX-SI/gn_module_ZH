@@ -367,6 +367,15 @@ def get_tab_data(id_tab, info_role):
             DB.session.commit()
             return {"id_zh": form_data['id_zh']}, 200
 
+        if id_tab == 6:
+            # {"ownership": [{"id_status":id_status1,"remark":remark1},{"id_status":id_status2,"remark":remark2},...]
+            update_ownership(
+                form_data['id_zh'], form_data['ownership'])
+            update_instruments(
+                form_data['id_zh'], form_data['instruments'])
+            )
+
+
         if id_tab == 7:
             update_zh_tab7(form_data)
             update_actions(
@@ -381,13 +390,13 @@ def get_tab_data(id_tab, info_role):
         if e.__class__.__name__ == 'IntegrityError':
             return 'ZH main_name already exists', 400
         DB.session.rollback()
-        raise ZHApiError(message=str(e), details=str(e))
+        raise ZHApiError(message = str(e), details = str(e))
     finally:
         DB.session.close()
 
 
-@ blueprint.route("/<int:id_zh>", methods=["DELETE"])
-@ permissions.check_cruved_scope("D", True, module_code="ZONES_HUMIDES")
+@ blueprint.route("/<int:id_zh>", methods = ["DELETE"])
+@ permissions.check_cruved_scope("D", True, module_code = "ZONES_HUMIDES")
 @ json_resp
 def deleteOneZh(id_zh, info_role):
     """Delete one zh
@@ -396,11 +405,11 @@ def deleteOneZh(id_zh, info_role):
 
     """
     try:
-        zhRepository = ZhRepository(TZH)
+        zhRepository=ZhRepository(TZH)
         # delete references
         DB.session.query(CorZhRef).filter(CorZhRef.id_zh == id_zh).delete()
         # delete criteres delim
-        id_lim_list = DB.session.query(TZH).filter(
+        id_lim_list=DB.session.query(TZH).filter(
             TZH.id_zh == id_zh).one().id_lim_list
         DB.session.query(CorLimList).filter(
             CorLimList.id_lim_list == id_lim_list).delete()
@@ -418,7 +427,7 @@ def deleteOneZh(id_zh, info_role):
         if e.__class__.__name__ == 'IntegrityError':
             return 'ZH main_name already exists', 400
         DB.session.rollback()
-        raise ZHApiError(message=str(e), details=str(e))
+        raise ZHApiError(message = str(e), details = str(e))
     finally:
         DB.session.close()
 
@@ -446,6 +455,6 @@ def get_sensitive_view(info_role):
 
 @ blueprint.errorhandler(ZHApiError)
 def handle_geonature_zh_api(error):
-    response = jsonify(error.to_dict())
-    response.status_code = error.status_code
+    response=jsonify(error.to_dict())
+    response.status_code=error.status_code
     return response
