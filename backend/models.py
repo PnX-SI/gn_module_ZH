@@ -1239,3 +1239,18 @@ class TOwnership(DB.Model):
     def get_ownerships_by_id(id_zh):
         return DB.session.query(TOwnership).filter(
             TOwnership.id_zh == id_zh).all()
+
+
+class CorZhProtection(DB.Model):
+    __tablename__ = "cor_zh_protection"
+    __table_args__ = {"schema": "pr_zh"}
+    id_protection = DB.Column(
+        DB.Integer,
+        ForeignKey(CorProtectionLevelType.id_protection),
+        primary_key=True
+    )
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )

@@ -440,16 +440,33 @@ def post_ownerships(id_zh, ownerships):
 def update_instruments(id_zh, instruments):
     DB.session.query(TInstruments).filter(
         TInstruments.id_zh == id_zh).delete()
-    post_ownerships(id_zh, instruments)
+    post_instruments(id_zh, instruments)
 
 
-def post_ownerships(id_zh, instruments):
+def post_instruments(id_zh, instruments):
     for instrument in instruments:
         DB.session.add(
             TInstruments(
                 id_instrument=instrument.id_instrument,
                 id_zh=id_zh,
                 instrument_date=instrument.instrument_date
+            )
+        )
+        DB.session.flush()
+
+
+def update_protections(id_zh, protections):
+    DB.session.query(CorZhProtection).filter(
+        CorZhProtection.id_zh == id_zh).delete()
+    post_instruments(id_zh, protections)
+
+
+def post_instruments(id_zh, protections):
+    for protection in protections:
+        DB.session.add(
+            CorZhProtection(
+                id_protection=protection.id_protection,
+                id_zh=id_zh,
             )
         )
         DB.session.flush()
