@@ -358,12 +358,12 @@ def get_tab_data(id_tab, info_role):
             return {"id_zh": form_data['id_zh']}, 200
 
     except Exception as e:
+        DB.session.rollback()
         pdb.set_trace()
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
-            return 'Empty mandatory field', 400
+            return 'Empty mandatory field ?', 400
         if e.__class__.__name__ == 'IntegrityError':
             return 'ZH main_name already exists', 400
-        DB.session.rollback()
         raise ZHApiError(message=str(e), details=str(e))
     finally:
         DB.session.close()
@@ -375,7 +375,7 @@ def get_tab_data(id_tab, info_role):
 def deleteOneZh(id_zh, info_role):
     """Delete one zh
 
-    :params int id_zh: ID of the zh to delete
+    :params int id_zh: ID of th*e zh to delete
 
     """
     try:

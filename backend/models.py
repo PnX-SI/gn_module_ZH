@@ -359,24 +359,26 @@ class ZH(TZH):
         flows = []
         outflows = []
         inflows = []
+
         for flow in q_outflows:
             outflows.append({
-                "id_outflow": flow['id_outflow'],
-                "id_permanance": flow['id_permanance'],
-                "topo": flow['topo']
+                "id_outflow": flow.id_outflow,
+                "id_permanance": flow.id_permanance,
+                "topo": flow.topo
             })
         flows.append({
             "outflows": outflows
         })
         for flow in q_inflows:
             inflows.append({
-                "id_inflow": flow['id_inflow'],
-                "id_permanance": flow['id_permanance'],
-                "topo": flow['topo']
+                "id_inflow": flow.id_inflow,
+                "id_permanance": flow.id_permanance,
+                "topo": flow.topo
             })
         flows.append({
             "inflows": inflows
         })
+
         return {
             "flows": flows
         }
