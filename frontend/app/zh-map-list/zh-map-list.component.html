@@ -1,50 +1,43 @@
 <div class="container-fluid">
-    <div class="map-list-container">
-      <div class="float-btns">
-        <ng-container *ngIf="userCruved?.C != '0'">
-          <button
-            mat-raised-button
-            color="primary"
-            class="btn-action hard-shadow button-success uppercase ml-3"
-            [routerLink]="['forms']"
-          >
-            Ajouter une zone humide
-            <mat-icon>add_circle_outline</mat-icon>
-          </button>
-        </ng-container>
+  <div class="map-list-container">
+    <div class="float-btns">
+      <ng-container *ngIf="userCruved?.C != '0'">
         <button
+          mat-raised-button
+          color="primary"
+          class="btn-action hard-shadow button-success uppercase ml-3"
+          [routerLink]="['forms']"
+        >
+          Ajouter une zone humide
+          <mat-icon>add_circle_outline</mat-icon>
+        </button>
+      </ng-container>
+      <button
         mat-raised-button
         color="primary"
         class="btn-action hard-shadow uppercase ml-3"
         data-toggle="collapse"
         data-target="#collapseAvance"
-        >
+      >
         Filtrer
-          <i
-            class="fa fa-sliders"
-            aria-hidden="true"
-          ></i>
-        </button>
-      </div>
-      <div class="collapse" id="collapseAvance">
+        <i class="fa fa-sliders" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="collapse" id="collapseAvance">
       <div>filter component</div>
     </div>
     <div class="row">
       <div
         class="col-xs-12 col-sm-12 col-md-6 col-lg-6 padding-sm-occ"
-        [ngStyle]="{'min-height.px': cardContentHeight}"
+        [ngStyle]="{ 'min-height.px': cardContentHeight }"
       >
         <!-- MAP -->
-        <pnx-map-list
-          [idName]="idName"
-          height="100%"
-        >
-        </pnx-map-list>
+        <pnx-map-list [idName]="idName" height="100%"> </pnx-map-list>
       </div>
-        <div
+      <div
         class="col-xs-12 col-sm-12 col-md-6 col-lg-6 padding-sm-occ"
-        [ngStyle]="{'min-height.px': cardContentHeight}"
-        >
+        [ngStyle]="{ 'min-height.px': cardContentHeight }"
+      >
         <!-- LIST -->
         <!--Table-->
         <ngx-datatable
@@ -73,36 +66,30 @@
         >
           <!-- ACTION COLUMNS -->
           <ngx-datatable-column maxWidth="10">
-            <ng-template
-              let-row="row"
-              ngx-datatable-cell-template
-            >
-            <ng-container *ngIf="row.rights.U; else disabledEditBlc">
-              <a
-                class="btn btn-outline-shadow btn-no-padding btn-ghost"
-                [routerLink]="['forms', row.id_zh]"
-              >
-                <i
-                  matTooltip="{{'Editer la '}} {{row.main_name}}"
-                  class="fa fa-pencil-square-o"
-                  aria-hidden="true"
-                ></i>
-              </a>
-            </ng-container>
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <ng-container *ngIf="row.rights.U; else disabledEditBlc">
+                <a
+                  class="btn btn-outline-shadow btn-no-padding btn-ghost"
+                  [routerLink]="['forms', row.id_zh]"
+                >
+                  <i
+                    matTooltip="{{ 'Editer la ' }} {{ row.main_name }}"
+                    class="fa fa-pencil-square-o"
+                    aria-hidden="true"
+                  ></i>
+                </a>
+              </ng-container>
             </ng-template>
           </ngx-datatable-column>
           <ngx-datatable-column maxWidth="10">
-            <ng-template
-              let-row="row"
-              ngx-datatable-cell-template
-            >
+            <ng-template let-row="row" ngx-datatable-cell-template>
               <ng-container *ngIf="row.rights.R; else disabledInfoBlc">
                 <a
                   class="btn btn-outline-shadow btn-no-padding btn-ghost"
                   [routerLink]="['info', row.id_zh]"
                 >
                   <i
-                    matTooltip="{{'Info'}} {{ row.main_name }}"
+                    matTooltip="{{ 'Info' }} {{ row.main_name }}"
                     class="fa fa-info-circle"
                     aria-hidden="true"
                   ></i>
@@ -115,7 +102,7 @@
                 >
                   <i
                     class="fa fa-info-circle disabled"
-                    matTooltip="{{ 'Info'}} {{ row.main_name }}"
+                    matTooltip="{{ 'Info' }} {{ row.main_name }}"
                     aria-hidden="true"
                   ></i>
                 </button>
@@ -123,19 +110,16 @@
             </ng-template>
           </ngx-datatable-column>
           <ngx-datatable-column maxWidth="10">
-            <ng-template
-              let-row="row"
-              ngx-datatable-cell-template
-            >
+            <ng-template let-row="row" ngx-datatable-cell-template>
               <button
                 class="btn btn-outline-shadow btn-no-padding btn-ghost"
                 [disabled]="!row.rights.D"
                 (click)="openDeleteModal($event, modalConfirm, iElement, row)"
               >
                 <i
-                  [ngClass]="{'disabled' : !row.rights.D}"
+                  [ngClass]="{ disabled: !row.rights.D }"
                   #iElement
-                  matTooltip="{{ 'Supprimer la ' }} {{row.main_name}}"
+                  matTooltip="{{ 'Supprimer la ' }} {{ row.main_name }}"
                   class="fa fa-trash-o"
                   aria-hidden="true"
                 ></i>
@@ -160,17 +144,14 @@
 </div>
 
 <!-- MODAL DELETE -->
-<ng-template
- #modalConfirm
- let-c="close"
- let-d="dismiss"
->
+<ng-template #modalConfirm let-c="close" let-d="dismiss">
   <div class="modal-header">
     <h5 class="modal-title"><i class="fa fa-trash"></i></h5>
   </div>
   <div class="modal-body">
-    Êtes-vous sûr de vouloir supprimer la {{mapListService.selectedRow[0].main_name}} ?
-    <br>
+    Êtes-vous sûr de vouloir supprimer la
+    {{ mapListService.selectedRow[0].main_name }} ?
+    <br />
     Sa suppression sera définitive
   </div>
   <div class="modal-footer">
@@ -180,16 +161,16 @@
       class="mr-1 uppercase"
       (click)="c()"
     >
-    Annuler
+      Annuler
     </button>
     <button
       type="button"
       mat-raised-button
       color="warn"
       class="uppercase"
-      (click)="c(); deleteOneZh(mapListService.selectedRow[0]) "
+      (click)="c(); deleteOneZh(mapListService.selectedRow[0])"
     >
-    Supprimer 
-  </button>
-</div>
-
+      Supprimer
+    </button>
+  </div>
+</ng-template>

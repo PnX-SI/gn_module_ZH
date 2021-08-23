@@ -166,8 +166,6 @@ export class ZhFormTab3Component implements OnInit {
             });
           });
         }
-        console.log("  this.listActivity", this.listActivity);
-
         this.form.patchValue({
           id_sdage: this._currentZh.properties.id_sdage,
           id_sage: this._currentZh.properties.id_sage,
