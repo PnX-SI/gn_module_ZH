@@ -47,6 +47,7 @@ export class ZhFormTab2Component implements OnInit {
 
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
       if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
+      this.$_currentZhSub.unsubscribe();
       if (tabPosition == 2) {
         this.initTab();
       }
@@ -115,6 +116,7 @@ export class ZhFormTab2Component implements OnInit {
     };
 
     if (this.formTab2.valid) {
+      this.$_fromChangeSub.unsubscribe();
       formValues.critere_delim.forEach((critere) => {
         formToPost.critere_delim.push(critere.id_nomenclature);
       });

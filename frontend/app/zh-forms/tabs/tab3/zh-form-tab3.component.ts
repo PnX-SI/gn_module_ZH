@@ -94,6 +94,7 @@ export class ZhFormTab3Component implements OnInit {
 
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
       this.$_fromChangeSub.unsubscribe();
+      this.$_currentZhSub.unsubscribe();
       if (tabPosition == 3) {
         this.initTab();
       }
@@ -390,6 +391,7 @@ export class ZhFormTab3Component implements OnInit {
   onFormSubmit() {
     if (this.form.valid) {
       this.submitted = true;
+      this.$_fromChangeSub.unsubscribe();
       let formToPost = {
         id_zh: Number(this._currentZh.properties.id_zh),
         id_sdage: this.form.value.id_sdage,

@@ -162,7 +162,7 @@
             name="inlineRadioOptions"
             id="inlineRadio1"
             [formControl]="formTab4.controls.connexion"
-            value="728"
+            [value]="728"
           />
         </div>
         <div class="d-flex flex-column align-items-center">
@@ -175,7 +175,7 @@
             name="inlineRadioOptions"
             id="inlineRadio2"
             [formControl]="formTab4.controls.connexion"
-            value="729"
+            [value]="729"
           />
         </div>
         <div class="d-flex flex-column align-items-center">
@@ -188,7 +188,7 @@
             name="inlineRadioOptions"
             id="inlineRadio3"
             [formControl]="formTab4.controls.connexion"
-            value="730"
+            [value]="730"
           />
         </div>
         <div class="d-flex flex-column align-items-center">
@@ -201,7 +201,7 @@
             name="inlineRadioOptions"
             id="inlineRadio4"
             [formControl]="formTab4.controls.connexion"
-            value="731"
+            [value]="731"
           />
         </div>
         <div class="d-flex flex-column align-items-center">
@@ -214,7 +214,7 @@
             name="inlineRadioOptions"
             id="inlineRadio5"
             [formControl]="formTab4.controls.connexion"
-            value="732"
+            [value]="732"
           />
         </div>
         <div class="d-flex flex-column align-items-center">
@@ -229,7 +229,7 @@
             name="inlineRadioOptions"
             id="inlineRadio6"
             [formControl]="formTab4.controls.connexion"
-            value="733"
+            [value]="733"
           />
         </div>
       </div>
@@ -280,21 +280,21 @@
         ></textarea>
       </div>
     </fieldset>
+    <div class="footer-btn">
+      <button
+        type="submit"
+        mat-raised-button
+        color="primary"
+        class="ml-3"
+        [disabled]="posted"
+        (click)="onFormSubmit()"
+      >
+        <mat-icon *ngIf="!posted">save_outline</mat-icon>
+        <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
+        Enregister
+      </button>
+    </div>
   </form>
-  <div class="footer-btn">
-    <button
-      type="submit"
-      mat-raised-button
-      color="primary"
-      class="ml-3"
-      [disabled]="posted"
-      (click)="onFormSubmit()"
-    >
-      <mat-icon *ngIf="!posted">save_outline</mat-icon>
-      <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
-      Enregister
-    </button>
-  </div>
 </div>
 <!-- MODAL ENTREE EAU -->
 <ng-template #inflowModal let-c="close" let-d="dismiss">

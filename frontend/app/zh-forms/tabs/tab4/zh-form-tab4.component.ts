@@ -32,9 +32,10 @@ export class ZhFormTab4Component implements OnInit {
   public outflowInput: any[];
   public outflowsTable: any = [];
   private $_outflowInputSub: Subscription;
-
+  posted: boolean;
   public submitted: boolean;
   private $_currentZhSub: Subscription;
+  private $_fromChangeSub: Subscription;
   private _currentZh: any;
 
   public inflowTableCol = [
@@ -48,7 +49,6 @@ export class ZhFormTab4Component implements OnInit {
     { name: "permanance", label: "Permanence" },
     { name: "topo", label: "Toponymie et compléments d'information" },
   ];
-  posted: boolean;
 
   constructor(
     private fb: FormBuilder,
@@ -63,6 +63,13 @@ export class ZhFormTab4Component implements OnInit {
 
     this.initForms();
     this.getCurrentZh();
+    this._tabService.getTabChange().subscribe((tabPosition: number) => {
+      this.$_fromChangeSub.unsubscribe();
+      this.$_currentZhSub.unsubscribe();
+      if (tabPosition == 4) {
+        this.getCurrentZh();
+      }
+    });
   }
 
   // initialize forms
@@ -100,13 +107,93 @@ export class ZhFormTab4Component implements OnInit {
     });
   }
 
-  // get current zone humides && patsh forms values
+  // get current zone humides && patch forms values
   getCurrentZh() {
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
         this._currentZh = zh;
-        console.log("current ZH", this._currentZh);
+        this.inflowsTable = [];
+        this.outflowsTable = [];
+        //patch forms values
+        if (
+          this._currentZh.properties.flows &&
+          this._currentZh.properties.flows.length > 0
+        ) {
+          this._currentZh.properties.flows.forEach((element: any) => {
+            for (const key in element) {
+              if (key == "inflows") {
+                if (element[key].length > 0) {
+                  element[key].forEach((inflow) => {
+                    this.inflowsTable.push({
+                      inflow: this.formMetaData["ENTREE_EAU"].find((item) => {
+                        return item.id_nomenclature == inflow.id_inflow;
+                      }),
+                      permanance: this.formMetaData["PERMANENCE_ENTREE"].find(
+                        (item) => {
+                          return item.id_nomenclature == inflow.id_permanance;
+                        }
+                      ),
+                      topo: inflow.topo,
+                    });
+                    this.inflowInput.map((item: any) => {
+                      if (item.id_nomenclature == inflow.id_inflow) {
+                        item.disabled = true;
+                      }
+                    });
+                  });
+                }
+              }
+              if (key == "outflows") {
+                if (element[key].length > 0) {
+                  element[key].forEach((outflow) => {
+                    this.outflowsTable.push({
+                      outflow: this.formMetaData["SORTIE_EAU"].find((item) => {
+                        return item.id_nomenclature == outflow.id_outflow;
+                      }),
+                      permanance: this.formMetaData["PERMANENCE_SORTIE"].find(
+                        (item) => {
+                          return item.id_nomenclature == outflow.id_permanance;
+                        }
+                      ),
+                      topo: outflow.topo,
+                    });
+                    this.outflowInput.map((item: any) => {
+                      if (item.id_nomenclature == outflow.id_outflow) {
+                        item.disabled = true;
+                      }
+                    });
+                  });
+                }
+              }
+            }
+          });
+        }
+        this.formTab4.patchValue({
+          spread: this.formMetaData["SUBMERSION_ETENDUE"].find((item) => {
+            return item.id_nomenclature == this._currentZh.properties.id_spread;
+          }),
+          frequency: this.formMetaData["SUBMERSION_FREQ"].find((item) => {
+            return (
+              item.id_nomenclature == this._currentZh.properties.id_frequency
+            );
+          }),
+          connexion: this._currentZh.properties.id_connexion,
+          diag_hydro: this.formMetaData["FONCTIONNALITE_HYDRO"].find((item) => {
+            return (
+              item.id_nomenclature == this._currentZh.properties.id_diag_hydro
+            );
+          }),
+          diag_bio: this.formMetaData["FONCTIONNALITE_BIO"].find((item) => {
+            return (
+              item.id_nomenclature == this._currentZh.properties.id_diag_bio
+            );
+          }),
+          remark_diag: this._currentZh.properties.remark_diag,
+        });
       }
+      this.$_fromChangeSub = this.formTab4.valueChanges.subscribe(() => {
+        this.canChangeTab.emit(false);
+      });
     });
   }
 
@@ -147,11 +234,6 @@ export class ZhFormTab4Component implements OnInit {
       this.inflowForm.reset();
       this.canChangeTab.emit(false);
       this.inflowFormSubmitted = false;
-      /*  {
-        id_outflow: inflowValues.inflow.id_nomenclature,
-        id_permanance: inflowValues.permanance.id_nomenclature,
-        topo: inflowValues.topo,
-      } */
     }
   }
 
@@ -266,11 +348,6 @@ export class ZhFormTab4Component implements OnInit {
       this.outflowForm.reset();
       this.canChangeTab.emit(false);
       this.outflowFormSubmitted = false;
-      /*  {
-        id_outflow: inflowValues.inflow.id_nomenclature,
-        id_permanance: inflowValues.permanance.id_nomenclature,
-        topo: inflowValues.topo,
-      } */
     }
   }
 
@@ -350,7 +427,7 @@ export class ZhFormTab4Component implements OnInit {
   onFormSubmit() {
     if (this.formTab4.valid) {
       this.submitted = true;
-      console.log("this.formTab4", this.formTab4);
+      this.$_fromChangeSub.unsubscribe();
       let outflows = [];
       let inflows = [];
       if (this.outflowsTable && this.outflowsTable.length > 0) {
@@ -394,8 +471,6 @@ export class ZhFormTab4Component implements OnInit {
         inflows: inflows,
       };
       this.posted = true;
-      console.log("formToPost", formToPost);
-
       this._dataService.postDataForm(formToPost, 4).subscribe(
         () => {
           this._dataService

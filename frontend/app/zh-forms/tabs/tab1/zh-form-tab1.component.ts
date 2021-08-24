@@ -54,6 +54,7 @@ export class ZhFormTab1Component implements OnInit {
     this.initTab();
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
       if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
+      this.$_currentZhSub.unsubscribe();
       if (tabPosition == 1) {
         this.initTab();
       }
@@ -144,6 +145,7 @@ export class ZhFormTab1Component implements OnInit {
     };
 
     if (this.generalInfoForm.valid) {
+      this.$_fromChangeSub.unsubscribe();
       if (formValues.main_name != this._currentZh.properties.main_name) {
         formValues.main_name = formValues.main_name;
       }
