@@ -176,17 +176,24 @@ def get_zh_eval(id_zh, info_role):
         raise ZHApiError(message=str(e), details=str(e))
 
 
-@blueprint.route("/municipalities/<int:id_zh>", methods=["GET"])
+@blueprint.route("/geography/<int:id_zh>", methods=["GET"])
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
-def get_municipalities(id_zh, info_role):
-    """Get municipalities by zh id
+def get_geography(id_zh, info_role):
+    """Get geographic information by zh id
     """
     try:
-        q_municipalities = CorZhArea.get_municipalities(id_zh)
-        municipalities = [
-            municipality.LAreas.area_name for municipality in q_municipalities]
-        return {"municipalities": municipalities}, 200
+        q_deps = CorZhArea.get_departments(id_zh)
+        departments = [{
+            dep.LAreas.area_code: dep.LAreas.area_name
+        } for dep in q_deps]
+
+        q_municipalities = CorZhArea.get_municipalities_info(id_zh)
+        municipalities = [{
+            int(municipality.LAreas.area_code): municipality.LAreas.area_name
+        } for municipality in q_municipalities]
+
+        return {"departments": departments, "municipalities": municipalities}, 200
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':
             raise ZHApiError(message='zh id exist?', details=str(e))

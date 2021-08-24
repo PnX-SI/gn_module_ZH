@@ -28,7 +28,11 @@ from utils_flask_sqla_geo.serializers import geoserializable
 # instance de la BDD
 from geonature.utils.env import DB
 
-from geonature.core.ref_geo.models import LAreas
+from geonature.core.ref_geo.models import (
+    LAreas,
+    BibAreasTypes,
+    LiMunicipalities
+)
 
 import pdb
 from sqlalchemy.inspection import inspect
@@ -300,7 +304,7 @@ class CorZhArea(DB.Model):
     __table_args__ = {"schema": "pr_zh"}
     id_area = DB.Column(
         DB.Integer,
-        ForeignKey("ref_geo.l_areas.id_area"),
+        ForeignKey(LAreas.id_area),
         primary_key=True
     )
     id_zh = DB.Column(
@@ -309,13 +313,16 @@ class CorZhArea(DB.Model):
     )
     cover = DB.Column(DB.Integer)
 
+    def get_id_type(mnemo):
+        return DB.session.query(BibAreasTypes).filter(BibAreasTypes.type_name == mnemo).one().id_type
+
     def get_departments(id_zh):
         return DB.session.query(CorZhArea, LAreas, TZH).join(LAreas).filter(
-            CorZhArea.id_zh == id_zh, LAreas.id_type == 26, TZH.id_zh == id_zh).all()
+            CorZhArea.id_zh == id_zh, LAreas.id_type == CorZhArea.get_id_type("Départements"), TZH.id_zh == id_zh).all()
 
-    def get_municipalities(id_zh):
+    def get_municipalities_info(id_zh):
         return DB.session.query(CorZhArea, LAreas, TZH).join(LAreas).filter(
-            CorZhArea.id_zh == id_zh, LAreas.id_type == 25, TZH.id_zh == id_zh).all()
+            CorZhArea.id_zh == id_zh, LAreas.id_type == CorZhArea.get_id_type("Communes"), TZH.id_zh == id_zh).all()
 
 
 @serializable
@@ -399,18 +406,18 @@ class ZH(TZH):
         inflows = []
         for flow in q_outflows:
             outflows.append({
-                "id_outflow": flow['id_outflow'],
-                "id_permanance": flow['id_permanance'],
-                "topo": flow['topo']
+                "id_outflow": flow.id_outflow,
+                "id_permanance": flow.id_permanance,
+                "topo": flow.topo
             })
         flows.append({
             "outflows": outflows
         })
         for flow in q_inflows:
             inflows.append({
-                "id_inflow": flow['id_inflow'],
-                "id_permanance": flow['id_permanance'],
-                "topo": flow['topo']
+                "id_inflow": flow.id_inflow,
+                "id_permanance": flow.id_permanance,
+                "topo": flow.topo
             })
         flows.append({
             "inflows": inflows
