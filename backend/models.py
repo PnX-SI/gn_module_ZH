@@ -1206,3 +1206,16 @@ class TActions(DB.Model):
     def get_actions_by_id(id_zh):
         return DB.session.query(TActions).filter(
             TActions.id_zh == id_zh).all()
+
+
+class TInseeRegions(DB.Model):
+    __tablename__ = "insee_regions"
+    __table_args__ = {"schema": "ref_geo"}
+    insee_reg = DB.Column(
+        DB.Unicode(length=2),
+        primary_key=True
+    )
+    region_name = DB.Column(
+        DB.Unicode(length=50),
+        nullable=False
+    )
