@@ -183,17 +183,28 @@ def get_geography(id_zh, info_role):
     """Get geographic information by zh id
     """
     try:
+        # get departments
         q_deps = CorZhArea.get_departments(id_zh)
         departments = [{
             dep.LAreas.area_code: dep.LAreas.area_name
         } for dep in q_deps]
 
+        # get municipalities
         q_municipalities = CorZhArea.get_municipalities_info(id_zh)
         municipalities = [{
-            int(municipality.LAreas.area_code): municipality.LAreas.area_name
+            municipality.LiMunicipalities.insee_com: municipality.LiMunicipalities.nom_com
         } for municipality in q_municipalities]
 
-        return {"departments": departments, "municipalities": municipalities}, 200
+        # get regions
+        region_list = []
+        for municipality in q_municipalities:
+            if municipality.LiMunicipalities.insee_reg not in region_list:
+                region_list.append(municipality.LiMunicipalities.insee_reg)
+        q_region = DB.session.query(InseeRegions).filter(
+            InseeRegions.insee_reg.in_(region_list)).all()
+        regions = [region.region_name for region in q_region]
+
+        return {"departments": departments, "municipalities": municipalities, "regions": regions}, 200
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':
             raise ZHApiError(message='zh id exist?', details=str(e))

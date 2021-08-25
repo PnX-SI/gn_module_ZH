@@ -321,8 +321,8 @@ class CorZhArea(DB.Model):
             CorZhArea.id_zh == id_zh, LAreas.id_type == CorZhArea.get_id_type("Départements"), TZH.id_zh == id_zh).all()
 
     def get_municipalities_info(id_zh):
-        return DB.session.query(CorZhArea, LAreas, TZH).join(LAreas).filter(
-            CorZhArea.id_zh == id_zh, LAreas.id_type == CorZhArea.get_id_type("Communes"), TZH.id_zh == id_zh).all()
+        return DB.session.query(CorZhArea, LiMunicipalities, TZH).join(LiMunicipalities, LiMunicipalities.id_area == CorZhArea.id_area).filter(
+            CorZhArea.id_zh == id_zh, TZH.id_zh == id_zh).all()
 
 
 @serializable
@@ -333,6 +333,7 @@ class ZH(TZH):
     def __init__(self, id_zh):
         self.zh = DB.session.query(TZH).filter(
             TZH.id_zh == id_zh).one()
+        self.geo_info = self.get_geo_info()
         self.id_lims = self.get_id_lims()
         self.id_lims_fs = self.get_id_lims_fs()
         self.id_references = self.get_id_references()
@@ -479,8 +480,40 @@ class ZH(TZH):
             invertebrates = 0
         return vertebrates+invertebrates
 
+    def get_departments(self):
+        q_deps = CorZhArea.get_departments(self.zh.id_zh)
+        departments = [{
+            dep.LAreas.area_code: dep.LAreas.area_name
+        } for dep in q_deps]
+        return departments
+
+    def get_municipalities(self, query):
+        municipalities = [{
+            municipality.LiMunicipalities.insee_com: municipality.LiMunicipalities.nom_com
+        } for municipality in query]
+        return municipalities
+
+    def get_regions(self, query):
+        region_list = []
+        for municipality in query:
+            if municipality.LiMunicipalities.insee_reg not in region_list:
+                region_list.append(municipality.LiMunicipalities.insee_reg)
+        q_region = DB.session.query(InseeRegions).filter(
+            InseeRegions.insee_reg.in_(region_list)).all()
+        regions = [region.region_name for region in q_region]
+        return regions
+
+    def get_geo_info(self):
+        geo_info = {}
+        departments = self.get_departments()
+        q_municipalities = CorZhArea.get_municipalities_info(self.zh.id_zh)
+        municipalities = self.get_municipalities(q_municipalities)
+        regions = self.get_regions(q_municipalities)
+        return {"geo_info": {"departments": departments, "municipalities": municipalities, "regions": regions}}
+
     def get_full_zh(self):
         full_zh = self.zh.get_geofeature()
+        full_zh.properties.update(self.geo_info)
         full_zh.properties.update(self.id_lims)
         full_zh.properties.update(self.id_lims_fs)
         full_zh.properties.update(self.id_references)
@@ -1208,7 +1241,7 @@ class TActions(DB.Model):
             TActions.id_zh == id_zh).all()
 
 
-class TInseeRegions(DB.Model):
+class InseeRegions(DB.Model):
     __tablename__ = "insee_regions"
     __table_args__ = {"schema": "ref_geo"}
     insee_reg = DB.Column(
