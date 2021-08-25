@@ -24,6 +24,10 @@ def gnmodule_install_app(gn_db, gn_app):
                 open(
                     str(ROOT_DIR / "data/insert_into_ref_nomenclatures_schema.sql"), "r").read()
             )
+            gn_db.session.execute(
+                open(
+                    str(ROOT_DIR / "data/insert_into_ref_geo_schema.sql"), "r").read()
+            )
             # gn_db.session.execute(
             #    open(
             #        str(ROOT_DIR / "data/insert_into_ref_habitats_schema.sql"), "r").read()
