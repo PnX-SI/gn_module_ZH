@@ -1,1 +1,18 @@
 @import "../../../../app.module";
+select.custom-select option:disabled {
+  color: #d9d9d9;
+}
+.radio-list {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+input[type="radio"] {
+  transform: scale(1.2);
+}
+.footer-btn {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 36px;
+  margin-bottom: 36px;
+}
