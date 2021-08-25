@@ -176,35 +176,14 @@ def get_zh_eval(id_zh, info_role):
         raise ZHApiError(message=str(e), details=str(e))
 
 
-@blueprint.route("/geography/<int:id_zh>", methods=["GET"])
+@blueprint.route("/municipalities/<int:id_zh>", methods=["GET"])
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
-def get_geography(id_zh, info_role):
+def get_municipalities(id_zh, info_role):
     """Get geographic information by zh id
     """
     try:
-        # get departments
-        q_deps = CorZhArea.get_departments(id_zh)
-        departments = [{
-            dep.LAreas.area_code: dep.LAreas.area_name
-        } for dep in q_deps]
-
-        # get municipalities
-        q_municipalities = CorZhArea.get_municipalities_info(id_zh)
-        municipalities = [{
-            municipality.LiMunicipalities.insee_com: municipality.LiMunicipalities.nom_com
-        } for municipality in q_municipalities]
-
-        # get regions
-        region_list = []
-        for municipality in q_municipalities:
-            if municipality.LiMunicipalities.insee_reg not in region_list:
-                region_list.append(municipality.LiMunicipalities.insee_reg)
-        q_region = DB.session.query(InseeRegions).filter(
-            InseeRegions.insee_reg.in_(region_list)).all()
-        regions = [region.region_name for region in q_region]
-
-        return {"departments": departments, "municipalities": municipalities, "regions": regions}, 200
+        return [municipality.LiMunicipalities.nom_com for municipality in CorZhArea.get_municipalities_info(id_zh)]
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':
             raise ZHApiError(message='zh id exist?', details=str(e))

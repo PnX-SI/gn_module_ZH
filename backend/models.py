@@ -504,7 +504,6 @@ class ZH(TZH):
         return regions
 
     def get_geo_info(self):
-        geo_info = {}
         departments = self.get_departments()
         q_municipalities = CorZhArea.get_municipalities_info(self.zh.id_zh)
         municipalities = self.get_municipalities(q_municipalities)
