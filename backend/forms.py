@@ -479,6 +479,25 @@ def update_zh_tab6(data):
     DB.session.flush()
 
 
+def update_urban_docs(id_zh, urban_docs):
+    DB.session.query(TUrbanPlanningDocs).filter(
+        TUrbanPlanningDocs.id_zh == id_zh).delete()
+    post_instruments(id_zh, TUrbanPlanningDocs)
+
+
+def post_urban_docs(id_zh, urban_docs):
+    for urban_doc in urban_docs:
+        DB.session.add(
+            TUrbanPlanningDocs(
+                id_area=urban_doc.id_area,
+                id_zh=id_zh,
+                id_urban_type=urban_doc.id_urban_type,
+                remark=urban_doc.remark
+            )
+        )
+        DB.session.flush()
+
+
 # tab 7
 
 
