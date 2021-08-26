@@ -46,7 +46,8 @@ export class ZhFormTab2Component implements OnInit {
     this.initTab();
 
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
-      this.$_fromChangeSub.unsubscribe();
+      if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
+      this.$_currentZhSub.unsubscribe();
       if (tabPosition == 2) {
         this.initTab();
       }
@@ -110,11 +111,12 @@ export class ZhFormTab2Component implements OnInit {
       critere_delim: [],
       id_zh: Number(this._currentZh.properties.id_zh),
       remark_lim_fs: formValues.remark_lim_fs,
-      remark_lim: formValues.remark_lim_fs,
+      remark_lim: formValues.remark_lim,
       critere_delim_fs: [],
     };
 
     if (this.formTab2.valid) {
+      this.$_fromChangeSub.unsubscribe();
       formValues.critere_delim.forEach((critere) => {
         formToPost.critere_delim.push(critere.id_nomenclature);
       });
@@ -124,11 +126,16 @@ export class ZhFormTab2Component implements OnInit {
       this.posted = true;
       this._dataService.postDataForm(formToPost, 2).subscribe(
         () => {
-          this.posted = false;
-          this.canChangeTab.emit(true);
-          this._toastr.success("Vos données sont bien enregistrées", "", {
-            positionClass: "toast-top-right",
-          });
+          this._dataService
+            .getZhById(this._currentZh.properties.id_zh)
+            .subscribe((zh: any) => {
+              this._dataService.setCurrentZh(zh);
+              this.posted = false;
+              this.canChangeTab.emit(true);
+              this._toastr.success("Vos données sont bien enregistrées", "", {
+                positionClass: "toast-top-right",
+              });
+            });
         },
         (error) => {
           this.posted = false;
@@ -142,6 +149,6 @@ export class ZhFormTab2Component implements OnInit {
 
   ngOnDestroy() {
     this.$_currentZhSub.unsubscribe();
-    this.$_fromChangeSub.unsubscribe();
+    if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
   }
 }

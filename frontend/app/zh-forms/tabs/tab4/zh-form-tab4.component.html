@@ -1,154 +1,461 @@
 <div class="container-fluid">
-    <form>
-        <fieldset>
-            <legend>
-                <h5 class="section-title">Régime hydrique</h5>
-            </legend>
-            <div class="form-row">
-                <div class="form-group col-md-4">
-                    <small>Entrée d'eau</small>
-                    <select 
-                    class="form-control form-control-sm" 
+  <form [formGroup]="formTab4">
+    <fieldset>
+      <legend>
+        <h5 class="section-title">Régime hydrique</h5>
+      </legend>
+      <div class="form-row">
+        <button
+          mat-raised-button
+          class="mb-3"
+          color="primary"
+          (click)="onAddInflow($event, inflowModal)"
+        >
+          <mat-icon>add_box</mat-icon>
+          une entrée d'eau
+        </button>
+        <button
+          mat-raised-button
+          class="mb-3 ml-3"
+          color="accent"
+          (click)="onAddOutflow($event, outflowModal)"
+        >
+          <mat-icon>add_box</mat-icon>
+          une sortie d'eau
+        </button>
+        <div
+          *ngIf="inflowsTable && inflowsTable.length > 0"
+          class="table-responsive"
+        >
+          <table class="table">
+            <thead class="thead-inverse table-header">
+              <tr>
+                <th *ngFor="let col of inflowTableCol">{{ col.label }}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let inflow of inflowsTable">
+                <td *ngFor="let col of inflowTableCol">
+                  {{ inflow[col.name]?.mnemonique || inflow[col.name] }}
+                </td>
+                <td>
+                  <div>
+                    <button
+                      mat-icon-button
+                      class="mr-2"
+                      placement="top"
+                      ngbTooltip="Editer"
                     >
-                        <option></option>
-                        <option>option 1</option>
-                        <option>option 2</option>
-                    </select>
-                </div>
-                <div class="form-group col-md-4">
-                    <small>Permanence</small>
-                    <select 
-                    class="form-control form-control-sm" 
+                      <mat-icon
+                        class="edit-icon"
+                        (click)="onEditInflow(inflowModal, inflow)"
+                        >edit</mat-icon
+                      >
+                    </button>
+                    <button
+                      mat-icon-button
+                      placement="top"
+                      ngbTooltip="Supprimer"
+                      (click)="onDeleteInflow(inflow)"
                     >
-                        <option></option>
-                        <option>option 1</option>
-                        <option>option 2</option>
-                    </select>
-                </div>
-                <div class="form-group col-md-4">
-                    <small>Toponymie et complément d'informations</small>
-                    <input
-                        class="form-control form-control-sm"
-                        type='text'
-                    />
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-md-4">
-                    <small>Sortie d'eau</small>
-                    <select 
-                    class="form-control form-control-sm" 
+                      <mat-icon class="delete-icon">close</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="form-row">
+        <div
+          *ngIf="outflowsTable && outflowsTable.length > 0"
+          class="table-responsive"
+        >
+          <table class="table">
+            <thead class="thead-inverse table-header">
+              <tr>
+                <th *ngFor="let col of outflowTableCol">{{ col.label }}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let outflow of outflowsTable">
+                <td *ngFor="let col of outflowTableCol">
+                  {{ outflow[col.name]?.mnemonique || outflow[col.name] }}
+                </td>
+                <td>
+                  <div>
+                    <button
+                      mat-icon-button
+                      class="mr-2"
+                      placement="top"
+                      ngbTooltip="Editer"
                     >
-                        <option></option>
-                        <option>option 1</option>
-                        <option>option 2</option>
-                    </select>
-                </div>
-                <div class="form-group col-md-4">
-                    <small>Permanence</small>
-                    <select 
-                    class="form-control form-control-sm" 
+                      <mat-icon
+                        class="edit-icon"
+                        (click)="onEditOutflow(outflowModal, outflow)"
+                        >edit</mat-icon
+                      >
+                    </button>
+                    <button
+                      mat-icon-button
+                      placement="top"
+                      ngbTooltip="Supprimer"
+                      (click)="onDeleteOutflow(outflow)"
                     >
-                        <option></option>
-                        <option>option 1</option>
-                        <option>option 2</option>
-                    </select>
-                </div>
-                <div class="form-group col-md-4">
-                    <small>Toponymie et complément d'informations</small>
-                    <input
-                        class="form-control form-control-sm"
-                        type='text'
-                    />
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-md-4">
-                    <small>Submersion fréquence</small>
-                    <select 
-                    class="form-control form-control-sm" 
-                    >
-                        <option></option>
-                        <option>option 1</option>
-                        <option>option 2</option>
-                    </select>
-                </div>
-                <div class="form-group col-md-4">
-                    <small>Submersion étendue</small>
-                    <select 
-                    class="form-control form-control-sm" 
-                    >
-                        <option></option>
-                        <option>option 1</option>
-                        <option>option 2</option>
-                    </select>
-                </div>
-            </div>
-        </fieldset>
-        <fieldset>
-            <legend>
-                <h5 class="section-title">Connexion de la zone humide dans son environement</h5>
-            </legend>
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <small>Type de connexion</small>
-                    <select 
-                    class="form-control form-control-sm" 
-                    >
-                    <option></option>
-                    <option>option 1</option>
-                    <option>option 2</option>
-                    </select>
-                </div>
-                <div class="form-group col-md-12">
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" value="option1">
-                        <label class="form-check-label" for="inlineCheckbox1">1</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" value="option2">
-                        <label class="form-check-label" for="inlineCheckbox2">2</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" value="option3">
-                        <label class="form-check-label" for="inlineCheckbox3">3</label>
-                    </div>
-                </div>
-            </div>
-        </fieldset>
-        <fieldset>
-            <legend>
-                <h5 class="section-title">Diagnostic fonctionnel</h5>
-            </legend>
-            <div class="form-row">
-                <div class="form-group col-md-4">
-                    <small>Fonctionalité hydrologique</small>
-                    <select 
-                    class="form-control form-control-sm" 
-                    >
-                        <option></option>
-                        <option>option 1</option>
-                        <option>option 2</option>
-                    </select>
-                </div>
-                <div class="form-group col-md-4">
-                    <small>Fonctionalité biologique</small>
-                    <select 
-                    class="form-control form-control-sm" 
-                    >
-                        <option></option>
-                        <option>option 1</option>
-                        <option>option 2</option>
-                    </select>
-                </div>
-                <div class="form-group col-md-4">
-                    <small>Commentaires</small>
-                    <input
-                        class="form-control form-control-sm"
-                        type='text'
-                    />
-                </div>
-            </div>
-        </fieldset>
-    </form>
+                      <mat-icon class="delete-icon">close</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <small>Submersion fréquence</small>
+          <select
+            class="form-control"
+            [formControl]="formTab4.controls.frequency"
+          >
+            <option></option>
+            <option
+              *ngFor="let freq of formMetaData.SUBMERSION_FREQ"
+              [ngValue]="freq"
+            >
+              {{ freq.mnemonique }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group col-md-4">
+          <small>Submersion étendue</small>
+          <select class="form-control" [formControl]="formTab4.controls.spread">
+            <option></option>
+            <option
+              *ngFor="let spread of formMetaData.SUBMERSION_ETENDUE"
+              [ngValue]="spread"
+            >
+              {{ spread.mnemonique }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>
+        <h5 class="section-title">
+          Connexion de la zone humide dans son environement
+        </h5>
+      </legend>
+
+      <div class="radio-list">
+        <div class="d-flex flex-column align-items-center">
+          <small>Traversée</small>
+          <label class="form-check-label p-3">
+            <img src="external_assets/zones_humides/traversee.svg" alt=""
+          /></label>
+          <input
+            type="radio"
+            name="inlineRadioOptions"
+            id="inlineRadio1"
+            [formControl]="formTab4.controls.connexion"
+            [value]="728"
+          />
+        </div>
+        <div class="d-flex flex-column align-items-center">
+          <small>Entrée et sortie</small>
+          <label class="form-check-label p-3">
+            <img src="external_assets/zones_humides/entree_sortie.svg" alt=""
+          /></label>
+          <input
+            type="radio"
+            name="inlineRadioOptions"
+            id="inlineRadio2"
+            [formControl]="formTab4.controls.connexion"
+            [value]="729"
+          />
+        </div>
+        <div class="d-flex flex-column align-items-center">
+          <small>Entrée</small>
+          <label class="form-check-label p-3">
+            <img src="external_assets/zones_humides/entree.svg" alt=""
+          /></label>
+          <input
+            type="radio"
+            name="inlineRadioOptions"
+            id="inlineRadio3"
+            [formControl]="formTab4.controls.connexion"
+            [value]="730"
+          />
+        </div>
+        <div class="d-flex flex-column align-items-center">
+          <small>Sorite</small>
+          <label class="form-check-label p-3">
+            <img src="external_assets/zones_humides/sortie.svg" alt=""
+          /></label>
+          <input
+            type="radio"
+            name="inlineRadioOptions"
+            id="inlineRadio4"
+            [formControl]="formTab4.controls.connexion"
+            [value]="731"
+          />
+        </div>
+        <div class="d-flex flex-column align-items-center">
+          <small>Passe à coté</small>
+          <label class="form-check-label p-3">
+            <img src="external_assets/zones_humides/passe_a_cote.svg" alt=""
+          /></label>
+          <input
+            type="radio"
+            name="inlineRadioOptions"
+            id="inlineRadio5"
+            [formControl]="formTab4.controls.connexion"
+            [value]="732"
+          />
+        </div>
+        <div class="d-flex flex-column align-items-center">
+          <small>Aucunne connexion</small>
+          <label class="form-check-label p-3">
+            <img
+              src="external_assets/zones_humides/aucune_connexion.svg"
+              alt=""
+          /></label>
+          <input
+            type="radio"
+            name="inlineRadioOptions"
+            id="inlineRadio6"
+            [formControl]="formTab4.controls.connexion"
+            [value]="733"
+          />
+        </div>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>
+        <h5 class="section-title">Diagnostic fonctionnel</h5>
+      </legend>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <small>Fonctionalité hydrologique</small>
+          <select
+            class="form-control"
+            [formControl]="formTab4.controls.diag_hydro"
+          >
+            <option></option>
+            <option
+              *ngFor="let fct_hydro of formMetaData.FONCTIONNALITE_HYDRO"
+              [ngValue]="fct_hydro"
+            >
+              {{ fct_hydro.mnemonique }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group col-md-6">
+          <small>Fonctionalité biologique</small>
+          <select
+            class="form-control"
+            [formControl]="formTab4.controls.diag_bio"
+          >
+            <option></option>
+            <option
+              *ngFor="let fct_bio of formMetaData.FONCTIONNALITE_BIO"
+              [ngValue]="fct_bio"
+            >
+              {{ fct_bio.mnemonique }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group col-md-12">
+        <small>Commentaires</small>
+        <textarea
+          class="form-control"
+          [formControl]="formTab4.controls.remark_diag"
+          rows="3"
+        ></textarea>
+      </div>
+    </fieldset>
+    <div class="footer-btn">
+      <button
+        type="submit"
+        mat-raised-button
+        color="primary"
+        class="ml-3"
+        [disabled]="posted"
+        (click)="onFormSubmit()"
+      >
+        <mat-icon *ngIf="!posted">save_outline</mat-icon>
+        <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
+        Enregister
+      </button>
+    </div>
+  </form>
 </div>
+<!-- MODAL ENTREE EAU -->
+<ng-template #inflowModal let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h6>{{ inflowModalTitle }}</h6>
+    <button mat-icon-button class="closeModalBtn" (click)="c()">
+      <mat-icon class="cancel-icon">cancel</mat-icon>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="inflowForm">
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <small class="required">Entrée d'eau</small>
+          <select
+            class="form-control custom-select"
+            ngbAutofocus
+            [formControl]="inflowForm.controls.inflow"
+          >
+            <option
+              *ngFor="let inflow of inflowInput"
+              [ngValue]="inflow"
+              [disabled]="inflow.disabled"
+            >
+              {{ inflow.mnemonique }}
+            </option>
+          </select>
+          <small
+            *ngIf="
+              (inflowForm.controls.inflow.touched || inflowFormSubmitted) &&
+              inflowForm.controls.inflow.errors?.required
+            "
+            class="error-msg"
+            >Champ requis</small
+          >
+        </div>
+        <div class="form-group col-md-6">
+          <small class="required">Permanence</small>
+          <select
+            class="form-control"
+            [formControl]="inflowForm.controls.permanance"
+          >
+            <option
+              *ngFor="let permanance of formMetaData.PERMANENCE_ENTREE"
+              [ngValue]="permanance"
+            >
+              {{ permanance.mnemonique }}
+            </option>
+          </select>
+          <small
+            *ngIf="
+              (inflowForm.controls.permanance.touched || inflowFormSubmitted) &&
+              inflowForm.controls.permanance.errors?.required
+            "
+            class="error-msg"
+            >Champ requis</small
+          >
+        </div>
+
+        <div class="form-group col-md-12">
+          <small>Toponymie et compléments d'information</small>
+          <textarea
+            class="form-control"
+            [formControl]="inflowForm.controls.topo"
+            rows="3"
+          ></textarea>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      mat-raised-button
+      color="primary"
+      class="uppercase"
+      (click)="patchInflow ? onPatchInflow() : onPostInflow()"
+    >
+      {{ inflowModalBtnLabel }}
+    </button>
+  </div>
+</ng-template>
+<!-- MODAL SORTIE EAU -->
+<ng-template #outflowModal let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h6>{{ outflowModalTitle }}</h6>
+    <button mat-icon-button class="closeModalBtn" (click)="c()">
+      <mat-icon class="cancel-icon">cancel</mat-icon>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="outflowForm">
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <small class="required">Sortie d'eau</small>
+          <select
+            class="form-control custom-select"
+            ngbAutofocus
+            [formControl]="outflowForm.controls.outflow"
+          >
+            <option
+              *ngFor="let outflow of outflowInput"
+              [ngValue]="outflow"
+              [disabled]="outflow.disabled"
+            >
+              {{ outflow.mnemonique }}
+            </option>
+          </select>
+          <small
+            *ngIf="
+              (outflowForm.controls.outflow.touched || outflowFormSubmitted) &&
+              outflowForm.controls.outflow.errors?.required
+            "
+            class="error-msg"
+            >Champ requis</small
+          >
+        </div>
+        <div class="form-group col-md-6">
+          <small class="required">Permanence</small>
+          <select
+            class="form-control"
+            [formControl]="outflowForm.controls.permanance"
+          >
+            <option
+              *ngFor="let permanance of formMetaData.PERMANENCE_SORTIE"
+              [ngValue]="permanance"
+            >
+              {{ permanance.mnemonique }}
+            </option>
+          </select>
+          <small
+            *ngIf="
+              (outflowForm.controls.permanance.touched ||
+                outflowFormSubmitted) &&
+              outflowForm.controls.permanance.errors?.required
+            "
+            class="error-msg"
+            >Champ requis</small
+          >
+        </div>
+
+        <div class="form-group col-md-12">
+          <small>Toponymie et compléments d'information</small>
+          <textarea
+            class="form-control"
+            [formControl]="outflowForm.controls.topo"
+            rows="3"
+          ></textarea>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      mat-raised-button
+      color="primary"
+      class="uppercase"
+      (click)="patchOutflow ? onPatchOutflow() : onPostOutflow()"
+    >
+      {{ outflowModalBtnLabel }}
+    </button>
+  </div>
+</ng-template>

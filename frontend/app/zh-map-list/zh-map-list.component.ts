@@ -150,18 +150,14 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   zhCustomCallBack(feature): any {
-    console.log("feature", this.mapListService.geojsonData);
-
     // set Author name
     feature["properties"]["author"] = this.displayAuthorName(
       feature["properties"]["authors"]
     );
-
     // format Date
     feature["properties"]["create_date"] = this.displayDate(
       feature["properties"]["create_date"]
     );
-
     return feature;
   }
 

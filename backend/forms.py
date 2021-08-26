@@ -339,7 +339,7 @@ def post_inflow(id_zh, inflows):
     for inflow in inflows:
         DB.session.add(
             TInflow(
-                id_outflow=inflow['id_outflow'],
+                id_inflow=inflow['id_inflow'],
                 id_zh=id_zh,
                 id_permanance=inflow['id_permanance'],
                 topo=inflow['topo']
