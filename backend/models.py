@@ -1149,6 +1149,7 @@ class CorUrbanTypeRange(DB.Model):
         ranges = []
         for range in q_ranges:
             ranges.append({
+                "id_cor": range.id_cor,
                 "id_nomenclature": range.id_doc_type,
                 "mnemonique": DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == range.id_doc_type).one().mnemonique
             })

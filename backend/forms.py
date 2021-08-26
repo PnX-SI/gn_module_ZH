@@ -491,7 +491,7 @@ def post_urban_docs(id_zh, urban_docs):
             TUrbanPlanningDocs(
                 id_area=urban_doc.id_area,
                 id_zh=id_zh,
-                id_urban_type=urban_doc.id_urban_type,
+                id_urban_type=urban_doc.id_cor,
                 remark=urban_doc.remark
             )
         )
