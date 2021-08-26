@@ -472,6 +472,13 @@ def post_protections(id_zh, protections):
         DB.session.flush()
 
 
+def update_zh_tab6(data):
+    DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
+        TZH.is_other_inventory: data['is_other_inventory']
+    })
+    DB.session.flush()
+
+
 # tab 7
 
 
@@ -501,3 +508,4 @@ def post_actions(id_zh, actions):
             id_priority_level=action['id_priority_level'],
             remark=action['remark']
         ))
+        DB.session.flush()
