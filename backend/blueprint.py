@@ -180,10 +180,13 @@ def get_zh_eval(id_zh, info_role):
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
 def get_municipalities(id_zh, info_role):
-    """Get geographic information by zh id
+    """Get municipalities list
     """
     try:
-        return [municipality.LiMunicipalities.nom_com for municipality in CorZhArea.get_municipalities_info(id_zh)]
+        return [{
+            "municipality_name": municipality.LiMunicipalities.nom_com,
+            "id_area": municipality.CorZhArea.id_area
+        } for municipality in CorZhArea.get_municipalities_info(id_zh)]
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':
             raise ZHApiError(message='zh id exist?', details=str(e))
@@ -391,6 +394,9 @@ def get_tab_data(id_tab, info_role):
             # {"protections": [id_protection1, id_protection2, ...]
             update_protections(
                 form_data['id_zh'], form_data['protections'])
+            # "is_other_inventory": boolean
+            update_zh_tab6(form_data)
+            #
 
         if id_tab == 7:
             update_zh_tab7(form_data)
