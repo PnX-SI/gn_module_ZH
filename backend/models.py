@@ -1155,6 +1155,29 @@ class CorUrbanTypeRange(DB.Model):
         return ranges
 
 
+class TUrbanPlanningDocs(DB.Model):
+    __tablename__ = "t_urban_planning_docs"
+    __table_args__ = {"schema": "pr_zh"}
+    id_doc = DB.Column(
+        DB.Integer,
+        primary_key=True
+    )
+    id_area = DB.Column(
+        DB.Integer,
+        nullable=False
+    )
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        nullable=False
+    )
+    id_urban_type = DB.Column(
+        DB.Integer,
+        ForeignKey(CorUrbanTypeRange.id_cor),
+        nullable=False
+    )
+
+
 class CorProtectionLevelType(DB.Model):
     __tablename__ = "cor_protection_level_type"
     __table_args__ = {"schema": "pr_zh"}
