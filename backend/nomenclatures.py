@@ -88,6 +88,7 @@ def get_function_list(mnemo):
     nomenclature_ids = [nomenc.id_nomenclature for nomenc in DB.session.query(TNomenclatures).filter(
         TNomenclatures.id_type == id_type_main_function).all()]
 
+    """
     # get mnemo main_functions
     main_functions_ids = CorMainFct.get_main_function_list(nomenclature_ids)
 
@@ -109,6 +110,22 @@ def get_function_list(mnemo):
         else:
             list_by_main_function.append({type_mnemo: nomenc_list})
     return list_by_main_function
+    """
+
+    q_functions = CorMainFct.get_functions(nomenclature_ids)
+
+    nomenc_list = []
+    for function in q_functions:
+        nomenc_list.append(
+            {
+                "id_nomenclature": function.CorMainFct.id_function,
+                "mnemonique": function.TNomenclatures.mnemonique,
+                "id_category": function.CorMainFct.id_main_function,
+                "category": DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == function.CorMainFct.id_main_function).one().mnemonique
+            }
+        )
+
+    return nomenc_list
 
 
 def get_urban_docs():
