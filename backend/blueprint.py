@@ -57,6 +57,8 @@ from .repositories import (
     ZhRepository
 )
 
+from .complete_card import *
+
 from .api_error import ZHApiError
 
 import pdb
@@ -153,6 +155,78 @@ def get_zh_by_id(id_zh, info_role):
     try:
         full_zh = ZH(id_zh).get_full_zh()
         return full_zh
+
+    except Exception as e:
+        if e.__class__.__name__ == 'NoResultFound':
+            raise ZHApiError(message='zh id exist?', details=str(e))
+        raise ZHApiError(message=str(e), details=str(e))
+
+
+@blueprint.route("/<int:id_zh>/complete_card", methods=["GET"])
+@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@json_resp
+def get_complete_info(id_zh, info_role):
+    """Get zh complete info
+    """
+    try:
+        full_zh = ZH(id_zh).get_full_zh()
+        complete_card = {}
+
+        identification = {
+            "Nom usuel de la zone humide": full_zh.properties['main_name'],
+            "Autre nom": full_zh.properties['secondary_name'],
+            "Partie d'un ensemble": get_is_site_space(full_zh.properties['is_id_site_space']),
+            "Nom du grand ensemble": TZH.get_site_space_name(full_zh.properties['id_site_space']),
+            "Code de la zone humide": full_zh.properties['code']
+        }
+
+        localisation = {
+            "Région": full_zh.properties['geo_info']['regions'],
+            "Département": full_zh.properties['geo_info']['departments'],
+            "Commune": get_communes_info(full_zh.properties['id_zh'])
+        }
+
+        auteur = {
+            "Auteur de la fiche": get_author(full_zh.properties['id_zh']),
+            "Auteur des dernières modifications": get_author(full_zh.properties['id_zh'], type='co-author'),
+            "Date d'établissement": datetime.strptime(full_zh.properties['create_date'], '%Y-%m-%d %H:%M:%S').date().strftime("%d/%m/%Y"),
+            "Date des dernières modifications": datetime.strptime(full_zh.properties['update_date'], '%Y-%m-%d %H:%M:%S.%f').date().strftime("%d/%m/%Y")
+        }
+
+        references = get_references(full_zh.properties['id_references'])
+
+        complete_card.update({
+            "Renseignements généraux": {
+                "Identification de la zone humide": identification,
+                "Localisation de la zone humide": localisation,
+                "Auteur": auteur,
+                "Principales références bibliographiques": references
+            },
+            "Délimitation de la zone humide et de l'espace de fonctionnalité": {
+                "Critères de délimitation de la zone humide": {
+                    "Critères utilisés": get_mnemo(full_zh.properties['id_lims']),
+                    "Remarque": full_zh.properties['remark_lim']
+                },
+                "Critère de délimitation de l'espace de fonctionnalité": {
+                    "Critères utilisés": get_mnemo(full_zh.properties['id_lims_fs']),
+                    "Remarque": full_zh.properties['remark_lim_fs']
+                }
+            },
+            "Description du bassin versant et de la zone humide": {
+                "Présentation de la zone humide et de ses milieux": {
+                    "Typologie SDAGE": get_mnemo(full_zh.properties['id_sdage']),
+                    "Typologie locale": get_mnemo(full_zh.properties['id_sage']),
+                    # "Corine Biotope": get_mnemo(full_zh.properties['cb_codes_corine_biotope']),
+                    "Remarques": full_zh.properties['remark_pres']
+                },
+                "Description de l'espace de fonctionnalité": {
+                    "Occupation des sols": get_mnemo(full_zh.properties['id_corine_landcovers'])
+                }
+                #"Usage et processus naturels"
+            }
+        })
+
+        return complete_card
 
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':

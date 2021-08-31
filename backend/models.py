@@ -281,8 +281,17 @@ class TZH(ZhModel):
         primaryjoin=(User.id_role == create_author)
     )
 
+    coauthors = DB.relationship(
+        User,
+        lazy="joined",
+        primaryjoin=(User.id_role == update_author)
+    )
+
     def get_geofeature(self, recursif=True, relationships=()):
         return self.as_geofeature("geom", "id_zh", recursif, relationships=relationships)
+
+    def get_site_space_name(id):
+        return DB.session.query(BibSiteSpace).filter(BibSiteSpace.id_site_space == id).one().name
 
     @staticmethod
     def get_zh_area_intersected(zh_area_type, id_zh_geom):
