@@ -216,7 +216,7 @@ def get_complete_info(id_zh, info_role):
                 "Présentation de la zone humide et de ses milieux": {
                     "Typologie SDAGE": get_mnemo(full_zh.properties['id_sdage']),
                     "Typologie locale": get_mnemo(full_zh.properties['id_sage']),
-                    "Corine Biotope": get_cb(full_zh.properties['hab_heritages']),
+                    "Corine Biotope": get_cb(full_zh.properties['cb_codes_corine_biotope']),
                     "Remarques": full_zh.properties['remark_pres']
                 },
                 "Description de l'espace de fonctionnalité": {
@@ -226,6 +226,20 @@ def get_complete_info(id_zh, info_role):
                     "Activités": get_activities(full_zh.properties['activities']),
                     "Evaluation globale des menaces potentielles ou avérées": get_mnemo(full_zh.properties['id_thread']),
                     "Remarques": full_zh.properties['global_remark_activity']
+                }
+            },
+            "Fonctionnement de la zone humide": {
+                "Régime hydrique": {
+                    "Entrée d'eau": get_flows(full_zh.properties['flows'], type="inflows"),
+                    "Sortie d'eau": get_flows(full_zh.properties['flows'], type="outflows"),
+                    "Submersion fréquence": get_mnemo(full_zh.properties['id_frequency']),
+                    "Submersion étendue": get_mnemo(full_zh.properties['id_spread']),
+                },
+                "Connexion de la zone humide dans son environnement": get_mnemo(full_zh.properties['id_connexion']),
+                "Diagnostic fonctionnel": {
+                    "Fonctionnalité hydrologique / biogéochimique": get_mnemo(full_zh.properties['id_diag_hydro']),
+                    "Fonctionnalité biologique / écologique": get_mnemo(full_zh.properties['id_diag_bio']),
+                    "Commentaires": full_zh.properties['remark_diag']
                 }
             }
         })

@@ -97,3 +97,24 @@ def get_cb(cb_ids):
                 })
         return cbs_info
     return "Non renseigné"
+
+
+def get_flows(flows, type):
+    if type == "inflows":
+        flow_type = "Entrée d'eau"
+        id_key = "id_inflow"
+        flows = flows[1]  # to do : correct json input
+    else:
+        flow_type = "Sortie d'eau"
+        id_key = "id_outflow"
+        flows = flows[0]  # to do : correct json input
+    if flows[type]:
+        return [
+            {
+                flow_type: get_mnemo(flow[id_key]),
+                "Permanence": get_mnemo(flow["id_permanance"]),
+                "Toponymie et compléments d'information": flow["topo"]
+            }
+            for flow in flows[type]
+        ]
+    return "Non renseigné"
