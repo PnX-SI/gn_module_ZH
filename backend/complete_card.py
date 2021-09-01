@@ -47,31 +47,53 @@ def get_author(id_zh, type='author'):
 
 
 def get_references(ref_list):
-    return [
-        {
-            "Titre du document": ref['title'],
-            "Auteurs": ref['authors'],
-            "Année de parution": ref['pub_year'],
-            "Bassins versants": 'en attente',
-            "Editeur": ref['editor'],
-            "Lieu": ref['editor_location']
-        }
-        for ref in ref_list
-    ]
+    if ref_list:
+        return [
+            {
+                "Titre du document": ref['title'],
+                "Auteurs": ref['authors'],
+                "Année de parution": ref['pub_year'],
+                "Bassins versants": 'en attente',
+                "Editeur": ref['editor'],
+                "Lieu": ref['editor_location']
+            }
+            for ref in ref_list
+        ]
+    return "Non renseigné"
 
 
 def get_mnemo(ids):
-    if type(ids) is int:
-        if ids:
-            mnemo = DB.session.query(TNomenclatures).filter(
-                TNomenclatures.id_nomenclature == ids).one().mnemonique
-        else:
-            mnemo = "Non renseigné"
-    else:
-        if ids:
-            mnemo = [DB.session.query(TNomenclatures).filter(
-                TNomenclatures.id_nomenclature == id).one().mnemonique
-                for id in ids]
-        else:
-            mnemo = "Non renseigné"
-    return mnemo
+    if ids:
+        if type(ids) is int:
+            return DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == ids).one().mnemonique
+        return [DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == id).one().mnemonique for id in ids]
+    return "Non renseigné"
+
+
+def get_activities(activities):
+    if activities:
+        return [
+            {
+                "Activité humaine": get_mnemo(activity['id_human_activity']),
+                "Localisation": get_mnemo(activity['id_localisation']),
+                "Impacts": get_mnemo(activity['ids_impact']),
+                "Remarques": activity['remark_activity']
+            }
+            for activity in activities
+        ]
+    return "Non renseigné"
+
+
+def get_cb(cb_ids):
+    if cb_ids:
+        cbs = BibCb.get_label()
+        cbs_info = {}
+        for cb in cbs:
+            if cb.BibCb.lb_code in cb_ids:
+                cbs_info.update({
+                    "Code Corine Biotope": cb.BibCb.lb_code,
+                    "Libellé Corine Biotope": cb.Habref.lb_hab_fr,
+                    "Humidité": cb.BibCb.humidity
+                })
+        return cbs_info
+    return "Non renseigné"

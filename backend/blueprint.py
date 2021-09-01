@@ -216,13 +216,17 @@ def get_complete_info(id_zh, info_role):
                 "Présentation de la zone humide et de ses milieux": {
                     "Typologie SDAGE": get_mnemo(full_zh.properties['id_sdage']),
                     "Typologie locale": get_mnemo(full_zh.properties['id_sage']),
-                    # "Corine Biotope": get_mnemo(full_zh.properties['cb_codes_corine_biotope']),
+                    "Corine Biotope": get_cb(full_zh.properties['hab_heritages']),
                     "Remarques": full_zh.properties['remark_pres']
                 },
                 "Description de l'espace de fonctionnalité": {
                     "Occupation des sols": get_mnemo(full_zh.properties['id_corine_landcovers'])
+                },
+                "Usage et processus naturels": {
+                    "Activités": get_activities(full_zh.properties['activities']),
+                    "Evaluation globale des menaces potentielles ou avérées": get_mnemo(full_zh.properties['id_thread']),
+                    "Remarques": full_zh.properties['global_remark_activity']
                 }
-                #"Usage et processus naturels"
             }
         })
 
