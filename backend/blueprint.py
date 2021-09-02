@@ -175,7 +175,7 @@ def get_complete_info(id_zh, info_role):
         identification = {
             "Nom usuel de la zone humide": full_zh.properties['main_name'],
             "Autre nom": full_zh.properties['secondary_name'],
-            "Partie d'un ensemble": get_is_site_space(full_zh.properties['is_id_site_space']),
+            "Partie d'un ensemble": get_bool(full_zh.properties['is_id_site_space']),
             "Nom du grand ensemble": TZH.get_site_space_name(full_zh.properties['id_site_space']),
             "Code de la zone humide": full_zh.properties['code']
         }
@@ -241,6 +241,18 @@ def get_complete_info(id_zh, info_role):
                     "Fonctionnalité biologique / écologique": get_mnemo(full_zh.properties['id_diag_bio']),
                     "Commentaires": full_zh.properties['remark_diag']
                 }
+            },
+            "Fonctions écologiques, valeurs socio-écologiques, intérêt patrimonial": {
+                "Fonctions hydrologiques / biogéochimiques": get_function_info(full_zh.properties['fonctions_hydro'], type="fonctions_hydro"),
+                "Fonctions biologiques / écologiques": get_function_info(full_zh.properties['fonctions_bio'], type="fonctions_bio"),
+                "Intérêt patrimonial": get_function_info(full_zh.properties['interet_patrim'], type="interet_patrim"),
+                "Habitats naturels humides patrimoniaux": {
+                    "Cartographie d'habitats": get_bool(full_zh.properties['is_carto_hab']),
+                    "Nombre d'habitats": get_int(full_zh.properties['nb_hab']),
+                    "Recouvrement total de la ZH (%)": "Non évalué" if full_zh.properties['total_hab_cover'] == "999" else full_zh.properties['total_hab_cover'],
+                    "Habitats naturels patrimoniaux": get_hab_heritages(full_zh.properties['hab_heritages'])
+                },
+                "Valeurs socio-économiques": get_function_info(full_zh.properties['val_soc_eco'], type="val_soc_eco")
             }
         })
 
