@@ -346,6 +346,7 @@ class ZH(TZH):
         self.interet_patrim = self.get_functions('INTERET_PATRIM')
         self.val_soc_eco = self.get_functions('VAL_SOC_ECO')
         self.hab_heritages = self.get_hab_heritages()
+        self.managements = self.get_managements()
         self.actions = self.get_actions()
         self.eval_fonctions_hydro = self.get_functions(
             'FONCTIONS_HYDRO', is_eval=True)
@@ -458,6 +459,29 @@ class ZH(TZH):
             "hab_heritages": hab_heritages
         }
 
+    def get_managements(self):
+        q_management_structures = TManagementStructures.get_management_structures_by_id(
+            self.zh.id_zh)
+        managements = []
+        for management in q_management_structures:
+            q_management_plans = DB.session.query(
+                TManagementPlans).filter(management.id_structure).all()
+            plans = []
+            if q_management_plans:
+                for plan in q_management_plans:
+                    plans.append({
+                        "id_nature": plan["id_nature"],
+                        "plan_date": plan["plan_date"],
+                        "duration": plan["duration"]
+                    })
+            managements.append({
+                "structure": management.id_org,
+                "plans": plans
+            })
+        return {
+            "managements": managements
+        }
+
     def get_actions(self):
         q_actions = TActions.get_actions_by_id(self.zh.id_zh)
         actions = []
@@ -527,6 +551,7 @@ class ZH(TZH):
         full_zh.properties.update(self.interet_patrim)
         full_zh.properties.update(self.val_soc_eco)
         full_zh.properties.update(self.hab_heritages)
+        full_zh.properties.update(self.managements)
         full_zh.properties.update(self.actions)
         return full_zh
 
@@ -1342,4 +1367,48 @@ class InseeRegions(DB.Model):
     region_name = DB.Column(
         DB.Unicode(length=50),
         nullable=False
+    )
+
+
+class TManagementStructures(DB.Model):
+    __tablename__ = "t_management_structures"
+    __table_args__ = {"schema": "pr_zh"}
+    id_structure = DB.Column(
+        DB.Integer,
+        primary_key=True,
+        autoincrement=True)
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh)
+    )
+    id_org = DB.Column(
+        DB.Integer,
+        ForeignKey(BibOrganismes.id_org)
+    )
+
+    def get_management_structures_by_id(id_zh):
+        return DB.session.query(TManagementStructures).filter(
+            TManagementStructures.id_zh == id_zh).all()
+
+
+class TManagementPlans(DB.Model):
+    __tablename__ = "t_management_plans"
+    __table_args__ = {"schema": "pr_zh"}
+    id_plan = DB.Column(
+        DB.Integer,
+        primary_key=True,
+        autoincrement=True)
+    id_nature = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature)
+    )
+    id_structure = DB.Column(
+        DB.Integer,
+        ForeignKey(TManagementStructures.id_structure)
+    )
+    plan_date = DB.Column(
+        DB.DateTime
+    )
+    duration = DB.Column(
+        DB.Integer
     )

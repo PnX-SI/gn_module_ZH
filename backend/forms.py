@@ -437,6 +437,36 @@ def post_ownerships(id_zh, ownerships):
         DB.session.flush()
 
 
+def update_managements(id_zh, managements):
+    DB.session.query(TManagementStructures).filter(
+        TManagementStructures.id_zh == id_zh).delete()
+    # verifier si suppression en cascade ok dans TManagementPlans
+    post_managements(id_zh, managements)
+
+
+def post_managements(id_zh, managements):
+    for management in managements:
+        DB.session.add(
+            TManagementStructures(
+                id_zh=id_zh,
+                id_org=management["structure"]
+            )
+        )
+        DB.session.flush()
+        if management["plans"]:
+            for plan in management["plans"]:
+                DB.session.add(
+                    TManagementPlans(
+                        id_nature=plan["id_nature"],
+                        id_structure=DB.session.query(TManagementStructures).filter(and_(
+                            TManagementStructures.id_zh == id_zh, TManagementStructures.id_org == management["structure"])).one().id_structure,
+                        plan_date=plan["plan_date"],
+                        duration=plan["duration"]
+                    )
+                )
+                DB.session.flush()
+
+
 def update_instruments(id_zh, instruments):
     DB.session.query(TInstruments).filter(
         TInstruments.id_zh == id_zh).delete()

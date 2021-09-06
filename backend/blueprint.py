@@ -392,6 +392,26 @@ def get_tab_data(id_tab, info_role):
             # ]}
             update_ownerships(
                 form_data['id_zh'], form_data['ownerships'])
+            # {"managements": [
+            #   {
+            #       "structure":id_org1,
+            #       "plans": [
+            #           {
+            #               "id_nature":id_nature1,
+            #               "plan_date":date1,
+            #               "duration":duration1
+            #           },
+            #           {
+            #               "id_nature":id_nature2,
+            #               "plan_date":date2,
+            #               "duration":duration2
+            #           },
+            #           ...
+            #       ]
+            #   },
+            #   ...
+            # ]}
+            update_managements(form_data['id_zh'], form_data['managements'])
             # {"instruments": [
             #   {"id_instrument":id_instrument1, "instrument_date":date1},
             #   {"id_instrument":id_instrument2,"instrument_date":date2},
