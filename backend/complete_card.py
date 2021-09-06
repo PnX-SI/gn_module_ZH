@@ -139,21 +139,14 @@ def get_int(nb):
 
 
 def get_hab_heritages(habs):
-    lb_code = "9210-3"
     if habs:
         return [
             {
-                "Corine Biotope": DB.session.query(BibCb, Habref).join(Habref, BibCb.lb_code == Habref.lb_code).filter(Habref.cd_typo == 22).filter(BibCb.lb_code == hab['id_corine_bio']).one().Habref.lb_hab_fr,
-                # "Cahier Habitats": ,
-                # "Etat de préservation": ,
+                "Corine Biotope": DB.session.query(Habref).filter(Habref.cd_hab == hab['id_corine_bio']).one().lb_hab_fr,
+                "Cahier Habitats": DB.session.query(Habref).filter(Habref.cd_hab == hab['id_cahier_hab']).one().lb_hab_fr,
+                "Etat de préservation": get_mnemo(hab['id_preservation_state']),
                 "Recouvrement de la ZH (%)": "Non évalué" if hab.hab_cover == "999" else hab.hab_cover
             }
             for hab in habs
         ]
     return "Non renseigné"
-    """
-                'id_corine_bio': hab_heritage.id_corine_bio,
-                'id_cahier_hab': hab_heritage.id_cahier_hab,
-                'id_preservation_state': hab_heritage.id_preservation_state,
-                'hab_cover': hab_heritage.hab_cover
-    """
