@@ -42,17 +42,12 @@ def get_corine_biotope():
     cbs = BibCb.get_label()
     nomenc_list = []
     for cb in cbs:
-        if cb.BibCb.is_ch:
-            ch = BibCb.get_ch(cb.BibCb.lb_code)
-        else:
-            ch = None
         nomenc_list.append(
             {
                 "CB_code": cb.BibCb.lb_code,
                 "CB_label": cb.Habref.lb_hab_fr,
                 "CB_humidity": cb.BibCb.humidity,
-                "CB_is_ch": cb.BibCb.is_ch,
-                "CB_ch": ch
+                "CB_is_ch": cb.BibCb.is_ch
             }
         )
     return nomenc_list
