@@ -336,20 +336,20 @@ def get_tab_data(id_tab, info_role):
             return {"id_zh": zh}, 200
 
         if id_tab == 1:
-            update_zh_tab1(form_data)
+            update_tzh(form_data)
             update_refs(form_data)
             DB.session.commit()
             return {"id_zh": form_data['id_zh']}, 200
 
         if id_tab == 2:
-            update_zh_tab2(form_data)
+            update_tzh(form_data)
             update_delim(form_data['id_zh'], form_data['critere_delim'])
             update_fct_delim(form_data['id_zh'], form_data['critere_delim_fs'])
             DB.session.commit()
             return {"id_zh": form_data['id_zh']}, 200
 
         if id_tab == 3:
-            update_zh_tab3(form_data)
+            update_tzh(form_data)
             update_corine_biotopes(
                 form_data['id_zh'], form_data['corine_biotopes'])
             update_corine_landcover(
@@ -362,7 +362,7 @@ def get_tab_data(id_tab, info_role):
         if id_tab == 4:
             update_outflow(form_data['id_zh'], form_data['outflows'])
             update_inflow(form_data['id_zh'], form_data['inflows'])
-            update_zh_tab4(form_data)
+            update_tzh(form_data)
             DB.session.commit()
             return {"id_zh": form_data['id_zh']}, 200
 
@@ -375,14 +375,14 @@ def get_tab_data(id_tab, info_role):
                 form_data['id_zh'], form_data['interet_patrim'], 'INTERET_PATRIM')
             update_functions(form_data['id_zh'],
                              form_data['val_soc_eco'], 'VAL_SOC_ECO')
-            update_zh_tab5(form_data)
+            update_tzh(form_data)
             update_hab_heritages(
                 form_data['id_zh'], form_data['hab_heritages'])
             DB.session.commit()
             return {"id_zh": form_data['id_zh']}, 200
 
         if id_tab == 7:
-            update_zh_tab7(form_data)
+            update_tzh(form_data)
             update_actions(
                 form_data['id_zh'], form_data['actions'])
             DB.session.commit()
@@ -390,7 +390,6 @@ def get_tab_data(id_tab, info_role):
 
     except Exception as e:
         DB.session.rollback()
-        pdb.set_trace()
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
             return 'Empty mandatory field ?', 400
         if e.__class__.__name__ == 'IntegrityError':
