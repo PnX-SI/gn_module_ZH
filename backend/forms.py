@@ -22,6 +22,14 @@ from .api_error import ZHApiError
 import pdb
 
 
+def update_tzh(data):
+    zh = DB.session.query(TZH).filter_by(id_zh=data['id_zh']).first()
+    for key, val in data.items():
+        if hasattr(TZH, key) and key != 'id_zh':
+            setattr(zh, key, val)
+            DB.session.flush()
+
+
 # tab 0
 
 
@@ -185,16 +193,6 @@ def update_cor_zh_fct_area(geom, id_zh):
 # tab 1
 
 
-def update_zh_tab1(data):
-    DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
-        TZH.main_name: data['main_name'],
-        TZH.secondary_name: data['secondary_name'],
-        TZH.is_id_site_space: data['is_id_site_space'],
-        TZH.id_site_space: data['id_site_space']
-    })
-    DB.session.flush()
-
-
 def update_refs(form_data):
     DB.session.query(CorZhRef).filter(
         CorZhRef.id_zh == form_data['id_zh']).delete()
@@ -233,17 +231,6 @@ def update_activities(id_zh, activities):
     post_activities(id_zh, activities)
 
 
-def update_zh_tab3(data):
-    DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
-        TZH.id_sdage: data['id_sdage'],
-        TZH.id_sage: data['id_sage'],
-        TZH.remark_pres: data['remark_pres'],
-        TZH.id_thread: data['id_thread'],
-        TZH.global_remark_activity: data['global_remark_activity']
-    })
-    DB.session.flush()
-
-
 def update_corine_biotopes(id_zh, corine_biotopes):
     DB.session.query(CorZhCb).filter(
         CorZhCb.id_zh == id_zh).delete()
@@ -271,13 +258,6 @@ def post_corine_landcover(id_zh, ids_cover):
 
 
 # tab 2
-
-
-def update_zh_tab2(data):
-    DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
-        TZH.remark_lim: data['remark_lim'],
-        TZH.remark_lim_fs: data['remark_lim_fs']
-    })
 
 
 def update_delim(id_zh, criteria):
@@ -348,18 +328,6 @@ def post_inflow(id_zh, inflows):
         DB.session.flush()
 
 
-def update_zh_tab4(data):
-    DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
-        TZH.id_frequency: data['id_frequency'],
-        TZH.id_spread: data['id_spread'],
-        TZH.id_connexion: data['id_connexion'],
-        TZH.id_diag_hydro: data['id_diag_hydro'],
-        TZH.id_diag_bio: data['id_diag_bio'],
-        TZH.remark_diag: data['remark_diag']
-    })
-    DB.session.flush()
-
-
 # tab 5
 
 
@@ -383,18 +351,6 @@ def update_functions(id_zh, functions, function_type):
     DB.session.query(TFunctions).filter(TFunctions.id_zh == id_zh).filter(
         TFunctions.id_function.in_(id_function_list)).delete()
     post_functions(id_zh, functions)
-
-
-def update_zh_tab5(data):
-    DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
-        TZH.is_carto_hab: data['is_carto_hab'],
-        TZH.nb_hab: data['nb_hab'],
-        TZH.total_hab_cover: data['total_hab_cover'],
-        TZH.nb_flora_sp: data['nb_flora_sp'],
-        TZH.nb_vertebrate_sp: data['nb_vertebrate_sp'],
-        TZH.nb_invertebrate_sp: data['nb_invertebrate_sp']
-    })
-    DB.session.flush()
 
 
 def update_hab_heritages(id_zh, hab_heritages):
@@ -529,16 +485,6 @@ def post_urban_docs(id_zh, urban_docs):
 
 
 # tab 7
-
-
-def update_zh_tab7(data):
-    DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
-        TZH.remark_eval_functions: data['remark_eval_functions'],
-        TZH.remark_eval_heritage: data['remark_eval_heritage'],
-        TZH.remark_eval_thread: data['remark_eval_thread'],
-        TZH.remark_eval_actions: data['remark_eval_actions']
-    })
-    DB.session.flush()
 
 
 def update_actions(id_zh, actions):
