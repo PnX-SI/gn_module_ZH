@@ -14,7 +14,7 @@ def get_complete_card(full_zh):
         "Nom usuel de la zone humide": full_zh.properties['main_name'],
         "Autre nom": full_zh.properties['secondary_name'],
         "Partie d'un ensemble": get_bool(full_zh.properties['is_id_site_space']),
-        "Nom du grand ensemble": TZH.get_site_space_name(full_zh.properties['id_site_space']),
+        **({"Nom du grand ensemble": TZH.get_site_space_name(full_zh.properties['id_site_space'])} if full_zh.properties['is_id_site_space'] else {}),
         "Code de la zone humide": full_zh.properties['code']
     }
 
@@ -99,6 +99,7 @@ def get_complete_card(full_zh):
             },
             "5.3- Valeurs socio-économiques": get_function_info(full_zh.properties['val_soc_eco'], type="val_soc_eco")
         }
+
     })
     return complete_card
 
