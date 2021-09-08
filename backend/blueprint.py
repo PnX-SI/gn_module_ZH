@@ -53,6 +53,8 @@ from .nomenclatures import get_nomenc
 
 from .forms import *
 
+from .geometry import set_geom
+
 from .repositories import (
     ZhRepository
 )
@@ -321,8 +323,7 @@ def get_tab_data(id_tab, info_role):
     try:
         if id_tab == 0:
             # set geometry from coordinates
-            polygon = DB.session.query(func.ST_GeomFromGeoJSON(
-                str(form_data['geom']['geometry']))).one()[0]
+            polygon = set_geom(form_data['geom']['geometry'])
             # set date
             zh_date = datetime.now(timezone.utc)
             # set name
