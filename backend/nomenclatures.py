@@ -20,58 +20,47 @@ import pdb
 
 
 def get_sage_list():
-    list_by_sdage = []
-    id_sdage_list = CorSdageSage.get_id_sdage_list()
-    for id in id_sdage_list:
-        nomenc_list = []
-        sages = CorSdageSage.get_sage_by_id(id)
-        for sage in sages:
-            nomenc_list.append(
+    return [
+        {
+            int(sdage_id): [
                 {
                     "id_nomenclature": sage.CorSdageSage.id_sage,
                     "mnemonique": sage.TNomenclatures.mnemonique
-                }
-            )
-        list_by_sdage.append(
-            {int(sage.CorSdageSage.id_sdage): nomenc_list}
-        )
-    return list_by_sdage
+                } for sage in CorSdageSage.get_sage_by_id(sdage_id)
+            ]
+        } for sdage_id in CorSdageSage.get_id_sdage_list()
+    ]
 
 
 def get_corine_biotope():
-    cbs = BibCb.get_label()
-    nomenc_list = []
-    for cb in cbs:
-        nomenc_list.append(
-            {
-                "CB_code": cb.BibCb.lb_code,
-                "CB_label": cb.Habref.lb_hab_fr,
-                "CB_humidity": cb.BibCb.humidity,
-                "CB_is_ch": cb.BibCb.is_ch
-            }
-        )
-    return nomenc_list
+    return [
+        {
+            "CB_code": cb.BibCb.lb_code,
+            "CB_label": cb.Habref.lb_hab_fr,
+            "CB_humidity": cb.BibCb.humidity,
+            "CB_is_ch": cb.BibCb.is_ch
+        } for cb in BibCb.get_label()
+    ]
 
 
 def get_impact_list():
-    impacts = CorImpactTypes.get_impacts()
-    impacts_list = []
-    for impact in impacts:
-        # get mnemonique of id_impact_type
-        if impact.CorImpactTypes.id_impact_type is not None:
-            category = DB.session.query(TNomenclatures).filter(
-                TNomenclatures.id_nomenclature == impact.CorImpactTypes.id_impact_type).one().mnemonique
-        else:
-            category = "Aucun"
-        # list of impact ids and mnemoniques
-        impacts_list.append({
+    return [
+        {
             "id_cor_impact_types": impact.CorImpactTypes.id_cor_impact_types,
             "id_nomenclature": impact.CorImpactTypes.id_impact,
             "mnemonique": impact.TNomenclatures.mnemonique,
             "id_category": impact.CorImpactTypes.id_impact_type,
-            "category": category
-        })
-    return impacts_list
+            "category": get_impact_category(impact)
+        } for impact in CorImpactTypes.get_impacts()
+    ]
+
+
+def get_impact_category(impact):
+    # get mnemonique of id_impact_type
+    if impact.CorImpactTypes.id_impact_type is not None:
+        return DB.session.query(TNomenclatures).filter(
+            TNomenclatures.id_nomenclature == impact.CorImpactTypes.id_impact_type).one().mnemonique
+    return "Aucun"
 
 
 def get_function_list(mnemo):
@@ -83,100 +72,57 @@ def get_function_list(mnemo):
     nomenclature_ids = [nomenc.id_nomenclature for nomenc in DB.session.query(TNomenclatures).filter(
         TNomenclatures.id_type == id_type_main_function).all()]
 
-    """
-    # get mnemo main_functions
-    main_functions_ids = CorMainFct.get_main_function_list(nomenclature_ids)
-
-    # get list of functions by mnemo main function
-    list_by_main_function = []
-    for main_function_id in main_functions_ids:
-        nomenc_list = []
-        functions = CorMainFct.get_function_by_main_function(main_function_id)
-        for function in functions:
-            nomenc_list.append(
-                {
-                    "id_nomenclature": function.CorMainFct.id_function,
-                    "mnemonique": function.TNomenclatures.mnemonique
-                }
-            )
-        type_mnemo = CorMainFct.get_mnemo_type(main_function_id)
-        if type_mnemo != '':
-            list_by_main_function.append({type_mnemo.mnemonique: nomenc_list})
-        else:
-            list_by_main_function.append({type_mnemo: nomenc_list})
-    return list_by_main_function
-    """
-
-    q_functions = CorMainFct.get_functions(nomenclature_ids)
-
-    nomenc_list = []
-    for function in q_functions:
-        nomenc_list.append(
-            {
-                "id_nomenclature": function.CorMainFct.id_function,
-                "mnemonique": function.TNomenclatures.mnemonique,
-                "id_category": function.CorMainFct.id_main_function,
-                "category": DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == function.CorMainFct.id_main_function).one().mnemonique
-            }
-        )
-
-    return nomenc_list
+    return [
+        {
+            "id_nomenclature": function.CorMainFct.id_function,
+            "mnemonique": function.TNomenclatures.mnemonique,
+            "id_category": function.CorMainFct.id_main_function,
+            "category": DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == function.CorMainFct.id_main_function).one().mnemonique
+        } for function in CorMainFct.get_functions(nomenclature_ids)
+    ]
 
 
 def get_urban_docs():
-    q_urban_docs = Nomenclatures.get_nomenclature_info("TYP_DOC_COMM")
-    urban_docs = []
-    for doc in q_urban_docs:
-        urban_docs.append({
+    return [
+        {
             "id_nomenclature": doc.id_nomenclature,
             "mnemonique": doc.mnemonique,
             "type_classement": CorUrbanTypeRange.get_range_by_doc(doc.id_nomenclature)
-        })
-    return urban_docs
+        } for doc in Nomenclatures.get_nomenclature_info("TYP_DOC_COMM")
+    ]
 
 
 def get_protections():
-    q_protection_types = Nomenclatures.get_nomenclature_info("PROTECTION_TYP")
-    protections = []
-    for q_protection_type in q_protection_types:
-        protections.append({
+    return [
+        {
             "id_protection_type": q_protection_type.id_nomenclature,
             "mnemonique_type": q_protection_type.mnemonique,
             "protection_status": CorProtectionLevelType.get_status_by_type(q_protection_type.id_nomenclature)
-        })
-    return protections
+        } for q_protection_type in Nomenclatures.get_nomenclature_info("PROTECTION_TYP")
+    ]
 
 
 def get_nomenc(config):
     nomenc_info = {}
     for mnemo in config:
         if mnemo in ['FONCTIONS_HYDRO', 'FONCTIONS_BIO', 'INTERET_PATRIM']:
-            nomenc_list = get_function_list(mnemo)
-            nomenc_info.update({mnemo: nomenc_list})
+            nomenc_info = {**nomenc_info, mnemo: get_function_list(mnemo)}
         elif mnemo == 'IMPACTS':
-            nomenc_list = get_impact_list()
-            nomenc_info.update({mnemo: nomenc_list})
+            nomenc_info = {**nomenc_info, mnemo: get_impact_list()}
         elif mnemo == 'CORINE_BIO':
-            nomenc_list = get_corine_biotope()
-            nomenc_info.update({mnemo: nomenc_list})
+            nomenc_info = {**nomenc_info, mnemo: get_corine_biotope()}
         elif mnemo == 'SDAGE-SAGE':
-            list_by_sdage = get_sage_list()
-            nomenc_info.update({mnemo: list_by_sdage})
+            nomenc_info = {**nomenc_info, mnemo: get_sage_list()}
         elif mnemo == 'TYP_DOC_COMM':
-            nomenc_list = get_urban_docs()
-            nomenc_info.update({mnemo: nomenc_list})
+            nomenc_info = {**nomenc_info, mnemo: get_urban_docs()}
         elif mnemo == 'PROTECTIONS':
-            nomenc_list = get_protections()
-            nomenc_info.update({mnemo: nomenc_list})
+            nomenc_info = {**nomenc_info, mnemo: get_protections()}
         else:
-            nomenc = Nomenclatures.get_nomenclature_info(mnemo)
-            nomenc_list = []
-            for i in nomenc:
-                nomenc_list.append(
-                    {
-                        "id_nomenclature": i.id_nomenclature,
-                        "mnemonique": i.mnemonique
-                    }
-                )
-            nomenc_info.update({mnemo: nomenc_list})
+            nomenc_list = [
+                {
+                    "id_nomenclature": nomenc.id_nomenclature,
+                    "mnemonique": nomenc.mnemonique
+                } for nomenc in Nomenclatures.get_nomenclature_info(mnemo)
+            ]
+            nomenc_info = {**nomenc_info, mnemo: nomenc_list}
     return nomenc_info
