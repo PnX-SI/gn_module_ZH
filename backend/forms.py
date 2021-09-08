@@ -416,6 +416,118 @@ def post_hab_heritages(id_zh, hab_heritages):
         ))
 
 
+# tab 6
+
+
+def update_ownerships(id_zh, ownerships):
+    DB.session.query(TOwnership).filter(
+        TOwnership.id_zh == id_zh).delete()
+    post_ownerships(id_zh, ownerships)
+
+
+def post_ownerships(id_zh, ownerships):
+    for ownership in ownerships:
+        DB.session.add(
+            TOwnership(
+                id_status=ownership.id_status,
+                id_zh=id_zh,
+                remark=ownership.remark
+            )
+        )
+        DB.session.flush()
+
+
+def update_managements(id_zh, managements):
+    DB.session.query(TManagementStructures).filter(
+        TManagementStructures.id_zh == id_zh).delete()
+    # verifier si suppression en cascade ok dans TManagementPlans
+    post_managements(id_zh, managements)
+
+
+def post_managements(id_zh, managements):
+    for management in managements:
+        DB.session.add(
+            TManagementStructures(
+                id_zh=id_zh,
+                id_org=management["structure"]
+            )
+        )
+        DB.session.flush()
+        if management["plans"]:
+            for plan in management["plans"]:
+                DB.session.add(
+                    TManagementPlans(
+                        id_nature=plan["id_nature"],
+                        id_structure=DB.session.query(TManagementStructures).filter(and_(
+                            TManagementStructures.id_zh == id_zh, TManagementStructures.id_org == management["structure"])).one().id_structure,
+                        plan_date=plan["plan_date"],
+                        duration=plan["duration"]
+                    )
+                )
+                DB.session.flush()
+
+
+def update_instruments(id_zh, instruments):
+    DB.session.query(TInstruments).filter(
+        TInstruments.id_zh == id_zh).delete()
+    post_instruments(id_zh, instruments)
+
+
+def post_instruments(id_zh, instruments):
+    for instrument in instruments:
+        DB.session.add(
+            TInstruments(
+                id_instrument=instrument.id_instrument,
+                id_zh=id_zh,
+                instrument_date=instrument.instrument_date
+            )
+        )
+        DB.session.flush()
+
+
+def update_protections(id_zh, protections):
+    DB.session.query(CorZhProtection).filter(
+        CorZhProtection.id_zh == id_zh).delete()
+    post_instruments(id_zh, protections)
+
+
+def post_protections(id_zh, protections):
+    for protection in protections:
+        DB.session.add(
+            CorZhProtection(
+                id_protection=protection.id_protection,
+                id_zh=id_zh,
+            )
+        )
+        DB.session.flush()
+
+
+def update_zh_tab6(data):
+    DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
+        TZH.is_other_inventory: data['is_other_inventory']
+    })
+    DB.session.flush()
+
+
+def update_urban_docs(id_zh, urban_docs):
+    DB.session.query(TUrbanPlanningDocs).filter(
+        TUrbanPlanningDocs.id_zh == id_zh).delete()
+    post_instruments(id_zh, TUrbanPlanningDocs)
+
+
+def post_urban_docs(id_zh, urban_docs):
+    for urban_doc in urban_docs:
+        DB.session.add(
+            TUrbanPlanningDocs(
+                id_area=urban_doc.id_area,
+                id_zh=id_zh,
+                id_urban_type=urban_doc.id_cor,
+                remark=urban_doc.remark
+            )
+        )
+        DB.session.flush()
+
+
 # tab 7
 
 
@@ -445,3 +557,4 @@ def post_actions(id_zh, actions):
             id_priority_level=action['id_priority_level'],
             remark=action['remark']
         ))
+        DB.session.flush()
