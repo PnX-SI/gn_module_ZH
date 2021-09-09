@@ -390,11 +390,10 @@ def get_tab_data(id_tab, info_role):
 
     except Exception as e:
         DB.session.rollback()
-        pdb.set_trace()
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
             return 'Empty mandatory field ?', 400
         if e.__class__.__name__ == 'IntegrityError':
-            return 'ZH main_name already exists', 400
+            return 'ZH_main_name_already_exists', 400
         raise ZHApiError(message=str(e), details=str(e))
     finally:
         DB.session.close()
@@ -426,7 +425,6 @@ def deleteOneZh(id_zh, info_role):
 
         return {"message": "delete with success"}, 200
     except Exception as e:
-        pdb.set_trace()
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
             return 'Empty mandatory field', 400
         if e.__class__.__name__ == 'IntegrityError':
