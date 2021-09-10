@@ -346,7 +346,11 @@ class ZH(TZH):
         self.interet_patrim = self.get_functions('INTERET_PATRIM')
         self.val_soc_eco = self.get_functions('VAL_SOC_ECO')
         self.hab_heritages = self.get_hab_heritages()
+        self.ownerships = self.get_ownerships()
         self.managements = self.get_managements()
+        self.instruments = self.get_instruments()
+        self.protections = self.get_protections()
+        self.urban_docs = self.get_urban_docs()
         self.actions = self.get_actions()
         self.eval_fonctions_hydro = self.get_functions(
             'FONCTIONS_HYDRO', is_eval=True)
@@ -387,76 +391,75 @@ class ZH(TZH):
         }
 
     def get_activities(self):
-        q_activities = TActivity.get_activites_by_id(self.zh.id_zh)
-        activities = []
-        for activity in q_activities:
-            activities.append({
-                'id_human_activity': activity.id_activity,
-                'id_localisation': activity.id_position,
-                'ids_impact': [impact.id_cor_impact_types for impact in CorImpactList.get_impacts_by_uuid(activity.id_impact_list)],
-                'remark_activity': activity.remark_activity
-            })
         return {
-            "activities": activities
+            "activities": [
+                {
+                    'id_human_activity': activity.id_activity,
+                    'id_localisation': activity.id_position,
+                    'ids_impact': [impact.id_cor_impact_types for impact in CorImpactList.get_impacts_by_uuid(activity.id_impact_list)],
+                    'remark_activity': activity.remark_activity
+                } for activity in TActivity.get_activites_by_id(self.zh.id_zh)
+            ]
         }
 
     def get_flows(self):
         q_outflows = TOutflow.get_outflows_by_id(self.zh.id_zh)
         q_inflows = TInflow.get_inflows_by_id(self.zh.id_zh)
-        flows = []
-        outflows = []
-        inflows = []
-
-        for flow in q_outflows:
-            outflows.append({
-                "id_outflow": flow.id_outflow,
-                "id_permanance": flow.id_permanance,
-                "topo": flow.topo
-            })
-        flows.append({
-            "outflows": outflows
-        })
-        for flow in q_inflows:
-            inflows.append({
-                "id_inflow": flow.id_inflow,
-                "id_permanance": flow.id_permanance,
-                "topo": flow.topo
-            })
-        flows.append({
-            "inflows": inflows
-        })
-
-        return {
-            "flows": flows
-        }
+        flows = [
+            {
+                "outflows": [
+                    {
+                        "id_outflow": flow.id_outflow,
+                        "id_permanance": flow.id_permanance,
+                        "topo": flow.topo
+                    } for flow in q_outflows
+                ]
+            },
+            {
+                "inflows": [
+                    {
+                        "id_inflow": flow.id_inflow,
+                        "id_permanance": flow.id_permanance,
+                        "topo": flow.topo
+                    } for flow in q_inflows
+                ]
+            }
+        ]
+        return {"flows": flows}
 
     def get_functions(self, category, is_eval=False):
-        q_functions = TFunctions.get_functions_by_id_and_category(
-            self.zh.id_zh, category, is_eval)
-        functions = []
-        for function in q_functions:
-            functions.append({
-                'id_function': function.id_function,
-                'justification': function.justification,
-                'id_qualification': function.id_qualification,
-                'id_knowledge': function.id_knowledge
-            })
         return {
-            category.lower(): functions
+            category.lower(): [
+                {
+                    'id_function': function.id_function,
+                    'justification': function.justification,
+                    'id_qualification': function.id_qualification,
+                    'id_knowledge': function.id_knowledge
+                } for function in TFunctions.get_functions_by_id_and_category(
+                    self.zh.id_zh, category, is_eval)
+            ]
         }
 
     def get_hab_heritages(self):
-        q_hab_heritages = THabHeritage.get_hab_heritage_by_id(self.zh.id_zh)
-        hab_heritages = []
-        for hab_heritage in q_hab_heritages:
-            hab_heritages.append({
-                'id_corine_bio': hab_heritage.id_corine_bio,
-                'id_cahier_hab': hab_heritage.id_cahier_hab,
-                'id_preservation_state': hab_heritage.id_preservation_state,
-                'hab_cover': hab_heritage.hab_cover
-            })
         return {
-            "hab_heritages": hab_heritages
+            "hab_heritages": [
+                {
+                    'id_corine_bio': hab_heritage.id_corine_bio,
+                    'id_cahier_hab': hab_heritage.id_cahier_hab,
+                    'id_preservation_state': hab_heritage.id_preservation_state,
+                    'hab_cover': hab_heritage.hab_cover
+                } for hab_heritage in THabHeritage.get_hab_heritage_by_id(self.zh.id_zh)
+            ]
+        }
+
+    def get_ownerships(self):
+        return {
+            "ownerships": [
+                {
+                    'id_status': ownership.id_status,
+                    'remark': ownership.remark
+                } for ownership in TOwnership.get_ownerships_by_id(self.zh.id_zh)
+            ]
         }
 
     def get_managements(self):
@@ -482,17 +485,43 @@ class ZH(TZH):
             "managements": managements
         }
 
-    def get_actions(self):
-        q_actions = TActions.get_actions_by_id(self.zh.id_zh)
-        actions = []
-        for action in q_actions:
-            actions.append({
-                'id_action': action.id_action,
-                'id_priority_level': action.id_priority_level,
-                'remark': action.remark
-            })
+    def get_instruments(self):
         return {
-            "actions": actions
+            "instruments": [
+                {
+                    'id_instrument': instrument.id_instrument,
+                    'instrument_date': instrument.instrument_date
+                } for instrument in TInstruments.get_instruments_by_id(self.zh.id_zh)
+            ]
+        }
+
+    def get_protections(self):
+        return {
+            "protections": [
+                protection.id_protection
+                for protection in CorZhProtection.get_protections_by_id(self.zh.id_zh)]
+        }
+
+    def get_urban_docs(self):
+        return {
+            "urban_docs": [
+                {
+                    'id_area': urban_doc.id_area,
+                    'id_urban_type': urban_doc.id_urban_type,
+                    'remark': urban_doc.remark
+                } for urban_doc in TUrbanPlanningDocs.get_urban_docs_by_id(self.zh.id_zh)
+            ]
+        }
+
+    def get_actions(self):
+        return {
+            "actions": [
+                {
+                    'id_action': action.id_action,
+                    'id_priority_level': action.id_priority_level,
+                    'remark': action.remark
+                } for action in TActions.get_actions_by_id(self.zh.id_zh)
+            ]
         }
 
     def get_fauna_nb(self):
@@ -507,17 +536,18 @@ class ZH(TZH):
         return vertebrates+invertebrates
 
     def get_departments(self):
-        q_deps = CorZhArea.get_departments(self.zh.id_zh)
-        departments = [{
-            dep.LAreas.area_code: dep.LAreas.area_name
-        } for dep in q_deps]
-        return departments
+        return [
+            {
+                dep.LAreas.area_code: dep.LAreas.area_name
+            } for dep in CorZhArea.get_departments(self.zh.id_zh)
+        ]
 
     def get_municipalities(self, query):
-        municipalities = [{
-            municipality.LiMunicipalities.insee_com: municipality.LiMunicipalities.nom_com
-        } for municipality in query]
-        return municipalities
+        return [
+            {
+                municipality.LiMunicipalities.insee_com: municipality.LiMunicipalities.nom_com
+            } for municipality in query
+        ]
 
     def get_regions(self, query):
         region_list = []
@@ -553,6 +583,10 @@ class ZH(TZH):
         full_zh.properties.update(self.hab_heritages)
         full_zh.properties.update(self.managements)
         full_zh.properties.update(self.actions)
+        full_zh.properties.update(self.ownerships)
+        full_zh.properties.update(self.instruments)
+        full_zh.properties.update(self.protections)
+        full_zh.properties.update(self.urban_docs)
         return full_zh
 
     def get_eval(self):
@@ -1210,6 +1244,10 @@ class TUrbanPlanningDocs(DB.Model):
         nullable=False
     )
 
+    def get_urban_docs_by_id(id_zh):
+        return DB.session.query(TUrbanPlanningDocs).filter(
+            TUrbanPlanningDocs.id_zh == id_zh).all()
+
 
 class CorProtectionLevelType(DB.Model):
     __tablename__ = "cor_protection_level_type"
@@ -1323,7 +1361,7 @@ class TInstruments(DB.Model):
 class TOwnership(DB.Model):
     __tablename__ = "t_ownership"
     __table_args__ = {"schema": "pr_zh"}
-    id_ownership = DB.Column(
+    id_status = DB.Column(
         DB.Integer,
         ForeignKey(TNomenclatures.id_nomenclature),
         primary_key=True
@@ -1355,6 +1393,10 @@ class CorZhProtection(DB.Model):
         ForeignKey(TZH.id_zh),
         primary_key=True
     )
+
+    def get_protections_by_id(id_zh):
+        return DB.session.query(CorZhProtection).filter(
+            CorZhProtection.id_zh == id_zh).all()
 
 
 class InseeRegions(DB.Model):
