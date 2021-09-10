@@ -160,7 +160,6 @@ def get_zh_by_id(id_zh, info_role):
     try:
         full_zh = ZH(id_zh).get_full_zh()
         return full_zh
-
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':
             raise ZHApiError(message='zh id exist?', details=str(e))
@@ -176,9 +175,7 @@ def get_complete_info(id_zh, info_role):
     try:
         full_zh = ZH(id_zh).get_full_zh()
         complete_card = get_complete_card(full_zh)
-
         return complete_card
-
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':
             raise ZHApiError(message='zh id exist?', details=str(e))
@@ -194,7 +191,6 @@ def get_zh_eval(id_zh, info_role):
     try:
         zh_eval = ZH(id_zh).get_eval()
         return zh_eval
-
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':
             raise ZHApiError(message='zh id exist?', details=str(e))
@@ -208,10 +204,10 @@ def get_municipalities(id_zh, info_role):
     """Get municipalities list
     """
     try:
-        return [{
-            "municipality_name": municipality.LiMunicipalities.nom_com,
-            "id_area": municipality.CorZhArea.id_area
-        } for municipality in CorZhArea.get_municipalities_info(id_zh)]
+        return [
+            municipality.LiMunicipalities.nom_com
+            for municipality in CorZhArea.get_municipalities_info(id_zh)
+        ]
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':
             raise ZHApiError(message='zh id exist?', details=str(e))

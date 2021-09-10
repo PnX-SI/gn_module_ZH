@@ -98,6 +98,13 @@ def get_complete_card(full_zh):
                 "Faune - nombre d'espèces d'invertébrés": get_int(full_zh.properties['nb_invertebrate_sp'])
             },
             "5.3- Valeurs socio-économiques": get_function_info(full_zh.properties['val_soc_eco'], type="val_soc_eco")
+        },
+        "6- Statuts et gestion de la zone humide": {
+            "6.1- Régime foncier - statut de propriété": get_ownerships_info(full_zh.properties['ownerships'])
+            # "Structure de gestion": get_owner,
+            # "Instruments contractuels et financiers": ,
+            # "Principaux status": ,
+            # "Zonage des documents d'urbanisme": ,
         }
 
     })
@@ -122,13 +129,13 @@ def get_communes(communes):
 
 
 def get_communes_info(id_zh):
-    q = CorZhArea.get_municipalities_info(id_zh)
-    communes = [{
-        "Commune": commune.LiMunicipalities.nom_com,
-        "Code INSEE": commune.LiMunicipalities.insee_com,
-        "Couverture ZH par rapport à la surface de la commune": str(commune.CorZhArea.cover) if commune.CorZhArea.cover is not None else 'Non renseigné'
-    } for commune in q]
-    return communes
+    return [
+        {
+            "Commune": commune.LiMunicipalities.nom_com,
+            "Code INSEE": commune.LiMunicipalities.insee_com,
+            "Couverture ZH par rapport à la surface de la commune": str(commune.CorZhArea.cover) if commune.CorZhArea.cover is not None else 'Non renseigné'
+        } for commune in CorZhArea.get_municipalities_info(id_zh)
+    ]
 
 
 def get_author(id_zh, type='author'):
@@ -247,5 +254,17 @@ def get_hab_heritages(habs):
                 "Recouvrement de la ZH (%)": "Non évalué" if hab.hab_cover == "999" else hab.hab_cover
             }
             for hab in habs
+        ]
+    return "Non renseigné"
+
+
+def get_ownerships_info(ownerships):
+    if ownerships:
+        return [
+            {
+                "Statut": get_mnemo(ownership['id_status']),
+                "Remarque": ownership['remark']
+            }
+            for ownership in ownerships
         ]
     return "Non renseigné"
