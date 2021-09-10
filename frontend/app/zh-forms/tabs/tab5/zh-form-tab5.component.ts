@@ -74,6 +74,7 @@ export class ZhFormTab5Component implements OnInit {
   private $_currentZhSub: Subscription;
   private $_fromChangeSub: Subscription;
   private _currentZh: any;
+  posted: boolean;
 
   constructor(
     private fb: FormBuilder,
@@ -99,9 +100,12 @@ export class ZhFormTab5Component implements OnInit {
   // initialize forms
   initForms(): void {
     this.formTab5 = this.fb.group({
-      is_carto_hab: null,
+      is_carto_hab: false,
       nb_hab: null,
       total_hab_cover: null,
+      nb_flora_sp: null,
+      nb_vertebrate_sp: null,
+      nb_invertebrate_sp: null,
     });
 
     this.hydroFctForm = this.fb.group({
@@ -805,6 +809,104 @@ export class ZhFormTab5Component implements OnInit {
     if (this.formTab5.valid) {
       this.submitted = true;
       this.$_fromChangeSub.unsubscribe();
+      let fonctions_hydro = [];
+      let fonctions_bio = [];
+      let interet_patrim = [];
+      let val_soc_eco = [];
+      let hab_heritages = [];
+
+      if (this.fctHydroTable && this.fctHydroTable.length > 0) {
+        this.fctHydroTable.forEach((item: any) => {
+          fonctions_hydro.push({
+            id_function: item.function.id_nomenclature,
+            justification: item.justification,
+            id_qualification: item.qualification.id_nomenclature,
+            id_knowledge: item.knowledge.id_nomenclature,
+          });
+        });
+      }
+
+      if (this.bioFctTable && this.bioFctTable.length > 0) {
+        this.bioFctTable.forEach((item: any) => {
+          fonctions_bio.push({
+            id_function: item.function.id_nomenclature,
+            justification: item.justification,
+            id_qualification: item.qualification.id_nomenclature,
+            id_knowledge: item.knowledge.id_nomenclature,
+          });
+        });
+      }
+
+      if (this.interetPatTable && this.interetPatTable.length > 0) {
+        this.interetPatTable.forEach((item: any) => {
+          interet_patrim.push({
+            id_function: item.function.id_nomenclature,
+            justification: item.justification,
+            id_qualification: item.qualification.id_nomenclature,
+            id_knowledge: item.knowledge.id_nomenclature,
+          });
+        });
+      }
+      if (this.valSocEcoTable && this.valSocEcoTable.length > 0) {
+        this.valSocEcoTable.forEach((item: any) => {
+          val_soc_eco.push({
+            id_function: item.function.id_nomenclature,
+            justification: item.justification,
+            id_qualification: item.qualification.id_nomenclature,
+            id_knowledge: item.knowledge.id_nomenclature,
+          });
+        });
+      }
+
+      if (this.corineBioTable && this.corineBioTable.length > 0) {
+        this.corineBioTable.forEach((item: any) => {
+          hab_heritages.push({
+            id_corine_bio: item.corinBio.CB_code,
+            id_cahier_hab: item.cahierHab.cd_hab,
+            id_preservation_state: item.preservationState.id_nomenclature,
+            hab_cover: item.habCover,
+          });
+        });
+      }
+
+      let formToPost = {
+        id_zh: Number(this._currentZh.properties.id_zh),
+        is_carto_hab: this.formTab5.value.is_carto_hab,
+        nb_hab: this.formTab5.value.nb_hab,
+        total_hab_cover: this.formTab5.value.total_hab_cover,
+        nb_flora_sp: this.formTab5.value.nb_flora_sp,
+        nb_vertebrate_sp: this.formTab5.value.nb_vertebrate_sp,
+        nb_invertebrate_sp: this.formTab5.value.nb_invertebrate_sp,
+        fonctions_hydro: fonctions_hydro,
+        fonctions_bio: fonctions_bio,
+        interet_patrim: interet_patrim,
+        val_soc_eco: val_soc_eco,
+        hab_heritages: hab_heritages,
+      };
+
+      this.posted = true;
+      this._dataService.postDataForm(formToPost, 5).subscribe(
+        () => {
+          this._dataService
+            .getZhById(this._currentZh.properties.id_zh)
+            .subscribe((zh: any) => {
+              this._dataService.setCurrentZh(zh);
+              this.posted = false;
+              this.canChangeTab.emit(true);
+              this._toastr.success("Vos données sont bien enregistrées", "", {
+                positionClass: "toast-top-right",
+              });
+            });
+        },
+        (error) => {
+          this.posted = false;
+          this._toastr.error(error.error, "", {
+            positionClass: "toast-top-right",
+          });
+        }
+      );
+
+      console.log("formToPost", formToPost);
     }
   }
 }

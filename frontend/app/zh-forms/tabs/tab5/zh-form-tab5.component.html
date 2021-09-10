@@ -278,6 +278,38 @@
     </fieldset>
     <fieldset>
       <legend>
+        <h5 class="section-title">Faune et flore patrimoniale</h5>
+      </legend>
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <small>Flore - nombre d'espèces</small>
+          <input
+            class="form-control"
+            [formControl]="formTab5.controls.nb_flora_sp"
+            type="number"
+          />
+        </div>
+        <div class="form-group col-md-4">
+          <small>Faune vertébrée - nombre d'espèces</small>
+          <input
+            class="form-control"
+            [formControl]="formTab5.controls.nb_vertebrate_sp"
+            type="number"
+          />
+        </div>
+        <div class="form-group col-md-4">
+          <small>Faune invertébrée - nombre d'espèces</small>
+          <input
+            class="form-control"
+            [formControl]="formTab5.controls.nb_invertebrate_sp"
+            type="number"
+          />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>
         <h5 class="section-title">Valeurs socio-économiques</h5>
       </legend>
       <div class="form-row">
