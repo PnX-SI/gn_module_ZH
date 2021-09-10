@@ -182,11 +182,152 @@ export class ZhFormTab5Component implements OnInit {
         this.valSocEcoTable = [];
         this.corineBioTable = [];
         //patch forms values
-
-        this.$_fromChangeSub = this.formTab5.valueChanges.subscribe(() => {
-          this.canChangeTab.emit(false);
+        this.formTab5.patchValue({
+          is_carto_hab: this._currentZh.properties.is_carto_hab,
+          nb_hab: this._currentZh.properties.nb_hab,
+          total_hab_cover: this._currentZh.properties.total_hab_cover,
+          nb_flora_sp: this._currentZh.properties.nb_flora_sp,
+          nb_vertebrate_sp: this._currentZh.properties.nb_vertebrate_sp,
+          nb_invertebrate_sp: this._currentZh.properties.nb_invertebrate_sp,
         });
+        if (
+          this._currentZh.properties.fonctions_hydro &&
+          this._currentZh.properties.fonctions_hydro.length > 0
+        ) {
+          this._currentZh.properties.fonctions_hydro.forEach(
+            (hydroFct: any) => {
+              this.fctHydroTable.push({
+                function: this.fctHydroInput
+                  .flat()
+                  .find(
+                    (item: any) => item.id_nomenclature == hydroFct.id_function
+                  ),
+                qualification: this.formMetaData["FONCTIONS_QUALIF"].find(
+                  (item: any) =>
+                    item.id_nomenclature == hydroFct.id_qualification
+                ),
+                knowledge: this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+                  (item: any) => item.id_nomenclature == hydroFct.id_knowledge
+                ),
+                justification: hydroFct.justification,
+              });
+              this.fctHydroInput.flat().map((item: any) => {
+                if (item.id_nomenclature == hydroFct.id_function) {
+                  item.disabled = false;
+                }
+              });
+            }
+          );
+        }
+        if (
+          this._currentZh.properties.fonctions_bio &&
+          this._currentZh.properties.fonctions_bio.length > 0
+        ) {
+          this._currentZh.properties.fonctions_bio.forEach((bioFct: any) => {
+            this.bioFctTable.push({
+              function: this.bioFctInput
+                .flat()
+                .find(
+                  (item: any) => item.id_nomenclature == bioFct.id_function
+                ),
+              qualification: this.formMetaData["FONCTIONS_QUALIF"].find(
+                (item: any) => item.id_nomenclature == bioFct.id_qualification
+              ),
+              knowledge: this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+                (item: any) => item.id_nomenclature == bioFct.id_knowledge
+              ),
+              justification: bioFct.justification,
+            });
+            this.bioFctInput.flat().map((item: any) => {
+              if (item.id_nomenclature == bioFct.id_function) {
+                item.disabled = false;
+              }
+            });
+          });
+        }
+        if (
+          this._currentZh.properties.val_soc_eco &&
+          this._currentZh.properties.val_soc_eco.length > 0
+        ) {
+          this._currentZh.properties.val_soc_eco.forEach((valSoc: any) => {
+            this.valSocEcoTable.push({
+              function: this.valSocEcoInput
+                .flat()
+                .find(
+                  (item: any) => item.id_nomenclature == valSoc.id_function
+                ),
+              qualification: this.formMetaData["FONCTIONS_QUALIF"].find(
+                (item: any) => item.id_nomenclature == valSoc.id_qualification
+              ),
+              knowledge: this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+                (item: any) => item.id_nomenclature == valSoc.id_knowledge
+              ),
+              justification: valSoc.justification,
+            });
+            this.valSocEcoInput.flat().map((item: any) => {
+              if (item.id_nomenclature == valSoc.id_function) {
+                item.disabled = false;
+              }
+            });
+          });
+        }
+        if (
+          this._currentZh.properties.interet_patrim &&
+          this._currentZh.properties.interet_patrim.length > 0
+        ) {
+          this._currentZh.properties.interet_patrim.forEach((pat: any) => {
+            this.interetPatTable.push({
+              function: this.interetPatInput
+                .flat()
+                .find((item: any) => item.id_nomenclature == pat.id_function),
+              qualification: this.formMetaData["FONCTIONS_QUALIF"].find(
+                (item: any) => item.id_nomenclature == pat.id_qualification
+              ),
+              knowledge: this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+                (item: any) => item.id_nomenclature == pat.id_knowledge
+              ),
+              justification: pat.justification,
+            });
+            this.interetPatInput.flat().map((item: any) => {
+              if (item.id_nomenclature == pat.id_function) {
+                item.disabled = false;
+              }
+            });
+          });
+        }
+        if (
+          this._currentZh.properties.hab_heritages &&
+          this._currentZh.properties.hab_heritages.length > 0
+        ) {
+          this._currentZh.properties.hab_heritages.forEach((corineBio: any) => {
+            let selectedCahierHab;
+            this._dataService
+              .getHabitatByCorine(corineBio.id_corine_bio)
+              .subscribe((habitats: any) => {
+                this.cahierHabInput = habitats;
+                selectedCahierHab = this.cahierHabInput.find(
+                  (item: any) => item.cd_hab == Number(corineBio.id_cahier_hab)
+                );
+                this.corineBioTable.push({
+                  corinBio: this.corinBioMetaData.find(
+                    (item: any) => item.CB_code == corineBio.id_corine_bio
+                  ),
+                  preservationState: this.formMetaData[
+                    "ETAT_CONSERVATION"
+                  ].find(
+                    (item: any) =>
+                      item.id_nomenclature == corineBio.id_preservation_state
+                  ),
+                  cahierHab: selectedCahierHab,
+                  habCover: corineBio.hab_cover,
+                });
+              });
+          });
+        }
       }
+      this.$_fromChangeSub = this.formTab5.valueChanges.subscribe(() => {
+        this.canChangeTab.emit(false);
+      });
     });
   }
 
@@ -905,8 +1046,6 @@ export class ZhFormTab5Component implements OnInit {
           });
         }
       );
-
-      console.log("formToPost", formToPost);
     }
   }
 }
