@@ -2,6 +2,8 @@ from datetime import datetime
 
 from sqlalchemy.sql.expression import true
 
+from geonature.core.ref_geo.models import LAreas
+
 import pdb
 
 from .models import *
@@ -100,11 +102,11 @@ def get_complete_card(full_zh):
             "5.3- Valeurs socio-économiques": get_function_info(full_zh.properties['val_soc_eco'], type="val_soc_eco")
         },
         "6- Statuts et gestion de la zone humide": {
-            "6.1- Régime foncier - statut de propriété": get_ownerships_info(full_zh.properties['ownerships'])
-            # "Structure de gestion": get_owner,
-            # "Instruments contractuels et financiers": ,
-            # "Principaux status": ,
-            # "Zonage des documents d'urbanisme": ,
+            "6.1- Régime foncier - statut de propriété": get_ownerships_info(full_zh.properties['ownerships']),
+            "6.2- Structure de gestion": get_managements_info(full_zh.properties['managements']),
+            "6.3- Instruments contractuels et financiers": get_instruments_info(full_zh.properties['instruments']),
+            "6.4- Principaux statuts": get_protection_names(full_zh.properties['protections']),
+            "6.5- Zonage des documents d'urbanisme": get_urban_doc_info(full_zh.properties['urban_docs'])
         }
 
     })
@@ -171,8 +173,8 @@ def get_references(ref_list):
 def get_mnemo(ids):
     if ids:
         if type(ids) is int:
-            return DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == ids).one().mnemonique
-        return [DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == id).one().mnemonique for id in ids]
+            return DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == ids).one().label_default
+        return [DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == id).one().label_default for id in ids]
     return "Non renseigné"
 
 
@@ -267,4 +269,69 @@ def get_ownerships_info(ownerships):
             }
             for ownership in ownerships
         ]
+    return "Non renseigné"
+
+
+def get_instruments_info(instruments):
+    if instruments:
+        return [
+            {
+                "Instruments contractuels et financiers": get_mnemo(instrument['id_instrument']),
+                "Date de mise en oeuvre": str(instrument['instrument_date'])
+            }
+            for instrument in instruments
+        ]
+    return "Non renseigné"
+
+
+def get_urban_doc_info(urban_docs):
+    if urban_docs:
+        return [
+            {
+                "Communes": DB.session.query(LAreas).filter(LAreas.id_area == urban_doc['id_area']).one().area_name,
+                "Type de document communal": get_urban_doc_names(urban_doc['id_urban_type'])['type_doc'],
+                "Type de classement": get_urban_doc_names(urban_doc['id_urban_type'])['type_classement'],
+                "Remarques": urban_doc['remark']
+            }
+            for urban_doc in urban_docs
+        ]
+    return "Non renseigné"
+
+
+def get_urban_doc_names(cor_id):
+    return {
+        "type_doc": get_mnemo(DB.session.query(CorUrbanTypeRange).filter(CorUrbanTypeRange.id_cor == cor_id).one().id_range_type),
+        "type_classement": get_mnemo(DB.session.query(CorUrbanTypeRange).filter(CorUrbanTypeRange.id_cor == cor_id).one().id_doc_type)
+    }
+
+
+def get_protection_names(protection_ids):
+    q_protections = DB.session.query(CorProtectionLevelType).filter(
+        CorProtectionLevelType.id_protection.in_(protection_ids)).all()
+    return [
+        get_mnemo(protection.id_protection_status) for protection in q_protections
+    ]
+
+
+def get_managements_info(managements):
+    if managements:
+        management_list = []
+        for management in managements:
+            structure_gestion = DB.session.query(BibOrganismes).filter(
+                BibOrganismes.id_org == management["structure"]).one().name
+            if management["plans"]:
+                plan_gestion = {}
+                for plan in management["plans"]:
+                    plan_gestion.update({
+                        "Nature du plan": get_mnemo(plan["id_nature"]),
+                        "Date de réalisation": str(plan['plan_date']),
+                        "Durée (années)": plan['duration']
+                    })
+            else:
+                plan_gestion = 'Pas de plan de gestion de la zone humide renseigné pour cette structure'
+            management_list.append({
+                "Structure de gestion": structure_gestion,
+                "Plan de gestion": plan_gestion
+            })
+        return management_list
     return "Non renseigné"

@@ -477,14 +477,14 @@ class ZH(TZH):
         managements = []
         for management in q_management_structures:
             q_management_plans = DB.session.query(
-                TManagementPlans).filter(management.id_structure).all()
+                TManagementPlans).filter(TManagementPlans.id_structure == management.id_structure).all()
             plans = []
             if q_management_plans:
                 for plan in q_management_plans:
                     plans.append({
-                        "id_nature": plan["id_nature"],
-                        "plan_date": plan["plan_date"],
-                        "duration": plan["duration"]
+                        "id_nature": plan.id_nature,
+                        "plan_date": str(plan.plan_date),
+                        "duration": plan.duration
                     })
             managements.append({
                 "structure": management.id_org,
@@ -499,7 +499,7 @@ class ZH(TZH):
             "instruments": [
                 {
                     'id_instrument': instrument.id_instrument,
-                    'instrument_date': instrument.instrument_date
+                    'instrument_date': str(instrument.instrument_date)
                 } for instrument in TInstruments.get_instruments_by_id(self.zh.id_zh)
             ]
         }
@@ -1251,6 +1251,9 @@ class TUrbanPlanningDocs(DB.Model):
         DB.Integer,
         ForeignKey(CorUrbanTypeRange.id_cor),
         nullable=False
+    )
+    remark = DB.Column(
+        DB.Unicode
     )
 
     def get_urban_docs_by_id(id_zh):
