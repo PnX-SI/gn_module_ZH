@@ -73,7 +73,13 @@
         <ng-template mat-tab-label>
           Fonctions écologiques, valeurs socio-économiques, interét patrimonial
         </ng-template>
-        <zh-form-tab5></zh-form-tab5>
+        <zh-form-tab5
+          *ngIf="formMetaData"
+          class="d-flex flex-column"
+          [ngStyle]="{ 'height.px': cardContentHeight }"
+          [formMetaData]="formMetaData"
+          (canChangeTab)="onCanChangeTab($event)"
+        ></zh-form-tab5>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
         <ng-template mat-tab-label>

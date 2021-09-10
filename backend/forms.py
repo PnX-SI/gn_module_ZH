@@ -23,6 +23,7 @@ import pdb
 
 
 def update_tzh(data):
+
     zh = DB.session.query(TZH).filter_by(id_zh=data['id_zh']).first()
     for key, val in data.items():
         if hasattr(TZH, key) and key != 'id_zh':
@@ -332,6 +333,7 @@ def post_inflow(id_zh, inflows):
 
 
 def post_functions(id_zh, functions):
+
     for function in functions:
         DB.session.add(TFunctions(
             id_function=function['id_function'],
@@ -344,12 +346,11 @@ def post_functions(id_zh, functions):
 
 
 def update_functions(id_zh, functions, function_type):
-    #function_type = 'FONCTIONS_HYDRO'
     id_function_list = [
         nomenclature.id_nomenclature for nomenclature in Nomenclatures.get_nomenclature_info(function_type)
     ]
     DB.session.query(TFunctions).filter(TFunctions.id_zh == id_zh).filter(
-        TFunctions.id_function.in_(id_function_list)).delete()
+        TFunctions.id_function.in_(id_function_list)).delete(synchronize_session='fetch')
     post_functions(id_zh, functions)
 
 
@@ -363,6 +364,8 @@ def update_hab_heritages(id_zh, hab_heritages):
 
 def post_hab_heritages(id_zh, hab_heritages):
     for hab_heritage in hab_heritages:
+        if hab_heritage['hab_cover'] is None:
+            hab_heritage['hab_cover'] = '999'
         DB.session.add(THabHeritage(
             id_zh=id_zh,
             id_corine_bio=hab_heritage['id_corine_bio'],
