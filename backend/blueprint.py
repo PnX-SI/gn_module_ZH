@@ -53,6 +53,8 @@ from .nomenclatures import get_nomenc
 
 from .forms import *
 
+from .geometry import set_geom
+
 from .repositories import (
     ZhRepository
 )
@@ -180,10 +182,13 @@ def get_zh_eval(id_zh, info_role):
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
 def get_municipalities(id_zh, info_role):
-    """Get geographic information by zh id
+    """Get municipalities list
     """
     try:
-        return [municipality.LiMunicipalities.nom_com for municipality in CorZhArea.get_municipalities_info(id_zh)]
+        return [{
+            "municipality_name": municipality.LiMunicipalities.nom_com,
+            "id_area": municipality.CorZhArea.id_area
+        } for municipality in CorZhArea.get_municipalities_info(id_zh)]
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':
             raise ZHApiError(message='zh id exist?', details=str(e))
@@ -318,8 +323,7 @@ def get_tab_data(id_tab, info_role):
     try:
         if id_tab == 0:
             # set geometry from coordinates
-            polygon = DB.session.query(func.ST_GeomFromGeoJSON(
-                str(form_data['geom']['geometry']))).one()[0]
+            polygon = set_geom(form_data['geom']['geometry'])
             # set date
             zh_date = datetime.now(timezone.utc)
             # set name
@@ -336,20 +340,20 @@ def get_tab_data(id_tab, info_role):
             return {"id_zh": zh}, 200
 
         if id_tab == 1:
-            update_zh_tab1(form_data)
+            update_tzh(form_data)
             update_refs(form_data)
             DB.session.commit()
             return {"id_zh": form_data['id_zh']}, 200
 
         if id_tab == 2:
-            update_zh_tab2(form_data)
+            update_tzh(form_data)
             update_delim(form_data['id_zh'], form_data['critere_delim'])
             update_fct_delim(form_data['id_zh'], form_data['critere_delim_fs'])
             DB.session.commit()
             return {"id_zh": form_data['id_zh']}, 200
 
         if id_tab == 3:
-            update_zh_tab3(form_data)
+            update_tzh(form_data)
             update_corine_biotopes(
                 form_data['id_zh'], form_data['corine_biotopes'])
             update_corine_landcover(
@@ -362,7 +366,7 @@ def get_tab_data(id_tab, info_role):
         if id_tab == 4:
             update_outflow(form_data['id_zh'], form_data['outflows'])
             update_inflow(form_data['id_zh'], form_data['inflows'])
-            update_zh_tab4(form_data)
+            update_tzh(form_data)
             DB.session.commit()
             return {"id_zh": form_data['id_zh']}, 200
 
@@ -375,14 +379,65 @@ def get_tab_data(id_tab, info_role):
                 form_data['id_zh'], form_data['interet_patrim'], 'INTERET_PATRIM')
             update_functions(form_data['id_zh'],
                              form_data['val_soc_eco'], 'VAL_SOC_ECO')
-            update_zh_tab5(form_data)
+            update_tzh(form_data)
             update_hab_heritages(
                 form_data['id_zh'], form_data['hab_heritages'])
             DB.session.commit()
             return {"id_zh": form_data['id_zh']}, 200
 
+        if id_tab == 6:
+            # {"ownerships": [
+            #   {"id_status":id_status1,"remark":remark1},
+            #   {"id_status":id_status2,"remark":remark2},
+            #   ...
+            # ]}
+            update_ownerships(
+                form_data['id_zh'], form_data['ownerships'])
+            # {"managements": [
+            #   {
+            #       "structure":id_org1,
+            #       "plans": [
+            #           {
+            #               "id_nature":id_nature1,
+            #               "plan_date":date1,
+            #               "duration":duration1
+            #           },
+            #           {
+            #               "id_nature":id_nature2,
+            #               "plan_date":date2,
+            #               "duration":duration2
+            #           },
+            #           ...
+            #       ]
+            #   },
+            #   ...
+            # ]}
+            update_managements(form_data['id_zh'], form_data['managements'])
+            # {"instruments": [
+            #   {"id_instrument":id_instrument1, "instrument_date":date1},
+            #   {"id_instrument":id_instrument2,"instrument_date":date2},
+            #   ...
+            # ]}
+            update_instruments(
+                form_data['id_zh'], form_data['instruments'])
+            # {"protections": [
+            #   id_protection1,
+            #   id_protection2,
+            #   ...
+            # ]}
+            update_protections(
+                form_data['id_zh'], form_data['protections'])
+            # "is_other_inventory": boolean
+            update_zh_tab6(form_data)
+            # {"urban_docs": [
+            #   {"id_area": id_area1, "id_urban_type": id_cor1, "remark": remark1},
+            #   {"id_area": id_area2, "id_urban_type": id_cor2, "remark": remark2},
+            #   ...
+            # ]}
+            update_urban_docs(form_data['id_zh'], form_data['urban_docs'])
+
         if id_tab == 7:
-            update_zh_tab7(form_data)
+            update_tzh(form_data)
             update_actions(
                 form_data['id_zh'], form_data['actions'])
             DB.session.commit()

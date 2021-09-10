@@ -22,6 +22,14 @@ from .api_error import ZHApiError
 import pdb
 
 
+def update_tzh(data):
+    zh = DB.session.query(TZH).filter_by(id_zh=data['id_zh']).first()
+    for key, val in data.items():
+        if hasattr(TZH, key) and key != 'id_zh':
+            setattr(zh, key, val)
+            DB.session.flush()
+
+
 # tab 0
 
 
@@ -185,16 +193,6 @@ def update_cor_zh_fct_area(geom, id_zh):
 # tab 1
 
 
-def update_zh_tab1(data):
-    DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
-        TZH.main_name: data['main_name'],
-        TZH.secondary_name: data['secondary_name'],
-        TZH.is_id_site_space: data['is_id_site_space'],
-        TZH.id_site_space: data['id_site_space']
-    })
-    DB.session.flush()
-
-
 def update_refs(form_data):
     DB.session.query(CorZhRef).filter(
         CorZhRef.id_zh == form_data['id_zh']).delete()
@@ -233,17 +231,6 @@ def update_activities(id_zh, activities):
     post_activities(id_zh, activities)
 
 
-def update_zh_tab3(data):
-    DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
-        TZH.id_sdage: data['id_sdage'],
-        TZH.id_sage: data['id_sage'],
-        TZH.remark_pres: data['remark_pres'],
-        TZH.id_thread: data['id_thread'],
-        TZH.global_remark_activity: data['global_remark_activity']
-    })
-    DB.session.flush()
-
-
 def update_corine_biotopes(id_zh, corine_biotopes):
     DB.session.query(CorZhCb).filter(
         CorZhCb.id_zh == id_zh).delete()
@@ -271,13 +258,6 @@ def post_corine_landcover(id_zh, ids_cover):
 
 
 # tab 2
-
-
-def update_zh_tab2(data):
-    DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
-        TZH.remark_lim: data['remark_lim'],
-        TZH.remark_lim_fs: data['remark_lim_fs']
-    })
 
 
 def update_delim(id_zh, criteria):
@@ -348,18 +328,6 @@ def post_inflow(id_zh, inflows):
         DB.session.flush()
 
 
-def update_zh_tab4(data):
-    DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
-        TZH.id_frequency: data['id_frequency'],
-        TZH.id_spread: data['id_spread'],
-        TZH.id_connexion: data['id_connexion'],
-        TZH.id_diag_hydro: data['id_diag_hydro'],
-        TZH.id_diag_bio: data['id_diag_bio'],
-        TZH.remark_diag: data['remark_diag']
-    })
-    DB.session.flush()
-
-
 # tab 5
 
 
@@ -385,18 +353,6 @@ def update_functions(id_zh, functions, function_type):
     post_functions(id_zh, functions)
 
 
-def update_zh_tab5(data):
-    DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
-        TZH.is_carto_hab: data['is_carto_hab'],
-        TZH.nb_hab: data['nb_hab'],
-        TZH.total_hab_cover: data['total_hab_cover'],
-        TZH.nb_flora_sp: data['nb_flora_sp'],
-        TZH.nb_vertebrate_sp: data['nb_vertebrate_sp'],
-        TZH.nb_invertebrate_sp: data['nb_invertebrate_sp']
-    })
-    DB.session.flush()
-
-
 def update_hab_heritages(id_zh, hab_heritages):
     # delete cascade t_hab_heritages
     DB.session.query(THabHeritage).filter(
@@ -416,17 +372,119 @@ def post_hab_heritages(id_zh, hab_heritages):
         ))
 
 
-# tab 7
+# tab 6
 
 
-def update_zh_tab7(data):
+def update_ownerships(id_zh, ownerships):
+    DB.session.query(TOwnership).filter(
+        TOwnership.id_zh == id_zh).delete()
+    post_ownerships(id_zh, ownerships)
+
+
+def post_ownerships(id_zh, ownerships):
+    for ownership in ownerships:
+        DB.session.add(
+            TOwnership(
+                id_status=ownership.id_status,
+                id_zh=id_zh,
+                remark=ownership.remark
+            )
+        )
+        DB.session.flush()
+
+
+def update_managements(id_zh, managements):
+    DB.session.query(TManagementStructures).filter(
+        TManagementStructures.id_zh == id_zh).delete()
+    # verifier si suppression en cascade ok dans TManagementPlans
+    post_managements(id_zh, managements)
+
+
+def post_managements(id_zh, managements):
+    for management in managements:
+        DB.session.add(
+            TManagementStructures(
+                id_zh=id_zh,
+                id_org=management["structure"]
+            )
+        )
+        DB.session.flush()
+        if management["plans"]:
+            for plan in management["plans"]:
+                DB.session.add(
+                    TManagementPlans(
+                        id_nature=plan["id_nature"],
+                        id_structure=DB.session.query(TManagementStructures).filter(and_(
+                            TManagementStructures.id_zh == id_zh, TManagementStructures.id_org == management["structure"])).one().id_structure,
+                        plan_date=plan["plan_date"],
+                        duration=plan["duration"]
+                    )
+                )
+                DB.session.flush()
+
+
+def update_instruments(id_zh, instruments):
+    DB.session.query(TInstruments).filter(
+        TInstruments.id_zh == id_zh).delete()
+    post_instruments(id_zh, instruments)
+
+
+def post_instruments(id_zh, instruments):
+    for instrument in instruments:
+        DB.session.add(
+            TInstruments(
+                id_instrument=instrument.id_instrument,
+                id_zh=id_zh,
+                instrument_date=instrument.instrument_date
+            )
+        )
+        DB.session.flush()
+
+
+def update_protections(id_zh, protections):
+    DB.session.query(CorZhProtection).filter(
+        CorZhProtection.id_zh == id_zh).delete()
+    post_instruments(id_zh, protections)
+
+
+def post_protections(id_zh, protections):
+    for protection in protections:
+        DB.session.add(
+            CorZhProtection(
+                id_protection=protection.id_protection,
+                id_zh=id_zh,
+            )
+        )
+        DB.session.flush()
+
+
+def update_zh_tab6(data):
     DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
-        TZH.remark_eval_functions: data['remark_eval_functions'],
-        TZH.remark_eval_heritage: data['remark_eval_heritage'],
-        TZH.remark_eval_thread: data['remark_eval_thread'],
-        TZH.remark_eval_actions: data['remark_eval_actions']
+        TZH.is_other_inventory: data['is_other_inventory']
     })
     DB.session.flush()
+
+
+def update_urban_docs(id_zh, urban_docs):
+    DB.session.query(TUrbanPlanningDocs).filter(
+        TUrbanPlanningDocs.id_zh == id_zh).delete()
+    post_instruments(id_zh, TUrbanPlanningDocs)
+
+
+def post_urban_docs(id_zh, urban_docs):
+    for urban_doc in urban_docs:
+        DB.session.add(
+            TUrbanPlanningDocs(
+                id_area=urban_doc.id_area,
+                id_zh=id_zh,
+                id_urban_type=urban_doc.id_cor,
+                remark=urban_doc.remark
+            )
+        )
+        DB.session.flush()
+
+
+# tab 7
 
 
 def update_actions(id_zh, actions):
@@ -445,3 +503,4 @@ def post_actions(id_zh, actions):
             id_priority_level=action['id_priority_level'],
             remark=action['remark']
         ))
+        DB.session.flush()
