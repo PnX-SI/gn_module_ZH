@@ -250,10 +250,10 @@ def get_hab_heritages(habs):
     if habs:
         return [
             {
-                "Corine Biotope": DB.session.query(Habref).filter(Habref.cd_hab == hab['id_corine_bio']).one().lb_hab_fr,
+                "Corine Biotope": DB.session.query(Habref).filter(Habref.lb_code == hab['id_corine_bio']).filter(Habref.cd_typo == 22).one().lb_hab_fr,
                 "Cahier Habitats": DB.session.query(Habref).filter(Habref.cd_hab == hab['id_cahier_hab']).one().lb_hab_fr,
                 "Etat de préservation": get_mnemo(hab['id_preservation_state']),
-                "Recouvrement de la ZH (%)": "Non évalué" if hab.hab_cover == "999" else hab.hab_cover
+                "Recouvrement de la ZH (%)": "Non évalué" if hab["hab_cover"] == "999" else hab["hab_cover"]
             }
             for hab in habs
         ]
