@@ -264,8 +264,8 @@ class TZH(ZhModel):
     is_carto_hab = DB.Column(DB.Boolean, default=False)
     nb_hab = DB.Column(DB.Integer)
     total_hab_cover = DB.Column(
-        DB.Integer,
-        default=999,
+        DB.Unicode,
+        default='999',
         nullable=False)
     nb_flora_sp = DB.Column(DB.Integer)
     nb_vertebrate_sp = DB.Column(DB.Integer)
