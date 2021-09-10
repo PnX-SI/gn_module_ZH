@@ -375,10 +375,15 @@ def get_tab_data(id_tab, info_role):
                 form_data['id_zh'], form_data['fonctions_hydro'], 'FONCTIONS_HYDRO')
             update_functions(
                 form_data['id_zh'], form_data['fonctions_bio'], 'FONCTIONS_BIO')
+
             update_functions(
                 form_data['id_zh'], form_data['interet_patrim'], 'INTERET_PATRIM')
+
             update_functions(form_data['id_zh'],
                              form_data['val_soc_eco'], 'VAL_SOC_ECO')
+            if form_data['total_hab_cover'] is None:
+                form_data['total_hab_cover'] = DB.session.query(TZH).filter(
+                    TZH.id_zh == form_data['id_zh']).one().total_hab_cover
             update_tzh(form_data)
             update_hab_heritages(
                 form_data['id_zh'], form_data['hab_heritages'])
@@ -448,7 +453,7 @@ def get_tab_data(id_tab, info_role):
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
             return 'Empty mandatory field ?', 400
         if e.__class__.__name__ == 'IntegrityError':
-            return 'ZH main_name already exists', 400
+            return 'ZH_main_name_already_exists', 400
         raise ZHApiError(message=str(e), details=str(e))
     finally:
         DB.session.close()
@@ -480,7 +485,6 @@ def deleteOneZh(id_zh, info_role):
 
         return {"message": "delete with success"}, 200
     except Exception as e:
-        pdb.set_trace()
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
             return 'Empty mandatory field', 400
         if e.__class__.__name__ == 'IntegrityError':

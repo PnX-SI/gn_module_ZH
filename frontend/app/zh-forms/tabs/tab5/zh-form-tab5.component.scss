@@ -1,1 +1,14 @@
 @import "../../../../app.module";
+select {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+select option {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+select.custom-select option:disabled {
+  color: #d9d9d9;
+}

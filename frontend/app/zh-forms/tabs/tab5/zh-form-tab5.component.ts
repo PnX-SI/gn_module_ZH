@@ -1,28 +1,1051 @@
-import { Component, OnInit } from "@angular/core";
-import { FormGroup, FormBuilder, FormControl } from "@angular/forms";
+import { Component, EventEmitter, OnInit, Input, Output } from "@angular/core";
+import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { ToastrService } from "ngx-toastr";
+import { Subscription, Observable } from "rxjs";
+import { debounceTime, distinctUntilChanged, map } from "rxjs/operators";
+import { ZhDataService } from "../../../services/zh-data.service";
+import { TabsService } from "../../../services/tabs.service";
 
 @Component({
   selector: "zh-form-tab5",
   templateUrl: "./zh-form-tab5.component.html",
-  styleUrls: ["./zh-form-tab5.component.scss"]
+  styleUrls: ["./zh-form-tab5.component.scss"],
 })
 export class ZhFormTab5Component implements OnInit {
-
+  @Input() public formMetaData: any;
+  @Output() public canChangeTab = new EventEmitter<boolean>();
   public formTab5: FormGroup;
+  public patchModal: boolean;
+  public modalFormSubmitted: boolean;
+  public modalTitle: string;
+  public addModalBtnLabel: string;
+  public hydroFctForm: FormGroup;
+  public bioFctForm: FormGroup;
+  public interetPatForm: FormGroup;
+  public valSocEcoForm: FormGroup;
+  public corineBioForm: FormGroup;
+  public fctHydroInput: any;
+  public bioFctInput: any;
+  public valSocEcoInput: any;
+  public interetPatInput: any;
+  public corineBioInput: any;
+  public cahierHabInput: any;
+  public fctHydroTable: any[] = [];
+  public bioFctTable: any[] = [];
+  public interetPatTable: any[] = [];
+  public valSocEcoTable: any[] = [];
+  public corineBioTable: any[] = [];
+  private $_hydroFctInputSub: Subscription;
+  private $_interetPatInputSub: Subscription;
+  private $_bioFctInputSub: Subscription;
+  private $_valSocEcoInputSub: Subscription;
+  private $_corineBioInputSub: Subscription;
+
+  public hydroFctTableCol = [
+    { name: "function", label: "Fonctions hydrologiques" },
+    { name: "qualification", label: "Qualifications" },
+    { name: "knowledge", label: "Connaissance" },
+    { name: "justification", label: "Justifications" },
+  ];
+  public bioFctTableCol = [
+    { name: "function", label: "Fonctions biologiques" },
+    { name: "qualification", label: "Qualifications" },
+    { name: "knowledge", label: "Connaissance" },
+    { name: "justification", label: "Justifications" },
+  ];
+  public fctTableCol = [
+    { name: "function", label: "Intérêts patrimoniaux" },
+    { name: "qualification", label: "Qualifications" },
+    { name: "knowledge", label: "Connaissance" },
+    { name: "justification", label: "Justifications" },
+  ];
+
+  public corineTableCol = [
+    { name: "corinBio", label: "Corine Biotope" },
+    { name: "preservationState", label: "État de conservation" },
+    { name: "cahierHab", label: "Cahier Habitats" },
+    { name: "habCover", label: "Recouvrement de la ZH (%)" },
+  ];
+
+  private tempID: any;
+  corinBioMetaData: any[];
+  public submitted: boolean;
+  private $_currentZhSub: Subscription;
+  private $_fromChangeSub: Subscription;
+  private _currentZh: any;
+  posted: boolean;
 
   constructor(
-    private fb: FormBuilder
-  ) { }
+    private fb: FormBuilder,
+    public ngbModal: NgbModal,
+    private _toastr: ToastrService,
+    private _dataService: ZhDataService,
+    private _tabService: TabsService
+  ) {}
 
   ngOnInit() {
-    this.createForm()
-
-  }
-
-  createForm(patchWithDefaultValues: boolean = false): void {
-    this.formTab5 = this.fb.group({
+    this.getMetaData();
+    this.initForms();
+    this.getCurrentZh();
+    this._tabService.getTabChange().subscribe((tabPosition: number) => {
+      this.$_fromChangeSub.unsubscribe();
+      this.$_currentZhSub.unsubscribe();
+      if (tabPosition == 5) {
+        this.getCurrentZh();
+      }
     });
   }
 
+  // initialize forms
+  initForms(): void {
+    this.formTab5 = this.fb.group({
+      is_carto_hab: false,
+      nb_hab: null,
+      total_hab_cover: null,
+      nb_flora_sp: null,
+      nb_vertebrate_sp: null,
+      nb_invertebrate_sp: null,
+    });
 
+    this.hydroFctForm = this.fb.group({
+      function: [null, Validators.required],
+      qualification: [null, Validators.required],
+      knowledge: [null, Validators.required],
+      justification: null,
+    });
+    this.bioFctForm = this.fb.group({
+      function: [null, Validators.required],
+      qualification: [null, Validators.required],
+      knowledge: [null, Validators.required],
+      justification: null,
+    });
+    this.interetPatForm = this.fb.group({
+      function: [null, Validators.required],
+      qualification: [null, Validators.required],
+      knowledge: [null, Validators.required],
+      justification: null,
+    });
+    this.valSocEcoForm = this.fb.group({
+      function: [null, Validators.required],
+      qualification: [null, Validators.required],
+      knowledge: [null, Validators.required],
+      justification: null,
+    });
+    this.corineBioForm = this.fb.group({
+      corinBio: [null, Validators.required],
+      preservationState: [null, Validators.required],
+      cahierHab: [{ value: "", disabled: true }, Validators.required],
+      habCover: null,
+    });
+  }
+
+  // get metaData forms
+  getMetaData() {
+    this.fctHydroInput = this.groupArrayByCategory(
+      this.formMetaData["FONCTIONS_HYDRO"]
+    );
+    this.bioFctInput = this.groupArrayByCategory(
+      this.formMetaData["FONCTIONS_BIO"]
+    );
+    this.interetPatInput = this.groupArrayByCategory(
+      this.formMetaData["INTERET_PATRIM"]
+    );
+    this.valSocEcoInput = this.formMetaData["VAL_SOC_ECO"];
+    this.corinBioMetaData = [...this.formMetaData["CORINE_BIO"]].filter(
+      (corine) => corine.CB_is_ch == true
+    );
+  }
+
+  // group array by category
+  groupArrayByCategory(array: any) {
+    let group = array.reduce((r, a) => {
+      r[a.id_category] = [...(r[a.id_category] || []), a];
+      return r;
+    }, {});
+    let grpupedArray = Object.values(group) as any;
+    // add disabled property to inflowInput options list
+    grpupedArray.flat().map((item: any) => {
+      item.disabled = false;
+    });
+    return grpupedArray;
+  }
+
+  // get current zone humides && patch forms values
+  getCurrentZh() {
+    this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
+      if (zh) {
+        this._currentZh = zh;
+        this.fctHydroTable = [];
+        this.bioFctTable = [];
+        this.interetPatTable = [];
+        this.valSocEcoTable = [];
+        this.corineBioTable = [];
+        //patch forms values
+        this.formTab5.patchValue({
+          is_carto_hab: this._currentZh.properties.is_carto_hab,
+          nb_hab: this._currentZh.properties.nb_hab,
+          total_hab_cover: this._currentZh.properties.total_hab_cover,
+          nb_flora_sp: this._currentZh.properties.nb_flora_sp,
+          nb_vertebrate_sp: this._currentZh.properties.nb_vertebrate_sp,
+          nb_invertebrate_sp: this._currentZh.properties.nb_invertebrate_sp,
+        });
+        if (
+          this._currentZh.properties.fonctions_hydro &&
+          this._currentZh.properties.fonctions_hydro.length > 0
+        ) {
+          this._currentZh.properties.fonctions_hydro.forEach(
+            (hydroFct: any) => {
+              this.fctHydroTable.push({
+                function: this.fctHydroInput
+                  .flat()
+                  .find(
+                    (item: any) => item.id_nomenclature == hydroFct.id_function
+                  ),
+                qualification: this.formMetaData["FONCTIONS_QUALIF"].find(
+                  (item: any) =>
+                    item.id_nomenclature == hydroFct.id_qualification
+                ),
+                knowledge: this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+                  (item: any) => item.id_nomenclature == hydroFct.id_knowledge
+                ),
+                justification: hydroFct.justification,
+              });
+              this.fctHydroInput.flat().map((item: any) => {
+                if (item.id_nomenclature == hydroFct.id_function) {
+                  item.disabled = false;
+                }
+              });
+            }
+          );
+        }
+        if (
+          this._currentZh.properties.fonctions_bio &&
+          this._currentZh.properties.fonctions_bio.length > 0
+        ) {
+          this._currentZh.properties.fonctions_bio.forEach((bioFct: any) => {
+            this.bioFctTable.push({
+              function: this.bioFctInput
+                .flat()
+                .find(
+                  (item: any) => item.id_nomenclature == bioFct.id_function
+                ),
+              qualification: this.formMetaData["FONCTIONS_QUALIF"].find(
+                (item: any) => item.id_nomenclature == bioFct.id_qualification
+              ),
+              knowledge: this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+                (item: any) => item.id_nomenclature == bioFct.id_knowledge
+              ),
+              justification: bioFct.justification,
+            });
+            this.bioFctInput.flat().map((item: any) => {
+              if (item.id_nomenclature == bioFct.id_function) {
+                item.disabled = false;
+              }
+            });
+          });
+        }
+        if (
+          this._currentZh.properties.val_soc_eco &&
+          this._currentZh.properties.val_soc_eco.length > 0
+        ) {
+          this._currentZh.properties.val_soc_eco.forEach((valSoc: any) => {
+            this.valSocEcoTable.push({
+              function: this.valSocEcoInput
+                .flat()
+                .find(
+                  (item: any) => item.id_nomenclature == valSoc.id_function
+                ),
+              qualification: this.formMetaData["FONCTIONS_QUALIF"].find(
+                (item: any) => item.id_nomenclature == valSoc.id_qualification
+              ),
+              knowledge: this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+                (item: any) => item.id_nomenclature == valSoc.id_knowledge
+              ),
+              justification: valSoc.justification,
+            });
+            this.valSocEcoInput.flat().map((item: any) => {
+              if (item.id_nomenclature == valSoc.id_function) {
+                item.disabled = false;
+              }
+            });
+          });
+        }
+        if (
+          this._currentZh.properties.interet_patrim &&
+          this._currentZh.properties.interet_patrim.length > 0
+        ) {
+          this._currentZh.properties.interet_patrim.forEach((pat: any) => {
+            this.interetPatTable.push({
+              function: this.interetPatInput
+                .flat()
+                .find((item: any) => item.id_nomenclature == pat.id_function),
+              qualification: this.formMetaData["FONCTIONS_QUALIF"].find(
+                (item: any) => item.id_nomenclature == pat.id_qualification
+              ),
+              knowledge: this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+                (item: any) => item.id_nomenclature == pat.id_knowledge
+              ),
+              justification: pat.justification,
+            });
+            this.interetPatInput.flat().map((item: any) => {
+              if (item.id_nomenclature == pat.id_function) {
+                item.disabled = false;
+              }
+            });
+          });
+        }
+        if (
+          this._currentZh.properties.hab_heritages &&
+          this._currentZh.properties.hab_heritages.length > 0
+        ) {
+          this._currentZh.properties.hab_heritages.forEach((corineBio: any) => {
+            let selectedCahierHab;
+            this._dataService
+              .getHabitatByCorine(corineBio.id_corine_bio)
+              .subscribe((habitats: any) => {
+                this.cahierHabInput = habitats;
+                selectedCahierHab = this.cahierHabInput.find(
+                  (item: any) => item.cd_hab == Number(corineBio.id_cahier_hab)
+                );
+                this.corineBioTable.push({
+                  corinBio: this.corinBioMetaData.find(
+                    (item: any) => item.CB_code == corineBio.id_corine_bio
+                  ),
+                  preservationState: this.formMetaData[
+                    "ETAT_CONSERVATION"
+                  ].find(
+                    (item: any) =>
+                      item.id_nomenclature == corineBio.id_preservation_state
+                  ),
+                  cahierHab: selectedCahierHab,
+                  habCover: corineBio.hab_cover,
+                });
+              });
+          });
+        }
+      }
+      this.$_fromChangeSub = this.formTab5.valueChanges.subscribe(() => {
+        this.canChangeTab.emit(false);
+      });
+    });
+  }
+
+  // open the add fonction hydrologique modal
+  onAddHydroFct(event: any, modal: any) {
+    this.patchModal = false;
+    this.addModalBtnLabel = "Ajouter";
+    this.modalTitle = "Ajout d'une fonction hydrologique";
+    event.stopPropagation();
+    this.ngbModal.open(modal, {
+      centered: true,
+      size: "lg",
+      windowClass: "bib-modal",
+    });
+  }
+
+  // add a new hydroFct to hydroFcts array
+  onPostHydroFct() {
+    this.modalFormSubmitted = true;
+    if (this.hydroFctForm.valid) {
+      let formValues = this.hydroFctForm.value;
+      // check if the hydroFct to add is already added
+      let itemExist = this.fctHydroTable.some(
+        (item: any) =>
+          item.function.id_nomenclature == formValues.function.id_nomenclature
+      );
+      if (!itemExist) {
+        this.fctHydroTable.push(formValues);
+      }
+      // disable the added hydroFct on the select input list
+      this.fctHydroInput.flat().map((item: any) => {
+        if (item.id_nomenclature == formValues.function.id_nomenclature) {
+          item.disabled = true;
+        }
+      });
+
+      this.ngbModal.dismissAll();
+      this.hydroFctForm.reset();
+      this.canChangeTab.emit(false);
+      this.modalFormSubmitted = false;
+    }
+  }
+
+  //delete hydroFct from the hydroFcts array
+  onDeleteHydroFct(hydroFct: any) {
+    this.fctHydroTable = this.fctHydroTable.filter((item: any) => {
+      return item.function.id_nomenclature != hydroFct.function.id_nomenclature;
+    });
+    this.fctHydroInput.flat().map((item: any) => {
+      if (item.id_nomenclature == hydroFct.function.id_nomenclature) {
+        item.disabled = false;
+      }
+    });
+    this.canChangeTab.emit(false);
+  }
+
+  // open the edit hydroFct modal
+  onEditHydroFct(modal: any, hydroFct: any) {
+    this.patchModal = true;
+    this.addModalBtnLabel = "Modifier";
+    this.modalTitle = "Modifier la fonction hydrologique";
+    // init inputs object type
+    const selectedFunction = this.fctHydroInput
+      .flat()
+      .find(
+        (item: any) => item.id_nomenclature == hydroFct.function.id_nomenclature
+      );
+    const selectedKnowledge = this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+      (item: any) => item.id_nomenclature == hydroFct.knowledge.id_nomenclature
+    );
+    const selectedQualif = this.formMetaData["FONCTIONS_QUALIF"].find(
+      (item: any) =>
+        item.id_nomenclature == hydroFct.qualification.id_nomenclature
+    );
+
+    // patch form values
+    this.hydroFctForm.patchValue({
+      function: selectedFunction,
+      qualification: selectedQualif,
+      knowledge: selectedKnowledge,
+      justification: hydroFct.justification,
+    });
+    this.tempID = hydroFct.function.id_nomenclature;
+    // manger disabled hydroFct input items
+    this.$_hydroFctInputSub = this.hydroFctForm
+      .get("function")
+      .valueChanges.subscribe(() => {
+        this.fctHydroInput.flat().map((item: any) => {
+          if (item.id_nomenclature == hydroFct.function.id_nomenclature) {
+            item.disabled = false;
+          }
+        });
+      });
+
+    this.ngbModal.open(modal, {
+      centered: true,
+      size: "lg",
+      windowClass: "bib-modal",
+    });
+  }
+
+  // edit hydroFct and save into hydroFcts array
+  onPatchHydroFct() {
+    this.patchModal = false;
+    this.modalFormSubmitted = true;
+    if (this.hydroFctForm.valid) {
+      let formValues = this.hydroFctForm.value;
+      this.fctHydroTable = this.fctHydroTable.map((item: any) =>
+        item.function.id_nomenclature != this.tempID ? item : formValues
+      );
+      this.tempID = null;
+      this.fctHydroInput.flat().map((item: any) => {
+        if (item.id_nomenclature == formValues.function.id_nomenclature) {
+          item.disabled = true;
+        }
+      });
+      this.ngbModal.dismissAll();
+      this.hydroFctForm.reset();
+
+      this.$_hydroFctInputSub.unsubscribe();
+      this.canChangeTab.emit(false);
+      this.modalFormSubmitted = false;
+    }
+  }
+
+  // open the add fonction biologique modal
+  onAddBioFct(event: any, modal: any) {
+    this.patchModal = false;
+    this.addModalBtnLabel = "Ajouter";
+    this.modalTitle = "Ajout d'une fonction biologique";
+    event.stopPropagation();
+    this.ngbModal.open(modal, {
+      centered: true,
+      size: "lg",
+      windowClass: "bib-modal",
+    });
+  }
+
+  // add a new bioFct to bioFcts array
+  onPostBioFct() {
+    this.modalFormSubmitted = true;
+    if (this.bioFctForm.valid) {
+      let formValues = this.bioFctForm.value;
+      // check if the bioFct to add is already added
+      let itemExist = this.bioFctTable.some(
+        (item: any) =>
+          item.function.id_nomenclature == formValues.function.id_nomenclature
+      );
+      if (!itemExist) {
+        this.bioFctTable.push(formValues);
+      }
+      // disable the added bioFct on the select input list
+      this.bioFctInput.flat().map((item: any) => {
+        if (item.id_nomenclature == formValues.function.id_nomenclature) {
+          item.disabled = true;
+        }
+      });
+
+      this.ngbModal.dismissAll();
+      this.bioFctForm.reset();
+      this.canChangeTab.emit(false);
+      this.modalFormSubmitted = false;
+    }
+  }
+
+  //delete bioFct from the bioFcts array
+  onDeleteBioFct(bioFct: any) {
+    this.bioFctTable = this.bioFctTable.filter((item: any) => {
+      return item.function.id_nomenclature != bioFct.function.id_nomenclature;
+    });
+    this.bioFctInput.flat().map((item: any) => {
+      if (item.id_nomenclature == bioFct.function.id_nomenclature) {
+        item.disabled = false;
+      }
+    });
+    this.canChangeTab.emit(false);
+  }
+
+  // open the edit bioFct modal
+  onEditBioFct(modal: any, bioFct: any) {
+    this.patchModal = true;
+    this.addModalBtnLabel = "Modifier";
+    this.modalTitle = "Modifier la fonction biologique";
+    // init inputs object type
+    const selectedFunction = this.bioFctInput
+      .flat()
+      .find(
+        (item: any) => item.id_nomenclature == bioFct.function.id_nomenclature
+      );
+    const selectedKnowledge = this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+      (item: any) => item.id_nomenclature == bioFct.knowledge.id_nomenclature
+    );
+    const selectedQualif = this.formMetaData["FONCTIONS_QUALIF"].find(
+      (item: any) =>
+        item.id_nomenclature == bioFct.qualification.id_nomenclature
+    );
+
+    // patch form values
+    this.bioFctForm.patchValue({
+      function: selectedFunction,
+      qualification: selectedQualif,
+      knowledge: selectedKnowledge,
+      justification: bioFct.justification,
+    });
+    this.tempID = bioFct.function.id_nomenclature;
+    // manger disabled bioFct input items
+    this.$_bioFctInputSub = this.bioFctForm
+      .get("function")
+      .valueChanges.subscribe(() => {
+        this.bioFctInput.flat().map((item: any) => {
+          if (item.id_nomenclature == bioFct.function.id_nomenclature) {
+            item.disabled = false;
+          }
+        });
+      });
+
+    this.ngbModal.open(modal, {
+      centered: true,
+      size: "lg",
+      windowClass: "bib-modal",
+    });
+  }
+  // edit bioFct and save into bioFcts array
+  onPatchBioFct() {
+    this.patchModal = false;
+    this.modalFormSubmitted = true;
+    if (this.bioFctForm.valid) {
+      let formValues = this.bioFctForm.value;
+      this.bioFctTable = this.bioFctTable.map((item: any) =>
+        item.function.id_nomenclature != this.tempID ? item : formValues
+      );
+      this.tempID = null;
+      this.bioFctInput.flat().map((item: any) => {
+        if (item.id_nomenclature == formValues.function.id_nomenclature) {
+          item.disabled = true;
+        }
+      });
+      this.ngbModal.dismissAll();
+      this.bioFctForm.reset();
+
+      this.$_bioFctInputSub.unsubscribe();
+      this.canChangeTab.emit(false);
+      this.modalFormSubmitted = false;
+    }
+  }
+
+  // open the add fonction intérêt patrimonal modal
+  onAddInteretPat(event: any, modal: any) {
+    this.patchModal = false;
+    this.addModalBtnLabel = "Ajouter";
+    this.modalTitle = "Ajout d'un intérêt patrimonal";
+    event.stopPropagation();
+    this.ngbModal.open(modal, {
+      centered: true,
+      size: "lg",
+      windowClass: "bib-modal",
+    });
+  }
+
+  // add a new bioFct to bioFcts array
+  onPostInteretPat() {
+    this.modalFormSubmitted = true;
+    if (this.interetPatForm.valid) {
+      let formValues = this.interetPatForm.value;
+      // check if the interetPat to add is already added
+      let itemExist = this.interetPatTable.some(
+        (item: any) =>
+          item.function.id_nomenclature == formValues.function.id_nomenclature
+      );
+      if (!itemExist) {
+        this.interetPatTable.push(formValues);
+      }
+      // disable the added interetPat on the select input list
+      this.interetPatInput.flat().map((item: any) => {
+        if (item.id_nomenclature == formValues.function.id_nomenclature) {
+          item.disabled = true;
+        }
+      });
+
+      this.ngbModal.dismissAll();
+      this.interetPatForm.reset();
+      this.canChangeTab.emit(false);
+      this.modalFormSubmitted = false;
+    }
+  }
+
+  //delete interetPat from the interetPat array
+  onDeleteInteretPat(interetPat: any) {
+    this.interetPatTable = this.interetPatTable.filter((item: any) => {
+      return (
+        item.function.id_nomenclature != interetPat.function.id_nomenclature
+      );
+    });
+    this.interetPatInput.flat().map((item: any) => {
+      if (item.id_nomenclature == interetPat.function.id_nomenclature) {
+        item.disabled = false;
+      }
+    });
+    this.canChangeTab.emit(false);
+  }
+
+  // open the edit interetPat modal
+  onEditInteretPat(modal: any, interetPat: any) {
+    this.patchModal = true;
+    this.addModalBtnLabel = "Modifier";
+    this.modalTitle = "Modifier l'intérêt patrimonal";
+    // init inputs object type
+    const selectedFunction = this.interetPatInput
+      .flat()
+      .find(
+        (item: any) =>
+          item.id_nomenclature == interetPat.function.id_nomenclature
+      );
+    const selectedKnowledge = this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+      (item: any) =>
+        item.id_nomenclature == interetPat.knowledge.id_nomenclature
+    );
+    const selectedQualif = this.formMetaData["FONCTIONS_QUALIF"].find(
+      (item: any) =>
+        item.id_nomenclature == interetPat.qualification.id_nomenclature
+    );
+
+    // patch form values
+    this.interetPatForm.patchValue({
+      function: selectedFunction,
+      qualification: selectedQualif,
+      knowledge: selectedKnowledge,
+      justification: interetPat.justification,
+    });
+    this.tempID = interetPat.function.id_nomenclature;
+    // manger disabled interetPat input items
+    this.$_interetPatInputSub = this.interetPatForm
+      .get("function")
+      .valueChanges.subscribe(() => {
+        this.interetPatInput.flat().map((item: any) => {
+          if (item.id_nomenclature == interetPat.function.id_nomenclature) {
+            item.disabled = false;
+          }
+        });
+      });
+
+    this.ngbModal.open(modal, {
+      centered: true,
+      size: "lg",
+      windowClass: "bib-modal",
+    });
+  }
+  // edit interetPat and save into interetPats array
+  onPatchInteretPat() {
+    this.patchModal = false;
+    this.modalFormSubmitted = true;
+    if (this.interetPatForm.valid) {
+      let formValues = this.interetPatForm.value;
+      this.interetPatTable = this.interetPatTable.map((item: any) =>
+        item.function.id_nomenclature != this.tempID ? item : formValues
+      );
+      this.tempID = null;
+      this.interetPatInput.flat().map((item: any) => {
+        if (item.id_nomenclature == formValues.function.id_nomenclature) {
+          item.disabled = true;
+        }
+      });
+      this.ngbModal.dismissAll();
+      this.interetPatForm.reset();
+
+      this.$_interetPatInputSub.unsubscribe();
+      this.canChangeTab.emit(false);
+      this.modalFormSubmitted = false;
+    }
+  }
+
+  onAddValSocEco(event: any, modal: any) {
+    this.patchModal = false;
+    this.addModalBtnLabel = "Ajouter";
+    this.modalTitle = "Ajout d'une valeur socio-économique";
+    event.stopPropagation();
+    this.ngbModal.open(modal, {
+      centered: true,
+      size: "lg",
+      windowClass: "bib-modal",
+    });
+  }
+
+  // add a new valSocEco to valSocEco array
+  onPostValSocEco() {
+    this.modalFormSubmitted = true;
+    if (this.valSocEcoForm.valid) {
+      let formValues = this.valSocEcoForm.value;
+      // check if the valSocEco to add is already added
+      let itemExist = this.valSocEcoTable.some(
+        (item: any) =>
+          item.function.id_nomenclature == formValues.function.id_nomenclature
+      );
+      if (!itemExist) {
+        this.valSocEcoTable.push(formValues);
+      }
+      // disable the added valSocEco on the select input list
+      this.valSocEcoInput.flat().map((item: any) => {
+        if (item.id_nomenclature == formValues.function.id_nomenclature) {
+          item.disabled = true;
+        }
+      });
+
+      this.ngbModal.dismissAll();
+      this.valSocEcoForm.reset();
+      this.canChangeTab.emit(false);
+      this.modalFormSubmitted = false;
+    }
+  }
+
+  //delete valSocEco from the valSocEco array
+  onDeleteValSocEco(valSocEco: any) {
+    this.valSocEcoTable = this.valSocEcoTable.filter((item: any) => {
+      return (
+        item.function.id_nomenclature != valSocEco.function.id_nomenclature
+      );
+    });
+    this.valSocEcoInput.flat().map((item: any) => {
+      if (item.id_nomenclature == valSocEco.function.id_nomenclature) {
+        item.disabled = false;
+      }
+    });
+    this.canChangeTab.emit(false);
+  }
+
+  // open the edit valSocEco modal
+  onEditValSocEco(modal: any, valSocEco: any) {
+    this.patchModal = true;
+    this.addModalBtnLabel = "Modifier";
+    this.modalTitle = "Modifier l'intérêt patrimonal";
+    // init inputs object type
+    const selectedFunction = this.valSocEcoInput
+      .flat()
+      .find(
+        (item: any) =>
+          item.id_nomenclature == valSocEco.function.id_nomenclature
+      );
+    const selectedKnowledge = this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+      (item: any) => item.id_nomenclature == valSocEco.knowledge.id_nomenclature
+    );
+    const selectedQualif = this.formMetaData["FONCTIONS_QUALIF"].find(
+      (item: any) =>
+        item.id_nomenclature == valSocEco.qualification.id_nomenclature
+    );
+
+    // patch form values
+    this.valSocEcoForm.patchValue({
+      function: selectedFunction,
+      qualification: selectedQualif,
+      knowledge: selectedKnowledge,
+      justification: valSocEco.justification,
+    });
+    this.tempID = valSocEco.function.id_nomenclature;
+    // manger disabled valSocEco input items
+    this.$_valSocEcoInputSub = this.valSocEcoForm
+      .get("function")
+      .valueChanges.subscribe(() => {
+        this.valSocEcoInput.flat().map((item: any) => {
+          if (item.id_nomenclature == valSocEco.function.id_nomenclature) {
+            item.disabled = false;
+          }
+        });
+      });
+
+    this.ngbModal.open(modal, {
+      centered: true,
+      size: "lg",
+      windowClass: "bib-modal",
+    });
+  }
+  // edit valSocEco and save into valSocEcos array
+  onPatchValSocEco() {
+    this.patchModal = false;
+    this.modalFormSubmitted = true;
+    if (this.valSocEcoForm.valid) {
+      let formValues = this.valSocEcoForm.value;
+      this.valSocEcoTable = this.valSocEcoTable.map((item: any) =>
+        item.function.id_nomenclature != this.tempID ? item : formValues
+      );
+      this.tempID = null;
+      this.valSocEcoInput.flat().map((item: any) => {
+        if (item.id_nomenclature == formValues.function.id_nomenclature) {
+          item.disabled = true;
+        }
+      });
+      this.ngbModal.dismissAll();
+      this.valSocEcoForm.reset();
+
+      this.$_valSocEcoInputSub.unsubscribe();
+      this.canChangeTab.emit(false);
+      this.modalFormSubmitted = false;
+    }
+  }
+
+  // open the add CorineBio modal
+  onAddCorineBio(event: any, modal: any) {
+    this.patchModal = false;
+    this.addModalBtnLabel = "Ajouter";
+    this.modalTitle = "Ajout d'une corine biotope";
+    event.stopPropagation();
+    this.ngbModal.open(modal, {
+      centered: true,
+      size: "lg",
+      windowClass: "bib-modal",
+    });
+  }
+
+  // add a new CorineBio to CorineBio array
+  onPostCorineBio() {
+    this.modalFormSubmitted = true;
+    if (this.corineBioForm.valid) {
+      let formValues = this.corineBioForm.value;
+      // check if the corineBio to add is already added
+      let itemExist = this.corineBioTable.some(
+        (item: any) => item.corinBio.CB_code == formValues.corinBio.CB_code
+      );
+      if (!itemExist) {
+        this.corineBioTable.push(formValues);
+      }
+      this.ngbModal.dismissAll();
+      this.corineBioForm.reset();
+      this.corineBioForm.get("cahierHab").disable();
+      this.canChangeTab.emit(false);
+      this.modalFormSubmitted = false;
+    }
+  }
+
+  //delete corineBio from the corineBio array
+  onDeleteCorineBio(corineBio: any) {
+    this.corineBioTable = this.corineBioTable.filter((item: any) => {
+      return item.corinBio.CB_code != corineBio.corinBio.CB_code;
+    });
+    this.canChangeTab.emit(false);
+  }
+
+  // open the edit corineBio modal
+  onEditCorineBio(modal: any, corineBio: any) {
+    this.patchModal = true;
+    this.addModalBtnLabel = "Modifier";
+    this.modalTitle = "Modifier la corine biotope";
+    let selectedCahierHab;
+    // init inputs object type
+    const selectedCorin = this.corinBioMetaData.find(
+      (item: any) => item.CB_code == corineBio.corinBio.CB_code
+    );
+    const selectedState = this.formMetaData["ETAT_CONSERVATION"].find(
+      (item: any) =>
+        item.id_nomenclature == corineBio.preservationState.id_nomenclature
+    );
+    this._dataService
+      .getHabitatByCorine(corineBio.corinBio.CB_code)
+      .subscribe((habitats: any) => {
+        this.cahierHabInput = habitats;
+        selectedCahierHab = this.cahierHabInput.find(
+          (item: any) => item.cd_hab == corineBio.cahierHab.cd_hab
+        );
+        this.corineBioForm.get("cahierHab").enable();
+        // patch form values
+        this.corineBioForm.patchValue({
+          corinBio: selectedCorin,
+          preservationState: selectedState,
+          cahierHab: selectedCahierHab,
+          habCover: corineBio.habCover,
+        });
+        this.tempID = corineBio.corinBio.CB_code;
+        this.ngbModal.open(modal, {
+          centered: true,
+          size: "lg",
+          windowClass: "bib-modal",
+        });
+      });
+  }
+  // edit corineBio and save into corineBios array
+  onPatchCorineBio() {
+    this.patchModal = false;
+    this.modalFormSubmitted = true;
+    if (this.corineBioForm.valid) {
+      let formValues = this.corineBioForm.value;
+      this.corineBioTable = this.corineBioTable.map((item: any) =>
+        item.corinBio.CB_code != this.tempID ? item : formValues
+      );
+      this.tempID = null;
+      this.ngbModal.dismissAll();
+      this.corineBioForm.reset();
+      this.canChangeTab.emit(false);
+      this.modalFormSubmitted = false;
+    }
+  }
+
+  // autocomplet corine biotope
+  search = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map((term) =>
+        term.length < 1
+          ? []
+          : this.corinBioMetaData
+              .filter(
+                (v) =>
+                  v.CB_label.toLowerCase().indexOf(term.toLowerCase()) > -1 ||
+                  v.CB_code.toLowerCase().indexOf(term.toLowerCase()) > -1
+              )
+              .slice(0, 10)
+      )
+    );
+
+  formatter = (result: any) => `${result.CB_code} ${result.CB_label}`;
+
+  onSelectedCorin(corineBio: any) {
+    this._dataService
+      .getHabitatByCorine(corineBio.CB_code)
+      .subscribe((habitats: any) => {
+        this.cahierHabInput = habitats;
+        this.corineBioForm.get("cahierHab").enable();
+      });
+  }
+
+  onFormSubmit() {
+    if (this.formTab5.valid) {
+      this.submitted = true;
+      this.$_fromChangeSub.unsubscribe();
+      let fonctions_hydro = [];
+      let fonctions_bio = [];
+      let interet_patrim = [];
+      let val_soc_eco = [];
+      let hab_heritages = [];
+
+      if (this.fctHydroTable && this.fctHydroTable.length > 0) {
+        this.fctHydroTable.forEach((item: any) => {
+          fonctions_hydro.push({
+            id_function: item.function.id_nomenclature,
+            justification: item.justification,
+            id_qualification: item.qualification.id_nomenclature,
+            id_knowledge: item.knowledge.id_nomenclature,
+          });
+        });
+      }
+
+      if (this.bioFctTable && this.bioFctTable.length > 0) {
+        this.bioFctTable.forEach((item: any) => {
+          fonctions_bio.push({
+            id_function: item.function.id_nomenclature,
+            justification: item.justification,
+            id_qualification: item.qualification.id_nomenclature,
+            id_knowledge: item.knowledge.id_nomenclature,
+          });
+        });
+      }
+
+      if (this.interetPatTable && this.interetPatTable.length > 0) {
+        this.interetPatTable.forEach((item: any) => {
+          interet_patrim.push({
+            id_function: item.function.id_nomenclature,
+            justification: item.justification,
+            id_qualification: item.qualification.id_nomenclature,
+            id_knowledge: item.knowledge.id_nomenclature,
+          });
+        });
+      }
+      if (this.valSocEcoTable && this.valSocEcoTable.length > 0) {
+        this.valSocEcoTable.forEach((item: any) => {
+          val_soc_eco.push({
+            id_function: item.function.id_nomenclature,
+            justification: item.justification,
+            id_qualification: item.qualification.id_nomenclature,
+            id_knowledge: item.knowledge.id_nomenclature,
+          });
+        });
+      }
+
+      if (this.corineBioTable && this.corineBioTable.length > 0) {
+        this.corineBioTable.forEach((item: any) => {
+          hab_heritages.push({
+            id_corine_bio: item.corinBio.CB_code,
+            id_cahier_hab: item.cahierHab.cd_hab,
+            id_preservation_state: item.preservationState.id_nomenclature,
+            hab_cover: item.habCover,
+          });
+        });
+      }
+
+      let formToPost = {
+        id_zh: Number(this._currentZh.properties.id_zh),
+        is_carto_hab: this.formTab5.value.is_carto_hab,
+        nb_hab: this.formTab5.value.nb_hab,
+        total_hab_cover: this.formTab5.value.total_hab_cover,
+        nb_flora_sp: this.formTab5.value.nb_flora_sp,
+        nb_vertebrate_sp: this.formTab5.value.nb_vertebrate_sp,
+        nb_invertebrate_sp: this.formTab5.value.nb_invertebrate_sp,
+        fonctions_hydro: fonctions_hydro,
+        fonctions_bio: fonctions_bio,
+        interet_patrim: interet_patrim,
+        val_soc_eco: val_soc_eco,
+        hab_heritages: hab_heritages,
+      };
+
+      this.posted = true;
+      this._dataService.postDataForm(formToPost, 5).subscribe(
+        () => {
+          this._dataService
+            .getZhById(this._currentZh.properties.id_zh)
+            .subscribe((zh: any) => {
+              this._dataService.setCurrentZh(zh);
+              this.posted = false;
+              this.canChangeTab.emit(true);
+              this._toastr.success("Vos données sont bien enregistrées", "", {
+                positionClass: "toast-top-right",
+              });
+            });
+        },
+        (error) => {
+          this.posted = false;
+          this._toastr.error(error.error, "", {
+            positionClass: "toast-top-right",
+          });
+        }
+      );
+    }
+  }
 }
