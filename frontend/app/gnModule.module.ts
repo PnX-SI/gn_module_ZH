@@ -19,6 +19,7 @@ import { ZhFormTab6Component } from "./zh-forms/tabs/tab6/zh-form-tab6.component
 // Service
 import { ZhDataService } from "./services/zh-data.service";
 import { ZhTabsComponent } from "./zh-forms/tabs/zh-tabs.component";
+import { DatepickerI18n } from "./services/datepicker-i18n.service";
 
 // my module routing
 const routes: Routes = [
@@ -49,7 +50,7 @@ const routes: Routes = [
     NgMultiSelectDropDownModule.forRoot(),
     NgbModule,
   ],
-  providers: [ZhDataService, MapListService],
+  providers: [ZhDataService, MapListService, DatepickerI18n],
   bootstrap: [ZhMapListComponent],
 })
 export class GeonatureModule {}

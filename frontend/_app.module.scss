@@ -190,11 +190,14 @@ small.required::after {
   th {
     font-weight: 200;
   }
-  tr {
-    background: rgba(67, 175, 0, 0.04);
-  }
-  td {
-    border-top: 1px solid #6fcf97;
+  tbody {
+    tr {
+      background: rgba(67, 175, 0, 0.04);
+    }
+    td {
+      border-top: 1px solid #6fcf97;
+      vertical-align: middle;
+    }
   }
   .delete-icon {
     color: red;
@@ -202,6 +205,22 @@ small.required::after {
   }
   .edit-icon {
     color: #219653;
+  }
+}
+
+.subtable {
+  border-bottom: 1px solid #777977;
+  .table-header {
+    color: black;
+    background-color: rgba(116, 167, 137, 1);
+  }
+  tbody {
+    tr {
+      background: white;
+    }
+    td {
+      border-top: 1px solid #80808045;
+    }
   }
 }
 

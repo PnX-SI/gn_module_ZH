@@ -1,28 +1,735 @@
-import { Component, OnInit } from "@angular/core";
-import { FormGroup, FormBuilder, FormControl } from "@angular/forms";
+import { Component, EventEmitter, OnInit, Input, Output } from "@angular/core";
+import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import { NgbDateParserFormatter, NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { NgbDatepickerI18n } from "@ng-bootstrap/ng-bootstrap";
+
+import { ToastrService } from "ngx-toastr";
+import { Subscription } from "rxjs";
+import {
+  DatepickerI18n,
+  I18n,
+} from "../../../services/datepicker-i18n.service";
+import { ZhDataService } from "../../../services/zh-data.service";
 
 @Component({
   selector: "zh-form-tab6",
   templateUrl: "./zh-form-tab6.component.html",
-  styleUrls: ["./zh-form-tab6.component.scss"]
+  styleUrls: ["./zh-form-tab6.component.scss"],
+  providers: [I18n, { provide: NgbDatepickerI18n, useClass: DatepickerI18n }],
 })
 export class ZhFormTab6Component implements OnInit {
-
+  @Input() public formMetaData: any;
+  @Output() public canChangeTab = new EventEmitter<boolean>();
   public formTab6: FormGroup;
+  public statusForm: FormGroup;
+  public instrumentForm: FormGroup;
+  public urbanDocForm: FormGroup;
+  public planForm: FormGroup;
+  public statusInput: any;
+  public instrumentInput: any;
+  public planInput: any;
+  public municipalities: any;
+  public typeClassementInput: any;
+  public patchModal: boolean;
+  public addModalBtnLabel: string;
+  public modalTitle: string;
+  public modalFormSubmitted: boolean;
+  public statusTable: any[] = [];
+  public instrumentTable: any[] = [];
+  public urbanDocTable: any[] = [];
+  public managements: any[] = [];
+  public plans: any[] = [];
+  private tempID: any;
+  private $_statusInputSub: Subscription;
+  private $_instrumentInputSub: Subscription;
+  private $_currentZhSub: Subscription;
+
+  public statusTableCol = [
+    { name: "status", label: "Statut" },
+    { name: "remark", label: "Remarques" },
+  ];
+
+  public instrumentTableCol = [
+    { name: "instrument", label: "Instruments contractuels et financiers" },
+    { name: "instrument_date", label: "Date de mise en oeuvre" },
+  ];
+
+  public urbanDocTableCol = [
+    { name: "area", label: "Commune" },
+    { name: "urbanType", label: "Type de document communal" },
+    { name: "typeClassement", label: "Type de classement" },
+    { name: "remark", label: "Remarques" },
+  ];
+  public planTableCol = [
+    { name: "plan", label: "Nature du plan" },
+    { name: "plan_date", label: "Date de réalisation" },
+    { name: "duration", label: "Durée (années)" },
+  ];
+
+  public dropdownSettings: any;
+  public multiselectTypeClassement: any;
+  private _currentZh: any;
+  selectedManagement: any;
+  moreDetails: boolean;
 
   constructor(
-    private fb: FormBuilder
-  ) { }
+    private fb: FormBuilder,
+    private dateParser: NgbDateParserFormatter,
+    public ngbModal: NgbModal,
+    private _dataService: ZhDataService
+  ) {}
 
   ngOnInit() {
-    this.createForm()
+    this.dropdownSettings = {
+      singleSelection: false,
+      idField: "id_protection_type",
+      textField: "mnemonique_type",
+      searchPlaceholderText: "Rechercher",
+      enableCheckAll: false,
+      allowSearchFilter: true,
+    };
+    this.multiselectTypeClassement = {
+      singleSelection: false,
+      idField: "id_nomenclature",
+      textField: "mnemonique",
+      searchPlaceholderText: "Rechercher",
+      enableCheckAll: false,
+      allowSearchFilter: true,
+    };
 
+    this.getCurrentZh();
+    this.getMetaData();
+    this.initForms();
   }
 
-  createForm(patchWithDefaultValues: boolean = false): void {
+  // initialize forms
+  initForms(): void {
     this.formTab6 = this.fb.group({
+      protections: null,
+      structure: null,
+    });
+
+    this.statusForm = this.fb.group({
+      status: [null, Validators.required],
+      remark: null,
+    });
+
+    this.instrumentForm = this.fb.group({
+      instrument: [null, Validators.required],
+      instrument_date: [null, Validators.required],
+    });
+
+    this.urbanDocForm = this.fb.group({
+      area: [null, Validators.required],
+      urbanType: [null, Validators.required],
+      typeClassement: [null, Validators.required],
+      remark: null,
+    });
+
+    this.planForm = this.fb.group({
+      plan: [null, Validators.required],
+      plan_date: [null, Validators.required],
+      duration: [null, Validators.required],
     });
   }
 
+  // get metaData forms
+  getMetaData() {
+    this.statusInput = this.formMetaData["STATUT_PROPRIETE"];
+    // add disabled property to statusInput options list
+    this.statusInput.map((item: any) => {
+      item.disabled = false;
+    });
+    this.instrumentInput = this.formMetaData["INSTRU_CONTRAC_FINANC"];
+    this.instrumentInput.map((item: any) => {
+      item.disabled = false;
+    });
+  }
 
+  // get current zone humides && patch forms values
+  getCurrentZh() {
+    this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
+      if (zh) {
+        this._currentZh = zh;
+        this._dataService
+          .getMunicipalitiesByZh(zh.id)
+          .subscribe((municipalities: any) => {
+            this.municipalities = municipalities;
+          });
+      }
+    });
+  }
+
+  // open the add status modal
+  onAddStatus(event: any, modal: any) {
+    this.patchModal = false;
+    this.addModalBtnLabel = "Ajouter";
+    this.modalTitle = "Ajout d'un statut de propriété";
+    event.stopPropagation();
+    const modalRef = this.ngbModal.open(modal, {
+      centered: true,
+      size: "lg",
+      windowClass: "bib-modal",
+    });
+    modalRef.result.then().finally(() => this.statusForm.reset());
+  }
+
+  // add a new status to status array
+  onPostStatus() {
+    this.modalFormSubmitted = true;
+    if (this.statusForm.valid) {
+      let formValues = this.statusForm.value;
+      // check if the status to add is already added
+      let itemExist = this.statusTable.some(
+        (item: any) =>
+          item.status.id_nomenclature == formValues.status.id_nomenclature
+      );
+      if (!itemExist) {
+        this.statusTable.push(formValues);
+      }
+      // disable the added status on the select input list
+      this.statusInput.map((item: any) => {
+        if (item.id_nomenclature == formValues.status.id_nomenclature) {
+          item.disabled = true;
+        }
+      });
+
+      this.ngbModal.dismissAll();
+      this.statusForm.reset();
+      this.canChangeTab.emit(false);
+      this.modalFormSubmitted = false;
+    }
+  }
+
+  //delete status from the status array
+  onDeleteStatus(status: any) {
+    this.statusTable = this.statusTable.filter((item: any) => {
+      return item.status.id_nomenclature != status.status.id_nomenclature;
+    });
+    this.statusInput.map((item: any) => {
+      if (item.id_nomenclature == status.status.id_nomenclature) {
+        item.disabled = false;
+      }
+    });
+    this.canChangeTab.emit(false);
+  }
+
+  // open the edit status modal
+  onEditStatus(modal: any, status: any) {
+    this.patchModal = true;
+    this.addModalBtnLabel = "Modifier";
+    this.modalTitle = "Modifier le statut de propriété";
+    // init inputs object type
+    const selectedStatus = this.statusInput.find(
+      (item: any) => item.id_nomenclature == status.status.id_nomenclature
+    );
+    // patch form values
+    this.statusForm.patchValue({
+      status: selectedStatus,
+      remark: status.remark,
+    });
+    this.tempID = status.status.id_nomenclature;
+    // manger disabled status input items
+    this.$_statusInputSub = this.statusForm
+      .get("status")
+      .valueChanges.subscribe(() => {
+        this.statusInput.map((item: any) => {
+          if (item.id_nomenclature == status.status.id_nomenclature) {
+            item.disabled = false;
+          }
+        });
+      });
+
+    const modalRef = this.ngbModal.open(modal, {
+      centered: true,
+      size: "lg",
+      windowClass: "bib-modal",
+    });
+    modalRef.result.then().finally(() => {
+      this.$_statusInputSub.unsubscribe();
+      this.statusForm.reset();
+    });
+  }
+
+  // edit status and save into status array
+  onPatchStatus() {
+    this.patchModal = false;
+    this.modalFormSubmitted = true;
+    if (this.statusForm.valid) {
+      let formValues = this.statusForm.value;
+      this.statusTable = this.statusTable.map((item: any) =>
+        item.status.id_nomenclature != this.tempID ? item : formValues
+      );
+      this.tempID = null;
+      this.statusInput.map((item: any) => {
+        if (item.id_nomenclature == formValues.status.id_nomenclature) {
+          item.disabled = true;
+        }
+      });
+      this.ngbModal.dismissAll();
+      this.$_statusInputSub.unsubscribe();
+      this.statusForm.reset();
+      this.canChangeTab.emit(false);
+      this.modalFormSubmitted = false;
+    }
+  }
+
+  // open the add instrument modal
+  onAddInstrument(event: any, modal: any) {
+    this.patchModal = false;
+    this.addModalBtnLabel = "Ajouter";
+    this.modalTitle = "Ajout d'un instrument contractuel et financier";
+    event.stopPropagation();
+    const modalRef = this.ngbModal.open(modal, {
+      centered: true,
+      size: "lg",
+      windowClass: "bib-modal",
+    });
+    modalRef.result.then().finally(() => this.instrumentForm.reset());
+  }
+
+  // add a new Instrument to Instrument array
+  onPostInstrument() {
+    this.modalFormSubmitted = true;
+    if (this.instrumentForm.valid) {
+      let formValues = this.instrumentForm.value;
+      // check if the instrument to add is already added
+      let itemExist = this.instrumentTable.some(
+        (item: any) =>
+          item.instrument.id_nomenclature ==
+          formValues.instrument.id_nomenclature
+      );
+      formValues.instrument_date = this.dateParser.format(
+        formValues.instrument_date
+      );
+      if (!itemExist) {
+        this.instrumentTable.push(formValues);
+      }
+      // disable the added instrument on the select input list
+      this.instrumentInput.map((item: any) => {
+        if (item.id_nomenclature == formValues.instrument.id_nomenclature) {
+          item.disabled = true;
+        }
+      });
+
+      this.ngbModal.dismissAll();
+      this.instrumentForm.reset();
+      this.canChangeTab.emit(false);
+      this.modalFormSubmitted = false;
+    }
+  }
+
+  //delete instrument from the instrument array
+  onDeleteInstrument(instrument: any) {
+    this.instrumentTable = this.instrumentTable.filter((item: any) => {
+      return (
+        item.instrument.id_nomenclature != instrument.instrument.id_nomenclature
+      );
+    });
+    this.instrumentInput.map((item: any) => {
+      if (item.id_nomenclature == instrument.instrument.id_nomenclature) {
+        item.disabled = false;
+      }
+    });
+    this.canChangeTab.emit(false);
+  }
+
+  // open the edit instrument modal
+  onEditInstrument(modal: any, instrument: any) {
+    this.patchModal = true;
+    this.addModalBtnLabel = "Modifier";
+    this.modalTitle = "Modifier l'instrument contractuel et financier";
+    // init inputs object type
+    const selectedinstrument = this.instrumentInput.find(
+      (item: any) =>
+        item.id_nomenclature == instrument.instrument.id_nomenclature
+    );
+    // patch form values
+    this.instrumentForm.patchValue({
+      instrument: selectedinstrument,
+      instrument_date: this.dateParser.parse(instrument.instrument_date),
+    });
+    this.tempID = instrument.instrument.id_nomenclature;
+    // manger disabled instrument input items
+    this.$_instrumentInputSub = this.instrumentForm
+      .get("instrument")
+      .valueChanges.subscribe(() => {
+        this.instrumentInput.map((item: any) => {
+          if (item.id_nomenclature == instrument.instrument.id_nomenclature) {
+            item.disabled = false;
+          }
+        });
+      });
+    const modalRef = this.ngbModal.open(modal, {
+      centered: true,
+      size: "lg",
+      windowClass: "bib-modal",
+    });
+    modalRef.result.then().finally(() => {
+      this.$_instrumentInputSub.unsubscribe();
+      this.instrumentForm.reset();
+    });
+  }
+
+  // edit instrument and save into instruments array
+  onPatchInstrument() {
+    this.patchModal = false;
+    this.modalFormSubmitted = true;
+    if (this.instrumentForm.valid) {
+      let formValues = this.instrumentForm.value;
+      formValues.instrument_date = this.dateParser.format(
+        formValues.instrument_date
+      );
+      this.instrumentTable = this.instrumentTable.map((item: any) =>
+        item.instrument.id_nomenclature != this.tempID ? item : formValues
+      );
+      this.tempID = null;
+      this.instrumentInput.map((item: any) => {
+        if (item.id_nomenclature == formValues.instrument.id_nomenclature) {
+          item.disabled = true;
+        }
+      });
+      this.ngbModal.dismissAll();
+      this.$_instrumentInputSub.unsubscribe();
+      this.instrumentForm.reset();
+      this.canChangeTab.emit(false);
+      this.modalFormSubmitted = false;
+    }
+  }
+
+  // open the add urbanDoc modal
+  onAddUrbanDoc(event: any, modal: any) {
+    this.patchModal = false;
+    this.addModalBtnLabel = "Ajouter";
+    this.modalTitle = "Ajout d'une zonage des documents";
+    event.stopPropagation();
+    const modalRef = this.ngbModal.open(modal, {
+      centered: true,
+      size: "lg",
+      windowClass: "bib-modal",
+    });
+    let $_urbanTypeInputSub = this.urbanDocForm
+      .get("urbanType")
+      .valueChanges.subscribe((val) => {
+        this.urbanDocForm.get("typeClassement").reset();
+        if (val) this.typeClassementInput = val.type_classement;
+      });
+    modalRef.result.then().finally(() => {
+      $_urbanTypeInputSub.unsubscribe();
+      this.urbanDocForm.reset();
+      this.typeClassementInput = null;
+    });
+  }
+
+  // add a new urbanDoc to urbanDoc array
+  onPostUrbanDoc() {
+    this.modalFormSubmitted = true;
+    if (this.urbanDocForm.valid) {
+      let formValues = this.urbanDocForm.value;
+      // check if the urbanDoc to add is already added
+      let itemExist = this.urbanDocTable.some(
+        (item: any) => item.area.id_area == formValues.area.id_area
+      );
+      if (!itemExist) {
+        if (formValues.typeClassement && formValues.typeClassement.length > 0) {
+          let classementNames = formValues.typeClassement.map((item) => {
+            return item["mnemonique"];
+          });
+          formValues.typeClassement = {
+            typeClassement: formValues.typeClassement,
+            mnemonique: classementNames.join("\r\n"),
+          };
+        }
+        this.urbanDocTable.push(formValues);
+      }
+      // disable the added urbanDoc on the municipalities list
+      this.municipalities.map((item: any) => {
+        if (item.id_area == formValues.area.id_area) {
+          item.disabled = true;
+        }
+      });
+
+      this.ngbModal.dismissAll();
+      this.urbanDocForm.reset();
+      this.canChangeTab.emit(false);
+      this.modalFormSubmitted = false;
+    }
+  }
+
+  //delete urbanDoc from the urbanDoc array
+  onDeleteUrbanDoc(urbanDoc: any) {
+    this.urbanDocTable = this.urbanDocTable.filter((item: any) => {
+      return item.area.id_area != urbanDoc.area.id_area;
+    });
+    this.municipalities.map((item: any) => {
+      if (item.id_area == urbanDoc.area.id_area) {
+        item.disabled = false;
+      }
+    });
+    this.canChangeTab.emit(false);
+  }
+
+  // open the edit urbanDoc modal
+  onEditUrbanDoc(modal: any, urbanDoc: any) {
+    this.patchModal = true;
+    this.addModalBtnLabel = "Modifier";
+    this.modalTitle = "Modifier la zonage des documents";
+    // init inputs object type
+    const selectedArea = this.municipalities.find(
+      (item: any) => item.id_area == urbanDoc.area.id_area
+    );
+    const selecteurbanType = this.formMetaData.TYP_DOC_COMM.find(
+      (item: any) => item.id_nomenclature == urbanDoc.urbanType.id_nomenclature
+    );
+    this.typeClassementInput = selecteurbanType.type_classement;
+    // patch form values
+    this.urbanDocForm.patchValue({
+      area: selectedArea,
+      urbanType: selecteurbanType,
+      typeClassement: urbanDoc.typeClassement.typeClassement,
+      remark: urbanDoc.remark,
+    });
+    let $_urbanTypeInputSub = this.urbanDocForm
+      .get("urbanType")
+      .valueChanges.subscribe((val) => {
+        this.urbanDocForm.get("typeClassement").reset();
+        if (val) this.typeClassementInput = val.type_classement;
+      });
+
+    this.tempID = urbanDoc.area.id_area;
+    // manger disabled urbanDoc input items
+    let $_areaInputSub = this.urbanDocForm
+      .get("area")
+      .valueChanges.subscribe(() => {
+        this.municipalities.map((item: any) => {
+          if (item.id_area == urbanDoc.area.id_area) {
+            item.disabled = false;
+          }
+        });
+      });
+    const modalRef = this.ngbModal.open(modal, {
+      centered: true,
+      size: "lg",
+      windowClass: "bib-modal",
+    });
+    modalRef.result.then().finally(() => {
+      $_areaInputSub.unsubscribe();
+      $_urbanTypeInputSub.unsubscribe();
+      this.urbanDocForm.reset();
+    });
+  }
+
+  // edit urbanDoc and save into urbanDocs array
+  onPatchUrbanDoc() {
+    this.patchModal = false;
+    this.modalFormSubmitted = true;
+    if (this.urbanDocForm.valid) {
+      let formValues = this.urbanDocForm.value;
+      if (formValues.typeClassement && formValues.typeClassement.length > 0) {
+        let classementNames = formValues.typeClassement.map((item) => {
+          return item["mnemonique"];
+        });
+        formValues.typeClassement = {
+          typeClassement: formValues.typeClassement,
+          mnemonique: classementNames.join("\r\n"),
+        };
+      }
+      this.urbanDocTable = this.urbanDocTable.map((item: any) =>
+        item.area.id_area != this.tempID ? item : formValues
+      );
+      this.tempID = null;
+      this.municipalities.map((item: any) => {
+        if (item.id_area == formValues.area.id_area) {
+          item.disabled = true;
+        }
+      });
+      this.ngbModal.dismissAll();
+      this.urbanDocForm.reset();
+      this.canChangeTab.emit(false);
+      this.modalFormSubmitted = false;
+    }
+  }
+
+  onAddStructure() {
+    if (this.formTab6.value.structure) {
+      let itemExist = this.managements.some(
+        (item) => item.id_org == this.formTab6.value.structure.id_org
+      );
+      if (!itemExist && this.formTab6.value.structure.id_org) {
+        this.managements.push(this.formTab6.value.structure);
+      }
+      this.formTab6.get("structure").reset();
+      this.canChangeTab.emit(false);
+    }
+  }
+
+  //delete Structure from the StructureS array
+  onDeleteStructure(structure: any) {
+    this.managements = this.managements.filter((item: any) => {
+      return item.id_org != structure.id_org;
+    });
+    this.canChangeTab.emit(false);
+  }
+
+  // open the add plan modal
+  onAddPlan(event: any, management: any, modal: any) {
+    this.patchModal = false;
+    this.addModalBtnLabel = "Ajouter";
+    this.modalTitle = "Ajout d'un plan de gestion";
+    event.stopPropagation();
+    this.selectedManagement = management;
+    this.planInput = [...this.formMetaData["PLAN_GESTION"]];
+    this.planInput.map((item: any) => {
+      item.disabled = false;
+      if (
+        this.selectedManagement.plans &&
+        this.selectedManagement.plans.length > 0
+      ) {
+        this.selectedManagement.plans.forEach((plan) => {
+          if (plan.plan.id_nomenclature == item.id_nomenclature)
+            item.disabled = true;
+        });
+      }
+    });
+    const modalRef = this.ngbModal.open(modal, {
+      centered: true,
+      size: "lg",
+      windowClass: "bib-modal",
+    });
+    modalRef.result.then().finally(() => {
+      this.planForm.reset();
+      this.selectedManagement = null;
+    });
+  }
+
+  // add a new plan to plan array
+  onPostPlan() {
+    this.modalFormSubmitted = true;
+    if (this.planForm.valid) {
+      let formValues = this.planForm.value;
+      this.managements.map((item: any) => {
+        if (item.id_org == this.selectedManagement.id_org) {
+          if (!item.plans) {
+            formValues.plan_date = this.dateParser.format(formValues.plan_date);
+            this.moreDetails = true;
+            item.plans = [formValues];
+          } else if (item.plans && item.plans.length > 0) {
+            let palnExist = item.plans.some(
+              (item: any) =>
+                item.plan.id_nomenclature == formValues.plan.id_nomenclature
+            );
+            if (!palnExist) {
+              formValues.plan_date = this.dateParser.format(
+                formValues.plan_date
+              );
+              item.plans.push(formValues);
+              this.moreDetails = true;
+            }
+          }
+        }
+      });
+      this.selectedManagement = null;
+      this.ngbModal.dismissAll();
+      this.planForm.reset();
+      this.canChangeTab.emit(false);
+      this.modalFormSubmitted = false;
+    }
+  }
+
+  //delete plan from the plan array
+  onDeletePlan(plan: any, structure: any) {
+    this.managements.map((item: any) => {
+      if (item.id_org == structure.id_org) {
+        if (item.plans && item.plans.length > 0) {
+          item.plans = item.plans.filter((item: any) => {
+            return item.plan.id_nomenclature != plan.plan.id_nomenclature;
+          });
+        }
+      }
+    });
+    this.canChangeTab.emit(false);
+  }
+
+  // open the edit plan modal
+  onEditPlan(modal: any, plan: any, management: any) {
+    this.patchModal = true;
+    this.addModalBtnLabel = "Modifier";
+    this.modalTitle = "Modifier un plan de gestion";
+    this.selectedManagement = management;
+    this.planInput = [...this.formMetaData["PLAN_GESTION"]];
+    this.planInput.map((item: any) => {
+      item.disabled = false;
+      if (
+        this.selectedManagement.plans &&
+        this.selectedManagement.plans.length > 0
+      ) {
+        this.selectedManagement.plans.forEach((plan) => {
+          if (plan.plan.id_nomenclature == item.id_nomenclature)
+            item.disabled = true;
+        });
+      }
+    });
+
+    // init inputs object type
+    const selectedPlan = this.planInput.find(
+      (item: any) => item.id_nomenclature == plan.plan.id_nomenclature
+    );
+
+    // patch form values
+    this.planForm.patchValue({
+      plan: selectedPlan,
+      plan_date: this.dateParser.parse(plan.plan_date),
+      duration: plan.duration,
+    });
+
+    let $_planInputSub = this.planForm
+      .get("plan")
+      .valueChanges.subscribe(() => {
+        this.planInput.map((item: any) => {
+          if (item.id_nomenclature == plan.plan.id_nomenclature) {
+            item.disabled = false;
+          }
+        });
+      });
+
+    this.tempID = plan.plan.id_nomenclature;
+
+    const modalRef = this.ngbModal.open(modal, {
+      centered: true,
+      size: "lg",
+      windowClass: "bib-modal",
+    });
+    modalRef.result.then().finally(() => {
+      $_planInputSub.unsubscribe();
+      this.planForm.reset();
+    });
+  }
+
+  // edit plan and save into plans array
+  onPatchPlan() {
+    this.patchModal = false;
+    this.modalFormSubmitted = true;
+    if (this.planForm.valid) {
+      let formValues = this.planForm.value;
+      formValues.plan_date = this.dateParser.format(formValues.plan_date);
+      this.managements.map((item: any) => {
+        if (item.id_org == this.selectedManagement.id_org) {
+          if (item.plans && item.plans.length > 0) {
+            item.plans = item.plans.map((item: any) =>
+              item.plan.id_nomenclature != this.tempID ? item : formValues
+            );
+          }
+        }
+      });
+      this.tempID = null;
+      this.ngbModal.dismissAll();
+      this.planForm.reset();
+      this.canChangeTab.emit(false);
+      this.modalFormSubmitted = false;
+    }
+  }
+
+  onMoreDetails(status: boolean) {
+    this.moreDetails = status;
+  }
 }
