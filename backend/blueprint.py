@@ -175,7 +175,8 @@ def get_complete_info(id_zh, info_role):
     try:
 
         full_zh = ZH(id_zh).get_full_zh()
-        complete_card = get_complete_card(full_zh)
+        eval = ZH(id_zh).get_eval()
+        complete_card = get_complete_card(full_zh, eval)
         return complete_card
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':

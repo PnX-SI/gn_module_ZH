@@ -9,7 +9,7 @@ import pdb
 from .models import *
 
 
-def get_complete_card(full_zh):
+def get_complete_card(full_zh, eval):
     complete_card = {}
 
     identification = {
@@ -93,7 +93,7 @@ def get_complete_card(full_zh):
         },
         "7- Evaluation générale du site": {
             "7.1- Fonctions et valeurs majeures": {
-                "Principales fonctions hydrologiques / biogéochimiques": get_function_info(full_zh.properties['eval_fonctions_hydro'], type="fonctions_hydro")
+                "Principales fonctions hydrologiques / biogéochimiques": get_function_info(eval['fonctions_hydro'], type="fonctions_hydro")
             }
             # "7.2- Intérêt patrimonial majeur": ,
             # "7.3- Bilan des menaces et des facteurs infuançant la zone humide": ,
