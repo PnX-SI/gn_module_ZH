@@ -291,6 +291,7 @@ class TZH(ZhModel):
         return self.as_geofeature("geom", "id_zh", recursif, relationships=relationships)
 
     def get_site_space_name(id):
+        pdb.set_trace()
         return DB.session.query(BibSiteSpace).filter(BibSiteSpace.id_site_space == id).one().name
 
     @staticmethod

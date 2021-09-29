@@ -16,7 +16,7 @@ def get_complete_card(full_zh):
         "Nom usuel de la zone humide": full_zh.properties['main_name'],
         "Autre nom": full_zh.properties['secondary_name'],
         "Partie d'un ensemble": get_bool(full_zh.properties['is_id_site_space']),
-        **({"Nom du grand ensemble": TZH.get_site_space_name(full_zh.properties['id_site_space'])} if full_zh.properties['is_id_site_space'] else {}),
+        **({"Nom du grand ensemble": TZH.get_site_space_name(full_zh.properties['id_site_space'])} if full_zh.properties['is_id_site_space'] and full_zh.properties['id_site_space'] else {}),
         "Code de la zone humide": full_zh.properties['code']
     }
 
@@ -84,31 +84,21 @@ def get_complete_card(full_zh):
                 "Commentaires": full_zh.properties['remark_diag']
             }
         },
-        "5- Fonctions écologiques, valeurs socio-écologiques, intérêt patrimonial": {
-            "5.1- Fonctions hydrologiques / biogéochimiques": get_function_info(full_zh.properties['fonctions_hydro'], type="fonctions_hydro"),
-            "5.2- Fonctions biologiques / écologiques": get_function_info(full_zh.properties['fonctions_bio'], type="fonctions_bio"),
-            "5.4- Intérêt patrimonial": get_function_info(full_zh.properties['interet_patrim'], type="interet_patrim"),
-            "5.4.1- Habitats naturels humides patrimoniaux": {
-                "Cartographie d'habitats": get_bool(full_zh.properties['is_carto_hab']),
-                "Nombre d'habitats": get_int(full_zh.properties['nb_hab']),
-                "Recouvrement total de la ZH (%)": "Non évalué" if full_zh.properties['total_hab_cover'] == "999" else full_zh.properties['total_hab_cover'],
-                "Habitats naturels patrimoniaux": get_hab_heritages(full_zh.properties['hab_heritages'])
-            },
-            "5.4.2- Faune et flore patrimoniale": {
-                "Flore - nombre d'espèces": get_int(full_zh.properties['nb_flora_sp']),
-                "Faune - nombre d'espèces de vertébrés": get_int(full_zh.properties['nb_vertebrate_sp']),
-                "Faune - nombre d'espèces d'invertébrés": get_int(full_zh.properties['nb_invertebrate_sp'])
-            },
-            "5.3- Valeurs socio-économiques": get_function_info(full_zh.properties['val_soc_eco'], type="val_soc_eco")
-        },
         "6- Statuts et gestion de la zone humide": {
             "6.1- Régime foncier - statut de propriété": get_ownerships_info(full_zh.properties['ownerships']),
             "6.2- Structure de gestion": get_managements_info(full_zh.properties['managements']),
             "6.3- Instruments contractuels et financiers": get_instruments_info(full_zh.properties['instruments']),
             "6.4- Principaux statuts": get_protection_names(full_zh.properties['protections']),
             "6.5- Zonage des documents d'urbanisme": get_urban_doc_info(full_zh.properties['urban_docs'])
+        },
+        "7- Evaluation générale du site": {
+            "7.1- Fonctions et valeurs majeures": {
+                "Principales fonctions hydrologiques / biogéochimiques": get_function_info(full_zh.properties['eval_fonctions_hydro'], type="fonctions_hydro")
+            }
+            # "7.2- Intérêt patrimonial majeur": ,
+            # "7.3- Bilan des menaces et des facteurs infuançant la zone humide": ,
+            # "7.4- Stratégie de gestion et orientations d'actions":
         }
-
     })
     return complete_card
 
