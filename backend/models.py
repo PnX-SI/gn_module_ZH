@@ -1271,22 +1271,6 @@ class CorProtectionLevelType(DB.Model):
         nullable=False
     )
 
-    def get_status_by_type(type_id):
-        q_protection_types = DB.session.query(CorProtectionLevelType).filter(
-            CorProtectionLevelType.id_protection_type == type_id).all()
-        protection_status = []
-        for protection in q_protection_types:
-            protection_status.append({
-                "id_protection_status": protection.id_protection_status,
-                "mnemonique_status": DB.session.query(TNomenclatures).filter(
-                    TNomenclatures.id_nomenclature == protection.id_protection_status).one().mnemonique,
-                "id_protection_level": protection.id_protection_level,
-                "mnemonique_level": DB.session.query(TNomenclatures).filter(
-                    TNomenclatures.id_nomenclature == protection.id_protection_level).one().mnemonique
-
-            })
-        return protection_status
-
 
 @serializable
 class BibActions(DB.Model):
