@@ -191,6 +191,7 @@
         </div>
       </div>
     </fieldset>
+
     <fieldset>
       <legend>
         <h5 class="section-title">Instruments contractuels et financiers</h5>
@@ -247,6 +248,17 @@
           </table>
         </div>
       </div>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <small style="display: block; margin-bottom: 8px"
+            >Autres inventaires</small
+          >
+          <mat-label ngClass="labelBeforeSlide">Non</mat-label>
+          <mat-slide-toggle [formControl]="formTab6.controls.is_other_inventory"
+            >oui</mat-slide-toggle
+          >
+        </div>
+      </div>
     </fieldset>
     <fieldset>
       <legend>
@@ -255,12 +267,14 @@
       <div class="form-row">
         <div class="form-group col-md-12">
           <small>statut</small>
-          <ng-multiselect-dropdown
-            [settings]="dropdownSettings"
+          <angular2-multiselect
             [data]="formMetaData.PROTECTIONS"
+            [(ngModel)]="selectedItems"
             [formControl]="formTab6.controls.protections"
+            [settings]="dropdownSettings"
+            (onDeSelectAll)="onDeSelectAll($event)"
           >
-          </ng-multiselect-dropdown>
+          </angular2-multiselect>
         </div>
       </div>
     </fieldset>

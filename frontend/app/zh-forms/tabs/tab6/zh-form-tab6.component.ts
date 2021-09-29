@@ -43,6 +43,7 @@ export class ZhFormTab6Component implements OnInit {
   private $_statusInputSub: Subscription;
   private $_instrumentInputSub: Subscription;
   private $_currentZhSub: Subscription;
+  public selectedItems = [];
 
   public statusTableCol = [
     { name: "status", label: "Statut" },
@@ -71,30 +72,37 @@ export class ZhFormTab6Component implements OnInit {
   private _currentZh: any;
   selectedManagement: any;
   moreDetails: boolean;
+  posted: boolean;
+  submitted: boolean;
+  $_fromChangeSub: any;
 
   constructor(
     private fb: FormBuilder,
     private dateParser: NgbDateParserFormatter,
     public ngbModal: NgbModal,
-    private _dataService: ZhDataService
+    private _dataService: ZhDataService,
+    private _toastr: ToastrService
   ) {}
 
   ngOnInit() {
-    this.dropdownSettings = {
-      singleSelection: false,
-      idField: "id_protection_type",
-      textField: "mnemonique_type",
-      searchPlaceholderText: "Rechercher",
-      enableCheckAll: false,
-      allowSearchFilter: true,
-    };
     this.multiselectTypeClassement = {
       singleSelection: false,
-      idField: "id_nomenclature",
+      idField: "id_cor",
       textField: "mnemonique",
       searchPlaceholderText: "Rechercher",
       enableCheckAll: false,
       allowSearchFilter: true,
+    };
+    this.dropdownSettings = {
+      enableCheckAll: false,
+      text: "Selectionner",
+      labelKey: "mnemonique_status",
+      primaryKey: "id_protection_status",
+      searchPlaceholderText: "Rechercher",
+      enableSearchFilter: true,
+      groupBy: "category",
+      position: "bottom",
+      autoPosition: false,
     };
 
     this.getCurrentZh();
@@ -107,6 +115,7 @@ export class ZhFormTab6Component implements OnInit {
     this.formTab6 = this.fb.group({
       protections: null,
       structure: null,
+      is_other_inventory: false,
     });
 
     this.statusForm = this.fb.group({
@@ -414,6 +423,7 @@ export class ZhFormTab6Component implements OnInit {
         this.urbanDocForm.get("typeClassement").reset();
         if (val) this.typeClassementInput = val.type_classement;
       });
+
     modalRef.result.then().finally(() => {
       $_urbanTypeInputSub.unsubscribe();
       this.urbanDocForm.reset();
@@ -731,5 +741,107 @@ export class ZhFormTab6Component implements OnInit {
 
   onMoreDetails(status: boolean) {
     this.moreDetails = status;
+  }
+
+  onFormSubmit() {
+    if (this.formTab6.valid) {
+      this.submitted = true;
+      //this.$_fromChangeSub.unsubscribe();
+      let managements = [];
+      let urban_docs = [];
+      let instruments = [];
+      let protections = [];
+      let ownerships = [];
+      console.log("this.managements", this.managements);
+      console.log("this.urbanDocTable", this.urbanDocTable);
+      console.log("this.instrumentTable", this.instrumentTable);
+      console.log("this.statusTable", this.statusTable);
+      console.log("this.form", this.formTab6);
+
+      if (this.managements && this.managements.length > 0) {
+        this.managements.forEach((item: any) => {
+          let plans = [];
+          if (item.plans && item.plans.length > 0) {
+            item.plans.forEach((item: any) => {
+              plans.push({
+                id_nature: item.plan.id_nomenclature,
+                plan_date: item.plan_date,
+                duration: item.duration,
+              });
+            });
+          }
+          managements.push({
+            structure: item.id_org,
+            plans: plans,
+          });
+        });
+      }
+
+      if (this.statusTable && this.statusTable.length > 0) {
+        this.statusTable.forEach((item: any) => {
+          ownerships.push({
+            id_status: item.status.id_nomenclature,
+            remark: item.instrument_date,
+          });
+        });
+      }
+      if (this.instrumentTable && this.instrumentTable.length > 0) {
+        this.instrumentTable.forEach((item: any) => {
+          instruments.push({
+            id_instrument: item.instrument.id_nomenclature,
+            instrument_date: item.instrument_date,
+          });
+        });
+      }
+      if (this.urbanDocTable && this.urbanDocTable.length > 0) {
+        this.urbanDocTable.forEach((item: any) => {
+          urban_docs.push({
+            id_area: item.area.id_area,
+            id_urban_type: item.typeClassement.typeClassement,
+            remark: item.remark,
+          });
+        });
+      }
+      if (
+        this.formTab6.value.protections &&
+        this.formTab6.value.protections.length > 0
+      ) {
+        this.formTab6.value.protections.forEach((item: any) => {
+          protections.push(item.id_protection_status);
+        });
+      }
+
+      let formToPost = {
+        id_zh: Number(this._currentZh.properties.id_zh),
+        ownerships: ownerships,
+        managements: managements,
+        instruments: instruments,
+        protections: protections,
+        is_other_inventory: this.formTab6.value.is_other_inventory,
+        urban_docs: urban_docs,
+      };
+
+      this.posted = true;
+      this._dataService.postDataForm(formToPost, 6).subscribe(
+        () => {
+          this._dataService
+            .getZhById(this._currentZh.properties.id_zh)
+            .subscribe((zh: any) => {
+              this._dataService.setCurrentZh(zh);
+              this.posted = false;
+              this.canChangeTab.emit(true);
+              this._toastr.success("Vos données sont bien enregistrées", "", {
+                positionClass: "toast-top-right",
+              });
+            });
+        },
+        (error) => {
+          this.posted = false;
+          this._toastr.error(error.error, "", {
+            positionClass: "toast-top-right",
+          });
+        }
+      );
+    }
   }
 }
