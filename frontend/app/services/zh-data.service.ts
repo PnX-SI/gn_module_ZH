@@ -60,4 +60,9 @@ export class ZhDataService {
       `${AppConfig.API_ENDPOINT}/zones_humides/forms/cahierhab/${corineId}`
     );
   }
+  getEvalZh(zhId: string) {
+    return this._api.get<any>(
+      `${AppConfig.API_ENDPOINT}/zones_humides/eval/${zhId}`
+    );
+  }
 }
