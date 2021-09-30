@@ -781,7 +781,7 @@ export class ZhFormTab6Component implements OnInit {
         this.statusTable.forEach((item: any) => {
           ownerships.push({
             id_status: item.status.id_nomenclature,
-            remark: item.instrument_date,
+            remark: item.remark,
           });
         });
       }

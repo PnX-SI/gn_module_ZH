@@ -331,6 +331,7 @@ class ZH(TZH):
     __abstract__ = True
 
     def __init__(self, id_zh):
+        print('ok')
         self.zh = DB.session.query(TZH).filter(
             TZH.id_zh == id_zh).one()
         self.geo_info = self.get_geo_info()
@@ -350,7 +351,7 @@ class ZH(TZH):
         self.managements = self.get_managements()
         self.instruments = self.get_instruments()
         self.protections = self.get_protections()
-        self.urban_docs = self.get_urban_docs()
+        #self.urban_docs = self.get_urban_docs()
         self.actions = self.get_actions()
         self.eval_fonctions_hydro = self.get_functions(
             'FONCTIONS_HYDRO', is_eval=True)
@@ -467,15 +468,15 @@ class ZH(TZH):
             self.zh.id_zh)
         managements = []
         for management in q_management_structures:
-            q_management_plans = DB.session.query(
-                TManagementPlans).filter(management.id_structure).all()
+            q_management_plans = DB.session.query(TManagementPlans).filter(
+                TManagementPlans.id_structure == management.id_structure).all()
             plans = []
             if q_management_plans:
                 for plan in q_management_plans:
                     plans.append({
-                        "id_nature": plan["id_nature"],
-                        "plan_date": plan["plan_date"],
-                        "duration": plan["duration"]
+                        "id_nature": plan.id_nature,
+                        "plan_date": str(plan.plan_date),
+                        "duration": plan.duration
                     })
             managements.append({
                 "structure": management.id_org,
@@ -490,7 +491,7 @@ class ZH(TZH):
             "instruments": [
                 {
                     'id_instrument': instrument.id_instrument,
-                    'instrument_date': instrument.instrument_date
+                    'instrument_date': str(instrument.instrument_date)
                 } for instrument in TInstruments.get_instruments_by_id(self.zh.id_zh)
             ]
         }
@@ -586,7 +587,7 @@ class ZH(TZH):
         full_zh.properties.update(self.ownerships)
         full_zh.properties.update(self.instruments)
         full_zh.properties.update(self.protections)
-        full_zh.properties.update(self.urban_docs)
+        # full_zh.properties.update(self.urban_docs)
         return full_zh
 
     def get_eval(self):

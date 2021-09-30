@@ -388,9 +388,9 @@ def post_ownerships(id_zh, ownerships):
     for ownership in ownerships:
         DB.session.add(
             TOwnership(
-                id_status=ownership.id_status,
+                id_status=ownership['id_status'],
                 id_zh=id_zh,
-                remark=ownership.remark
+                remark=ownership['remark']
             )
         )
         DB.session.flush()
@@ -436,9 +436,9 @@ def post_instruments(id_zh, instruments):
     for instrument in instruments:
         DB.session.add(
             TInstruments(
-                id_instrument=instrument.id_instrument,
+                id_instrument=instrument["id_instrument"],
                 id_zh=id_zh,
-                instrument_date=instrument.instrument_date
+                instrument_date=instrument["instrument_date"]
             )
         )
         DB.session.flush()
@@ -447,17 +447,18 @@ def post_instruments(id_zh, instruments):
 def update_protections(id_zh, protections):
     DB.session.query(CorZhProtection).filter(
         CorZhProtection.id_zh == id_zh).delete()
-    post_instruments(id_zh, protections)
+    post_protections(id_zh, protections)
 
 
 def post_protections(id_zh, protections):
     for protection in protections:
         DB.session.add(
             CorZhProtection(
-                id_protection=protection.id_protection,
+                id_protection=protection,
                 id_zh=id_zh,
             )
         )
+        pdb.set_trace()
         DB.session.flush()
 
 

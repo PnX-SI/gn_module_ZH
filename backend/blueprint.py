@@ -391,55 +391,26 @@ def get_tab_data(id_tab, info_role):
             return {"id_zh": form_data['id_zh']}, 200
 
         if id_tab == 6:
-            # {"ownerships": [
-            #   {"id_status":id_status1,"remark":remark1},
-            #   {"id_status":id_status2,"remark":remark2},
-            #   ...
-            # ]}
             update_ownerships(
                 form_data['id_zh'], form_data['ownerships'])
-            # {"managements": [
-            #   {
-            #       "structure":id_org1,
-            #       "plans": [
-            #           {
-            #               "id_nature":id_nature1,
-            #               "plan_date":date1,
-            #               "duration":duration1
-            #           },
-            #           {
-            #               "id_nature":id_nature2,
-            #               "plan_date":date2,
-            #               "duration":duration2
-            #           },
-            #           ...
-            #       ]
-            #   },
-            #   ...
-            # ]}
             update_managements(form_data['id_zh'], form_data['managements'])
-            # {"instruments": [
-            #   {"id_instrument":id_instrument1, "instrument_date":date1},
-            #   {"id_instrument":id_instrument2,"instrument_date":date2},
-            #   ...
-            # ]}
-            update_instruments(
-                form_data['id_zh'], form_data['instruments'])
+            update_instruments(form_data['id_zh'], form_data['instruments'])
             # {"protections": [
             #   id_protection1,
             #   id_protection2,
             #   ...
             # ]}
-            update_protections(
-                form_data['id_zh'], form_data['protections'])
-            # "is_other_inventory": boolean
+            update_protections(form_data['id_zh'], form_data['protections'])
             update_zh_tab6(form_data)
             # {"urban_docs": [
             #   {"id_area": id_area1, "id_urban_type": id_cor1, "remark": remark1},
             #   {"id_area": id_area2, "id_urban_type": id_cor2, "remark": remark2},
             #   ...
             # ]}
-            update_urban_docs(form_data['id_zh'], form_data['urban_docs'])
+            #update_urban_docs(form_data['id_zh'], form_data['urban_docs'])
+            pdb.set_trace()
+            DB.session.commit()
+            return {"id_zh": form_data['id_zh']}, 200
 
         if id_tab == 7:
             update_tzh(form_data)
