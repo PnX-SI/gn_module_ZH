@@ -272,19 +272,26 @@ export class ZhFormTab6Component implements OnInit {
                   (item: any) => item.id_nomenclature == doc.id_doc_type
                 );
                 let typeClassement = [];
-                doc.id_cors.forEach((idCor) => {
-                  let temp = docType.type_classement.find(
-                    (item: any) => item.id_nomenclature == idCor
-                  );
-                  typeClassement.push(temp);
+                if (docType.type_classement) {
+                  doc.id_cors.forEach((idCor) => {
+                    let temp = docType.type_classement.find(
+                      (item: any) => item.id_cor == idCor
+                    );
+                    typeClassement.push(temp);
+                  });
+                }
+                let classementNames = typeClassement.map((item) => {
+                  return item["mnemonique"];
                 });
-
                 this.urbanDocTable.push({
                   area: this.municipalities.find(
                     (item: any) => item.id_area == doc.id_area
                   ),
                   urbanType: docType,
-                  typeClassement: typeClassement,
+                  typeClassement: {
+                    typeClassement: typeClassement,
+                    mnemonique: classementNames.join("\r\n"),
+                  },
                   remark: doc.remark,
                 });
               });
