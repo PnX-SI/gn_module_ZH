@@ -14,8 +14,6 @@ CREATE SEQUENCE pr_zh.t_management_structures_id_structure_seq START WITH 1 INCR
 
 CREATE SEQUENCE pr_zh.t_references_id_reference_seq START WITH 1 INCREMENT BY 1;
 
-CREATE SEQUENCE pr_zh.t_urban_planning_docs_id_doc_seq START WITH 1 INCREMENT BY 1;
-
 CREATE SEQUENCE pr_zh.t_zh_id_zh_seq START WITH 1 INCREMENT BY 1;
 
 CREATE  TABLE pr_zh.bib_actions ( 
@@ -109,9 +107,15 @@ COMMENT ON COLUMN pr_zh.cor_sdage_sage.id_sage IS 'id_nomenclature sage dans ref
 
 CREATE  TABLE pr_zh.cor_urban_type_range ( 
 	id_cor               integer  NOT NULL ,
-	id_range_type        integer  NOT NULL ,
 	id_doc_type          integer  NOT NULL ,
+	id_range_type        integer  NOT NULL ,
 	CONSTRAINT pk_cor_urban_type_range PRIMARY KEY ( id_cor )
+ );
+
+CREATE  TABLE pr_zh.cor_zh_doc_range ( 
+	id_doc         uuid  NOT NULL ,
+	id_cor         integer  NOT NULL ,
+	CONSTRAINT pk_cor_zh_doc_range PRIMARY KEY ( id_doc, id_cor )
  );
 
 CREATE  TABLE pr_zh.cor_zh_area ( 
@@ -504,17 +508,15 @@ CREATE  TABLE pr_zh.t_ownership (
 COMMENT ON TABLE pr_zh.t_ownership IS 'regime foncier : statut de propriete';
 
 CREATE  TABLE pr_zh.t_urban_planning_docs ( 
-	id_doc               integer DEFAULT nextval('pr_zh.t_urban_planning_docs_id_doc_seq'::regclass) NOT NULL ,
 	id_area              integer  NOT NULL ,
 	id_zh                integer  NOT NULL ,
-	id_urban_type        integer  NOT NULL ,
+	id_doc_type          integer NOT NULL ,
+	id_doc               uuid NOT NULL UNIQUE  ,
 	remark               varchar(2000)   ,
-	CONSTRAINT pk_t_docs_id_doc PRIMARY KEY ( id_doc )
+	CONSTRAINT pk_t_urban_planning_docs PRIMARY KEY ( id_area, id_zh, id_doc_type )
  );
 
 COMMENT ON TABLE pr_zh.t_urban_planning_docs IS 'liste zonage des documents d''urbanisme';
-
-COMMENT ON COLUMN pr_zh.t_urban_planning_docs.id_urban_type IS 'type de classement';
 
 CREATE  TABLE pr_zh.t_management_plans ( 
 	id_plan              integer DEFAULT nextval('pr_zh.t_management_plans_id_plan_seq'::regclass) NOT NULL ,
@@ -566,6 +568,10 @@ ALTER TABLE pr_zh.cor_sdage_sage ADD CONSTRAINT fk_cor_sage FOREIGN KEY ( id_sag
 ALTER TABLE pr_zh.cor_urban_type_range ADD CONSTRAINT fk_cor_urban_range FOREIGN KEY ( id_range_type ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_urban_type_range ADD CONSTRAINT fk_cor_urban_type FOREIGN KEY ( id_doc_type ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.cor_zh_doc_range ADD CONSTRAINT fk_cor_zh_doc_range1 FOREIGN KEY ( id_doc ) REFERENCES pr_zh.t_urban_planning_docs( id_doc )  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.cor_zh_doc_range ADD CONSTRAINT fk_cor_zh_doc_range2 FOREIGN KEY ( id_cor ) REFERENCES pr_zh.cor_urban_type_range( id_cor )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_zh_area ADD CONSTRAINT fk_cor_zh_area_id_area FOREIGN KEY ( id_area ) REFERENCES ref_geo.l_areas( id_area )  ON UPDATE CASCADE;
 
@@ -661,7 +667,7 @@ ALTER TABLE pr_zh.t_river_basin ADD CONSTRAINT fk_t_river_basin_t_nomenclatures_
 
 ALTER TABLE pr_zh.t_urban_planning_docs ADD CONSTRAINT fk_t_docs_t_zh FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh ) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE pr_zh.t_urban_planning_docs ADD CONSTRAINT fk_t_urban_planning_docs FOREIGN KEY ( id_urban_type ) REFERENCES pr_zh.cor_urban_type_range( id_cor )  ON UPDATE CASCADE;
+ALTER TABLE pr_zh.t_urban_planning_docs ADD CONSTRAINT fk_t_urban_planning_docs FOREIGN KEY ( id_doc_type ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature ) ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_bib_site_space FOREIGN KEY ( id_site_space ) REFERENCES pr_zh.bib_site_space( id_site_space )  ON UPDATE CASCADE;
 
