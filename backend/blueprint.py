@@ -240,6 +240,18 @@ def get_cahier_hab(info_role, lb_code):
         raise ZHApiError(message=str(e), details=str(e))
 
 
+@blueprint.route("/geometries", methods=["GET"])
+@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@json_resp
+def get_geometries(info_role):
+    """Get list of all zh geometries (contours)
+    """
+    try:
+        return [zh.get_geofeature()["geometry"] for zh in DB.session.query(TZH).all()]
+    except Exception as e:
+        raise ZHApiError(message=str(e), details=str(e))
+
+
 @ blueprint.route("/references/autocomplete", methods=["GET"])
 @ permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @ json_resp
