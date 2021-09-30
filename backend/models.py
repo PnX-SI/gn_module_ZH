@@ -331,7 +331,6 @@ class ZH(TZH):
     __abstract__ = True
 
     def __init__(self, id_zh):
-        print('ok')
         self.zh = DB.session.query(TZH).filter(
             TZH.id_zh == id_zh).one()
         self.geo_info = self.get_geo_info()
@@ -475,7 +474,7 @@ class ZH(TZH):
                 for plan in q_management_plans:
                     plans.append({
                         "id_nature": plan.id_nature,
-                        "plan_date": str(plan.plan_date),
+                        "plan_date": str(plan.plan_date.date()),
                         "duration": plan.duration
                     })
             managements.append({
@@ -491,7 +490,7 @@ class ZH(TZH):
             "instruments": [
                 {
                     'id_instrument': instrument.id_instrument,
-                    'instrument_date': str(instrument.instrument_date)
+                    'instrument_date': str(instrument.instrument_date.date())
                 } for instrument in TInstruments.get_instruments_by_id(self.zh.id_zh)
             ]
         }
