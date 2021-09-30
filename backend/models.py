@@ -509,6 +509,7 @@ class ZH(TZH):
             "urban_docs": [
                 {
                     'id_area': urban_doc.id_area,
+                    'id_doc_type': urban_doc.id_doc_type,
                     'id_cors': [doc.id_cor for doc in DB.session.query(CorZhDocRange).filter(CorZhDocRange.id_doc == urban_doc.id_doc).all()],
                     'remark': urban_doc.remark
                 } for urban_doc in TUrbanPlanningDocs.get_urban_docs_by_id(self.zh.id_zh)
