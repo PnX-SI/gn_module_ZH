@@ -351,7 +351,7 @@ class ZH(TZH):
         self.managements = self.get_managements()
         self.instruments = self.get_instruments()
         self.protections = self.get_protections()
-        #self.urban_docs = self.get_urban_docs()
+        self.urban_docs = self.get_urban_docs()
         self.actions = self.get_actions()
         self.eval_fonctions_hydro = self.get_functions(
             'FONCTIONS_HYDRO', is_eval=True)
@@ -509,7 +509,7 @@ class ZH(TZH):
             "urban_docs": [
                 {
                     'id_area': urban_doc.id_area,
-                    'id_urban_type': urban_doc.id_urban_type,
+                    'id_cors': [doc.id_cor for doc in DB.session.query(CorZhDocRange).filter(CorZhDocRange.id_doc == urban_doc.id_doc).all()],
                     'remark': urban_doc.remark
                 } for urban_doc in TUrbanPlanningDocs.get_urban_docs_by_id(self.zh.id_zh)
             ]
@@ -588,7 +588,7 @@ class ZH(TZH):
         full_zh.properties.update(self.ownerships)
         full_zh.properties.update(self.instruments)
         full_zh.properties.update(self.protections)
-        # full_zh.properties.update(self.urban_docs)
+        full_zh.properties.update(self.urban_docs)
         return full_zh
 
     def get_eval(self):
