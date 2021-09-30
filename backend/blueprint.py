@@ -391,24 +391,12 @@ def get_tab_data(id_tab, info_role):
             return {"id_zh": form_data['id_zh']}, 200
 
         if id_tab == 6:
-            update_ownerships(
-                form_data['id_zh'], form_data['ownerships'])
+            update_ownerships(form_data['id_zh'], form_data['ownerships'])
             update_managements(form_data['id_zh'], form_data['managements'])
             update_instruments(form_data['id_zh'], form_data['instruments'])
-            # {"protections": [
-            #   id_protection1,
-            #   id_protection2,
-            #   ...
-            # ]}
             update_protections(form_data['id_zh'], form_data['protections'])
             update_zh_tab6(form_data)
-            # {"urban_docs": [
-            #   {"id_area": id_area1, "id_urban_type": id_cor1, "remark": remark1},
-            #   {"id_area": id_area2, "id_urban_type": id_cor2, "remark": remark2},
-            #   ...
-            # ]}
-            #update_urban_docs(form_data['id_zh'], form_data['urban_docs'])
-            pdb.set_trace()
+            update_urban_docs(form_data['id_zh'], form_data['urban_docs'])
             DB.session.commit()
             return {"id_zh": form_data['id_zh']}, 200
 

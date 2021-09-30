@@ -499,8 +499,9 @@ class ZH(TZH):
     def get_protections(self):
         return {
             "protections": [
-                protection.id_protection
-                for protection in CorZhProtection.get_protections_by_id(self.zh.id_zh)]
+                DB.session.query(CorProtectionLevelType).filter(
+                    CorProtectionLevelType.id_protection == protec).one().id_protection_status
+                for protec in [protection.id_protection for protection in CorZhProtection.get_protections_by_id(self.zh.id_zh)]]
         }
 
     def get_urban_docs(self):
@@ -1201,24 +1202,24 @@ class CorUrbanTypeRange(DB.Model):
         DB.Integer,
         primary_key=True
     )
-    id_range_type = DB.Column(
+    id_doc_type = DB.Column(
         DB.Integer,
         ForeignKey(TNomenclatures.id_nomenclature)
     )
-    id_doc_type = DB.Column(
+    id_range_type = DB.Column(
         DB.Integer,
         ForeignKey(TNomenclatures.id_nomenclature)
     )
 
     def get_range_by_doc(doc_id):
         q_ranges = DB.session.query(CorUrbanTypeRange).filter(
-            CorUrbanTypeRange.id_range_type == doc_id).all()
+            CorUrbanTypeRange.id_doc_type == doc_id).all()
         ranges = []
         for range in q_ranges:
             ranges.append({
                 "id_cor": range.id_cor,
-                "id_nomenclature": range.id_doc_type,
-                "mnemonique": DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == range.id_doc_type).one().mnemonique
+                "id_nomenclature": range.id_range_type,
+                "mnemonique": DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == range.id_range_type).one().mnemonique
             })
         return ranges
 
@@ -1226,28 +1227,46 @@ class CorUrbanTypeRange(DB.Model):
 class TUrbanPlanningDocs(DB.Model):
     __tablename__ = "t_urban_planning_docs"
     __table_args__ = {"schema": "pr_zh"}
-    id_doc = DB.Column(
-        DB.Integer,
-        primary_key=True
-    )
     id_area = DB.Column(
         DB.Integer,
-        nullable=False
+        primary_key=True
     )
     id_zh = DB.Column(
         DB.Integer,
         ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    id_doc_type = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+    id_doc = DB.Column(
+        UUID(as_uuid=True),
         nullable=False
     )
-    id_urban_type = DB.Column(
-        DB.Integer,
-        ForeignKey(CorUrbanTypeRange.id_cor),
-        nullable=False
+    remark = DB.Column(
+        DB.Unicode
     )
 
     def get_urban_docs_by_id(id_zh):
         return DB.session.query(TUrbanPlanningDocs).filter(
             TUrbanPlanningDocs.id_zh == id_zh).all()
+
+
+class CorZhDocRange(DB.Model):
+    __tablename__ = "cor_zh_doc_range"
+    __table_args__ = {"schema": "pr_zh"}
+    id_doc = DB.Column(
+        DB.Integer,
+        ForeignKey(TUrbanPlanningDocs.id_doc),
+        primary_key=True
+    )
+    id_cor = DB.Column(
+        DB.Integer,
+        ForeignKey(CorUrbanTypeRange.id_cor),
+        primary_key=True
+    )
 
 
 class CorProtectionLevelType(DB.Model):
