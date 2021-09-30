@@ -268,12 +268,23 @@ export class ZhFormTab6Component implements OnInit {
               this._currentZh.properties.urban_docs.length > 0
             ) {
               this._currentZh.properties.urban_docs.forEach((doc: any) => {
+                let docType = this.formMetaData["TYP_DOC_COMM"].find(
+                  (item: any) => item.id_nomenclature == doc.id_doc_type
+                );
+                let typeClassement = [];
+                doc.id_cors.forEach((idCor) => {
+                  let temp = docType.type_classement.find(
+                    (item: any) => item.id_nomenclature == idCor
+                  );
+                  typeClassement.push(temp);
+                });
+
                 this.urbanDocTable.push({
                   area: this.municipalities.find(
                     (item: any) => item.id_area == doc.id_area
                   ),
-                  urbanType: doc.id_cors,
-                  typeClassement: doc.id_cors,
+                  urbanType: docType,
+                  typeClassement: typeClassement,
                   remark: doc.remark,
                 });
               });
