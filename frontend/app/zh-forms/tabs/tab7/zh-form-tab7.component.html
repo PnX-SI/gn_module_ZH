@@ -1,0 +1,337 @@
+<div *ngIf="evalZh" class="container-fluid">
+  <form>
+    <fieldset>
+      <legend>
+        <h5 class="section-title">Fonctions et valeurs majeures</h5>
+      </legend>
+      <div
+        *ngIf="hydroFctData && hydroFctData.length > 0"
+        class="table-responsive"
+      >
+        <table class="table eval-table fct-table mb-4">
+          <thead class="thead-inverse table-header">
+            <tr>
+              <th *ngFor="let col of hydroFctTableCol">{{ col.label }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of hydroFctData">
+              <td *ngFor="let col of hydroFctTableCol">
+                {{ item[col.name]?.mnemonique || item[col.name] }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="bioFctData && bioFctData.length > 0" class="table-responsive">
+        <table class="table eval-table fct-table mb-4">
+          <thead class="thead-inverse table-header">
+            <tr>
+              <th *ngFor="let col of bioFctTableCol">{{ col.label }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of bioFctData">
+              <td *ngFor="let col of bioFctTableCol">
+                {{ item[col.name]?.mnemonique || item[col.name] }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="patrimData && patrimData.length > 0" class="table-responsive">
+        <table class="table eval-table fct-table mb-4">
+          <thead class="thead-inverse table-header">
+            <tr>
+              <th *ngFor="let col of patrimTableCol">{{ col.label }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of patrimData">
+              <td *ngFor="let col of patrimTableCol">
+                {{ item[col.name]?.mnemonique || item[col.name] }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="row">
+        <div class="col-sm">
+          <table class="table eval-table mb-4">
+            <thead class="thead-inverse table-header">
+              <tr>
+                <th>
+                  Nombre d'espèces faunistiques patrimoniales patrimoniaux
+                </th>
+                <th>Nombre d'espèces floristiques patrimoniales</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  {{ evalZh.nb_fauna_sp }}
+                </td>
+                <td>
+                  {{ evalZh.nb_flora_sp }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-sm">
+          <table class="table eval-table mb-4">
+            <thead class="thead-inverse table-header">
+              <tr>
+                <th>Nombre d'habitats naturels humides patrimoniaux</th>
+                <th>Recouvrement total sur la ZH (%)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  {{ evalZh.nb_hab }}
+                </td>
+                <td>
+                  {{ evalZh.total_hab_cover }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div *ngIf="socEcoData && socEcoData.length > 0" class="table-responsive">
+        <table class="table eval-table fct-table mb-4">
+          <thead class="thead-inverse table-header">
+            <tr>
+              <th *ngFor="let col of socEcoTableCol">{{ col.label }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of socEcoData">
+              <td *ngFor="let col of socEcoTableCol">
+                {{ item[col.name]?.mnemonique || item[col.name] }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="form-group col-md-12">
+        <small>Commentaires</small>
+        <textarea
+          class="form-control"
+          rows="3"
+          [formControl]="formTab7.controls.remark_eval_functions"
+          name="name"
+        ></textarea>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>
+        <h5 class="section-title">
+          Bilan des menaces et facteurs influençant la zone humide
+        </h5>
+      </legend>
+      <div class="col-sm">
+        <table class="table eval-table mb-4">
+          <thead class="thead-inverse table-header">
+            <tr>
+              <th>Évaluation globale des menaces potentielles ou avérées</th>
+              <th>Fonctionnalité hydrologique / biogéochimique</th>
+              <th>
+                Fonctionnalité biologique / écologique (habitats / faune /
+                flore)
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ evalZh.thread?.mnemonique || "Non évaluée" }}</td>
+              <td>{{ evalZh.diag_hydro?.mnemonique || "Non évaluée" }}</td>
+              <td>{{ evalZh.diag_bio?.mnemonique || "Non évaluée" }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="form-group col-md-12">
+        <small>Commentaires</small>
+        <textarea
+          class="form-control"
+          rows="3"
+          [formControl]="formTab7.controls.remark_eval_thread"
+          name="name"
+        ></textarea>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>
+        <h5 class="section-title">
+          Stratégie de gestion et orientations d'actions
+        </h5>
+      </legend>
+      <div class="form-row">
+        <button
+          mat-raised-button
+          class="mb-3"
+          color="primary"
+          (click)="onAddAction($event, actionModal)"
+        >
+          <mat-icon>add_box</mat-icon>
+          proposition d’action
+        </button>
+        <div
+          *ngIf="actionTable && actionTable.length > 0"
+          class="table-responsive"
+        >
+          <table class="table mb-4">
+            <thead class="thead-inverse table-header">
+              <tr>
+                <th *ngFor="let col of actionTableCol">{{ col.label }}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of actionTable">
+                <td *ngFor="let col of actionTableCol">
+                  {{
+                    item[col.name]?.mnemonique ||
+                      item[col.name]?.name ||
+                      item[col.name]
+                  }}
+                </td>
+                <td>
+                  <div>
+                    <button
+                      mat-icon-button
+                      class="mr-2"
+                      placement="top"
+                      ngbTooltip="Editer"
+                    >
+                      <mat-icon
+                        class="edit-icon"
+                        (click)="onEditAction(actionModal, item)"
+                        >edit</mat-icon
+                      >
+                    </button>
+                    <button
+                      mat-icon-button
+                      placement="top"
+                      ngbTooltip="Supprimer"
+                      (click)="onDeleteAction(item)"
+                    >
+                      <mat-icon class="delete-icon">close</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="form-group col-md-12">
+        <small>Commentaires</small>
+        <textarea
+          class="form-control"
+          rows="3"
+          [formControl]="formTab7.controls.remark_eval_actions"
+          name="name"
+        ></textarea>
+      </div>
+    </fieldset>
+    <div class="footer-btn">
+      <button
+        type="submit"
+        mat-raised-button
+        color="primary"
+        class="ml-3"
+        [disabled]="posted"
+        (click)="onFormSubmit()"
+      >
+        <mat-icon *ngIf="!posted">save_outline</mat-icon>
+        <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
+        Enregister
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Modal Stratégie de gestion et orientations d'actions-->
+<ng-template #actionModal let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h6>{{ modalTitle }}</h6>
+    <button mat-icon-button class="closeModalBtn" (click)="c()">
+      <mat-icon class="cancel-icon">cancel</mat-icon>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="actionForm">
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <small class="required">Propositions d'actions</small>
+          <select
+            class="form-control custom-select"
+            ngbAutofocus
+            [formControl]="actionForm.controls.action"
+          >
+            <option
+              *ngFor="let item of actionInput"
+              [ngValue]="item"
+              [disabled]="item.disabled"
+            >
+              {{ item.name }}
+            </option>
+          </select>
+          <small
+            *ngIf="
+              (actionForm.controls.action.touched || modalFormSubmitted) &&
+              actionForm.controls.action.errors?.required
+            "
+            class="error-msg"
+            >Champ requis</small
+          >
+        </div>
+        <div class="form-group col-md-6">
+          <small class="required">Niveau de priorité</small>
+          <select
+            class="form-control"
+            [formControl]="actionForm.controls.priority"
+          >
+            <option
+              *ngFor="let qualif of formMetaData.NIVEAU_PRIORITE"
+              [ngValue]="qualif"
+            >
+              {{ qualif.mnemonique }}
+            </option>
+          </select>
+          <small
+            *ngIf="
+              (actionForm.controls.priority.touched || modalFormSubmitted) &&
+              actionForm.controls.priority.errors?.required
+            "
+            class="error-msg"
+            >Champ requis</small
+          >
+        </div>
+        <div class="form-group col-md-12">
+          <small>remarques</small>
+          <textarea
+            class="form-control"
+            [formControl]="actionForm.controls.remark"
+            rows="3"
+          ></textarea>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      mat-raised-button
+      color="primary"
+      class="uppercase"
+      (click)="patchModal ? onPatchAction() : onPostAction()"
+    >
+      {{ addModalBtnLabel }}
+    </button>
+  </div>
+</ng-template>

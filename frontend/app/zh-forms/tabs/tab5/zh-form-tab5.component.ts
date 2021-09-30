@@ -151,7 +151,7 @@ export class ZhFormTab5Component implements OnInit {
     this.interetPatInput = this.groupArrayByCategory(
       this.formMetaData["INTERET_PATRIM"]
     );
-    this.valSocEcoInput = this.formMetaData["VAL_SOC_ECO"];
+    this.valSocEcoInput = [...this.formMetaData["VAL_SOC_ECO"]];
     this.corinBioMetaData = [...this.formMetaData["CORINE_BIO"]].filter(
       (corine) => corine.CB_is_ch == true
     );
