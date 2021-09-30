@@ -95,11 +95,23 @@ def get_urban_docs():
 def get_protections():
     return [
         {
-            "id_protection_type": q_protection_type.id_nomenclature,
-            "mnemonique_type": q_protection_type.mnemonique,
-            "protection_status": CorProtectionLevelType.get_status_by_type(q_protection_type.id_nomenclature)
-        } for q_protection_type in Nomenclatures.get_nomenclature_info("PROTECTION_TYP")
+            "id_protection_status": protection.id_protection_status,
+            "mnemonique_status": DB.session.query(TNomenclatures).filter(
+                TNomenclatures.id_nomenclature == protection.id_protection_status).one().mnemonique,
+            "id_protection_level": protection.id_protection_level,
+            "mnemonique_level": DB.session.query(TNomenclatures).filter(
+                TNomenclatures.id_nomenclature == protection.id_protection_level).one().mnemonique,
+            "category": get_protection_category(protection),
+            "category_id": protection.id_protection_type
+        } for protection in DB.session.query(CorProtectionLevelType).all()
     ]
+
+
+def get_protection_category(protection):
+    if protection.id_protection_type is not None:
+        return DB.session.query(TNomenclatures).filter(
+            TNomenclatures.id_nomenclature == protection.id_protection_type).one().mnemonique
+    return "Aucun"
 
 
 def get_nomenc(config):

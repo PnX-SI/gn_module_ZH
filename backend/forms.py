@@ -388,9 +388,9 @@ def post_ownerships(id_zh, ownerships):
     for ownership in ownerships:
         DB.session.add(
             TOwnership(
-                id_status=ownership.id_status,
+                id_status=ownership['id_status'],
                 id_zh=id_zh,
-                remark=ownership.remark
+                remark=ownership['remark']
             )
         )
         DB.session.flush()
@@ -436,9 +436,9 @@ def post_instruments(id_zh, instruments):
     for instrument in instruments:
         DB.session.add(
             TInstruments(
-                id_instrument=instrument.id_instrument,
+                id_instrument=instrument["id_instrument"],
                 id_zh=id_zh,
-                instrument_date=instrument.instrument_date
+                instrument_date=instrument["instrument_date"]
             )
         )
         DB.session.flush()
@@ -447,14 +447,15 @@ def post_instruments(id_zh, instruments):
 def update_protections(id_zh, protections):
     DB.session.query(CorZhProtection).filter(
         CorZhProtection.id_zh == id_zh).delete()
-    post_instruments(id_zh, protections)
+    post_protections(id_zh, protections)
 
 
 def post_protections(id_zh, protections):
     for protection in protections:
         DB.session.add(
             CorZhProtection(
-                id_protection=protection.id_protection,
+                id_protection=DB.session.query(CorProtectionLevelType).filter(
+                    CorProtectionLevelType.id_protection_status == protection).one().id_protection,
                 id_zh=id_zh,
             )
         )
@@ -471,20 +472,32 @@ def update_zh_tab6(data):
 def update_urban_docs(id_zh, urban_docs):
     DB.session.query(TUrbanPlanningDocs).filter(
         TUrbanPlanningDocs.id_zh == id_zh).delete()
-    post_instruments(id_zh, TUrbanPlanningDocs)
+    post_urban_docs(id_zh, urban_docs)
 
 
 def post_urban_docs(id_zh, urban_docs):
     for urban_doc in urban_docs:
+        id_doc_type = DB.session.query(CorUrbanTypeRange).filter(
+            CorUrbanTypeRange.id_cor == urban_doc["id_urban_type"][0]["id_cor"]).one().id_doc_type
+        uuid_doc = uuid.uuid4()
         DB.session.add(
             TUrbanPlanningDocs(
-                id_area=urban_doc.id_area,
+                id_area=urban_doc["id_area"],
                 id_zh=id_zh,
-                id_urban_type=urban_doc.id_cor,
-                remark=urban_doc.remark
+                id_doc_type=id_doc_type,
+                id_doc=uuid_doc,
+                remark=urban_doc["remark"]
             )
         )
         DB.session.flush()
+        for type in urban_doc["id_urban_type"]:
+            DB.session.add(
+                CorZhDocRange(
+                    id_doc=uuid_doc,
+                    id_cor=type["id_cor"]
+                )
+            )
+            DB.session.flush()
 
 
 # tab 7

@@ -706,7 +706,7 @@ INSERT INTO pr_zh.cor_main_fct VALUES
 INSERT INTO pr_zh.cor_protection_level_type VALUES
 (1, (SELECT ref_nomenclatures.get_id_nomenclature('STATUT_PROTECTION','0')), NULL, (SELECT ref_nomenclatures.get_id_nomenclature('NIV_PROTECTION','0'))),
 (2, (SELECT ref_nomenclatures.get_id_nomenclature('STATUT_PROTECTION','1')), NULL, (SELECT ref_nomenclatures.get_id_nomenclature('NIV_PROTECTION','0'))),
-(3, (SELECT ref_nomenclatures.get_id_nomenclature('STATUT_PROTECTION','11')), (SELECT ref_nomenclatures.get_id_nomenclature('PROTECTION_TYP','1')), (SELECT ref_nomenclatures.get_id_nomenclature('NIV_PROTECTION','2'))),
+(51, (SELECT ref_nomenclatures.get_id_nomenclature('STATUT_PROTECTION','102')), (SELECT ref_nomenclatures.get_id_nomenclature('PROTECTION_TYP','6')), (SELECT ref_nomenclatures.get_id_nomenclature('NIV_PROTECTION','1'))),
 (4, (SELECT ref_nomenclatures.get_id_nomenclature('STATUT_PROTECTION','11')), (SELECT ref_nomenclatures.get_id_nomenclature('PROTECTION_TYP','1')), (SELECT ref_nomenclatures.get_id_nomenclature('NIV_PROTECTION','2'))),
 (5, (SELECT ref_nomenclatures.get_id_nomenclature('STATUT_PROTECTION','13')), (SELECT ref_nomenclatures.get_id_nomenclature('PROTECTION_TYP','1')), (SELECT ref_nomenclatures.get_id_nomenclature('NIV_PROTECTION','2'))),
 (6, (SELECT ref_nomenclatures.get_id_nomenclature('STATUT_PROTECTION','15')), (SELECT ref_nomenclatures.get_id_nomenclature('PROTECTION_TYP','1')), (SELECT ref_nomenclatures.get_id_nomenclature('NIV_PROTECTION','2'))),
@@ -753,8 +753,7 @@ INSERT INTO pr_zh.cor_protection_level_type VALUES
 (47, (SELECT ref_nomenclatures.get_id_nomenclature('STATUT_PROTECTION','98')), (SELECT ref_nomenclatures.get_id_nomenclature('PROTECTION_TYP','6')), (SELECT ref_nomenclatures.get_id_nomenclature('NIV_PROTECTION','1'))),
 (48, (SELECT ref_nomenclatures.get_id_nomenclature('STATUT_PROTECTION','99')), (SELECT ref_nomenclatures.get_id_nomenclature('PROTECTION_TYP','6')), (SELECT ref_nomenclatures.get_id_nomenclature('NIV_PROTECTION','1'))),
 (49, (SELECT ref_nomenclatures.get_id_nomenclature('STATUT_PROTECTION','100')), (SELECT ref_nomenclatures.get_id_nomenclature('PROTECTION_TYP','6')), (SELECT ref_nomenclatures.get_id_nomenclature('NIV_PROTECTION','2'))),
-(50, (SELECT ref_nomenclatures.get_id_nomenclature('STATUT_PROTECTION','101')), (SELECT ref_nomenclatures.get_id_nomenclature('PROTECTION_TYP','6')), (SELECT ref_nomenclatures.get_id_nomenclature('NIV_PROTECTION','1'))),
-(51, (SELECT ref_nomenclatures.get_id_nomenclature('STATUT_PROTECTION','102')), (SELECT ref_nomenclatures.get_id_nomenclature('PROTECTION_TYP','6')), (SELECT ref_nomenclatures.get_id_nomenclature('NIV_PROTECTION','1')))
+(50, (SELECT ref_nomenclatures.get_id_nomenclature('STATUT_PROTECTION','101')), (SELECT ref_nomenclatures.get_id_nomenclature('PROTECTION_TYP','6')), (SELECT ref_nomenclatures.get_id_nomenclature('NIV_PROTECTION','1')))
 ;
 
 
