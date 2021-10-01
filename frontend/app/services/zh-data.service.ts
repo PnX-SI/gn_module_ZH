@@ -80,4 +80,10 @@ export class ZhDataService {
         })
       );
   }
+
+  getAllZhGeom() {
+    return this._api.get<any>(
+      `${AppConfig.API_ENDPOINT}/zones_humides/geometries`
+    );
+  }
 }

@@ -4,7 +4,11 @@
       class="col-xl-6 col-lg-7 col-sm-6"
       [ngStyle]="{ 'min-height.px': cardContentHeight }"
     >
-      <zh-form-map></zh-form-map>
+      <zh-form-map
+        (draw)="updateGeom($event)"
+        (endDraw)="onNewGeom($event)"
+        (edit)="updateGeom($event)"
+      ></zh-form-map>
     </div>
     <div class="col-xl-6 col-lg-5 col-sm-6">
       <form>

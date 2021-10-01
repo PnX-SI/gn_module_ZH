@@ -36,6 +36,7 @@ export class ZhFormTab0Component implements OnInit {
   public $_geojsonSub: Subscription;
   public $_currentZhSub: Subscription;
   private geometry: GeoJSON;
+  private currentLayer: any;
   public submitted = false;
   public posted = false;
 
@@ -69,12 +70,10 @@ export class ZhFormTab0Component implements OnInit {
         ) {
           this.canChangeTab.emit(false);
         }
-        this.geometry = geojson;
       }
     );
 
     this.intiTab();
-
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
       if (tabPosition == 0) {
         this.intiTab();
@@ -87,6 +86,23 @@ export class ZhFormTab0Component implements OnInit {
   }
 
   intiTab() {
+    setTimeout(() => {
+      this._mapService.removeAllLayers(
+        this._mapService.map,
+        this._mapService.leafletDrawFeatureGroup
+      );
+    }, 0);
+
+    this._dataService.getAllZhGeom().subscribe((geoms: any) => {
+      geoms.forEach((geom) => {
+        let geojson = {
+          geometry: geom,
+          properties: {},
+          type: "Feature",
+        };
+        // L.geoJSON(geojson).addTo(this._mapService.map);
+      });
+    });
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
         this._currentZh = zh;
@@ -106,11 +122,15 @@ export class ZhFormTab0Component implements OnInit {
         });
         setTimeout(() => {
           this._mapService.loadGeometryReleve(this._currentZh, false);
+
+          this.currentLayer =
+            this._mapService.leafletDrawFeatureGroup.getLayers()[0];
+
           const coordinates = this._currentZh.geometry.coordinates;
           const myLatLong = coordinates[0].map((point) => {
             return L.latLng(point[1], point[0]);
           });
-          let layer = L.polygon(myLatLong);
+          const layer = L.polygon(myLatLong);
           this.geometry = layer.toGeoJSON();
           if (this._mapService.map) {
             setTimeout(() => {
@@ -165,6 +185,7 @@ export class ZhFormTab0Component implements OnInit {
       sdage: formValues.sdage,
       geom: null,
     };
+
     if (this.geometry) {
       formToPost.geom = this.geometry;
       if (this.form.valid) {
@@ -202,6 +223,18 @@ export class ZhFormTab0Component implements OnInit {
         { positionClass: "toast-top-right" }
       );
     }
+  }
+
+  onNewGeom(e) {
+    this._mapService.map.eachLayer((l) => {
+      if (l._leaflet_id == this.currentLayer._leaflet_id) {
+        this._mapService.map.removeLayer(l);
+      }
+    });
+  }
+
+  updateGeom(e) {
+    this.geometry = e;
   }
 
   onCancel() {
