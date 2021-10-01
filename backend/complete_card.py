@@ -279,8 +279,8 @@ def get_urban_doc_info(urban_docs):
         return [
             {
                 "Communes": DB.session.query(LAreas).filter(LAreas.id_area == urban_doc['id_area']).one().area_name,
-                "Type de document communal": get_urban_doc_names(urban_doc['id_urban_type'])['type_doc'],
-                "Type de classement": get_urban_doc_names(urban_doc['id_urban_type'])['type_classement'],
+                "Type de document communal": get_mnemo(urban_doc['id_doc_type']),
+                "Type de classement": get_range_type_mnemo(urban_doc['id_cors']),
                 "Remarques": urban_doc['remark']
             }
             for urban_doc in urban_docs
@@ -288,11 +288,10 @@ def get_urban_doc_info(urban_docs):
     return "Non renseigné"
 
 
-def get_urban_doc_names(cor_id):
-    return {
-        "type_doc": get_mnemo(DB.session.query(CorUrbanTypeRange).filter(CorUrbanTypeRange.id_cor == cor_id).one().id_range_type),
-        "type_classement": get_mnemo(DB.session.query(CorUrbanTypeRange).filter(CorUrbanTypeRange.id_cor == cor_id).one().id_doc_type)
-    }
+def get_range_type_mnemo(cor_id):
+    return [
+        get_mnemo(DB.session.query(CorUrbanTypeRange).filter(CorUrbanTypeRange.id_cor == id).one().id_range_type) for id in cor_id
+    ]
 
 
 def get_protection_names(protection_ids):
