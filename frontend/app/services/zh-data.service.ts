@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, pipe } from "rxjs";
+import { map } from "rxjs/operators";
 import { AppConfig } from "@geonature_config/app.config";
 
 @Injectable({
@@ -59,5 +60,24 @@ export class ZhDataService {
     return this._api.get<any>(
       `${AppConfig.API_ENDPOINT}/zones_humides/forms/cahierhab/${corineId}`
     );
+  }
+
+  getEvalZh(zhId: string) {
+    return this._api.get<any>(
+      `${AppConfig.API_ENDPOINT}/zones_humides/eval/${zhId}`
+    );
+  }
+
+  getMunicipalitiesByZh(ZhId: number) {
+    return this._api
+      .get<any>(
+        `${AppConfig.API_ENDPOINT}/zones_humides/municipalities/${ZhId}`
+      )
+      .pipe(
+        map((municipalities: any) => {
+          municipalities.map((item) => (item.disabled = false));
+          return municipalities;
+        })
+      );
   }
 }

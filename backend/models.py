@@ -477,14 +477,23 @@ class ZH(TZH):
             self.zh.id_zh)
         managements = []
         for management in q_management_structures:
+<<<<<<< HEAD
             q_management_plans = DB.session.query(
                 TManagementPlans).filter(TManagementPlans.id_structure == management.id_structure).all()
+=======
+            q_management_plans = DB.session.query(TManagementPlans).filter(
+                TManagementPlans.id_structure == management.id_structure).all()
+>>>>>>> f1588f6d1a4f46983a161588c2934a5162c0dc34
             plans = []
             if q_management_plans:
                 for plan in q_management_plans:
                     plans.append({
                         "id_nature": plan.id_nature,
+<<<<<<< HEAD
                         "plan_date": str(plan.plan_date),
+=======
+                        "plan_date": str(plan.plan_date.date()),
+>>>>>>> f1588f6d1a4f46983a161588c2934a5162c0dc34
                         "duration": plan.duration
                     })
             managements.append({
@@ -500,7 +509,11 @@ class ZH(TZH):
             "instruments": [
                 {
                     'id_instrument': instrument.id_instrument,
+<<<<<<< HEAD
                     'instrument_date': str(instrument.instrument_date)
+=======
+                    'instrument_date': str(instrument.instrument_date.date())
+>>>>>>> f1588f6d1a4f46983a161588c2934a5162c0dc34
                 } for instrument in TInstruments.get_instruments_by_id(self.zh.id_zh)
             ]
         }
@@ -508,8 +521,9 @@ class ZH(TZH):
     def get_protections(self):
         return {
             "protections": [
-                protection.id_protection
-                for protection in CorZhProtection.get_protections_by_id(self.zh.id_zh)]
+                DB.session.query(CorProtectionLevelType).filter(
+                    CorProtectionLevelType.id_protection == protec).one().id_protection_status
+                for protec in [protection.id_protection for protection in CorZhProtection.get_protections_by_id(self.zh.id_zh)]]
         }
 
     def get_urban_docs(self):
@@ -517,7 +531,8 @@ class ZH(TZH):
             "urban_docs": [
                 {
                     'id_area': urban_doc.id_area,
-                    'id_urban_type': urban_doc.id_urban_type,
+                    'id_doc_type': urban_doc.id_doc_type,
+                    'id_cors': [doc.id_cor for doc in DB.session.query(CorZhDocRange).filter(CorZhDocRange.id_doc == urban_doc.id_doc).all()],
                     'remark': urban_doc.remark
                 } for urban_doc in TUrbanPlanningDocs.get_urban_docs_by_id(self.zh.id_zh)
             ]
@@ -1210,24 +1225,24 @@ class CorUrbanTypeRange(DB.Model):
         DB.Integer,
         primary_key=True
     )
-    id_range_type = DB.Column(
+    id_doc_type = DB.Column(
         DB.Integer,
         ForeignKey(TNomenclatures.id_nomenclature)
     )
-    id_doc_type = DB.Column(
+    id_range_type = DB.Column(
         DB.Integer,
         ForeignKey(TNomenclatures.id_nomenclature)
     )
 
     def get_range_by_doc(doc_id):
         q_ranges = DB.session.query(CorUrbanTypeRange).filter(
-            CorUrbanTypeRange.id_range_type == doc_id).all()
+            CorUrbanTypeRange.id_doc_type == doc_id).all()
         ranges = []
         for range in q_ranges:
             ranges.append({
                 "id_cor": range.id_cor,
-                "id_nomenclature": range.id_doc_type,
-                "mnemonique": DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == range.id_doc_type).one().mnemonique
+                "id_nomenclature": range.id_range_type,
+                "mnemonique": DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == range.id_range_type).one().mnemonique
             })
         return ranges
 
@@ -1235,22 +1250,22 @@ class CorUrbanTypeRange(DB.Model):
 class TUrbanPlanningDocs(DB.Model):
     __tablename__ = "t_urban_planning_docs"
     __table_args__ = {"schema": "pr_zh"}
-    id_doc = DB.Column(
-        DB.Integer,
-        primary_key=True
-    )
     id_area = DB.Column(
         DB.Integer,
-        nullable=False
+        primary_key=True
     )
     id_zh = DB.Column(
         DB.Integer,
         ForeignKey(TZH.id_zh),
-        nullable=False
+        primary_key=True
     )
-    id_urban_type = DB.Column(
+    id_doc_type = DB.Column(
         DB.Integer,
-        ForeignKey(CorUrbanTypeRange.id_cor),
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+    id_doc = DB.Column(
+        UUID(as_uuid=True),
         nullable=False
     )
     remark = DB.Column(
@@ -1260,6 +1275,21 @@ class TUrbanPlanningDocs(DB.Model):
     def get_urban_docs_by_id(id_zh):
         return DB.session.query(TUrbanPlanningDocs).filter(
             TUrbanPlanningDocs.id_zh == id_zh).all()
+
+
+class CorZhDocRange(DB.Model):
+    __tablename__ = "cor_zh_doc_range"
+    __table_args__ = {"schema": "pr_zh"}
+    id_doc = DB.Column(
+        DB.Integer,
+        ForeignKey(TUrbanPlanningDocs.id_doc),
+        primary_key=True
+    )
+    id_cor = DB.Column(
+        DB.Integer,
+        ForeignKey(CorUrbanTypeRange.id_cor),
+        primary_key=True
+    )
 
 
 class CorProtectionLevelType(DB.Model):
@@ -1283,22 +1313,6 @@ class CorProtectionLevelType(DB.Model):
         ForeignKey(TNomenclatures.id_nomenclature),
         nullable=False
     )
-
-    def get_status_by_type(type_id):
-        q_protection_types = DB.session.query(CorProtectionLevelType).filter(
-            CorProtectionLevelType.id_protection_type == type_id).all()
-        protection_status = []
-        for protection in q_protection_types:
-            protection_status.append({
-                "id_protection_status": protection.id_protection_status,
-                "mnemonique_status": DB.session.query(TNomenclatures).filter(
-                    TNomenclatures.id_nomenclature == protection.id_protection_status).one().mnemonique,
-                "id_protection_level": protection.id_protection_level,
-                "mnemonique_level": DB.session.query(TNomenclatures).filter(
-                    TNomenclatures.id_nomenclature == protection.id_protection_level).one().mnemonique
-
-            })
-        return protection_status
 
 
 @serializable

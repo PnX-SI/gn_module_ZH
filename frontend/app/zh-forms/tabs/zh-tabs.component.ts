@@ -2,7 +2,7 @@ import { Component, HostListener, OnInit, ViewChild } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { ZhDataService } from "../../services/zh-data.service";
 import { MatTabGroup } from "@angular/material";
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { NgbModalConfig, NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { TabsService } from "../../services/tabs.service";
 
 @Component({
@@ -30,8 +30,11 @@ export class ZhTabsComponent implements OnInit {
     private _route: ActivatedRoute,
     public ngbModal: NgbModal,
     private _dataService: ZhDataService,
-    private _tabService: TabsService
-  ) {}
+    private _tabService: TabsService,
+    private config: NgbModalConfig
+  ) {
+    config.backdrop = "static";
+  }
 
   ngOnInit() {
     this.id_zh = this._route.snapshot.params["id"];
