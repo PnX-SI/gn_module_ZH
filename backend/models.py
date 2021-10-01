@@ -477,23 +477,14 @@ class ZH(TZH):
             self.zh.id_zh)
         managements = []
         for management in q_management_structures:
-<<<<<<< HEAD
-            q_management_plans = DB.session.query(
-                TManagementPlans).filter(TManagementPlans.id_structure == management.id_structure).all()
-=======
             q_management_plans = DB.session.query(TManagementPlans).filter(
                 TManagementPlans.id_structure == management.id_structure).all()
->>>>>>> f1588f6d1a4f46983a161588c2934a5162c0dc34
             plans = []
             if q_management_plans:
                 for plan in q_management_plans:
                     plans.append({
                         "id_nature": plan.id_nature,
-<<<<<<< HEAD
-                        "plan_date": str(plan.plan_date),
-=======
                         "plan_date": str(plan.plan_date.date()),
->>>>>>> f1588f6d1a4f46983a161588c2934a5162c0dc34
                         "duration": plan.duration
                     })
             managements.append({
@@ -509,11 +500,7 @@ class ZH(TZH):
             "instruments": [
                 {
                     'id_instrument': instrument.id_instrument,
-<<<<<<< HEAD
-                    'instrument_date': str(instrument.instrument_date)
-=======
                     'instrument_date': str(instrument.instrument_date.date())
->>>>>>> f1588f6d1a4f46983a161588c2934a5162c0dc34
                 } for instrument in TInstruments.get_instruments_by_id(self.zh.id_zh)
             ]
         }
