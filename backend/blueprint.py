@@ -345,8 +345,6 @@ def get_tab_data(id_tab, info_role):
     form_data = request.json
     try:
         if id_tab == 0:
-            # set geometry from coordinates
-            polygon = set_geom(form_data['geom']['geometry'])
             # set date
             zh_date = datetime.now(timezone.utc)
             # set name
@@ -354,8 +352,15 @@ def get_tab_data(id_tab, info_role):
                 return 'Empty mandatory field', 400
 
             if 'id_zh' not in form_data.keys():
+                # set geometry from coordinates
+                polygon = set_geom(form_data['geom']['geometry'])
+                # create_zh
                 zh = create_zh(form_data, info_role, zh_date, polygon)
             else:
+                # edit geometry
+                polygon = set_geom(
+                    form_data['geom']['geometry'], form_data['id_zh'])
+                # edit zh
                 zh = update_zh_tab0(form_data, polygon, info_role, zh_date)
 
             DB.session.commit()
