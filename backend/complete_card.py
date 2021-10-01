@@ -84,6 +84,23 @@ def get_complete_card(full_zh, eval):
                 "Commentaires": full_zh.properties['remark_diag']
             }
         },
+        "5- Fonctions écologiques, valeurs socio-écologiques, intérêt patrimonial": {
+            "5.1- Fonctions hydrologiques / biogéochimiques": get_function_info(full_zh.properties['fonctions_hydro'], type="fonctions_hydro"),
+            "5.2- Fonctions biologiques / écologiques": get_function_info(full_zh.properties['fonctions_bio'], type="fonctions_bio"),
+            "5.4- Intérêt patrimonial": get_function_info(full_zh.properties['interet_patrim'], type="interet_patrim"),
+            "5.4.1- Habitats naturels humides patrimoniaux": {
+                "Cartographie d'habitats": get_bool(full_zh.properties['is_carto_hab']),
+                "Nombre d'habitats": get_int(full_zh.properties['nb_hab']),
+                "Recouvrement total de la ZH (%)": "Non évalué" if full_zh.properties['total_hab_cover'] == "999" else full_zh.properties['total_hab_cover'],
+                "Habitats naturels patrimoniaux": get_hab_heritages(full_zh.properties['hab_heritages'])
+            },
+            "5.4.2- Faune et flore patrimoniale": {
+                "Flore - nombre d'espèces": get_int(full_zh.properties['nb_flora_sp']),
+                "Faune - nombre d'espèces de vertébrés": get_int(full_zh.properties['nb_vertebrate_sp']),
+                "Faune - nombre d'espèces d'invertébrés": get_int(full_zh.properties['nb_invertebrate_sp'])
+            },
+            "5.3- Valeurs socio-économiques": get_function_info(full_zh.properties['val_soc_eco'], type="val_soc_eco")
+        },
         "6- Statuts et gestion de la zone humide": {
             "6.1- Régime foncier - statut de propriété": get_ownerships_info(full_zh.properties['ownerships']),
             "6.2- Structure de gestion": get_managements_info(full_zh.properties['managements']),
@@ -280,18 +297,12 @@ def get_urban_doc_info(urban_docs):
             {
                 "Communes": DB.session.query(LAreas).filter(LAreas.id_area == urban_doc['id_area']).one().area_name,
                 "Type de document communal": get_mnemo(urban_doc['id_doc_type']),
-                "Type de classement": get_range_type_mnemo(urban_doc['id_cors']),
+                "Type de classement": [get_mnemo(DB.session.query(CorUrbanTypeRange).filter(CorUrbanTypeRange.id_cor == id).one().id_range_type) for id in urban_doc['id_cors']],
                 "Remarques": urban_doc['remark']
             }
             for urban_doc in urban_docs
         ]
     return "Non renseigné"
-
-
-def get_range_type_mnemo(cor_id):
-    return [
-        get_mnemo(DB.session.query(CorUrbanTypeRange).filter(CorUrbanTypeRange.id_cor == id).one().id_range_type) for id in cor_id
-    ]
 
 
 def get_protection_names(protection_ids):
