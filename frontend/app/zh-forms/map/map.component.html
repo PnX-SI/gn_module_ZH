@@ -1,17 +1,15 @@
-<pnx-map
-  height="100%"
-  class="map-card"
->
+<pnx-map height="100%" class="map-card">
   <pnx-leaflet-draw
     [geojson]="geometry"
     [options]="leafletDrawOptions"
     [zoomLevel]="zhConfig.releve_map_zoom_level"
+    (layerDrawed)="onDrawn($event)"
   >
   </pnx-leaflet-draw>
   <pnx-leaflet-filelayer
     [editMode]="false"
     (onLoad)="infoMessageFileLayer($event)"
-    [style]="{'color': 'green'}"
+    [style]="{ color: 'green' }"
   >
   </pnx-leaflet-filelayer>
 </pnx-map>
