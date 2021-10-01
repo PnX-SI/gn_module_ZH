@@ -253,7 +253,12 @@ def get_geometries(info_role):
     """Get list of all zh geometries (contours)
     """
     try:
-        return [zh.get_geofeature()["geometry"] for zh in DB.session.query(TZH).all()]
+        return [
+            {
+                "geometry": zh.get_geofeature()["geometry"],
+                "id_zh": zh.get_geofeature()["properties"]["id_zh"]
+            } for zh in DB.session.query(TZH).all()
+        ]
     except Exception as e:
         raise ZHApiError(message=str(e), details=str(e))
 
