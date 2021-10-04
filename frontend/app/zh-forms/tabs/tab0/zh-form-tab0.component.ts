@@ -9,7 +9,7 @@ import {
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { Subscription } from "rxjs";
-import { GeoJSON } from "leaflet";
+import { GeoJSON, Layer } from "leaflet";
 import * as L from "leaflet";
 import { MapService } from "@geonature_common/map/map.service";
 import { IDropdownSettings } from "ng-multiselect-dropdown";
@@ -39,7 +39,8 @@ export class ZhFormTab0Component implements OnInit {
   private currentLayer: any;
   public submitted = false;
   public posted = false;
-  private geomLayers: any[];
+  private geomLayers: any;
+  layerGroup: any;
 
   constructor(
     private fb: FormBuilder,
@@ -84,10 +85,15 @@ export class ZhFormTab0Component implements OnInit {
         this._mapService.map,
         this._mapService.leafletDrawFeatureGroup
       );
-      this._mapService.removeAllLayers(
-        this._mapService.map,
-        this._mapService.fileLayerFeatureGroup
-      );
+
+      if (this._mapService.map) {
+        this._mapService.map.eachLayer((layer: any) => {
+          if (layer.geomTag && layer.geomTag === "allGeom") {
+            this._mapService.map.removeLayer(layer);
+          }
+        });
+      }
+
       this._dataService.getAllZhGeom().subscribe((geoms: any) => {
         this.geomLayers = [];
         geoms.forEach((geom) => {
@@ -98,7 +104,11 @@ export class ZhFormTab0Component implements OnInit {
           };
           if (!zh || zh.properties.id_zh != geom.id_zh) {
             this.geomLayers.push(
-              L.geoJSON(geojson).addTo(this._mapService.map)
+              L.geoJSON(geojson, {
+                onEachFeature: function (feature, layer) {
+                  layer.geomTag = "allGeom";
+                },
+              }).addTo(this._mapService.map)
             );
           }
         });
@@ -198,6 +208,10 @@ export class ZhFormTab0Component implements OnInit {
         }
         this._dataService.postDataForm(formToPost, 0).subscribe(
           (data) => {
+            this._mapService.removeAllLayers(
+              this._mapService.map,
+              this._mapService.leafletDrawFeatureGroup
+            );
             this.posted = false;
             this._dataService.getZhById(data.id_zh).subscribe((zh: any) => {
               this._dataService.setCurrentZh(zh);
@@ -225,24 +239,31 @@ export class ZhFormTab0Component implements OnInit {
     }
   }
 
-  slideToggleChanged(e) {
-    this.geomLayers.forEach((g) =>
-      g.setStyle({ opacity: 1 * e.checked, fillOpacity: 0.2 * e.checked })
-    );
+  slideToggleChanged(event) {
+    this.geomLayers.forEach((layer: any) => {
+      layer.setStyle({
+        opacity: 1 * event.checked,
+        fillOpacity: 0.2 * event.checked,
+      });
+    });
   }
 
-  onNewGeom(e) {
+  onNewGeom(event: any) {
+    this.geometry = event.layer.toGeoJSON();
     this.canChangeTab.emit(false);
-    this._mapService.map.eachLayer((l) => {
-      if (l._leaflet_id == this.currentLayer._leaflet_id) {
-        this._mapService.map.removeLayer(l);
+    this._mapService.map.eachLayer((layer: any) => {
+      if (
+        this.currentLayer &&
+        layer._leaflet_id == this.currentLayer._leaflet_id
+      ) {
+        this._mapService.map.removeLayer(layer);
       }
     });
   }
 
-  updateGeom(e) {
+  updateGeom(newGeometry: any) {
     this.canChangeTab.emit(false);
-    this.geometry = e;
+    this.geometry = newGeometry;
   }
 
   onCancel() {
