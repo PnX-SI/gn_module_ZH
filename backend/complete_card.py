@@ -10,6 +10,8 @@ from .models import *
 
 
 def get_complete_card(full_zh, eval):
+
+    pdb.set_trace()
     complete_card = {}
 
     identification = {
@@ -110,9 +112,16 @@ def get_complete_card(full_zh, eval):
         },
         "7- Evaluation générale du site": {
             "7.1- Fonctions et valeurs majeures": {
-                "Principales fonctions hydrologiques / biogéochimiques": get_function_info(eval['fonctions_hydro'], type="fonctions_hydro")
+                "Principales fonctions hydrologiques / biogéochimiques": get_function_info(eval['fonctions_hydro'], type="fonctions_hydro"),
+                "Principales fonctions biologiques / écologiques": get_function_info(eval['fonctions_bio'], type="fonctions_bio")
+            },
+            "7.2- Intérêt patrimonial majeur": {
+                "Intérêts patrimoniaux": get_function_info(eval['interet_patrim'], type="interet_patrim"),
+                "Nombre d'espèces faunistiques": get_int(full_zh.properties['nb_vertebrate_sp']) + get_int(full_zh.properties['nb_invertebrate_sp']),
+                "Nombre d'espèces floristiques": get_int(full_zh.properties['nb_flora_sp']),
+                "Nombre d'habitats humides patrimoniaux": get_int(full_zh.properties['nb_hab']),
+                "Recouvrement total de la ZH (%)": get_int(full_zh.properties['total_hab_cover'])
             }
-            # "7.2- Intérêt patrimonial majeur": ,
             # "7.3- Bilan des menaces et des facteurs infuançant la zone humide": ,
             # "7.4- Stratégie de gestion et orientations d'actions":
         }

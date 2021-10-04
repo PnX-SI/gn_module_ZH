@@ -173,7 +173,6 @@ def get_complete_info(id_zh, info_role):
     """Get zh complete info
     """
     try:
-
         full_zh = ZH(id_zh).get_full_zh()
         eval = ZH(id_zh).get_eval()
         complete_card = get_complete_card(full_zh, eval)
