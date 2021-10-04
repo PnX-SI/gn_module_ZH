@@ -81,21 +81,9 @@ export class ZhFormTab0Component implements OnInit {
 
   intiTab() {
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
-      this._mapService.removeAllLayers(
-        this._mapService.map,
-        this._mapService.leafletDrawFeatureGroup
-      );
-
-      if (this._mapService.map) {
-        this._mapService.map.eachLayer((layer: any) => {
-          if (layer.geomTag && layer.geomTag === "allGeom") {
-            this._mapService.map.removeLayer(layer);
-          }
-        });
-      }
-
       this._dataService.getAllZhGeom().subscribe((geoms: any) => {
         this.geomLayers = [];
+        this.removeLayers();
         geoms.forEach((geom) => {
           let geojson = {
             geometry: geom.geometry,
@@ -115,7 +103,10 @@ export class ZhFormTab0Component implements OnInit {
       });
       if (zh) {
         this._currentZh = zh;
-
+        this._mapService.removeAllLayers(
+          this._mapService.map,
+          this._mapService.leafletDrawFeatureGroup
+        );
         const selectedCritDelim = [];
         this.critDelim.forEach((critere) => {
           if (
@@ -208,10 +199,12 @@ export class ZhFormTab0Component implements OnInit {
         }
         this._dataService.postDataForm(formToPost, 0).subscribe(
           (data) => {
-            this._mapService.removeAllLayers(
-              this._mapService.map,
-              this._mapService.leafletDrawFeatureGroup
-            );
+            setTimeout(() => {
+              this._mapService.removeAllLayers(
+                this._mapService.map,
+                this._mapService.leafletDrawFeatureGroup
+              );
+            }, 0);
             this.posted = false;
             this._dataService.getZhById(data.id_zh).subscribe((zh: any) => {
               this._dataService.setCurrentZh(zh);
@@ -269,6 +262,17 @@ export class ZhFormTab0Component implements OnInit {
   onCancel() {
     this.form.reset();
     this._router.navigate(["zones_humides"]);
+  }
+
+  removeLayers() {
+    this.geomLayers = [];
+    if (this._mapService.map) {
+      this._mapService.map.eachLayer((layer: any) => {
+        if (layer.geomTag && layer.geomTag === "allGeom") {
+          this._mapService.map.removeLayer(layer);
+        }
+      });
+    }
   }
 
   getMetaData() {
