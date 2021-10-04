@@ -126,8 +126,11 @@ def get_complete_card(full_zh, eval):
                 "Fonctionnalité hydrologique / biogéochimique": get_mnemo(full_zh.properties['id_diag_hydro']),
                 "Fonctionnalité biologique / écologique (habitats / faune / flore)": get_mnemo(full_zh.properties['id_diag_bio']),
                 "Commentaire": full_zh.properties['remark_eval_thread']
+            },
+            "7.4- Stratégie de gestion et orientations d'actions": {
+                "Propositions d'actions": get_actions_info(full_zh.properties['actions']),
+                "Commentaires": full_zh.properties['remark_eval_actions']
             }
-            # "7.4- Stratégie de gestion et orientations d'actions":
         }
     })
     return complete_card
@@ -347,4 +350,17 @@ def get_managements_info(managements):
                 "Plan de gestion": plan_gestion
             })
         return management_list
+    return "Non renseigné"
+
+
+def get_actions_info(actions):
+    if actions:
+        return [
+            {
+                "Proposition d'action": DB.session.query(BibActions).filter(BibActions.id_action == action['id_action']).one().name,
+                "Niveau de priorité": get_mnemo(action['id_priority_level']),
+                "Remarques": action['remark']
+            }
+            for action in actions
+        ]
     return "Non renseigné"
