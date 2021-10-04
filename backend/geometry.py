@@ -7,11 +7,16 @@ from geoalchemy2.shape import to_shape
 from .models import TZH
 
 
-def set_geom(geometry):
-    polygon = DB.session.query(func.ST_GeomFromGeoJSON(str(geometry))).one()[0]
+def set_geom(geometry, id_zh=None):
+    if not id_zh:
+        id_zh = 0
+    polygon = DB.session.query(
+        func.ST_GeomFromGeoJSON(str(geometry))).one()[0]
     q_zh = DB.session.query(TZH).all()
-    for q in q_zh:
-        intersect = DB.session.query(func.ST_Difference(polygon, q.geom))
-        polygon = DB.session.query(func.ST_GeomFromText(
-            to_shape(intersect.scalar()).to_wkt())).one()[0]
+    for zh in q_zh:
+        if zh.id_zh != id_zh:
+            intersect = DB.session.query(
+                func.ST_Difference(polygon, zh.geom))
+            polygon = DB.session.query(func.ST_GeomFromText(
+                to_shape(intersect.scalar()).to_wkt())).one()[0]
     return polygon
