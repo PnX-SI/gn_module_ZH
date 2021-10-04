@@ -56,7 +56,7 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit, OnDestroy {
       );
     }
     this._mapService.map.off(L.Draw.Event.DRAWSTART);
-    this._mapService.map.on(L.Draw.Event.DRAWSTOP, (e) => {
+    this._mapService.map.on(L.Draw.Event.CREATED, (e) => {
       this.onDrawStop(e);
     });
     this._mapService.map.off(L.Draw.Event.EDITED);
@@ -83,6 +83,7 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit, OnDestroy {
   infoMessageFileLayer(geojson) {
     this._mapService.firstLayerFromMap = false;
     this._mapService.setGeojsonCoord(geojson);
+    this.onDrawn(geojson[0]);
   }
 
   onDrawn(e) {

@@ -39,6 +39,7 @@ export class ZhFormTab0Component implements OnInit {
   private currentLayer: any;
   public submitted = false;
   public posted = false;
+  private geomLayers: any[];
 
   constructor(
     private fb: FormBuilder,
@@ -62,16 +63,8 @@ export class ZhFormTab0Component implements OnInit {
     this.getMetaData();
     this.createForm();
 
-    this.$_geojsonSub = this._mapService.gettingGeojson$.subscribe(
-      (geojson: GeoJSON) => {
-        if (
-          this.geometry &&
-          JSON.stringify(this.geometry) != JSON.stringify(geojson)
-        ) {
-          this.canChangeTab.emit(false);
-        }
-      }
-    );
+    // do not delete it
+    this.$_geojsonSub = this._mapService.gettingGeojson$.subscribe(() => {});
 
     this.intiTab();
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
@@ -86,26 +79,33 @@ export class ZhFormTab0Component implements OnInit {
   }
 
   intiTab() {
-    setTimeout(() => {
+    this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       this._mapService.removeAllLayers(
         this._mapService.map,
         this._mapService.leafletDrawFeatureGroup
       );
-    }, 0);
-
-    this._dataService.getAllZhGeom().subscribe((geoms: any) => {
-      geoms.forEach((geom) => {
-        let geojson = {
-          geometry: geom,
-          properties: {},
-          type: "Feature",
-        };
-        // L.geoJSON(geojson).addTo(this._mapService.map);
+      this._mapService.removeAllLayers(
+        this._mapService.map,
+        this._mapService.fileLayerFeatureGroup
+      );
+      this._dataService.getAllZhGeom().subscribe((geoms: any) => {
+        this.geomLayers = [];
+        geoms.forEach((geom) => {
+          let geojson = {
+            geometry: geom.geometry,
+            properties: { idZh: geom.id_zh },
+            type: "Feature",
+          };
+          if (!zh || zh.properties.id_zh != geom.id_zh) {
+            this.geomLayers.push(
+              L.geoJSON(geojson).addTo(this._mapService.map)
+            );
+          }
+        });
       });
-    });
-    this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
         this._currentZh = zh;
+
         const selectedCritDelim = [];
         this.critDelim.forEach((critere) => {
           if (
@@ -225,7 +225,14 @@ export class ZhFormTab0Component implements OnInit {
     }
   }
 
+  slideToggleChanged(e) {
+    this.geomLayers.forEach((g) =>
+      g.setStyle({ opacity: 1 * e.checked, fillOpacity: 0.2 * e.checked })
+    );
+  }
+
   onNewGeom(e) {
+    this.canChangeTab.emit(false);
     this._mapService.map.eachLayer((l) => {
       if (l._leaflet_id == this.currentLayer._leaflet_id) {
         this._mapService.map.removeLayer(l);
@@ -234,6 +241,7 @@ export class ZhFormTab0Component implements OnInit {
   }
 
   updateGeom(e) {
+    this.canChangeTab.emit(false);
     this.geometry = e;
   }
 
