@@ -10,8 +10,6 @@ from .models import *
 
 
 def get_complete_card(full_zh, eval):
-
-    pdb.set_trace()
     complete_card = {}
 
     identification = {
@@ -120,9 +118,15 @@ def get_complete_card(full_zh, eval):
                 "Nombre d'espèces faunistiques": get_int(full_zh.properties['nb_vertebrate_sp']) + get_int(full_zh.properties['nb_invertebrate_sp']),
                 "Nombre d'espèces floristiques": get_int(full_zh.properties['nb_flora_sp']),
                 "Nombre d'habitats humides patrimoniaux": get_int(full_zh.properties['nb_hab']),
-                "Recouvrement total de la ZH (%)": get_int(full_zh.properties['total_hab_cover'])
+                "Recouvrement total de la ZH (%)": get_int(int(full_zh.properties['total_hab_cover'])),
+                "Commentaire": full_zh.properties['remark_eval_heritage']
+            },
+            "7.3- Bilan des menaces et des facteurs infuançant la zone humide": {
+                "Evaluation globale des menaces potentielles ou avérées": get_mnemo(full_zh.properties['id_thread']),
+                "Fonctionnalité hydrologique / biogéochimique": get_mnemo(full_zh.properties['id_diag_hydro']),
+                "Fonctionnalité biologique / écologique (habitats / faune / flore)": get_mnemo(full_zh.properties['id_diag_bio']),
+                "Commentaire": full_zh.properties['remark_eval_thread']
             }
-            # "7.3- Bilan des menaces et des facteurs infuançant la zone humide": ,
             # "7.4- Stratégie de gestion et orientations d'actions":
         }
     })
