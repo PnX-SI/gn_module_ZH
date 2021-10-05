@@ -1,0 +1,29 @@
+<div class="container-fluid">
+  <pnx-map height="40vh" searchBar="false">
+    <pnx-geojson [geojson]="this.validBbox" [zoomOnFirstTime]="true">
+    </pnx-geojson>
+  </pnx-map>
+  <collapse title="Renseignements généraux"
+    ><zh-details-renseignements></zh-details-renseignements
+  ></collapse>
+  <collapse
+    title="Délimitation de la zone humide et de l’espace de fonctionnalité"
+    ><zh-details-delimitation></zh-details-delimitation
+  ></collapse>
+  <collapse title="Description du bassin versant et de la zone humide"
+    ><zh-details-description></zh-details-description
+  ></collapse>
+  <collapse title="Fonctionnement de la zone humide"
+    ><zh-details-fonctionnement></zh-details-fonctionnement
+  ></collapse>
+  <collapse
+    title="Fonctions écologiques, valeurs socio-écologiques, interêt patrimonial"
+    ><zh-details-fonctions></zh-details-fonctions
+  ></collapse>
+  <collapse title="Statuts et gestion de la zone humide"
+    ><zh-details-statuts></zh-details-statuts
+  ></collapse>
+  <collapse title="Évaluation générale du site"
+    ><zh-details-evaluation></zh-details-evaluation
+  ></collapse>
+</div>

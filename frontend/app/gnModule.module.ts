@@ -4,6 +4,7 @@ import { CommonModule } from "@angular/common";
 import { Routes, RouterModule } from "@angular/router";
 import { GN2CommonModule } from "@geonature_common/GN2Common.module";
 import { MapListService } from "@geonature_common/map-list/map-list.service";
+import { ZhDetailsModule } from "./zh-details/zh-details.module";
 import { NgMultiSelectDropDownModule } from "ng-multiselect-dropdown";
 import { AngularMultiSelectModule } from "angular2-multiselect-dropdown";
 //Components
@@ -51,6 +52,7 @@ const routes: Routes = [
     AngularMultiSelectModule,
     NgMultiSelectDropDownModule.forRoot(),
     NgbModule,
+    ZhDetailsModule,
   ],
   providers: [ZhDataService, MapListService, DatepickerI18n],
   bootstrap: [ZhMapListComponent],

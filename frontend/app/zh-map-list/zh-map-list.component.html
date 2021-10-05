@@ -86,7 +86,7 @@
               <ng-container *ngIf="row.rights.R; else disabledInfoBlc">
                 <a
                   class="btn btn-outline-shadow btn-no-padding btn-ghost"
-                  [routerLink]="['info', row.id_zh]"
+                  [routerLink]="['zhDetails', row.id_zh]"
                 >
                   <i
                     matTooltip="{{ 'Info' }} {{ row.main_name }}"

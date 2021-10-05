@@ -3,6 +3,7 @@ import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, pipe } from "rxjs";
 import { map } from "rxjs/operators";
 import { AppConfig } from "@geonature_config/app.config";
+import { DetailsModel } from "../zh-details/models/zh-details.model";
 
 @Injectable({
   providedIn: "root",
@@ -68,10 +69,10 @@ export class ZhDataService {
     );
   }
 
-  getMunicipalitiesByZh(ZhId: number) {
+  getMunicipalitiesByZh(zhId: number) {
     return this._api
       .get<any>(
-        `${AppConfig.API_ENDPOINT}/zones_humides/municipalities/${ZhId}`
+        `${AppConfig.API_ENDPOINT}/zones_humides/municipalities/${zhId}`
       )
       .pipe(
         map((municipalities: any) => {
@@ -84,6 +85,12 @@ export class ZhDataService {
   getAllZhGeom() {
     return this._api.get<any>(
       `${AppConfig.API_ENDPOINT}/zones_humides/geometries`
+    );
+  }
+
+  getZhDetails(zhId: number) {
+    return this._api.get<DetailsModel>(
+      `${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/complete_card`
     );
   }
 }
