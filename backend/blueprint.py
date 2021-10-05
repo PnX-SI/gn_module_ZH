@@ -49,7 +49,10 @@ from .models import (
     BibActions
 )
 
-from .nomenclatures import get_nomenc
+from .nomenclatures import (
+    get_nomenc,
+    get_ch
+)
 
 from .forms import *
 
@@ -58,6 +61,8 @@ from .geometry import set_geom
 from .repositories import (
     ZhRepository
 )
+
+from .complete_card import *
 
 from .api_error import ZHApiError
 
@@ -155,7 +160,23 @@ def get_zh_by_id(id_zh, info_role):
     try:
         full_zh = ZH(id_zh).get_full_zh()
         return full_zh
+    except Exception as e:
+        if e.__class__.__name__ == 'NoResultFound':
+            raise ZHApiError(message='zh id exist?', details=str(e))
+        raise ZHApiError(message=str(e), details=str(e))
 
+
+@blueprint.route("/<int:id_zh>/complete_card", methods=["GET"])
+@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@json_resp
+def get_complete_info(id_zh, info_role):
+    """Get zh complete info
+    """
+    try:
+        full_zh = ZH(id_zh).get_full_zh()
+        eval = ZH(id_zh).get_eval()
+        complete_card = get_complete_card(full_zh, eval)
+        return complete_card
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':
             raise ZHApiError(message='zh id exist?', details=str(e))
@@ -171,7 +192,6 @@ def get_zh_eval(id_zh, info_role):
     try:
         zh_eval = ZH(id_zh).get_eval()
         return zh_eval
-
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':
             raise ZHApiError(message='zh id exist?', details=str(e))
@@ -218,24 +238,10 @@ def get_tab(info_role):
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
 def get_cahier_hab(info_role, lb_code):
-    """Get form metadata for all tabs
+    """Get cahier hab list from corine biotope lb_code
     """
     try:
-        # get cd_hab_sortie from lb_code of selected Corine Biotope
-        cd_hab_sortie = DB.session.query(Habref).filter(
-            and_(Habref.lb_code == lb_code, Habref.cd_typo == 22)).one().cd_hab
-        # get all cd_hab_entre corresponding to cd_hab_sortie
-        q_cd_hab_entre = DB.session.query(CorespHab).filter(
-            CorespHab.cd_hab_sortie == cd_hab_sortie).all()
-        # get list of cd_hab_entre/lb_code/lb_hab_fr for each cahier habitat
-        ch = []
-        for q in q_cd_hab_entre:
-            ch.append({
-                "cd_hab": q.cd_hab_entre,
-                "lb_code": DB.session.query(Habref).filter(Habref.cd_hab == q.cd_hab_entre).one().lb_code,
-                "lb_hab_fr": DB.session.query(Habref).filter(Habref.cd_hab == q.cd_hab_entre).one().lb_hab_fr
-            })
-        return ch
+        return get_ch(lb_code)
     except Exception as e:
         raise ZHApiError(message=str(e), details=str(e))
 
