@@ -46,6 +46,8 @@ from .model.zh_schema import (
 
 from .model.zh import ZH
 
+from .model.cards import Card
+
 from .nomenclatures import (
     get_nomenc,
     get_ch
@@ -58,8 +60,6 @@ from .geometry import set_geom
 from .model.repositories import (
     ZhRepository
 )
-
-from .complete_card import *
 
 from .api_error import ZHApiError
 
@@ -169,10 +169,7 @@ def get_complete_info(id_zh, info_role):
     """Get zh complete info
     """
     try:
-        full_zh = ZH(id_zh).get_full_zh()
-        eval = ZH(id_zh).get_eval()
-        complete_card = get_complete_card(full_zh, eval)
-        return complete_card
+        return Card(id_zh, "full").__repr__()
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':
             raise ZHApiError(message='zh id exist?', details=str(e))
