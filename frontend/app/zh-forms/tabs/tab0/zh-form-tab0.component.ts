@@ -9,7 +9,7 @@ import {
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { Subscription } from "rxjs";
-import { GeoJSON } from "leaflet";
+import { GeoJSON, Layer } from "leaflet";
 import * as L from "leaflet";
 import { MapService } from "@geonature_common/map/map.service";
 import { IDropdownSettings } from "ng-multiselect-dropdown";
@@ -36,8 +36,11 @@ export class ZhFormTab0Component implements OnInit {
   public $_geojsonSub: Subscription;
   public $_currentZhSub: Subscription;
   private geometry: GeoJSON;
+  private currentLayer: any;
   public submitted = false;
   public posted = false;
+  private geomLayers: any;
+  layerGroup: any;
 
   constructor(
     private fb: FormBuilder,
@@ -61,20 +64,10 @@ export class ZhFormTab0Component implements OnInit {
     this.getMetaData();
     this.createForm();
 
-    this.$_geojsonSub = this._mapService.gettingGeojson$.subscribe(
-      (geojson: GeoJSON) => {
-        if (
-          this.geometry &&
-          JSON.stringify(this.geometry) != JSON.stringify(geojson)
-        ) {
-          this.canChangeTab.emit(false);
-        }
-        this.geometry = geojson;
-      }
-    );
+    // do not delete it
+    this.$_geojsonSub = this._mapService.gettingGeojson$.subscribe(() => {});
 
     this.intiTab();
-
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
       if (tabPosition == 0) {
         this.intiTab();
@@ -88,8 +81,32 @@ export class ZhFormTab0Component implements OnInit {
 
   intiTab() {
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
+      this._dataService.getAllZhGeom().subscribe((geoms: any) => {
+        this.geomLayers = [];
+        this.removeLayers();
+        geoms.forEach((geom) => {
+          let geojson = {
+            geometry: geom.geometry,
+            properties: { idZh: geom.id_zh },
+            type: "Feature",
+          };
+          if (!zh || zh.properties.id_zh != geom.id_zh) {
+            this.geomLayers.push(
+              L.geoJSON(geojson, {
+                onEachFeature: function (feature, layer) {
+                  layer.geomTag = "allGeom";
+                },
+              }).addTo(this._mapService.map)
+            );
+          }
+        });
+      });
       if (zh) {
         this._currentZh = zh;
+        this._mapService.removeAllLayers(
+          this._mapService.map,
+          this._mapService.leafletDrawFeatureGroup
+        );
         const selectedCritDelim = [];
         this.critDelim.forEach((critere) => {
           if (
@@ -106,11 +123,15 @@ export class ZhFormTab0Component implements OnInit {
         });
         setTimeout(() => {
           this._mapService.loadGeometryReleve(this._currentZh, false);
+
+          this.currentLayer =
+            this._mapService.leafletDrawFeatureGroup.getLayers()[0];
+
           const coordinates = this._currentZh.geometry.coordinates;
           const myLatLong = coordinates[0].map((point) => {
             return L.latLng(point[1], point[0]);
           });
-          let layer = L.polygon(myLatLong);
+          const layer = L.polygon(myLatLong);
           this.geometry = layer.toGeoJSON();
           if (this._mapService.map) {
             setTimeout(() => {
@@ -165,6 +186,7 @@ export class ZhFormTab0Component implements OnInit {
       sdage: formValues.sdage,
       geom: null,
     };
+
     if (this.geometry) {
       formToPost.geom = this.geometry;
       if (this.form.valid) {
@@ -177,6 +199,12 @@ export class ZhFormTab0Component implements OnInit {
         }
         this._dataService.postDataForm(formToPost, 0).subscribe(
           (data) => {
+            setTimeout(() => {
+              this._mapService.removeAllLayers(
+                this._mapService.map,
+                this._mapService.leafletDrawFeatureGroup
+              );
+            }, 0);
             this.posted = false;
             this._dataService.getZhById(data.id_zh).subscribe((zh: any) => {
               this._dataService.setCurrentZh(zh);
@@ -204,9 +232,47 @@ export class ZhFormTab0Component implements OnInit {
     }
   }
 
+  slideToggleChanged(event) {
+    this.geomLayers.forEach((layer: any) => {
+      layer.setStyle({
+        opacity: 1 * event.checked,
+        fillOpacity: 0.2 * event.checked,
+      });
+    });
+  }
+
+  onNewGeom(event: any) {
+    this.geometry = event.layer.toGeoJSON();
+    this.canChangeTab.emit(false);
+    this._mapService.map.eachLayer((layer: any) => {
+      if (
+        this.currentLayer &&
+        layer._leaflet_id == this.currentLayer._leaflet_id
+      ) {
+        this._mapService.map.removeLayer(layer);
+      }
+    });
+  }
+
+  updateGeom(newGeometry: any) {
+    this.canChangeTab.emit(false);
+    this.geometry = newGeometry;
+  }
+
   onCancel() {
     this.form.reset();
     this._router.navigate(["zones_humides"]);
+  }
+
+  removeLayers() {
+    this.geomLayers = [];
+    if (this._mapService.map) {
+      this._mapService.map.eachLayer((layer: any) => {
+        if (layer.geomTag && layer.geomTag === "allGeom") {
+          this._mapService.map.removeLayer(layer);
+        }
+      });
+    }
   }
 
   getMetaData() {
