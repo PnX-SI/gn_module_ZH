@@ -6,7 +6,7 @@ from geonature.core.ref_geo.models import LAreas
 
 import pdb
 
-from .models import *
+from .model.zh_schema import *
 
 
 def get_complete_card(full_zh, eval):

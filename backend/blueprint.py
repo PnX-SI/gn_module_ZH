@@ -33,21 +33,18 @@ from geonature.utils.env import DB
 from geonature.core.gn_permissions import decorators as permissions
 from geonature.core.gn_permissions.tools import get_or_fetch_user_cruved
 
-from .models import (
-    TActivity,
+from .model.zh_schema import (
     TZH,
     CorLimList,
     CorZhArea,
     CorZhRef,
     TReferences,
     BibSiteSpace,
-    CorZhLimFs,
     BibOrganismes,
-    ZH,
-    CorZhCb,
-    CorZhCorineCover,
     BibActions
 )
+
+from .model.zh import ZH
 
 from .nomenclatures import (
     get_nomenc,
@@ -58,7 +55,7 @@ from .forms import *
 
 from .geometry import set_geom
 
-from .repositories import (
+from .model.repositories import (
     ZhRepository
 )
 
@@ -158,8 +155,7 @@ def get_zh_by_id(id_zh, info_role):
     """Get zh form data by id
     """
     try:
-        full_zh = ZH(id_zh).get_full_zh()
-        return full_zh
+        return ZH(id_zh).__repr__()
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':
             raise ZHApiError(message='zh id exist?', details=str(e))
