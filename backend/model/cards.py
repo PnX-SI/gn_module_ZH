@@ -16,6 +16,7 @@ class Card(ZH):
         self.type = type
         self.__properties = self.get_properties()
         self.__eval = self.get_eval()
+        self.__na_hab_cover = "999"
 
     def get_properties(self):
         return ZH(self.id_zh).__repr__()['properties']
@@ -27,208 +28,421 @@ class Card(ZH):
         return {
             "data": [
                 {
-                    "name": "name",
+                    # "name": "name",
                     "label": "Nom usuel de la zone humide",
                     "value": self.__properties['main_name'],
-                    "group": "identification"
+                    "group": "identification",
+                    "subgroup": None
                 },
                 {
-                    "name": "other_name",
+                    # "name": "other_name",
                     "label": "Autre nom",
                     "value": self.__properties['secondary_name'],
-                    "group": "identification"
+                    "group": "identification",
+                    "subgroup": None
                 },
                 {
-                    "name": "is_site_space",
+                    # "name": "is_site_space",
                     "label": "Partie d'un ensemble",
                     "value": self.get_bool(self.__properties['is_id_site_space']),
-                    "group": "identification"
+                    "group": "identification",
+                    "subgroup": None
                 },
                 {
-                    "name": "site_space",
+                    # "name": "site_space",
                     "label": "Nom du grand ensemble",
                     "value": TZH.get_site_space_name(self.__properties['id_site_space']) if self.__properties['is_id_site_space'] and self.__properties['id_site_space'] else "Ne fait pas partie d'un grand ensemble",
-                    "group": "identification"
+                    "group": "identification",
+                    "subgroup": None
                 },
                 {
-                    "name": "code",
+                    # "name": "code",
                     "label": "Code de la zone humide",
                     "value": self.__properties['code'],
-                    "group": "identification"
+                    "group": "identification",
+                    "subgroup": None
                 },
                 {
-                    "name": "river_basin",
+                    # "name": "river_basin",
                     "label": "Bassin versant",
                     "value": self.get_river_basin(),
-                    "group": "identification"
+                    "group": "identification",
+                    "subgroup": None
                 },
                 {
-                    "name": "region",
+                    # "name": "region",
                     "label": "Région",
                     "value": self.__properties['geo_info']['regions'],
-                    "group": "localisation"
+                    "group": "localisation",
+                    "subgroup": None
                 },
                 {
-                    "name": "department",
+                    # "name": "department",
                     "label": "Département",
                     "value": self.__properties['geo_info']['departments'],
-                    "group": "localisation"
+                    "group": "localisation",
+                    "subgroup": None
                 },
                 {
-                    "name": "municipality",
+                    # "name": "municipality",
                     "label": "Commune",
                     "value": self.get_communes_info(),
-                    "group": "localisation"
+                    "group": "localisation",
+                    "subgroup": None
                 },
                 {
-                    "name": "author",
+                    # "name": "author",
                     "label": "Auteur de la fiche",
                     "value": self.get_author(),
-                    "group": "author"
+                    "group": "author",
+                    "subgroup": None
                 },
                 {
-                    "name": "author_edition",
+                    # "name": "author_edition",
                     "label": "Auteur des dernières modifications",
                     "value": self.get_author(type='co-author'),
-                    "group": "author"
+                    "group": "author",
+                    "subgroup": None
                 },
                 {
-                    "name": "date",
+                    # "name": "date",
                     "label": "Date d'établissement",
                     "value": datetime.strptime(self.__properties['create_date'], '%Y-%m-%d %H:%M:%S').date().strftime("%d/%m/%Y"),
-                    "group": "author"
+                    "group": "author",
+                    "subgroup": None
                 },
                 {
-                    "name": "date_edition",
+                    # "name": "date_edition",
                     "label": "Date des dernières modifications",
                     "value": datetime.strptime(self.__properties['update_date'], '%Y-%m-%d %H:%M:%S.%f').date().strftime("%d/%m/%Y"),
-                    "group": "author"
+                    "group": "author",
+                    "subgroup": None
                 },
                 {
-                    "name": "references",
+                    # "name": "references",
                     "label": None,
                     "value": self.get_references(self.__properties['id_references']),
-                    "group": "references"
+                    "group": "references",
+                    "subgroup": None
                 },
                 {
-                    "name": "used_crit1",
+                    # "name": "used_crit1",
                     "label": "Critères utilisés",
                     "value": self.get_mnemo(self.__properties['id_lims']),
-                    "group": "crit1"
+                    "group": "crit1",
+                    "subgroup": None
                 },
                 {
-                    "name": "remark_crit1",
+                    # "name": "remark_crit1",
                     "label": "Remarque",
                     "value": self.__properties['remark_lim'],
-                    "group": "crit1"
+                    "group": "crit1",
+                    "subgroup": None
                 },
                 {
-                    "name": "used_crit2",
+                    # "name": "used_crit2",
                     "label": "Critères utilisés",
                     "value": self.get_mnemo(self.__properties['id_lims_fs']),
-                    "group": "crit2"
+                    "group": "crit2",
+                    "subgroup": None
                 },
                 {
-                    "name": "remark_crit2",
+                    # "name": "remark_crit2",
                     "label": "Remarque",
                     "value": self.__properties['remark_lim_fs'],
-                    "group": "crit2"
+                    "group": "crit2",
+                    "subgroup": None
                 },
                 {
-                    "name": "typo_sdage",
+                    # "name": "typo_sdage",
                     "label": "Typologie SDAGE",
                     "value": self.get_mnemo(self.__properties['id_sdage']),
-                    "group": "presentation"
+                    "group": "presentation",
+                    "subgroup": None
                 },
                 {
-                    "name": "typo_locale",
+                    # "name": "typo_locale",
                     "label": "Typologie locale",
                     "value": self.get_mnemo(self.__properties['id_sage']),
-                    "group": "presentation"
+                    "group": "presentation",
+                    "subgroup": None
                 },
                 {
-                    "name": "corine_biotope",
+                    # "name": "corine_biotope",
                     "label": "Corine Biotope",
                     "value": self.get_cb(self.__properties['cb_codes_corine_biotope']),
-                    "group": "presentation"
+                    "group": "presentation",
+                    "subgroup": None
                 },
                 {
-                    "name": "remark_pres",
+                    # "name": "remark_pres",
                     "label": "Remarques",
                     "value": self.__properties['remark_pres'],
-                    "group": "presentation"
+                    "group": "presentation",
+                    "subgroup": None
                 },
                 {
-                    "name": "occupation",
+                    # "name": "occupation",
                     "label": "Occupation des sols",
                     "value": self.get_mnemo(self.__properties['id_corine_landcovers']),
-                    "group": "description"
+                    "group": "description",
+                    "subgroup": None
                 },
                 {
-                    "name": "activities",
+                    # "name": "activities",
                     "label": "Activités",
                     "value": self.get_activities(self.__properties['activities']),
-                    "group": "usage"
+                    "group": "usage",
+                    "subgroup": None
                 },
                 {
-                    "name": "thread",
+                    # "name": "thread",
                     "label": "Evaluation globale des menaces potentielles ou avérées",
                     "value": self.get_mnemo(self.__properties['id_thread']),
-                    "group": "usage"
+                    "group": "usage",
+                    "subgroup": None
                 },
                 {
-                    "name": "remark_usage",
+                    # "name": "remark_usage",
                     "label": "Remarques",
                     "value": self.__properties['global_remark_activity'],
-                    "group": "usage"
+                    "group": "usage",
+                    "subgroup": None
                 },
                 {
-                    "name": "inflow",
+                    # "name": "inflow",
                     "label": "Entrée d'eau",
                     "value": self.get_flows(self.__properties['flows'], type="inflows"),
-                    "group": "regime"
+                    "group": "regime",
+                    "subgroup": None
                 },
                 {
-                    "name": "outflow",
+                    # "name": "outflow",
                     "label": "Sortie d'eau",
                     "value": self.get_flows(self.__properties['flows'], type="outflows"),
-                    "group": "regime"
+                    "group": "regime",
+                    "subgroup": None
                 },
                 {
-                    "name": "submersion_freq",
+                    # "name": "submersion_freq",
                     "label": "Submersion fréquence",
                     "value": self.get_mnemo(self.__properties['id_frequency']),
-                    "group": "regime"
+                    "group": "regime",
+                    "subgroup": None
                 },
                 {
-                    "name": "submersion_spread",
+                    # "name": "submersion_spread",
                     "label": "Submersion étendue",
                     "value": self.get_mnemo(self.__properties['id_spread']),
-                    "group": "regime"
+                    "group": "regime",
+                    "subgroup": None
                 },
                 {
-                    "name": "connexion",
+                    # "name": "connexion",
                     "label": None,
                     "value": self.get_mnemo(self.__properties['id_connexion']),
-                    "group": "connexion"
+                    "group": "connexion",
+                    "subgroup": None
                 },
                 {
-                    "name": "hyrdo_diag",
+                    # "name": "hyrdo_diag",
                     "label": "Fonctionnalité hydrologique / biogéochimique",
                     "value": self.get_mnemo(self.__properties['id_connexion']),
-                    "group": "diagnostic"
+                    "group": "diagnostic",
+                    "subgroup": None
                 },
                 {
-                    "name": "bio_diag",
+                    # "name": "bio_diag",
                     "label": "Fonctionnalité biologique / écologique",
                     "value": self.get_mnemo(self.__properties['id_diag_bio']),
-                    "group": "diagnostic"
+                    "group": "diagnostic",
+                    "subgroup": None
                 },
                 {
-                    "name": "commentaires",
+                    # "name": "commentaires",
                     "label": "Commentaires",
                     "value": self.__properties['remark_diag'],
-                    "group": "diagnostic"
+                    "group": "diagnostic",
+                    "subgroup": None
+                },
+                {
+                    "label": None,
+                    "value": self.get_function_info(self.__properties['fonctions_hydro'], type="fonctions_hydro"),
+                    "group": "hydro_function",
+                    "subgroup": None
+                },
+                {
+                    "label": None,
+                    "value": self.get_function_info(self.__properties['fonctions_bio'], type="fonctions_bio"),
+                    "group": "bio_function",
+                    "subgroup": None
+                },
+                {
+                    "label": None,
+                    "value": self.get_function_info(self.__properties['interet_patrim'], type="interet_patrim"),
+                    "group": "heritage_interest",
+                    "subgroup": None
+                },
+                {
+                    "label": "Cartographie d'habitats",
+                    "value": self.get_bool(self.__properties['is_carto_hab']),
+                    "group": "heritage_interest",
+                    "subgroup": "habs"
+                },
+                {
+                    "label": "Nombre d'habitats",
+                    "value": self.get_int(self.__properties['nb_hab']),
+                    "group": "heritage_interest",
+                    "subgroup": "habs"
+                },
+                {
+                    "label": "Recouvrement total de la ZH (%)",
+                    "value": "Non évalué" if self.__properties['total_hab_cover'] == self.get_na_hab_cover() else self.__properties['total_hab_cover'],
+                    "group": "heritage_interest",
+                    "subgroup": "habs"
+                },
+                {
+                    "label": "Habitats naturels patrimoniaux",
+                    "value": self.get_hab_heritages(self.__properties['hab_heritages']),
+                    "group": "heritage_interest",
+                    "subgroup": "habs"
+                },
+                {
+                    "label": "Flore - nombre d'espèces",
+                    "value": self.get_int(self.__properties['nb_flora_sp']),
+                    "group": "heritage_interest",
+                    "subgroup": "taxa"
+                },
+                {
+                    "label": "Faune - nombre d'espèces de vertébrés",
+                    "value": self.get_int(self.__properties['nb_vertebrate_sp']),
+                    "group": "heritage_interest",
+                    "subgroup": "taxa"
+                },
+                {
+                    "label": "Faune - nombre d'espèces d'invertébrés",
+                    "value": self.get_int(self.__properties['nb_invertebrate_sp']),
+                    "group": "heritage_interest",
+                    "subgroup": "taxa"
+                },
+                {
+                    "label": None,
+                    "value": self.get_function_info(self.__properties['val_soc_eco'], type="val_soc_eco"),
+                    "group": "val_soc_eco",
+                    "subgroup": None
+                },
+                {
+                    "label": None,
+                    "value": self.get_ownerships_info(self.__properties['ownerships']),
+                    "group": "regime_fonctier",
+                    "subgroup": None
+                },
+                {
+                    "label": None,
+                    "value": self.get_managements_info(self.__properties['managements']),
+                    "group": "structures",
+                    "subgroup": None
+                },
+                {
+                    "label": None,
+                    "value": self.get_instruments_info(self.__properties['instruments']),
+                    "group": "instruments",
+                    "subgroup": None
+                },
+                {
+                    "label": None,
+                    "value": self.get_protection_names(self.__properties['protections']),
+                    "group": "statuts",
+                    "subgroup": None
+                },
+                {
+                    "label": None,
+                    "value": self.get_urban_doc_info(self.__properties['urban_docs']),
+                    "group": "zonage",
+                    "subgroup": None
+                },
+                {
+                    "label": "Principales fonctions hydrologiques / biogéochimiques",
+                    "value": self.get_function_info(self.__eval['fonctions_hydro'], type="fonctions_hydro"),
+                    "group": "eval_functions",
+                    "subgroup": None
+                },
+                {
+                    "label": "Principales fonctions biologiques / écologiques",
+                    "value": self.get_function_info(self.__eval['fonctions_bio'], type="fonctions_bio"),
+                    "group": "eval_functions",
+                    "subgroup": None
+                },
+                {
+                    "label": "Intérêts patrimoniaux",
+                    "value": self.get_function_info(self.__eval['interet_patrim'], type="interet_patrim"),
+                    "group": "eval_heritage_interest",
+                    "subgroup": None
+                },
+                {
+                    "label": "Nombre d'espèces faunistiques",
+                    "value": self.get_int(self.__eval['nb_fauna_sp']),
+                    "group": "eval_heritage_interest",
+                    "subgroup": None
+                },
+                {
+                    "label": "Nombre d'espèces floristiques",
+                    "value": self.get_int(self.__eval['nb_flora_sp']),
+                    "group": "eval_heritage_interest",
+                    "subgroup": None
+                },
+                {
+                    "label": "Nombre d'habitats humides patrimoniaux",
+                    "value": self.get_int(self.__eval['nb_hab']),
+                    "group": "eval_heritage_interest",
+                    "subgroup": None
+                },
+                {
+                    "label": "Recouvrement total de la ZH (%)",
+                    "value": self.get_int(self.__eval['total_hab_cover']),
+                    "group": "eval_heritage_interest",
+                    "subgroup": None
+                },
+                {
+                    "label": "Commentaire",
+                    "value": self.__properties['remark_eval_heritage'] if self.__properties['remark_eval_heritage'] is not None else 'Pas de commentaire',
+                    "group": "eval_heritage_interest",
+                    "subgroup": None
+                },
+                {
+                    "label": "Evaluation globale des menaces potentielles ou avérées",
+                    "value": self.get_mnemo(self.__properties['id_thread']),
+                    "group": "eval_threads",
+                    "subgroup": None
+                },
+                {
+                    "label": "Fonctionnalité hydrologique / biogéochimique",
+                    "value": self.get_mnemo(self.__properties['id_diag_hydro']),
+                    "group": "eval_threads",
+                    "subgroup": None
+                },
+                {
+                    "label": "Fonctionnalité biologique / écologique (habitats / faune / flore)",
+                    "value": self.get_mnemo(self.__properties['id_diag_bio']),
+                    "group": "eval_threads",
+                    "subgroup": None
+                },
+                {
+                    "label": "Commentaire",
+                    "value": self.__properties['remark_eval_thread'] if self.__properties['remark_eval_thread'] is not None else 'Pas de commentaire',
+                    "group": "eval_threads",
+                    "subgroup": None
+                },
+                {
+                    "label": "Propositions d'actions",
+                    "value": self.get_actions_info(self.__properties['actions']),
+                    "group": "eval_actions",
+                    "subgroup": None
+                },
+                {
+                    "label": "Commentaires",
+                    "value": self.__properties['remark_eval_actions'] if self.__properties['remark_eval_actions'] is not None else 'Pas de commentaire',                    "group": "eval_actions",
+                    "subgroup": None
                 }
             ],
             "tabs": [
@@ -321,10 +535,92 @@ class Card(ZH):
                     "name": "diagnostic",
                     "label": "Diagnostic fonctionnel",
                     "tab": "tab4"
+                },
+                {
+                    "name": "hydro_functions",
+                    "label": "Fonctions hydrologiques / biogéochimiques",
+                    "tab": "tab5"
+                },
+                {
+                    "name": "bio_functions",
+                    "label": "Fonctions biologiques / écologiques",
+                    "tab": "tab5"
+                },
+                {
+                    "name": "heritage_interest",
+                    "label": "Intérêt patrimonial",
+                    "tab": "tab5"
+                },
+                {
+                    "name": "val_soc_eco",
+                    "label": "Valeurs socio-économiques",
+                    "tab": "tab5"
+                },
+                {
+                    "name": "regime_foncier",
+                    "label": "Régime foncier - statut de propriété",
+                    "tab": "tab6"
+                },
+                {
+                    "name": "structures",
+                    "label": "Structure de gestion",
+                    "tab": "tab6"
+                },
+                {
+                    "name": "instruments",
+                    "label": "Instruments contractuels et financiers",
+                    "tab": "tab6"
+                },
+                {
+                    "name": "statuts",
+                    "label": "Principaux statuts",
+                    "tab": "tab6"
+                },
+                {
+                    "name": "zonage",
+                    "label": "Zonage des documents d'urbanisme",
+                    "tab": "tab6"
+                },
+                {
+                    "name": "eval_functions",
+                    "label": "Fonctions et valeurs majeures",
+                    "tab": "tab7"
+                },
+                {
+                    "name": "eval_heritage_interest",
+                    "label": "Intérêt patrimonial majeur",
+                    "tab": "tab7"
+                },
+                {
+                    "name": "eval_threads",
+                    "label": "Bilan des menaces et des facteurs infuançant la zone humide",
+                    "tab": "tab7"
+                },
+                {
+                    "name": "eval_actions",
+                    "label": "Stratégie de gestion et orientations d'actions",
+                    "tab": "tab7"
+                },
+
+
+            ],
+            "subgroup": [
+                {
+                    "name": "habs",
+                    "label": "Habitats naturels humides patrimoniaux",
+                    "group": "heritage_interest"
+                },
+                {
+                    "name": "taxa",
+                    "label": "Faune et flore patrimoniale",
+                    "group": "heritage_interest"
                 }
             ],
             "geometry": ZH(self.id_zh).__repr__()["geometry"]
         }
+
+    def get_na_hab_cover(self):
+        return self.__na_hab_cover
 
     def get_bool(self, bool):
         if bool:
