@@ -15,6 +15,7 @@ import { TabsService } from "../../../services/tabs.service";
 export class ZhFormTab5Component implements OnInit {
   @Input() public formMetaData: any;
   @Output() public canChangeTab = new EventEmitter<boolean>();
+  @Output() nextTab = new EventEmitter<number>();
   public formTab5: FormGroup;
   public patchModal: boolean;
   public modalFormSubmitted: boolean;
@@ -40,7 +41,6 @@ export class ZhFormTab5Component implements OnInit {
   private $_interetPatInputSub: Subscription;
   private $_bioFctInputSub: Subscription;
   private $_valSocEcoInputSub: Subscription;
-  private $_corineBioInputSub: Subscription;
 
   public hydroFctTableCol = [
     { name: "function", label: "Fonctions hydrologiques" },
@@ -1034,6 +1034,7 @@ export class ZhFormTab5Component implements OnInit {
               this._toastr.success("Vos données sont bien enregistrées", "", {
                 positionClass: "toast-top-right",
               });
+              this.nextTab.emit(6);
             });
         },
         (error) => {

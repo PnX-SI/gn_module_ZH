@@ -15,6 +15,7 @@ import { TabsService } from "../../../services/tabs.service";
 export class ZhFormTab3Component implements OnInit {
   @Input() formMetaData;
   @Output() canChangeTab = new EventEmitter<boolean>();
+  @Output() nextTab = new EventEmitter<number>();
   form: FormGroup;
   sage: any;
   allSage: any;
@@ -421,6 +422,7 @@ export class ZhFormTab3Component implements OnInit {
               this._toastr.success("Vos données sont bien enregistrées", "", {
                 positionClass: "toast-top-right",
               });
+              this.nextTab.emit(4);
             });
         },
         (error) => {

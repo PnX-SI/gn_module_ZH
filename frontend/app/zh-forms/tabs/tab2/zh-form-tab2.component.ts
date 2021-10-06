@@ -13,6 +13,7 @@ import { ZhDataService } from "../../../services/zh-data.service";
 export class ZhFormTab2Component implements OnInit {
   @Input() formMetaData;
   @Output() canChangeTab = new EventEmitter<boolean>();
+  @Output() nextTab = new EventEmitter<number>();
   private currentZh: any;
   public $_currentZhSub: Subscription;
   public $_fromChangeSub: Subscription;
@@ -134,6 +135,7 @@ export class ZhFormTab2Component implements OnInit {
               this._toastr.success("Vos données sont bien enregistrées", "", {
                 positionClass: "toast-top-right",
               });
+              this.nextTab.emit(3);
             });
         },
         (error) => {

@@ -52,6 +52,7 @@ export class ZhTabsComponent implements OnInit {
     if (this.canChangeTab) {
       this.currentTab = nextPosition;
       this._tabService.setTabChange(nextPosition);
+      this.selectedIndex = nextPosition;
     } else {
       if (nextPosition != this.currentTab) this.clickedTabIndex = nextPosition;
       this.tabs.selectedIndex = this.currentTab;

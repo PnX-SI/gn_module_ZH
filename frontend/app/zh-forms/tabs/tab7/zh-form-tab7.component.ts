@@ -14,7 +14,7 @@ import { TabsService } from "../../../services/tabs.service";
 export class ZhFormTab7Component implements OnInit {
   @Input() public formMetaData: any;
   @Output() public canChangeTab = new EventEmitter<boolean>();
-
+  @Output() nextTab = new EventEmitter<number>();
   public formTab7: FormGroup;
   public patchModal: boolean;
   public modalFormSubmitted: boolean;

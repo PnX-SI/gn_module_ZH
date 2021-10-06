@@ -22,6 +22,7 @@ import { ZhDataService } from "../../../services/zh-data.service";
 export class ZhFormTab6Component implements OnInit {
   @Input() public formMetaData: any;
   @Output() public canChangeTab = new EventEmitter<boolean>();
+  @Output() nextTab = new EventEmitter<number>();
   public formTab6: FormGroup;
   public statusForm: FormGroup;
   public instrumentForm: FormGroup;
@@ -108,12 +109,12 @@ export class ZhFormTab6Component implements OnInit {
       autoPosition: false,
     };
 
-    this.getCurrentZh();
     this.getMetaData();
     this.initForms();
+
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
       if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
-      this.$_currentZhSub.unsubscribe();
+      if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
       if (tabPosition == 6) {
         this.getCurrentZh();
       }
@@ -963,6 +964,7 @@ export class ZhFormTab6Component implements OnInit {
               this._toastr.success("Vos données sont bien enregistrées", "", {
                 positionClass: "toast-top-right",
               });
+              this.nextTab.emit(7);
             });
         },
         (error) => {

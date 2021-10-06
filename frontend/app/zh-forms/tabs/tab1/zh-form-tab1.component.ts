@@ -22,6 +22,7 @@ import { TabsService } from "../../../services/tabs.service";
 export class ZhFormTab1Component implements OnInit {
   @Input() formMetaData;
   @Output() canChangeTab = new EventEmitter<boolean>();
+  @Output() nextTab = new EventEmitter<number>();
   public generalInfoForm: FormGroup;
   public bibForm: FormGroup;
   public siteSpaceList: any[];
@@ -168,6 +169,7 @@ export class ZhFormTab1Component implements OnInit {
               this._toastr.success("Vos données sont bien enregistrées", "", {
                 positionClass: "toast-top-right",
               });
+              this.nextTab.emit(2);
             });
         },
         (error) => {

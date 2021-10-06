@@ -14,6 +14,7 @@ import { TabsService } from "../../../services/tabs.service";
 export class ZhFormTab4Component implements OnInit {
   @Input() public formMetaData: any;
   @Output() public canChangeTab = new EventEmitter<boolean>();
+  @Output() nextTab = new EventEmitter<number>();
   public formTab4: FormGroup;
   public patchInflow: boolean;
   public inflowModalTitle: string;
@@ -482,6 +483,7 @@ export class ZhFormTab4Component implements OnInit {
               this._toastr.success("Vos données sont bien enregistrées", "", {
                 positionClass: "toast-top-right",
               });
+              this.nextTab.emit(5);
             });
         },
         (error) => {
