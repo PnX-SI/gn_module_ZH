@@ -1,0 +1,39 @@
+<button
+  mat-raised-button
+  color="warn"
+  [disabled]="posted"
+  (click)="onCancel(cancelModal)"
+>
+  Quitter
+</button>
+
+<!-- cancelModal -->
+<ng-template #cancelModal let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <button mat-icon-button class="closeModalBtn" (click)="c()">
+      <mat-icon class="cancel-icon">cancel</mat-icon>
+    </button>
+  </div>
+  <div class="modal-body">Vers où Vous voulez être redirigé ?</div>
+  <div class="footer-modal-btn">
+    <button
+      type="button"
+      ngbAutofocus
+      mat-raised-button
+      color="primary"
+      class="uppercase"
+      [routerLink]="['/zones_humides']"
+    >
+      liste des zonnes hummides
+    </button>
+    <button
+      type="button"
+      mat-raised-button
+      color="accent"
+      class="uppercase"
+      [routerLink]="['/zones_humides/zhDetails', zhId]"
+    >
+      la fiche detaillées
+    </button>
+  </div>
+</ng-template>

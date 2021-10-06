@@ -1,0 +1,15 @@
+@import "../../../app.module";
+.modal-header {
+  justify-content: flex-end;
+  padding: 10px 8px 0;
+  border: none;
+}
+.footer-modal-btn {
+  margin: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+}
+.modal-body {
+  font-size: 18px;
+  padding: 10px 24px 16px;
+}

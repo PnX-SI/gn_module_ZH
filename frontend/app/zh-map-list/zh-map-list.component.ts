@@ -190,7 +190,9 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
       iElement.parentElement &&
       iElement.parentElement.parentElement &&
       iElement.parentElement.parentElement.blur();
-    this.ngbModal.open(modal);
+    this.ngbModal.open(modal, {
+      centered: true,
+    });
   }
 
   ngOnDestroy() {

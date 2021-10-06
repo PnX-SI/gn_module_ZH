@@ -73,7 +73,7 @@ export class ZhFormTab5Component implements OnInit {
   public submitted: boolean;
   private $_currentZhSub: Subscription;
   private $_fromChangeSub: Subscription;
-  private _currentZh: any;
+  public currentZh: any;
   posted: boolean;
 
   constructor(
@@ -175,7 +175,7 @@ export class ZhFormTab5Component implements OnInit {
   getCurrentZh() {
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
-        this._currentZh = zh;
+        this.currentZh = zh;
         this.fctHydroTable = [];
         this.bioFctTable = [];
         this.interetPatTable = [];
@@ -183,47 +183,44 @@ export class ZhFormTab5Component implements OnInit {
         this.corineBioTable = [];
         //patch forms values
         this.formTab5.patchValue({
-          is_carto_hab: this._currentZh.properties.is_carto_hab,
-          nb_hab: this._currentZh.properties.nb_hab,
-          total_hab_cover: this._currentZh.properties.total_hab_cover,
-          nb_flora_sp: this._currentZh.properties.nb_flora_sp,
-          nb_vertebrate_sp: this._currentZh.properties.nb_vertebrate_sp,
-          nb_invertebrate_sp: this._currentZh.properties.nb_invertebrate_sp,
+          is_carto_hab: this.currentZh.properties.is_carto_hab,
+          nb_hab: this.currentZh.properties.nb_hab,
+          total_hab_cover: this.currentZh.properties.total_hab_cover,
+          nb_flora_sp: this.currentZh.properties.nb_flora_sp,
+          nb_vertebrate_sp: this.currentZh.properties.nb_vertebrate_sp,
+          nb_invertebrate_sp: this.currentZh.properties.nb_invertebrate_sp,
         });
         if (
-          this._currentZh.properties.fonctions_hydro &&
-          this._currentZh.properties.fonctions_hydro.length > 0
+          this.currentZh.properties.fonctions_hydro &&
+          this.currentZh.properties.fonctions_hydro.length > 0
         ) {
-          this._currentZh.properties.fonctions_hydro.forEach(
-            (hydroFct: any) => {
-              this.fctHydroTable.push({
-                function: this.fctHydroInput
-                  .flat()
-                  .find(
-                    (item: any) => item.id_nomenclature == hydroFct.id_function
-                  ),
-                qualification: this.formMetaData["FONCTIONS_QUALIF"].find(
-                  (item: any) =>
-                    item.id_nomenclature == hydroFct.id_qualification
+          this.currentZh.properties.fonctions_hydro.forEach((hydroFct: any) => {
+            this.fctHydroTable.push({
+              function: this.fctHydroInput
+                .flat()
+                .find(
+                  (item: any) => item.id_nomenclature == hydroFct.id_function
                 ),
-                knowledge: this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
-                  (item: any) => item.id_nomenclature == hydroFct.id_knowledge
-                ),
-                justification: hydroFct.justification,
-              });
-              this.fctHydroInput.flat().map((item: any) => {
-                if (item.id_nomenclature == hydroFct.id_function) {
-                  item.disabled = false;
-                }
-              });
-            }
-          );
+              qualification: this.formMetaData["FONCTIONS_QUALIF"].find(
+                (item: any) => item.id_nomenclature == hydroFct.id_qualification
+              ),
+              knowledge: this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+                (item: any) => item.id_nomenclature == hydroFct.id_knowledge
+              ),
+              justification: hydroFct.justification,
+            });
+            this.fctHydroInput.flat().map((item: any) => {
+              if (item.id_nomenclature == hydroFct.id_function) {
+                item.disabled = false;
+              }
+            });
+          });
         }
         if (
-          this._currentZh.properties.fonctions_bio &&
-          this._currentZh.properties.fonctions_bio.length > 0
+          this.currentZh.properties.fonctions_bio &&
+          this.currentZh.properties.fonctions_bio.length > 0
         ) {
-          this._currentZh.properties.fonctions_bio.forEach((bioFct: any) => {
+          this.currentZh.properties.fonctions_bio.forEach((bioFct: any) => {
             this.bioFctTable.push({
               function: this.bioFctInput
                 .flat()
@@ -246,10 +243,10 @@ export class ZhFormTab5Component implements OnInit {
           });
         }
         if (
-          this._currentZh.properties.val_soc_eco &&
-          this._currentZh.properties.val_soc_eco.length > 0
+          this.currentZh.properties.val_soc_eco &&
+          this.currentZh.properties.val_soc_eco.length > 0
         ) {
-          this._currentZh.properties.val_soc_eco.forEach((valSoc: any) => {
+          this.currentZh.properties.val_soc_eco.forEach((valSoc: any) => {
             this.valSocEcoTable.push({
               function: this.valSocEcoInput
                 .flat()
@@ -272,10 +269,10 @@ export class ZhFormTab5Component implements OnInit {
           });
         }
         if (
-          this._currentZh.properties.interet_patrim &&
-          this._currentZh.properties.interet_patrim.length > 0
+          this.currentZh.properties.interet_patrim &&
+          this.currentZh.properties.interet_patrim.length > 0
         ) {
-          this._currentZh.properties.interet_patrim.forEach((pat: any) => {
+          this.currentZh.properties.interet_patrim.forEach((pat: any) => {
             this.interetPatTable.push({
               function: this.interetPatInput
                 .flat()
@@ -296,10 +293,10 @@ export class ZhFormTab5Component implements OnInit {
           });
         }
         if (
-          this._currentZh.properties.hab_heritages &&
-          this._currentZh.properties.hab_heritages.length > 0
+          this.currentZh.properties.hab_heritages &&
+          this.currentZh.properties.hab_heritages.length > 0
         ) {
-          this._currentZh.properties.hab_heritages.forEach((corineBio: any) => {
+          this.currentZh.properties.hab_heritages.forEach((corineBio: any) => {
             let selectedCahierHab;
             this._dataService
               .getHabitatByCorine(corineBio.id_corine_bio)
@@ -1011,7 +1008,7 @@ export class ZhFormTab5Component implements OnInit {
       }
 
       let formToPost = {
-        id_zh: Number(this._currentZh.properties.id_zh),
+        id_zh: Number(this.currentZh.properties.id_zh),
         is_carto_hab: this.formTab5.value.is_carto_hab,
         nb_hab: this.formTab5.value.nb_hab,
         total_hab_cover: this.formTab5.value.total_hab_cover,
@@ -1029,7 +1026,7 @@ export class ZhFormTab5Component implements OnInit {
       this._dataService.postDataForm(formToPost, 5).subscribe(
         () => {
           this._dataService
-            .getZhById(this._currentZh.properties.id_zh)
+            .getZhById(this.currentZh.properties.id_zh)
             .subscribe((zh: any) => {
               this._dataService.setCurrentZh(zh);
               this.posted = false;

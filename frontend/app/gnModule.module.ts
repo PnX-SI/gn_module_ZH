@@ -22,6 +22,7 @@ import { ZhFormTab7Component } from "./zh-forms/tabs/tab7/zh-form-tab7.component
 import { ZhDataService } from "./services/zh-data.service";
 import { ZhTabsComponent } from "./zh-forms/tabs/zh-tabs.component";
 import { DatepickerI18n } from "./services/datepicker-i18n.service";
+import { CancelButtonComponent } from "./zh-forms/cancelButton/cancelButton.component";
 
 // my module routing
 const routes: Routes = [
@@ -43,6 +44,7 @@ const routes: Routes = [
     ZhFormTab5Component,
     ZhFormTab6Component,
     ZhFormTab7Component,
+    CancelButtonComponent,
   ],
   imports: [
     CommonModule,

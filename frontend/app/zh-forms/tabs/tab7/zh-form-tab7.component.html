@@ -240,6 +240,10 @@
       </div>
     </fieldset>
     <div class="footer-btn">
+      <zh-cancelButton
+        *ngIf="currentZh"
+        [zhId]="currentZh.properties.id_zh"
+      ></zh-cancelButton>
       <button
         type="submit"
         mat-raised-button

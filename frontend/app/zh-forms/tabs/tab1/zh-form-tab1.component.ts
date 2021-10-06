@@ -27,7 +27,7 @@ export class ZhFormTab1Component implements OnInit {
   public siteSpaceList: any[];
   public hasSiteSpace = false;
   public appConfig = AppConfig;
-  private _currentZh: any;
+  public currentZh: any;
   public $_currentZhSub: Subscription;
   public $_fromChangeSub: Subscription;
   public listBib: any[] = [];
@@ -68,14 +68,14 @@ export class ZhFormTab1Component implements OnInit {
   initTab() {
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
-        this._currentZh = zh;
-        this.listBib = [...this._currentZh.properties.id_references];
+        this.currentZh = zh;
+        this.listBib = [...this.currentZh.properties.id_references];
         this.generalInfoForm.patchValue({
-          main_name: this._currentZh.properties.main_name,
-          secondary_name: this._currentZh.properties.secondary_name,
-          is_id_site_space: this._currentZh.properties.is_id_site_space,
-          id_site_space: this._currentZh.properties.id_site_space,
-          id_zh: this._currentZh.properties.id_zh,
+          main_name: this.currentZh.properties.main_name,
+          secondary_name: this.currentZh.properties.secondary_name,
+          is_id_site_space: this.currentZh.properties.is_id_site_space,
+          id_site_space: this.currentZh.properties.id_site_space,
+          id_zh: this.currentZh.properties.id_zh,
         });
         this.$_fromChangeSub = this.generalInfoForm.valueChanges.subscribe(
           () => {
@@ -142,7 +142,7 @@ export class ZhFormTab1Component implements OnInit {
     let formToPost = {
       main_name: formValues.main_name,
       secondary_name: formValues.secondary_name,
-      id_zh: Number(this._currentZh.properties.id_zh),
+      id_zh: Number(this.currentZh.properties.id_zh),
       id_site_space: formValues.id_site_space,
       is_id_site_space: formValues.is_id_site_space,
       id_references: [],
@@ -150,7 +150,7 @@ export class ZhFormTab1Component implements OnInit {
 
     if (this.generalInfoForm.valid) {
       this.$_fromChangeSub.unsubscribe();
-      if (formValues.main_name != this._currentZh.properties.main_name) {
+      if (formValues.main_name != this.currentZh.properties.main_name) {
         formValues.main_name = formValues.main_name;
       }
       this.listBib.forEach((bib) => {
@@ -160,7 +160,7 @@ export class ZhFormTab1Component implements OnInit {
       this._dataService.postDataForm(formToPost, 1).subscribe(
         () => {
           this._dataService
-            .getZhById(this._currentZh.properties.id_zh)
+            .getZhById(this.currentZh.properties.id_zh)
             .subscribe((zh: any) => {
               this._dataService.setCurrentZh(zh);
               this.posted = false;

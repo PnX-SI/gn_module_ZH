@@ -36,7 +36,7 @@ export class ZhFormTab4Component implements OnInit {
   public submitted: boolean;
   private $_currentZhSub: Subscription;
   private $_fromChangeSub: Subscription;
-  private _currentZh: any;
+  public currentZh: any;
 
   public inflowTableCol = [
     { name: "inflow", label: "Entrée d'eau" },
@@ -111,15 +111,15 @@ export class ZhFormTab4Component implements OnInit {
   getCurrentZh() {
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
-        this._currentZh = zh;
+        this.currentZh = zh;
         this.inflowsTable = [];
         this.outflowsTable = [];
         //patch forms values
         if (
-          this._currentZh.properties.flows &&
-          this._currentZh.properties.flows.length > 0
+          this.currentZh.properties.flows &&
+          this.currentZh.properties.flows.length > 0
         ) {
-          this._currentZh.properties.flows.forEach((element: any) => {
+          this.currentZh.properties.flows.forEach((element: any) => {
             for (const key in element) {
               if (key == "inflows") {
                 if (element[key].length > 0) {
@@ -170,25 +170,25 @@ export class ZhFormTab4Component implements OnInit {
         }
         this.formTab4.patchValue({
           spread: this.formMetaData["SUBMERSION_ETENDUE"].find((item) => {
-            return item.id_nomenclature == this._currentZh.properties.id_spread;
+            return item.id_nomenclature == this.currentZh.properties.id_spread;
           }),
           frequency: this.formMetaData["SUBMERSION_FREQ"].find((item) => {
             return (
-              item.id_nomenclature == this._currentZh.properties.id_frequency
+              item.id_nomenclature == this.currentZh.properties.id_frequency
             );
           }),
-          connexion: this._currentZh.properties.id_connexion,
+          connexion: this.currentZh.properties.id_connexion,
           diag_hydro: this.formMetaData["FONCTIONNALITE_HYDRO"].find((item) => {
             return (
-              item.id_nomenclature == this._currentZh.properties.id_diag_hydro
+              item.id_nomenclature == this.currentZh.properties.id_diag_hydro
             );
           }),
           diag_bio: this.formMetaData["FONCTIONNALITE_BIO"].find((item) => {
             return (
-              item.id_nomenclature == this._currentZh.properties.id_diag_bio
+              item.id_nomenclature == this.currentZh.properties.id_diag_bio
             );
           }),
-          remark_diag: this._currentZh.properties.remark_diag,
+          remark_diag: this.currentZh.properties.remark_diag,
         });
       }
       this.$_fromChangeSub = this.formTab4.valueChanges.subscribe(() => {
@@ -450,7 +450,7 @@ export class ZhFormTab4Component implements OnInit {
       }
 
       let formToPost = {
-        id_zh: Number(this._currentZh.properties.id_zh),
+        id_zh: Number(this.currentZh.properties.id_zh),
         id_frequency: this.formTab4.value.frequency
           ? this.formTab4.value.frequency.id_nomenclature
           : null,
@@ -474,7 +474,7 @@ export class ZhFormTab4Component implements OnInit {
       this._dataService.postDataForm(formToPost, 4).subscribe(
         () => {
           this._dataService
-            .getZhById(this._currentZh.properties.id_zh)
+            .getZhById(this.currentZh.properties.id_zh)
             .subscribe((zh: any) => {
               this._dataService.setCurrentZh(zh);
               this.posted = false;

@@ -40,7 +40,7 @@ export class ZhFormTab0Component implements OnInit {
   public submitted = false;
   public posted = false;
   private geomLayers: any;
-  layerGroup: any;
+  public zhId: number;
 
   constructor(
     private fb: FormBuilder,
@@ -103,6 +103,7 @@ export class ZhFormTab0Component implements OnInit {
       });
       if (zh) {
         this._currentZh = zh;
+        this.zhId = this._currentZh.properties.id_zh;
         this._mapService.removeAllLayers(
           this._mapService.map,
           this._mapService.leafletDrawFeatureGroup

@@ -105,15 +105,7 @@
         </fieldset>
       </form>
       <div class="footer-btn">
-        <button
-          type="submit"
-          mat-raised-button
-          color="warn"
-          [disabled]="posted"
-          (click)="onCancel()"
-        >
-          Quitter
-        </button>
+        <zh-cancelButton [zhId]="zhId"></zh-cancelButton>
         <button
           type="submit"
           mat-raised-button
