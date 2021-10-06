@@ -19,7 +19,7 @@ class Card(ZH):
 
         full_zh = ZH(self.id_zh).__repr__()
         eval = ZH(self.id_zh).get_eval()
-        complete_card = {}
+        card = {}
 
         identification = {
             "Nom usuel de la zone humide": full_zh.properties['main_name'],
@@ -44,7 +44,7 @@ class Card(ZH):
 
         references = self.get_references(full_zh.properties['id_references'])
 
-        complete_card.update({
+        card.update({
             "1- Renseignements généraux": {
                 "1.1- Identification de la zone humide": {
                     "Identification": identification,
@@ -142,7 +142,7 @@ class Card(ZH):
                 }
             }
         })
-        return complete_card
+        return card
 
     def get_bool(self, bool):
         if bool:
