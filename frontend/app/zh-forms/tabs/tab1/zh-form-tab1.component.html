@@ -1,5 +1,6 @@
 <div>
   <form [formGroup]="generalInfoForm">
+    <h2 class="tabsTitle">Renseignement Généreaux</h2>
     <fieldset>
       <legend>
         <h5 class="section-title">Identification</h5>
@@ -98,13 +99,13 @@
         <table class="table">
           <thead class="thead-inverse table-header">
             <tr>
-              <th *ngFor="let col of cols">{{ col }}</th>
+              <th *ngFor="let col of cols">{{ col.label }}</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let bib of listBib">
-              <td *ngFor="let col of cols">{{ bib[col] }}</td>
+              <td *ngFor="let col of cols">{{ bib[col.name] }}</td>
               <td>
                 <div>
                   <button mat-icon-button class="mr-2">

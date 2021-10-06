@@ -168,6 +168,7 @@ export class ZhFormTab7Component implements OnInit {
                 qualification: nameQaulif,
                 knowledge: nameKnowledge,
               });
+              console.log(this.hydroFctData);
             });
           }
           if (evalZh.interet_patrim && evalZh.interet_patrim.length > 0) {

@@ -27,7 +27,6 @@ export class ZhFormTab1Component implements OnInit {
   public siteSpaceList: any[];
   public hasSiteSpace = false;
   public appConfig = AppConfig;
-  public cols = ["title", "authors", "pub_year"];
   private _currentZh: any;
   public $_currentZhSub: Subscription;
   public $_fromChangeSub: Subscription;
@@ -39,6 +38,11 @@ export class ZhFormTab1Component implements OnInit {
   public modalBibTitle: string;
   public patchBib: boolean = false;
   public autocompleteBib: string;
+  public cols = [
+    { name: "title", label: "Titre du document" },
+    { name: "authors", label: "Auteurs" },
+    { name: "pub_year", label: "Année de parution" },
+  ];
 
   constructor(
     private fb: FormBuilder,

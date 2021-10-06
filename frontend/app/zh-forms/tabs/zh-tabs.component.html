@@ -10,7 +10,7 @@
       (selectedIndexChange)="selectedIndexChange($event)"
     >
       <mat-tab>
-        <ng-template mat-tab-label> Champs obligatoires </ng-template>
+        <ng-template mat-tab-label>Carte</ng-template>
         <zh-form-tab0
           *ngIf="formMetaData"
           class="d-flex flex-column"
@@ -22,7 +22,7 @@
         </zh-form-tab0>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label> Renseignement généraux </ng-template>
+        <ng-template mat-tab-label>Renseignement</ng-template>
         <zh-form-tab1
           *ngIf="formMetaData"
           class="d-flex flex-column"
@@ -33,9 +33,7 @@
         </zh-form-tab1>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label>
-          Délimitation de la zone humide et de l'espace de fonctionnalité
-        </ng-template>
+        <ng-template mat-tab-label> Délimitation </ng-template>
         <zh-form-tab2
           *ngIf="formMetaData"
           class="d-flex flex-column"
@@ -46,9 +44,7 @@
         </zh-form-tab2>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label>
-          Description du bassin versant et de la zone humide
-        </ng-template>
+        <ng-template mat-tab-label> Description </ng-template>
         <zh-form-tab3
           *ngIf="formMetaData"
           class="d-flex flex-column"
@@ -58,9 +54,7 @@
         </zh-form-tab3>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label>
-          Fonctionnement de la zone humide
-        </ng-template>
+        <ng-template mat-tab-label> Fonctionnement </ng-template>
         <zh-form-tab4
           *ngIf="formMetaData"
           class="d-flex flex-column"
@@ -70,9 +64,7 @@
         ></zh-form-tab4>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label>
-          Fonctions écologiques, valeurs socio-économiques, interét patrimonial
-        </ng-template>
+        <ng-template mat-tab-label> Fonctions écologiques </ng-template>
         <zh-form-tab5
           *ngIf="formMetaData"
           class="d-flex flex-column"
@@ -82,9 +74,7 @@
         ></zh-form-tab5>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label>
-          Statuts et gestion de la zone humide
-        </ng-template>
+        <ng-template mat-tab-label> Statuts </ng-template>
         <zh-form-tab6
           *ngIf="formMetaData"
           class="d-flex flex-column"
@@ -94,7 +84,7 @@
         ></zh-form-tab6>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label> Evaluation géneral du site </ng-template>
+        <ng-template mat-tab-label> Evaluation </ng-template>
         <zh-form-tab7
           *ngIf="formMetaData"
           class="d-flex flex-column"

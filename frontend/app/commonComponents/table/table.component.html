@@ -1,0 +1,14 @@
+<table class="table mb-4">
+  <thead class="thead-inverse table-header">
+    <tr>
+      <th *ngFor="let col of tableCols">{{ col.label }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of data">
+      <td *ngFor="let col of tableCols">
+        {{ item[col.name]?.mnemonique || item[col.name] }}
+      </td>
+    </tr>
+  </tbody>
+</table>

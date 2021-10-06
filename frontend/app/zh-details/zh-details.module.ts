@@ -12,6 +12,7 @@ import { FonctionsComponent } from "./fonctions/fonctions.component";
 import { RenseignementsComponent } from "./renseignements/renseignements.component";
 import { StatutsComponent } from "./statuts/statuts.component";
 import { CollapseComponent } from "../commonComponents/collapse/collapse.component";
+import { TableComponent } from "../commonComponents/table/table.component";
 
 // my module routing
 const routes: Routes = [
@@ -29,6 +30,7 @@ const routes: Routes = [
     RenseignementsComponent,
     StatutsComponent,
     CollapseComponent,
+    TableComponent,
   ],
   imports: [GN2CommonModule, CommonModule, RouterModule.forChild(routes)],
 })
