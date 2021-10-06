@@ -133,6 +133,54 @@ class Card(ZH):
                     "label": "Remarque",
                     "value": self.__properties['remark_lim_fs'],
                     "group": "crit2"
+                },
+                {
+                    "name": "typo_sdage",
+                    "label": "Typologie SDAGE",
+                    "value": self.get_mnemo(self.__properties['id_sdage']),
+                    "group": "presentation"
+                },
+                {
+                    "name": "typo_locale",
+                    "label": "Typologie locale",
+                    "value": self.get_mnemo(self.__properties['id_sage']),
+                    "group": "presentation"
+                },
+                {
+                    "name": "corine_biotope",
+                    "label": "Corine Biotope",
+                    "value": self.get_cb(self.__properties['cb_codes_corine_biotope']),
+                    "group": "presentation"
+                },
+                {
+                    "name": "remark_pres",
+                    "label": "Remarques",
+                    "value": self.__properties['remark_pres'],
+                    "group": "presentation"
+                },
+                {
+                    "name": "occupation",
+                    "label": "Occupation des sols",
+                    "value": self.get_mnemo(self.__properties['id_corine_landcovers']),
+                    "group": "description"
+                },
+                {
+                    "name": "activities",
+                    "label": "Activités",
+                    "value": self.get_activities(self.__properties['activities']),
+                    "group": "usage"
+                },
+                {
+                    "name": "thread",
+                    "label": "Evaluation globale des menaces potentielles ou avérées",
+                    "value": self.get_mnemo(self.__properties['id_thread']),
+                    "group": "usage"
+                },
+                {
+                    "name": "remark_usage",
+                    "label": "Remarques",
+                    "value": self.__properties['global_remark_activity'],
+                    "group": "usage"
                 }
             ],
             "tabs": [
@@ -195,6 +243,21 @@ class Card(ZH):
                     "name": "crit2",
                     "label": "Critère de délimitation de l'espace de fonctionnalité",
                     "tab": "tab2"
+                },
+                {
+                    "name": "presentation",
+                    "label": "Présentation de la zone humide et de ses milieux",
+                    "tab": "tab3"
+                },
+                {
+                    "name": "description",
+                    "label": "Description de l'espace de fonctionnalité",
+                    "tab": "tab3"
+                },
+                {
+                    "name": "usage",
+                    "label": "Usage et processus naturels",
+                    "tab": "tab3"
                 }
             ],
             "geometry": ZH(self.id_zh).__repr__()["geometry"]
