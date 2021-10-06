@@ -11,7 +11,8 @@ from sqlalchemy.sql.expression import delete
 
 from geonature.utils.env import DB
 
-from .models import *
+from .model.zh_schema import *
+from .model.code import Code
 
 from pypnnomenclature.models import (
     TNomenclatures
@@ -23,7 +24,6 @@ import pdb
 
 
 def update_tzh(data):
-
     zh = DB.session.query(TZH).filter_by(id_zh=data['id_zh']).first()
     for key, val in data.items():
         if hasattr(TZH, key) and key != 'id_zh':
@@ -71,12 +71,7 @@ def create_zh(form_data, info_role, zh_date, polygon):
 
     # create zh code
     code = Code(new_zh.id_zh, new_zh.id_org, new_zh.geom)
-    if code.is_valid_number:
-        new_zh.code = str(code)
-    else:
-        return {
-            "code error": "zh_number_greater_than_9999"
-        }, 500
+    new_zh.code = code.__repr__()
 
     DB.session.flush()
     return new_zh.id_zh

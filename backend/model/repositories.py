@@ -10,7 +10,7 @@ from geonature.utils.env import DB
 from geonature.core.gn_commons.models import VLatestValidations
 from geonature.utils.errors import GeonatureApiError
 
-from .models import (
+from .zh_schema import (
     TZH
 )
 from geonature.core.gn_meta.models import TDatasets, CorDatasetActor
@@ -41,5 +41,3 @@ class ZhRepository:
             DB.session.commit()
             return zh
         raise NotFound('The zh "{}" does not exist'.format(id_zh))
-
-

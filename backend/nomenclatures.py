@@ -1,4 +1,4 @@
-from .models import (
+from .model.zh_schema import (
     Nomenclatures,
     CorSdageSage,
     BibCb,
