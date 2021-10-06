@@ -181,6 +181,54 @@ class Card(ZH):
                     "label": "Remarques",
                     "value": self.__properties['global_remark_activity'],
                     "group": "usage"
+                },
+                {
+                    "name": "inflow",
+                    "label": "Entrée d'eau",
+                    "value": self.get_flows(self.__properties['flows'], type="inflows"),
+                    "group": "regime"
+                },
+                {
+                    "name": "outflow",
+                    "label": "Sortie d'eau",
+                    "value": self.get_flows(self.__properties['flows'], type="outflows"),
+                    "group": "regime"
+                },
+                {
+                    "name": "submersion_freq",
+                    "label": "Submersion fréquence",
+                    "value": self.get_mnemo(self.__properties['id_frequency']),
+                    "group": "regime"
+                },
+                {
+                    "name": "submersion_spread",
+                    "label": "Submersion étendue",
+                    "value": self.get_mnemo(self.__properties['id_spread']),
+                    "group": "regime"
+                },
+                {
+                    "name": "connexion",
+                    "label": None,
+                    "value": self.get_mnemo(self.__properties['id_connexion']),
+                    "group": "connexion"
+                },
+                {
+                    "name": "hyrdo_diag",
+                    "label": "Fonctionnalité hydrologique / biogéochimique",
+                    "value": self.get_mnemo(self.__properties['id_connexion']),
+                    "group": "diagnostic"
+                },
+                {
+                    "name": "bio_diag",
+                    "label": "Fonctionnalité biologique / écologique",
+                    "value": self.get_mnemo(self.__properties['id_diag_bio']),
+                    "group": "diagnostic"
+                },
+                {
+                    "name": "commentaires",
+                    "label": "Commentaires",
+                    "value": self.__properties['remark_diag'],
+                    "group": "diagnostic"
                 }
             ],
             "tabs": [
@@ -258,6 +306,21 @@ class Card(ZH):
                     "name": "usage",
                     "label": "Usage et processus naturels",
                     "tab": "tab3"
+                },
+                {
+                    "name": "regime",
+                    "label": "Régime hydrique",
+                    "tab": "tab4"
+                },
+                {
+                    "name": "connexion",
+                    "label": "Connexion de la zone humide dans son environnement",
+                    "tab": "tab4"
+                },
+                {
+                    "name": "diagnostic",
+                    "label": "Diagnostic fonctionnel",
+                    "tab": "tab4"
                 }
             ],
             "geometry": ZH(self.id_zh).__repr__()["geometry"]
