@@ -14,135 +14,191 @@ class Card(ZH):
     def __init__(self, id_zh, type):
         self.id_zh = id_zh
         self.type = type
+        self.__properties = self.get_properties()
+        self.__eval = self.get_eval()
+
+    def get_properties(self):
+        return ZH(self.id_zh).__repr__()['properties']
+
+    def get_eval(self):
+        return ZH(self.id_zh).get_eval()
 
     def __repr__(self):
-
-        full_zh = ZH(self.id_zh).__repr__()
-        eval = ZH(self.id_zh).get_eval()
-        card = {}
-
-        identification = {
-            "Nom usuel de la zone humide": full_zh.properties['main_name'],
-            "Autre nom": full_zh.properties['secondary_name'],
-            "Partie d'un ensemble": self.get_bool(full_zh.properties['is_id_site_space']),
-            **({"Nom du grand ensemble": TZH.get_site_space_name(full_zh.properties['id_site_space'])} if full_zh.properties['is_id_site_space'] and full_zh.properties['id_site_space'] else {}),
-            "Code de la zone humide": full_zh.properties['code']
+        return {
+            "data": [
+                {
+                    "name": "name",
+                    "label": "Nom usuel de la zone humide",
+                    "value": self.__properties['main_name'],
+                    "group": "identification"
+                },
+                {
+                    "name": "other_name",
+                    "label": "Autre nom",
+                    "value": self.__properties['secondary_name'],
+                    "group": "identification"
+                },
+                {
+                    "name": "is_site_space",
+                    "label": "Partie d'un ensemble",
+                    "value": self.get_bool(self.__properties['is_id_site_space']),
+                    "group": "identification"
+                },
+                {
+                    "name": "site_space",
+                    "label": "Nom du grand ensemble",
+                    "value": TZH.get_site_space_name(self.__properties['id_site_space']) if self.__properties['is_id_site_space'] and self.__properties['id_site_space'] else "Ne fait pas partie d'un grand ensemble",
+                    "group": "identification"
+                },
+                {
+                    "name": "code",
+                    "label": "Code de la zone humide",
+                    "value": self.__properties['code'],
+                    "group": "identification"
+                },
+                {
+                    "name": "river_basin",
+                    "label": "Bassin versant",
+                    "value": self.get_river_basin(),
+                    "group": "identification"
+                },
+                {
+                    "name": "region",
+                    "label": "Région",
+                    "value": self.__properties['geo_info']['regions'],
+                    "group": "localisation"
+                },
+                {
+                    "name": "department",
+                    "label": "Département",
+                    "value": self.__properties['geo_info']['departments'],
+                    "group": "localisation"
+                },
+                {
+                    "name": "municipality",
+                    "label": "Commune",
+                    "value": self.get_communes_info(),
+                    "group": "localisation"
+                },
+                {
+                    "name": "author",
+                    "label": "Auteur de la fiche",
+                    "value": self.get_author(),
+                    "group": "author"
+                },
+                {
+                    "name": "author_edition",
+                    "label": "Auteur des dernières modifications",
+                    "value": self.get_author(type='co-author'),
+                    "group": "author"
+                },
+                {
+                    "name": "date",
+                    "label": "Date d'établissement",
+                    "value": datetime.strptime(self.__properties['create_date'], '%Y-%m-%d %H:%M:%S').date().strftime("%d/%m/%Y"),
+                    "group": "author"
+                },
+                {
+                    "name": "date_edition",
+                    "label": "Date des dernières modifications",
+                    "value": datetime.strptime(self.__properties['update_date'], '%Y-%m-%d %H:%M:%S.%f').date().strftime("%d/%m/%Y"),
+                    "group": "author"
+                },
+                {
+                    "name": "references",
+                    "label": None,
+                    "value": self.get_references(self.__properties['id_references']),
+                    "group": "references"
+                },
+                {
+                    "name": "used_crit1",
+                    "label": "Critères utilisés",
+                    "value": self.get_mnemo(self.__properties['id_lims']),
+                    "group": "crit1"
+                },
+                {
+                    "name": "remark_crit1",
+                    "label": "Remarque",
+                    "value": self.__properties['remark_lim'],
+                    "group": "crit1"
+                },
+                {
+                    "name": "used_crit2",
+                    "label": "Critères utilisés",
+                    "value": self.get_mnemo(self.__properties['id_lims_fs']),
+                    "group": "crit2"
+                },
+                {
+                    "name": "remark_crit2",
+                    "label": "Remarque",
+                    "value": self.__properties['remark_lim_fs'],
+                    "group": "crit2"
+                }
+            ],
+            "tabs": [
+                {
+                    "name": "tab1",
+                    "label": "1- Renseignements généraux"
+                },
+                {
+                    "name": "tab2",
+                    "label": "2- Délimitation de la zone humide et de l'espace de fonctionnalité"
+                },
+                {
+                    "name": "tab3",
+                    "label": "3- Description du bassin versant et de la zone humide"
+                },
+                {
+                    "name": "tab4",
+                    "label": "4- Fonctionnement de la zone humide"
+                },
+                {
+                    "name": "tab5",
+                    "label": "5- Fonctions écologiques, valeurs socio-écologiques, intérêt patrimonial"
+                },
+                {
+                    "name": "tab6",
+                    "label": "6- Statuts et gestion de la zone humide"
+                },
+                {
+                    "name": "tab7",
+                    "label": "7- Evaluation générale du site"
+                }
+            ],
+            "groups": [
+                {
+                    "name": "identification",
+                    "label": "Identification de la zone humide",
+                    "tab": "tab1"
+                },
+                {
+                    "name": "localisation",
+                    "label": "Localisation de la zone humide",
+                    "tab": "tab1"
+                },
+                {
+                    "name": "author",
+                    "label": "Auteur",
+                    "tab": "tab1"
+                },
+                {
+                    "name": "references",
+                    "label": "Principales références bibliographiques",
+                    "tab": "tab1"
+                },
+                {
+                    "name": "crit1",
+                    "label": "Critères de délimitation de la zone humide",
+                    "tab": "tab2"
+                },
+                {
+                    "name": "crit2",
+                    "label": "Critère de délimitation de l'espace de fonctionnalité",
+                    "tab": "tab2"
+                }
+            ],
+            "geometry": ZH(self.id_zh).__repr__()["geometry"]
         }
-
-        localisation = {
-            "Région": full_zh.properties['geo_info']['regions'],
-            "Département": full_zh.properties['geo_info']['departments'],
-            "Commune": self.get_communes_info()
-        }
-
-        auteur = {
-            "Auteur de la fiche": self.get_author(full_zh.properties['id_zh']),
-            "Auteur des dernières modifications": self.get_author(full_zh.properties['id_zh'], type='co-author'),
-            "Date d'établissement": datetime.strptime(full_zh.properties['create_date'], '%Y-%m-%d %H:%M:%S').date().strftime("%d/%m/%Y"),
-            "Date des dernières modifications": datetime.strptime(full_zh.properties['update_date'], '%Y-%m-%d %H:%M:%S.%f').date().strftime("%d/%m/%Y")
-        }
-
-        references = self.get_references(full_zh.properties['id_references'])
-
-        card.update({
-            "1- Renseignements généraux": {
-                "1.1- Identification de la zone humide": {
-                    "Identification": identification,
-                    "Localisation de la zone humide": localisation
-                },
-                "1.2- Auteur": auteur,
-                "1.4- Principales références bibliographiques": references
-            },
-            "2- Délimitation de la zone humide et de l'espace de fonctionnalité": {
-                "2.1- Critères de délimitation de la zone humide": {
-                    "Critères utilisés": self.get_mnemo(full_zh.properties['id_lims']),
-                    "Remarque": full_zh.properties['remark_lim']
-                },
-                "2.2- Critère de délimitation de l'espace de fonctionnalité": {
-                    "Critères utilisés": self.get_mnemo(full_zh.properties['id_lims_fs']),
-                    "Remarque": full_zh.properties['remark_lim_fs']
-                }
-            },
-            "3- Description du bassin versant et de la zone humide": {
-                "3.2- Présentation de la zone humide et de ses milieux": {
-                    "Typologie SDAGE": self.get_mnemo(full_zh.properties['id_sdage']),
-                    "Typologie locale": self.get_mnemo(full_zh.properties['id_sage']),
-                    "Corine Biotope": self.get_cb(full_zh.properties['cb_codes_corine_biotope']),
-                    "Remarques": full_zh.properties['remark_pres']
-                },
-                "3.3- Description de l'espace de fonctionnalité": {
-                    "Occupation des sols": self.get_mnemo(full_zh.properties['id_corine_landcovers'])
-                },
-                "3.4- Usage et processus naturels": {
-                    "Activités": self.get_activities(full_zh.properties['activities']),
-                    "Evaluation globale des menaces potentielles ou avérées": self.get_mnemo(full_zh.properties['id_thread']),
-                    "Remarques": full_zh.properties['global_remark_activity']
-                }
-            },
-            "4- Fonctionnement de la zone humide": {
-                "4.1- Régime hydrique": {
-                    "Entrée d'eau": self.get_flows(full_zh.properties['flows'], type="inflows"),
-                    "Sortie d'eau": self.get_flows(full_zh.properties['flows'], type="outflows"),
-                    "Submersion fréquence": self.get_mnemo(full_zh.properties['id_frequency']),
-                    "Submersion étendue": self.get_mnemo(full_zh.properties['id_spread']),
-                },
-                "4.2- Connexion de la zone humide dans son environnement": self.get_mnemo(full_zh.properties['id_connexion']),
-                "4.3- Diagnostic fonctionnel": {
-                    "Fonctionnalité hydrologique / biogéochimique": self.get_mnemo(full_zh.properties['id_diag_hydro']),
-                    "Fonctionnalité biologique / écologique": self.get_mnemo(full_zh.properties['id_diag_bio']),
-                    "Commentaires": full_zh.properties['remark_diag']
-                }
-            },
-            "5- Fonctions écologiques, valeurs socio-écologiques, intérêt patrimonial": {
-                "5.1- Fonctions hydrologiques / biogéochimiques": self.get_function_info(full_zh.properties['fonctions_hydro'], type="fonctions_hydro"),
-                "5.2- Fonctions biologiques / écologiques": self.get_function_info(full_zh.properties['fonctions_bio'], type="fonctions_bio"),
-                "5.4- Intérêt patrimonial": self.get_function_info(full_zh.properties['interet_patrim'], type="interet_patrim"),
-                "5.4.1- Habitats naturels humides patrimoniaux": {
-                    "Cartographie d'habitats": self.get_bool(full_zh.properties['is_carto_hab']),
-                    "Nombre d'habitats": self.get_int(full_zh.properties['nb_hab']),
-                    "Recouvrement total de la ZH (%)": "Non évalué" if full_zh.properties['total_hab_cover'] == "999" else full_zh.properties['total_hab_cover'],
-                    "Habitats naturels patrimoniaux": self.get_hab_heritages(full_zh.properties['hab_heritages'])
-                },
-                "5.4.2- Faune et flore patrimoniale": {
-                    "Flore - nombre d'espèces": self.get_int(full_zh.properties['nb_flora_sp']),
-                    "Faune - nombre d'espèces de vertébrés": self.get_int(full_zh.properties['nb_vertebrate_sp']),
-                    "Faune - nombre d'espèces d'invertébrés": self.get_int(full_zh.properties['nb_invertebrate_sp'])
-                },
-                "5.3- Valeurs socio-économiques": self.get_function_info(full_zh.properties['val_soc_eco'], type="val_soc_eco")
-            },
-            "6- Statuts et gestion de la zone humide": {
-                "6.1- Régime foncier - statut de propriété": self.get_ownerships_info(full_zh.properties['ownerships']),
-                "6.2- Structure de gestion": self.get_managements_info(full_zh.properties['managements']),
-                "6.3- Instruments contractuels et financiers": self.get_instruments_info(full_zh.properties['instruments']),
-                "6.4- Principaux statuts": self.get_protection_names(full_zh.properties['protections']),
-                "6.5- Zonage des documents d'urbanisme": self.get_urban_doc_info(full_zh.properties['urban_docs'])
-            },
-            "7- Evaluation générale du site": {
-                "7.1- Fonctions et valeurs majeures": {
-                    "Principales fonctions hydrologiques / biogéochimiques": self.get_function_info(eval['fonctions_hydro'], type="fonctions_hydro"),
-                    "Principales fonctions biologiques / écologiques": self.get_function_info(eval['fonctions_bio'], type="fonctions_bio")
-                },
-                "7.2- Intérêt patrimonial majeur": {
-                    "Intérêts patrimoniaux": self.get_function_info(eval['interet_patrim'], type="interet_patrim"),
-                    "Nombre d'espèces faunistiques": self.get_int(full_zh.properties['nb_vertebrate_sp']) + self.get_int(full_zh.properties['nb_invertebrate_sp']),
-                    "Nombre d'espèces floristiques": self.get_int(full_zh.properties['nb_flora_sp']),
-                    "Nombre d'habitats humides patrimoniaux": self.get_int(full_zh.properties['nb_hab']),
-                    "Recouvrement total de la ZH (%)": self.get_int(int(full_zh.properties['total_hab_cover'])),
-                    "Commentaire": full_zh.properties['remark_eval_heritage']
-                },
-                "7.3- Bilan des menaces et des facteurs infuançant la zone humide": {
-                    "Evaluation globale des menaces potentielles ou avérées": self.get_mnemo(full_zh.properties['id_thread']),
-                    "Fonctionnalité hydrologique / biogéochimique": self.get_mnemo(full_zh.properties['id_diag_hydro']),
-                    "Fonctionnalité biologique / écologique (habitats / faune / flore)": self.get_mnemo(full_zh.properties['id_diag_bio']),
-                    "Commentaire": full_zh.properties['remark_eval_thread']
-                },
-                "7.4- Stratégie de gestion et orientations d'actions": {
-                    "Propositions d'actions": self.get_actions_info(full_zh.properties['actions']),
-                    "Commentaires": full_zh.properties['remark_eval_actions']
-                }
-            }
-        })
-        return card
 
     def get_bool(self, bool):
         if bool:
@@ -168,17 +224,24 @@ class Card(ZH):
             } for commune in CorZhArea.get_municipalities_info(self.id_zh)
         ]
 
-    def get_author(self, id_zh, type='author'):
+    def get_river_basin(self):
+        return [
+            DB.session.query(TRiverBasin)
+            .filter(TRiverBasin.id_rb == id).one().name
+            for id in [rb.id_rb for rb in DB.session.query(CorZhRb).filter(CorZhRb.id_zh == self.id_zh).all()]
+        ]
+
+    def get_author(self, type='author'):
         if type == 'author':
             prenom = DB.session.query(TZH).filter(
-                TZH.id_zh == id_zh).one().authors.prenom_role
+                TZH.id_zh == self.id_zh).one().authors.prenom_role
             nom = DB.session.query(TZH).filter(
-                TZH.id_zh == id_zh).one().authors.nom_role
+                TZH.id_zh == self.id_zh).one().authors.nom_role
         else:
             prenom = DB.session.query(TZH).filter(
-                TZH.id_zh == id_zh).one().coauthors.prenom_role
+                TZH.id_zh == self.id_zh).one().coauthors.prenom_role
             nom = DB.session.query(TZH).filter(
-                TZH.id_zh == id_zh).one().coauthors.nom_role
+                TZH.id_zh == self.id_zh).one().coauthors.nom_role
         return prenom + ' ' + nom.upper()
 
     def get_references(self, ref_list):

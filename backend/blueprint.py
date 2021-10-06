@@ -176,20 +176,6 @@ def get_complete_info(id_zh, info_role):
         raise ZHApiError(message=str(e), details=str(e))
 
 
-@blueprint.route("/<int:id_zh>/summary", methods=["GET"])
-@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
-@json_resp
-def get_complete_info(id_zh, info_role):
-    """Get zh summary card
-    """
-    try:
-        return Card(id_zh, "summary").__repr__()
-    except Exception as e:
-        if e.__class__.__name__ == 'NoResultFound':
-            raise ZHApiError(message='zh id exist?', details=str(e))
-        raise ZHApiError(message=str(e), details=str(e))
-
-
 @blueprint.route("/eval/<int:id_zh>", methods=["GET"])
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
