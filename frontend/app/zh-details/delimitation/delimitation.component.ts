@@ -1,4 +1,5 @@
 import { Component, Input } from "@angular/core";
+import { DelimitationModel } from "../models/delimitation.model";
 
 @Component({
   selector: "zh-details-delimitation",
@@ -6,5 +7,5 @@ import { Component, Input } from "@angular/core";
   styleUrls: ["./delimitation.component.scss"],
 })
 export class DelimitationComponent {
-  @Input() data;
+  @Input() data: DelimitationModel;
 }

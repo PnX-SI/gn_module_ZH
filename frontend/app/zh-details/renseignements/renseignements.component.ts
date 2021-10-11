@@ -1,5 +1,6 @@
 import { Component, Input } from "@angular/core";
 import { TableColumn } from "../../commonComponents/table/table-interface";
+import { RenseignementsGenerauxModel } from "../models/renseignements.model";
 
 @Component({
   selector: "zh-details-renseignements",
@@ -7,7 +8,7 @@ import { TableColumn } from "../../commonComponents/table/table-interface";
   styleUrls: ["./renseignements.component.scss"],
 })
 export class RenseignementsComponent {
-  @Input() data;
+  @Input() data: RenseignementsGenerauxModel;
 
   biblioTableCols: TableColumn[] = [
     { name: "docTitle", label: "Titre du document" },

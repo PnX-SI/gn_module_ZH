@@ -3,11 +3,12 @@
     <pnx-geojson [geojson]="this.validBbox" [zoomOnFirstTime]="true">
     </pnx-geojson>
   </pnx-map>
-  <collapse title="Renseignements généraux" expanded="true"
+  <collapse title="Renseignements généraux" [expanded]="true"
     ><zh-details-renseignements></zh-details-renseignements
   ></collapse>
   <collapse
     title="Délimitation de la zone humide et de l’espace de fonctionnalité"
+    [expanded]="true"
     ><zh-details-delimitation></zh-details-delimitation
   ></collapse>
   <collapse title="Description du bassin versant et de la zone humide"

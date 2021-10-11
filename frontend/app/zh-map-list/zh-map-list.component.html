@@ -64,6 +64,17 @@
           (select)="mapListService.onRowSelect($event)"
           (sort)="onColumnSort($event)"
         >
+          <!-- DATA COLUMNS -->
+          <ng-container *ngFor="let col of mapListService.displayColumns">
+            <ngx-datatable-column
+              [ngSwitch]="col.prop"
+              [maxWidth]="col.max_width"
+              [prop]="col.prop"
+              [name]="col.name"
+              [sortable]="true"
+            >
+            </ngx-datatable-column>
+          </ng-container>
           <!-- ACTION COLUMNS -->
           <ngx-datatable-column maxWidth="10">
             <ng-template let-row="row" ngx-datatable-cell-template>
@@ -73,7 +84,7 @@
                   [routerLink]="['forms', row.id_zh]"
                 >
                   <i
-                    matTooltip="{{ 'Editer la ' }} {{ row.main_name }}"
+                    matTooltip="{{ 'Editer la ' }}"
                     class="fa fa-pencil-square-o"
                     aria-hidden="true"
                   ></i>
@@ -89,7 +100,7 @@
                   [routerLink]="['zhDetails', row.id_zh]"
                 >
                   <i
-                    matTooltip="{{ 'Info' }} {{ row.main_name }}"
+                    matTooltip="{{ 'Info' }}"
                     class="fa fa-info-circle"
                     aria-hidden="true"
                   ></i>
@@ -102,7 +113,7 @@
                 >
                   <i
                     class="fa fa-info-circle disabled"
-                    matTooltip="{{ 'Info' }} {{ row.main_name }}"
+                    matTooltip="{{ 'Info' }}"
                     aria-hidden="true"
                   ></i>
                 </button>
@@ -119,24 +130,13 @@
                 <i
                   [ngClass]="{ disabled: !row.rights.D }"
                   #iElement
-                  matTooltip="{{ 'Supprimer la ' }} {{ row.main_name }}"
+                  matTooltip="{{ 'Supprimer la ' }}"
                   class="fa fa-trash-o"
                   aria-hidden="true"
                 ></i>
               </button>
             </ng-template>
           </ngx-datatable-column>
-          <!-- DATA COLUMNS -->
-          <ng-container *ngFor="let col of mapListService.displayColumns">
-            <ngx-datatable-column
-              [ngSwitch]="col.prop"
-              [maxWidth]="col.max_width"
-              [prop]="col.prop"
-              [name]="col.name"
-              [sortable]="true"
-            >
-            </ngx-datatable-column>
-          </ng-container>
         </ngx-datatable>
       </div>
     </div>

@@ -1,18 +1,25 @@
 export interface FonctionnementModel {
-  "4.1- Régime hydrique": Regime;
-  "4.2- Connexion de la zone humide dans son environnement": string;
-  "4.3- Diagnostic fonctionnel": Diagnostic;
+  regime: Regime;
+  connexion: string;
+  diagnostic: Diagnostic;
 }
 
 interface Regime {
-  "Entrée d'eau": string;
-  "Sortie d'eau": string;
-  "Submersion fréquence": string;
-  "Submersion étendue": string;
+  entree: EntreeSortie[];
+  sortie: EntreeSortie[];
+  frequence: string;
+  etendue: string;
+  // origine: string;
+}
+
+interface EntreeSortie {
+  type: string;
+  permanence: string;
+  toponymie: string;
 }
 
 interface Diagnostic {
-  "Fonctionnalité hydrologique / biogéochimique": string;
-  "Fonctionnalité biologique / écologique": string;
-  Commentaires: null | string;
+  hydrologique: string;
+  biologique: string;
+  commentaires: null | string;
 }

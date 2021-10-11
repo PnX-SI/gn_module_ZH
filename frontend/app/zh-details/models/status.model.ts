@@ -1,7 +1,32 @@
 export interface StatutsModel {
-  "6.1- Régime foncier - statut de propriété": string;
-  "6.2- Structure de gestion": string;
-  "6.3- Instruments contractuels et financiers": string;
-  "6.4- Principaux statuts": [string];
-  "6.5- Zonage des documents d'urbanisme": string;
+  regime: Regime[];
+  structure: Structure[];
+  instruments: Instrument[];
+  autre_invetaire: string; //boolean
+  statuts: string[];
+  zonage: Zonage[];
+}
+
+interface Regime {
+  status: string;
+  remarques: string;
+}
+interface Structure {
+  structure: string;
+  plans: Plan[];
+}
+interface Plan {
+  plan: string;
+  date: string;
+  duree: string;
+}
+interface Instrument {
+  instrument: string;
+  date: string;
+}
+interface Zonage {
+  commune: string;
+  type_doc: string;
+  type_classement: string[];
+  remarque: string;
 }

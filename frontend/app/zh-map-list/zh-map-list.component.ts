@@ -31,6 +31,7 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
   public rowPerPage: number;
   public cardContentHeight: number;
   public moduleSub: Subscription;
+  private metaData: any;
 
   constructor(
     public mapListService: MapListService,
@@ -149,6 +150,16 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     return moment(element).format("DD-MM-YYYY");
   }
 
+  displaySdageName(element) {
+    if (!this.metaData)
+      this._zhService.getMetaDataForms().subscribe((data: any) => {
+        this.metaData = data;
+        console.log("ddd", this.metaData);
+      });
+
+    return element;
+  }
+
   zhCustomCallBack(feature): any {
     // set Author name
     feature["properties"]["author"] = this.displayAuthorName(
@@ -158,6 +169,12 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     feature["properties"]["create_date"] = this.displayDate(
       feature["properties"]["create_date"]
     );
+
+    feature["properties"]["sdage"] = this.displaySdageName(
+      feature["properties"]["id_sdage"]
+    );
+    console.log("feature", feature);
+
     return feature;
   }
 

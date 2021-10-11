@@ -1,22 +1,35 @@
 export interface DescriptionModel {
-  "3.2- Présentation de la zone humide et de ses milieux": Presentation;
-  "3.3- Description de l'espace de fonctionnalité": Espace;
-  "3.4- Usage et processus naturels": Usage;
+  presentation: Presentation;
+  espace: Espace;
+  usage: Usage;
 }
 
 interface Presentation {
-  "Typologie SDAGE": string;
-  "Typologie locale": string;
-  "Corine Biotope": string;
-  Remarques: null | string;
+  sdage: string;
+  typologie_locale: string;
+  corine_biotope: Corine[];
+  remarques: null | string;
 }
 
 interface Espace {
-  "Occupation des sols": string;
+  ocupation: string[];
 }
 
 interface Usage {
-  Activités: string;
-  "Evaluation globale des menaces potentielles ou avérées": string;
+  activities: Activities[];
+  evaluation_menaces: string;
   Remarques: null | string;
+}
+
+interface Corine {
+  code: string;
+  label: string;
+  Humidité: string;
+}
+
+interface Activities {
+  activite: string;
+  impacts: string[];
+  localisation: string;
+  remarques: string;
 }

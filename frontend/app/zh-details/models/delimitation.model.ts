@@ -1,9 +1,9 @@
 export interface DelimitationModel {
-  "2.1- Critères de délimitation de la zone humide": Criteres;
-  "2.2- Critère de délimitation de l'espace de fonctionnalité": Criteres;
+  delitmitation_zone: Criteres;
+  delimitation_fonctions: Criteres;
 }
 
 interface Criteres {
-  "Critères utilisés": string[];
-  Remarque: null | string;
+  critere: string[];
+  remarque: null | string;
 }

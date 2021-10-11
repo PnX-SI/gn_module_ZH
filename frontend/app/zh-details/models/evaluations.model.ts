@@ -1,16 +1,15 @@
-export interface EvaluationModel {
-  "7.1- Fonctions et valeurs majeures": FonctionsEtValeursMajeures;
-  "7.2- Intérêt patrimonial majeur": InteretPatrimonialMajeur;
+// TODO importer des interfaces déjà faites ailleurs
 
-  "7.3- Bilan des menaces et des facteurs infuançant la zone humide": BilanMenaces;
-  "7.4- Stratégie de gestion et orientations d'actions": Strategie;
+export interface EvaluationModel {
+  fonctions: FonctionsEtValeursMajeures;
+  interet: InteretPatrimonialMajeur;
+  bilan: BilanMenaces;
+  strategie: Strategie;
 }
 
 interface FonctionsEtValeursMajeures {
-  "Principales fonctions hydrologiques / biogéochimiques": [
-    HydrologiquesBiogeochimiques
-  ];
-  "Principales fonctions biologiques / écologiques": [BiologiquesEcologiques];
+  hydrologique: HydrologiquesBiogeochimiques[];
+  biologique: BiologiquesEcologiques[];
 }
 
 interface HydrologiquesBiogeochimiques {
@@ -28,9 +27,9 @@ interface BiologiquesEcologiques {
 }
 
 interface InteretPatrimonialMajeur {
-  "Intérêts patrimoniaux": InteretsPatrimoniaux;
-  "Nombre d'espèces faunistiques": number;
-  "Nombre d'espèces floristiques": number;
+  interet: InteretsPatrimoniaux;
+  faunistique: number;
+  floristique: number;
   "Nombre d'habitats humides patrimoniaux": number;
   "Recouvrement total de la ZH (%)": number;
   Commentaire: null | string;

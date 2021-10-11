@@ -1,21 +1,34 @@
 export interface FonctionsModel {
-  "5.1- Fonctions hydrologiques / biogéochimiques": string;
-  "5.2- Fonctions biologiques / écologiques": string;
-  "5.3- Valeurs socio-économiques": "Non renseigné";
-  "5.4- Intérêt patrimonial": string;
-  "5.4.1- Habitats naturels humides patrimoniaux": Habitats;
-  "5.4.2- Faune et flore patrimoniale": FauneFlore;
+  hydrologie: Fonction[];
+  biologie: Fonction[];
+  interet: Fonction[];
+  habitats: Habitats;
+  socio: Fonction[];
+}
+
+interface Fonction {
+  type: string;
+  qualification: string;
+  connaissance: string;
+  justifications: string;
 }
 
 interface Habitats {
-  "Cartographie d'habitats": string;
-  "Nombre d'habitats": string;
-  "Recouvrement total de la ZH (%)": string;
-  "Habitats naturels patrimoniaux": string;
+  cartographie: boolean;
+  nombre: string; // number;
+  recouvrement: string; // number;
+  corine: Corine[];
+}
+
+interface Corine {
+  biotope: string;
+  etat: string;
+  cahier: string;
+  recouvrement: string; // number;
 }
 
 interface FauneFlore {
-  "Flore - nombre d'espèces": string;
-  "Faune - nombre d'espèces de vertébrés": string;
-  "Faune - nombre d'espèces d'invertébrés": string;
+  nb_flore: string; // number;
+  nb_vertebre: string; // number;
+  nb_invertebre: string; // number;
 }

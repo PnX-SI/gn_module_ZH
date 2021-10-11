@@ -1,4 +1,51 @@
 <div>
-  <h2>biblio table</h2>
-  <zh-table [tableCols]="biblioTableCols"></zh-table>
+  <div class="row my-3">
+    <div class="col-12 col-xl-4 col-lg-4 col-md-6">
+      <fieldset>
+        <legend>
+          <h5 class="section-title">Identification de la zone Humide</h5>
+        </legend>
+        <p class="label"><b>Nom usuel de la zone humide :</b></p>
+        <p class="label"><b>Autre nom :</b></p>
+        <p class="label"><b>Partie d’un ensemble :</b></p>
+        <p class="label"><b>Nom du grand ensemble :</b></p>
+        <p class="label"><b>Code de la zone humide :</b></p>
+      </fieldset>
+    </div>
+    <div class="col-12 col-xl-4 col-lg-4 col-md-6">
+      <fieldset>
+        <legend>
+          <h5 class="section-title">Localisation de la zone humide</h5>
+        </legend>
+        <p class="label"><b>Région :</b></p>
+        <p class="label"><b>Département:</b></p>
+        <p class="label"><b>Commune :</b></p>
+        <p class="label"><b>Code INSEE :</b></p>
+        <p class="label">
+          <b>Couverture ZH par rapport à surface de la commune :</b>
+        </p>
+      </fieldset>
+    </div>
+    <div class="col-12 col-xl-4 col-lg-4 col-md-6">
+      <fieldset>
+        <legend>
+          <h5 class="section-title">Auteur</h5>
+        </legend>
+        <p class="label"><b>Auteur de la fiche :</b></p>
+        <p class="label"><b>Auteur des dernières modifications :</b></p>
+        <p class="label"><b>Date d’établissement :</b></p>
+        <p class="label"><b>Date des dernières modifications :</b></p>
+      </fieldset>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <fieldset>
+        <legend>
+          <h5 class="section-title">Principales références bibliographiques</h5>
+        </legend>
+        <zh-table [tableCols]="biblioTableCols"></zh-table>
+      </fieldset>
+    </div>
+  </div>
 </div>
