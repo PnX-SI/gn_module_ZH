@@ -1,7 +1,5 @@
 <div class="container-fluid">
-  <h2 class="tabsTitle">
-    Fonctions écologiques, valeurs socio-économiques, interét patrimonial
-  </h2>
+  <h2 class="tabsTitle">Fonctions et valeurs de la zone humide</h2>
   <form>
     <fieldset>
       <legend>
@@ -182,11 +180,7 @@
           </table>
         </div>
       </div>
-    </fieldset>
-    <fieldset>
-      <legend>
-        <h5 class="section-title">Habitats naturels humides patrimoniaux</h5>
-      </legend>
+      <h3 class="sub-title">Habitats naturels humides patrimoniaux</h3>
       <div class="form-row">
         <div class="form-group col-md-4">
           <small style="display: block; margin-bottom: 8px"
@@ -208,7 +202,7 @@
           />
         </div>
         <div class="form-group col-md-4">
-          <small>Recouverement total de la ZH (%)</small>
+          <small>Recouvrement total de la ZH (%)</small>
           <input
             class="form-control"
             [formControl]="formTab5.controls.total_hab_cover"
@@ -216,6 +210,15 @@
             min="0"
             max="100"
           />
+          <small
+            *ngIf="
+              formTab5.controls.total_hab_cover.value &&
+              (formTab5.controls.total_hab_cover.errors?.min ||
+                formTab5.controls.total_hab_cover.errors?.max)
+            "
+            class="error-msg"
+            >La valeur doit être comprise entre 0 et 100
+          </small>
         </div>
       </div>
       <div class="form-row">
@@ -278,11 +281,7 @@
           </table>
         </div>
       </div>
-    </fieldset>
-    <fieldset>
-      <legend>
-        <h5 class="section-title">Faune et flore patrimoniale</h5>
-      </legend>
+      <h3 class="sub-title">Faune et flore patrimoniale</h3>
       <div class="form-row">
         <div class="form-group col-md-4">
           <small>Flore - nombre d'espèces</small>
@@ -915,6 +914,15 @@
             min="0"
             max="100"
           />
+          <small
+            *ngIf="
+              corineBioForm.controls.habCover.value &&
+              (corineBioForm.controls.habCover.errors?.min ||
+                corineBioForm.controls.habCover.errors?.max)
+            "
+            class="error-msg"
+            >La valeur doit être comprise entre 0 et 100
+          </small>
         </div>
       </div>
     </form>

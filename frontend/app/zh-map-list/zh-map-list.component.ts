@@ -82,11 +82,15 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     // FETCH THE DATA
     this.mapListService.refreshUrlQuery();
     this.calculateNbRow();
-    this.mapListService.getData(
-      this.apiEndPoint,
-      [{ param: "limit", value: this.rowPerPage }],
-      this.zhCustomCallBack.bind(this)
-    );
+    this._zhService.getMetaDataForms().subscribe((data: any) => {
+      this.metaData = data;
+      this.mapListService.getData(
+        this.apiEndPoint,
+        [{ param: "limit", value: this.rowPerPage }],
+        this.zhCustomCallBack.bind(this)
+      );
+    });
+
     // end OnInit
   }
 
@@ -150,14 +154,11 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     return moment(element).format("DD-MM-YYYY");
   }
 
-  displaySdageName(element) {
-    if (!this.metaData)
-      this._zhService.getMetaDataForms().subscribe((data: any) => {
-        this.metaData = data;
-        console.log("ddd", this.metaData);
-      });
-
-    return element;
+  displaySdageName(sdageID) {
+    const sdage = this.metaData["SDAGE"].find((item: any) => {
+      return item.id_nomenclature == sdageID;
+    });
+    return sdage.mnemonique;
   }
 
   zhCustomCallBack(feature): any {

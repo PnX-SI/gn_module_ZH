@@ -102,7 +102,10 @@ export class ZhFormTab5Component implements OnInit {
     this.formTab5 = this.fb.group({
       is_carto_hab: false,
       nb_hab: null,
-      total_hab_cover: null,
+      total_hab_cover: [
+        0,
+        Validators.compose([Validators.min(0), Validators.max(100)]),
+      ],
       nb_flora_sp: null,
       nb_vertebrate_sp: null,
       nb_invertebrate_sp: null,
@@ -136,8 +139,12 @@ export class ZhFormTab5Component implements OnInit {
       corinBio: [null, Validators.required],
       preservationState: [null, Validators.required],
       cahierHab: [{ value: "", disabled: true }, Validators.required],
-      habCover: null,
+      habCover: [
+        0,
+        Validators.compose([Validators.min(0), Validators.max(100)]),
+      ],
     });
+    console.log("this.formTab5", this.formTab5);
   }
 
   // get metaData forms

@@ -153,9 +153,9 @@
       </legend>
 
       <div class="radio-list">
-        <div class="d-flex flex-column align-items-center">
-          <small>Traversée</small>
-          <label class="form-check-label p-3">
+        <div class="d-flex flex-column align-items-center radio-item">
+          <label class="form-check-label p-3" for="inlineRadio1">
+            <small class="radio-label">Traversée</small>
             <img src="external_assets/zones_humides/traversee.svg" alt=""
           /></label>
           <input
@@ -166,9 +166,9 @@
             [value]="728"
           />
         </div>
-        <div class="d-flex flex-column align-items-center">
-          <small>Entrée et sortie</small>
-          <label class="form-check-label p-3">
+        <div class="d-flex flex-column align-items-center radio-item">
+          <label class="form-check-label p-3" for="inlineRadio2">
+            <small class="radio-label">Entrée et sortie</small>
             <img src="external_assets/zones_humides/entree_sortie.svg" alt=""
           /></label>
           <input
@@ -179,9 +179,9 @@
             [value]="729"
           />
         </div>
-        <div class="d-flex flex-column align-items-center">
-          <small>Entrée</small>
-          <label class="form-check-label p-3">
+        <div class="d-flex flex-column align-items-center radio-item">
+          <label class="form-check-label p-3" for="inlineRadio3">
+            <small class="radio-label">Entrée</small>
             <img src="external_assets/zones_humides/entree.svg" alt=""
           /></label>
           <input
@@ -192,9 +192,9 @@
             [value]="730"
           />
         </div>
-        <div class="d-flex flex-column align-items-center">
-          <small>Sortie</small>
-          <label class="form-check-label p-3">
+        <div class="d-flex flex-column align-items-center radio-item">
+          <label class="form-check-label p-3" for="inlineRadio4">
+            <small class="radio-label">Sortie</small>
             <img src="external_assets/zones_humides/sortie.svg" alt=""
           /></label>
           <input
@@ -205,9 +205,9 @@
             [value]="731"
           />
         </div>
-        <div class="d-flex flex-column align-items-center">
-          <small>Passe à coté</small>
-          <label class="form-check-label p-3">
+        <div class="d-flex flex-column align-items-center radio-item">
+          <label class="form-check-label p-3" for="inlineRadio5">
+            <small class="radio-label">Passe à coté</small>
             <img src="external_assets/zones_humides/passe_a_cote.svg" alt=""
           /></label>
           <input
@@ -218,9 +218,9 @@
             [value]="732"
           />
         </div>
-        <div class="d-flex flex-column align-items-center">
-          <small>Aucunne connexion</small>
-          <label class="form-check-label p-3">
+        <div class="d-flex flex-column align-items-center radio-item">
+          <label class="form-check-label p-3" for="inlineRadio6">
+            <small class="radio-label">Aucune connexion</small>
             <img
               src="external_assets/zones_humides/aucune_connexion.svg"
               alt=""
@@ -241,7 +241,7 @@
       </legend>
       <div class="form-row">
         <div class="form-group col-md-6">
-          <small>Fonctionalité hydrologique</small>
+          <small>Fonctionnalité hydrologique / biogéochimique</small>
           <select
             class="form-control"
             [formControl]="formTab4.controls.diag_hydro"
@@ -256,7 +256,7 @@
           </select>
         </div>
         <div class="form-group col-md-6">
-          <small>Fonctionalité biologique</small>
+          <small>Fonctionnalité biologique / écologique</small>
           <select
             class="form-control"
             [formControl]="formTab4.controls.diag_bio"
