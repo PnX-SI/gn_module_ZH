@@ -198,7 +198,8 @@ class ZH(TZH):
     def get_departments(self):
         return [
             {
-                dep.LAreas.area_code: dep.LAreas.area_name
+                "code": dep.LAreas.area_code,
+                "nom": dep.LAreas.area_name
             } for dep in CorZhArea.get_departments(self.zh.id_zh)
         ]
 
