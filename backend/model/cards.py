@@ -230,23 +230,23 @@ class Regime:
     def __init__(self):
         self.inflows: list(Flow)
         self.outflows: list(Flow)
-        self.frequency: int
-        self.spread: int
+        self.id_frequency: int
+        self.id_spread: int
 
     def __str__(self):
         return {
             "entree": [flow.__str__() for flow in self.inflows],
             "sortie": [flow.__str__() for flow in self.outflows],
-            "etendue": Utils.get_mnemo(self.spread),
-            "frequence": Utils.get_mnemo(self.frequency)
+            "etendue": Utils.get_mnemo(self.id_spread),
+            "frequence": Utils.get_mnemo(self.id_frequency)
         }
 
-    def set_regime(self, flows, frequency, spread):
+    def set_regime(self, flows, id_frequency, id_spread):
         self.inflows = self.__set_flows(flows[1]['inflows'], type='id_inflow')
         self.outflows = self.__set_flows(
             flows[0]['outflows'], type='id_outflow')
-        self.spread = spread
-        self.frequency = frequency
+        self.id_spread = id_spread
+        self.id_frequency = id_frequency
 
     def __set_flows(self, flows, type):
         if flows:
@@ -262,15 +262,15 @@ class Regime:
 
 class Flow:
 
-    def __init__(self, type, permanence, topo):
-        self.type = type
-        self.permanence = permanence
+    def __init__(self, id_flow, id_permanance, topo):
+        self.id_flow = id_flow
+        self.id_permanance = id_permanance
         self.topo = topo
 
     def __str__(self):
         return {
-            "type": Utils.get_mnemo(self.type),
-            "permanence": Utils.get_mnemo(self.permanence),
+            "type": Utils.get_mnemo(self.id_flow),
+            "permanence": Utils.get_mnemo(self.id_permanance),
             "toponymie": Utils.get_string(self.topo)
         }
 
@@ -279,29 +279,29 @@ class Functioning:
 
     def __init__(self):
         self.regime: Regime
-        self.connexion: int
+        self.id_connexion: int
         self.diagnostic: Diagnostic
 
     def __str__(self):
         return {
             "regime": self.regime.__str__(),
-            "connexion": Utils.get_mnemo(self.connexion),
+            "connexion": Utils.get_mnemo(self.id_connexion),
             "diagnostic": self.diagnostic.__str__()
         }
 
 
 class Diagnostic:
 
-    def __init__(self, diag_hydro, diag_bio, comment):
-        self.diag_hydro = diag_hydro
-        self.diag_bio = diag_bio
-        self.comment = comment
+    def __init__(self, id_diag_hydro, id_diag_bio, remark_diag):
+        self.id_diag_hydro = id_diag_hydro
+        self.id_diag_bio = id_diag_bio
+        self.remark_diag = remark_diag
 
     def __str__(self):
         return {
-            "hydrologique": Utils.get_mnemo(self.diag_hydro),
-            "biologique": Utils.get_mnemo(self.diag_bio),
-            "commentaires": Utils.get_string(self.comment)
+            "hydrologique": Utils.get_mnemo(self.id_diag_hydro),
+            "biologique": Utils.get_mnemo(self.id_diag_bio),
+            "commentaires": Utils.get_string(self.remark_diag)
         }
 
 
@@ -592,7 +592,7 @@ class Card(ZH):
         )
 
     def __set_connexion(self):
-        self.functioning.connexion = self.properties['id_connexion']
+        self.functioning.id_connexion = self.properties['id_connexion']
 
     def __set_diagnostic(self):
         self.functioning.diagnostic = Diagnostic(
