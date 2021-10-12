@@ -323,27 +323,73 @@ class Function:
 
 class Taxa:
 
-    def __init__(self, nb_flore, nb_vertebre, nb_invertebre):
-        self.nb_flore = nb_flore
-        self.nb_vertebre = nb_vertebre
-        self.nb_invertebre = nb_invertebre
+    def __init__(self, nb_flora_sp, nb_vertebrate_sp, nb_invertebrate_sp):
+        self.nb_flora_sp = nb_flora_sp
+        self.nb_vertebrate_sp = nb_vertebrate_sp
+        self.nb_invertebrate_sp = nb_invertebrate_sp
 
     def __str__(self):
         return {
-            "nb_flore": Utils.get_int(self.nb_flore),
-            "nb_vertebre": Utils.get_int(self.nb_vertebre),
-            "nb_invertebre": Utils.get_int(self.nb_invertebre)
+            "nb_flore": Utils.get_int(self.nb_flora_sp),
+            "nb_vertebre": Utils.get_int(self.nb_vertebrate_sp),
+            "nb_invertebre": Utils.get_int(self.nb_invertebrate_sp)
         }
 
 
-class ZhFunctions:
+class HabHeritage:
+
+    def __init__(self, id_corine_bio, id_cahier_hab, id_preservation_state, hab_cover):
+        self.id_corine_bio = id_corine_bio
+        self.id_cahier_hab = id_cahier_hab
+        self.id_preservation_state = id_preservation_state
+        self.hab_cover = hab_cover
+
+    def __str__(self):
+        return {
+            "biotope": DB.session.query(Habref).filter(Habref.lb_code == self.id_corine_bio).filter(Habref.cd_typo == 22).one().lb_hab_fr,
+            "etat": Utils.get_mnemo(self.id_preservation_state),
+            "cahier": DB.session.query(Habref).filter(Habref.cd_hab == self.id_cahier_hab).one().lb_hab_fr,
+            "recouvrement": int(self.hab_cover)
+        }
+
+
+class Habs:
+
+    def __init__(self):
+        self.is_carto_hab: bool
+        self.nb_hab: int
+        self.total_hab_cover: int
+        self.hab_heritage: list(HabHeritage)
+
+    def set_hab_heritage(self, habs):
+        if habs:
+            self.hab_heritage = [HabHeritage(
+                hab['id_corine_bio'],
+                hab['id_cahier_hab'],
+                hab['id_preservation_state'],
+                int(hab["hab_cover"])
+            ) for hab in habs
+            ]
+        else:
+            self.hab_heritage = []
+
+    def __str__(self):
+        return {
+            "cartographie": Utils.get_bool(self.is_carto_hab),
+            "nombre": Utils.get_int(self.nb_hab),
+            "recouvrement": Utils.get_int(int(self.total_hab_cover)),
+            "corine": [hab.__str__() for hab in self.hab_heritage]
+        }
+
+
+class Functions:
 
     def __init__(self):
         self.hydro: list(Function)
         self.bio: list(Function)
         self.interest: list(Function)
-        #self.habs = habs
-        #self.taxa = taxa
+        self.habs: Habs
+        self.taxa: Taxa
         self.val_soc_eco: list(Function)
 
     def set_function(self, functions):
@@ -361,8 +407,8 @@ class ZhFunctions:
             "hydrologie": [hydro.__str__() for hydro in self.hydro],
             "biologie": [bio.__str__() for bio in self.bio],
             "interet": [interest.__str__() for interest in self.interest],
-            # "habitats": self.habs,
-            # "taxons": self.taxa,
+            "habitats": self.habs.__str__(),
+            "taxons": self.taxa.__str__(),
             "socio": [val_soc_eco.__str__() for val_soc_eco in self.val_soc_eco]
         }
 
@@ -374,11 +420,10 @@ class Card(ZH):
         self.type = type
         self.properties = self.get_properties()
         self.eval = self.get_eval()
-        self.na_hab_cover = "999"
         self.info = Info()
         self.limits = Limits()
         self.functioning = Functioning()
-        self.functions = ZhFunctions()
+        self.functions = Functions()
         # self.description
         # self.status
         # self.evaluation
@@ -482,12 +527,25 @@ class Card(ZH):
             self.properties['fonctions_bio'])
         self.functions.interest = self.functions.set_function(
             self.properties['interet_patrim'])
+        self.__set_habs()
+        self.__set_taxa()
         self.functions.val_soc_eco = self.functions.set_function(
             self.properties['val_soc_eco'])
         return self.functions.__str__()
 
-    def get_na_hab_cover(self):
-        return self.__na_hab_cover
+    def __set_habs(self):
+        self.functions.habs = Habs()
+        self.functions.habs.is_carto_hab = self.properties['is_carto_hab']
+        self.functions.habs.nb_hab = self.properties['nb_hab']
+        self.functions.habs.total_hab_cover = self.properties['total_hab_cover']
+        self.functions.habs.set_hab_heritage(self.properties['hab_heritages'])
+
+    def __set_taxa(self):
+        self.functions.taxa = Taxa(
+            self.properties['nb_flora_sp'],
+            self.properties['nb_vertebrate_sp'],
+            self.properties['nb_invertebrate_sp']
+        )
 
     def get_activities(self, activities):
         if activities:
@@ -514,19 +572,6 @@ class Card(ZH):
                         "Humidité": cb.BibCb.humidity
                     })
             return cbs_info
-        return "Non renseigné"
-
-    def get_hab_heritages(self, habs):
-        if habs:
-            return [
-                {
-                    "Corine Biotope": DB.session.query(Habref).filter(Habref.lb_code == hab['id_corine_bio']).filter(Habref.cd_typo == 22).one().lb_hab_fr,
-                    "Cahier Habitats": DB.session.query(Habref).filter(Habref.cd_hab == hab['id_cahier_hab']).one().lb_hab_fr,
-                    "Etat de préservation": self.get_mnemo(hab['id_preservation_state']),
-                    "Recouvrement de la ZH (%)": "Non évalué" if hab["hab_cover"] == "999" else hab["hab_cover"]
-                }
-                for hab in habs
-            ]
         return "Non renseigné"
 
     def get_ownerships_info(self, ownerships):

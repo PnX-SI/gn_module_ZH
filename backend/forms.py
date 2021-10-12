@@ -359,8 +359,6 @@ def update_hab_heritages(id_zh, hab_heritages):
 
 def post_hab_heritages(id_zh, hab_heritages):
     for hab_heritage in hab_heritages:
-        if hab_heritage['hab_cover'] is None:
-            hab_heritage['hab_cover'] = '999'
         DB.session.add(THabHeritage(
             id_zh=id_zh,
             id_corine_bio=hab_heritage['id_corine_bio'],
