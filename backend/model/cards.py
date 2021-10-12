@@ -322,12 +322,12 @@ class Taxa:
 
 class ZhFunctions:
 
-    def __init__(self, hydro, bio, interest, habs, taxa, val_soc_eco):
+    def __init__(self, hydro, bio, interest, val_soc_eco):
         self.hydro = hydro
         self.bio = bio
         self.interest = interest
-        self.habs = habs
-        self.taxa = taxa
+        #self.habs = habs
+        #self.taxa = taxa
         self.val_soc_eco = val_soc_eco
 
     def __str__(self):
@@ -335,8 +335,8 @@ class ZhFunctions:
             "hydrologie": self.hydro,
             "biologie": self.bio,
             "interet": self.interest,
-            "habitats": self.habs,
-            "taxa": self.taxa,
+            # "habitats": self.habs,
+            # "taxons": self.taxa,
             "socio": self.val_soc_eco
         }
 
