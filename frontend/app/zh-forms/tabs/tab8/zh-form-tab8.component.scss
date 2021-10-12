@@ -1,0 +1,25 @@
+@import "../../../../app.module";
+select.custom-select option:disabled {
+  color: #d9d9d9;
+}
+.backToLigne {
+  white-space: pre;
+}
+.morePlan {
+  cursor: pointer;
+  user-select: none;
+  vertical-align: sub;
+  font-size: 26px;
+  padding-right: 8px;
+}
+.tr-plans {
+  background-color: #eeeeee !important;
+  padding: 10px 20px;
+}
+.tr-plans {
+  padding: 10px 30px;
+  p {
+    margin-bottom: 4px;
+    margin-left: 2px;
+  }
+}

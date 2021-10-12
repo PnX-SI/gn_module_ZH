@@ -144,7 +144,6 @@ export class ZhFormTab5Component implements OnInit {
         Validators.compose([Validators.min(0), Validators.max(100)]),
       ],
     });
-    console.log("this.formTab5", this.formTab5);
   }
 
   // get metaData forms

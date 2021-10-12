@@ -174,8 +174,6 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     feature["properties"]["sdage"] = this.displaySdageName(
       feature["properties"]["id_sdage"]
     );
-    console.log("feature", feature);
-
     return feature;
   }
 
