@@ -20,7 +20,7 @@ class Utils(ZH):
             if type(ids) is int:
                 return DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == ids).one().label_default
             return [DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == id).one().label_default for id in ids]
-        return "Non renseigné"
+        return []
 
     @staticmethod
     def get_bool(bool):
@@ -32,11 +32,11 @@ class Utils(ZH):
     def get_string(string):
         if string:
             return string
-        return 'Non renseigné'
+        return ''
 
     @staticmethod
     def get_int(nb):
-        return nb if nb is not None else 'Non évalué'
+        return nb  # if nb is not None else 'Non évalué'
 
     @staticmethod
     def is_valid(obj, classe):
@@ -183,7 +183,6 @@ class Author:
                 TZH.id_zh == self.id_zh).one().coauthors.prenom_role
             nom = DB.session.query(TZH).filter(
                 TZH.id_zh == self.id_zh).one().coauthors.nom_role
-
         return prenom + ' ' + nom.upper()
 
 
@@ -202,7 +201,7 @@ class Municipalities:
         }
 
     def __get_cover(self):
-        return str(self.cover) if self.cover is not None else 'Non renseigné'
+        return str(self.cover) if self.cover is not None else ''
 
 
 class Reference:
@@ -236,22 +235,16 @@ class Regime:
 
     def __str__(self):
         return {
-            "entree": self.__str__flows(self.inflows),
-            "sortie": self.__str__flows(self.outflows),
+            "entree": [flow.__str__() for flow in self.inflows],
+            "sortie": [flow.__str__() for flow in self.outflows],
             "etendue": Utils.get_mnemo(self.spread),
             "frequence": Utils.get_mnemo(self.frequency)
         }
 
-    def __str__flows(self, flows):
-        if flows == 'Non renseigné':
-            return flows
-        else:
-            return [flow.__str__() for flow in flows]
-
     def set_regime(self, flows, frequency, spread):
         self.inflows = self.__set_flows(flows[1]['inflows'], type='id_inflow')
         self.outflows = self.__set_flows(
-            flows[0]['outflows'], type='id_inflow')
+            flows[0]['outflows'], type='id_outflow')
         self.spread = spread
         self.frequency = frequency
 
@@ -264,7 +257,7 @@ class Regime:
                     flow['topo']
                 ) for flow in flows
             ]
-        return "Non renseigné"
+        return []
 
 
 class Flow:
@@ -346,13 +339,13 @@ class Taxa:
 
 class ZhFunctions:
 
-    def __init__(self, hydro, bio, interest, val_soc_eco):
-        self.hydro = hydro
-        self.bio = bio
-        self.interest = interest
+    def __init__(self):
+        self.hydro = list(Function)
+        self.bio = list(Function)
+        self.interest = list(Function)
         #self.habs = habs
         #self.taxa = taxa
-        self.val_soc_eco = val_soc_eco
+        self.val_soc_eco = list(Function)
 
     def __str__(self):
         return {
@@ -393,7 +386,7 @@ class Card(ZH):
             "delimitation": self.__set_limits(),
             "description": "",
             "fonctionnement": self.__set_functioning(),
-            "fonctions": self.__set_zh_functions(),
+            "fonctions": "",
             "statuts": "",
             "evaluation": ""
         }
@@ -473,6 +466,7 @@ class Card(ZH):
             self.properties['remark_diag']
         )
 
+    """
     def __set_zh_functions(self):
         hydro = self.__set_functions('fonctions_hydro')
         bio = self.__set_functions('fonctions_bio')
@@ -480,6 +474,7 @@ class Card(ZH):
         val_soc_eco = self.__set_functions('val_soc_eco')
         zh_function = ZhFunctions(hydro, bio, interest, val_soc_eco)
         return zh_function.__str__()
+    """
 
     def __set_functions(self, category):
         return [
