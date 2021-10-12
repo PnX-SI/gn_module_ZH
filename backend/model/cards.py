@@ -224,7 +224,7 @@ class Regime:
         return {
             "entree": self.__get_flows(self.inflows, type='id_inflow'),
             "sortie": self.__get_flows(self.outflows, type='id_outflow'),
-            "frequence": Utils.get_mnemo(self.frequency[0]),
+            "frequence": Utils.get_mnemo(self.frequency),
             "etendue": Utils.get_mnemo(self.spread)
         }
 
@@ -285,6 +285,42 @@ class Diagnostic:
         }
 
 
+class Function:
+
+    def __init__(self, type, qualification, knowledge, justif):
+        self.type = type
+        self.qualification = qualification
+        self.knowledge = knowledge
+        self.justif = justif
+
+    def __str__(self):
+        return {
+            "type": Utils.get_mnemo(self.type),
+            "qualification": Utils.get_mnemo(self.qualification),
+            "connaissance": Utils.get_mnemo(self.knowledge),
+            "justification": Utils.get_string(self.justif)
+        }
+
+
+class ZhFunctions:
+
+    def __init__(self, hydro, bio, interest, val_soc_eco):
+        self.hydro = hydro
+        self.bio = bio
+        self.interest = interest
+        #self.habs: habs
+        self.val_soc_eco = val_soc_eco
+
+    def __str__(self):
+        return {
+            "hydrologie": self.hydro,
+            "biologie": self.bio,
+            "interet": self.interest,
+            # "habitats": self.habs,
+            "socio": self.val_soc_eco
+        }
+
+
 class Card(ZH):
 
     def __init__(self, id_zh, type):
@@ -306,7 +342,7 @@ class Card(ZH):
             "delimitation": self.__get_delimitations(),
             "description": "",
             "fonctionnement": self.__get_functioning(),
-            "fonctions": "",
+            "fonctions": self.__get_zh_functions(),
             "statuts": "",
             "evaluation": ""
         }
@@ -385,6 +421,25 @@ class Card(ZH):
             self.properties['id_diag_bio'],
             self.properties['remark_diag']
         )
+
+    def __get_zh_functions(self):
+        hydro = self.__get_functions('fonctions_hydro')
+        bio = self.__get_functions('fonctions_bio')
+        interest = self.__get_functions('interet_patrim')
+        val_soc_eco = self.__get_functions('val_soc_eco')
+        zh_function = ZhFunctions(hydro, bio, interest, val_soc_eco)
+        return zh_function.__str__()
+
+    def __get_functions(self, category):
+        return [
+            Function(
+                function["id_function"],
+                function["id_qualification"],
+                function["id_knowledge"],
+                function["justification"]
+            ).__str__()
+            for function in self.properties[category]
+        ]
 
     def get_na_hab_cover(self):
         return self.__na_hab_cover
