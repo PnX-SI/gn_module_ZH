@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy.sql.expression import true
+from sqlalchemy.util.langhelpers import dependencies
 
 from geonature.utils.env import DB
 from geonature.core.ref_geo.models import LAreas
@@ -33,11 +34,19 @@ class Utils(ZH):
             return string
         return 'Non renseigné'
 
+    @staticmethod
     def get_int(nb):
         return nb if nb is not None else 'Non évalué'
 
+    @staticmethod
+    def is_valid(obj, classe):
+        if isinstance(obj, classe):
+            return obj
+        else:
+            raise ValueError("{} is not of {} class".format(obj, classe))
 
-class Delimitations:
+
+class Limits:
 
     def __init__(self):
         self.area_limits = Criteria([], None)
@@ -71,23 +80,6 @@ class Criteria:
         }
 
 
-class Info:
-
-    def __init__(self, identification, localisation, authors, references):
-        self.identification = identification
-        self.localisation = localisation
-        self.authors = authors
-        self.references = references
-
-    def __str__(self):
-        return {
-            "identification": self.identification.__str__(),
-            "localisation": self.localisation.__str__(),
-            "auteur": self.authors.__str__(),
-            "references": self.references
-        }
-
-
 class Identification:
 
     def __init__(self, main_name, other_name, is_id_site_space, id_site_space, code):
@@ -108,6 +100,23 @@ class Identification:
 
     def __get_site_space_name(self):
         return TZH.get_site_space_name(self.id_site_space) if self.is_id_site_space and self.id_site_space else "Ne fait pas partie d'un grand ensemble"
+
+
+class Info:
+
+    def __init__(self):
+        self.identification: Identification
+        self.localisation: Localisation
+        self.authors: Author
+        self.references: list[Reference]
+
+    def __str__(self):
+        return {
+            "identification": self.identification.__str__(),
+            "localisation": self.localisation.__str__(),
+            "auteur": self.authors.__str__(),
+            "references": self.references
+        }
 
 
 class Localisation:
@@ -151,10 +160,11 @@ class Author:
         self.id_zh = id_zh
         self.create_date = create_date
         self.update_date = update_date
-        self.create_author = self.__get_author(),
-        self.edit_author = self.__get_author(type='co-author'),
+        self.create_author = self.__get_author()
+        self.edit_author = self.__get_author(type='co-author')
 
     def __str__(self):
+        # pdb.set_trace()
         return {
             "auteur": self.create_author,
             "auteur_modif": self.edit_author,
@@ -173,6 +183,7 @@ class Author:
                 TZH.id_zh == self.id_zh).one().coauthors.prenom_role
             nom = DB.session.query(TZH).filter(
                 TZH.id_zh == self.id_zh).one().coauthors.nom_role
+
         return prenom + ' ' + nom.upper()
 
 
@@ -217,28 +228,41 @@ class Reference:
 
 class Regime:
 
-    def __init__(self, flows, frequency, spread):
-        self.inflows = flows[1]['inflows'],
-        self.outflows = flows[0]['outflows'],
-        self.frequency = frequency,
-        self.spread = spread
+    def __init__(self):
+        self.inflows: list(Flow)
+        self.outflows: list(Flow)
+        self.frequency: int
+        self.spread: int
 
     def __str__(self):
         return {
-            "entree": self.__get_flows(self.inflows, type='id_inflow'),
-            "sortie": self.__get_flows(self.outflows, type='id_outflow'),
-            "frequence": Utils.get_mnemo(self.frequency),
-            "etendue": Utils.get_mnemo(self.spread)
+            "entree": self.__str__flows(self.inflows),
+            "sortie": self.__str__flows(self.outflows),
+            "etendue": Utils.get_mnemo(self.spread),
+            "frequence": Utils.get_mnemo(self.frequency)
         }
 
-    def __get_flows(self, flows, type):
-        if flows[0]:
+    def __str__flows(self, flows):
+        if flows == 'Non renseigné':
+            return flows
+        else:
+            return [flow.__str__() for flow in flows]
+
+    def set_regime(self, flows, frequency, spread):
+        self.inflows = self.__set_flows(flows[1]['inflows'], type='id_inflow')
+        self.outflows = self.__set_flows(
+            flows[0]['outflows'], type='id_inflow')
+        self.spread = spread
+        self.frequency = frequency
+
+    def __set_flows(self, flows, type):
+        if flows:
             return [
                 Flow(
                     flow[type],
                     flow['id_permanance'],
                     flow['topo']
-                ).__str__() for flow in flows[0]
+                ) for flow in flows
             ]
         return "Non renseigné"
 
@@ -260,10 +284,10 @@ class Flow:
 
 class Functioning:
 
-    def __init__(self, regime, connexion, diagnostic):
-        self.regime = regime
-        self.connexion = connexion
-        self.diagnostic = diagnostic
+    def __init__(self):
+        self.regime: Regime
+        self.connexion: int
+        self.diagnostic: Diagnostic
 
     def __str__(self):
         return {
@@ -349,6 +373,13 @@ class Card(ZH):
         self.properties = self.get_properties()
         self.eval = self.get_eval()
         self.na_hab_cover = "999"
+        self.info = Info()
+        self.limits = Limits()
+        self.functioning = Functioning()
+        #self.functions = ZhFunctions()
+        # self.description
+        # self.status
+        # self.evaluation
 
     def get_properties(self):
         return ZH(self.id_zh).__repr__()['properties']
@@ -358,25 +389,24 @@ class Card(ZH):
 
     def __repr__(self):
         return {
-            "renseignements": self.__get_info(),
-            "delimitation": self.__get_delimitations(),
+            "renseignements": self.__set_info(),
+            "delimitation": self.__set_limits(),
             "description": "",
-            "fonctionnement": self.__get_functioning(),
-            "fonctions": self.__get_zh_functions(),
+            "fonctionnement": self.__set_functioning(),
+            "fonctions": self.__set_zh_functions(),
             "statuts": "",
             "evaluation": ""
         }
 
-    def __get_info(self):
-        identification = self.__get_identification()
-        localisation = self.__get_localisation()
-        authors = self.__get_author()
-        references = self.__get_references()
-        info = Info(identification, localisation, authors, references)
-        return info.__str__()
+    def __set_info(self):
+        self.__set_identification()
+        self.__set_localisation()
+        self.__set_author()
+        self.__set_references()
+        return self.info.__str__()
 
-    def __get_identification(self):
-        return Identification(
+    def __set_identification(self):
+        self.info.identification = Identification(
             self.properties['main_name'],
             self.properties['secondary_name'],
             self.properties['is_id_site_space'],
@@ -384,73 +414,74 @@ class Card(ZH):
             self.properties['code']
         )
 
-    def __get_localisation(self):
-        return Localisation(
+    def __set_localisation(self):
+        self.info.localisation = Localisation(
             self.id_zh,
             self.properties['geo_info']['regions'],
             self.properties['geo_info']['departments']
         )
 
-    def __get_author(self):
-        return Author(
+    def __set_author(self):
+        self.info.authors = Author(
             self.id_zh,
             self.properties['create_date'],
             self.properties['update_date']
         )
 
-    def __get_references(self):
-        return [
-            Reference(
-                ref["id_reference"],
-                ref["authors"],
-                ref["title"],
-                ref["editor"],
-                ref["editor_location"],
-                ref["pub_year"]
-            ).__str__()
+    def __set_references(self):
+        self.info.references = [Reference(
+            ref["id_reference"],
+            ref["authors"],
+            ref["title"],
+            ref["editor"],
+            ref["editor_location"],
+            ref["pub_year"]
+        ).__str__()
             for ref in self.properties['id_references']
         ]
 
-    def __get_delimitations(self):
-        delimitation = Delimitations()
-        delimitation.set_area_limits(
+    def __set_limits(self):
+        self.limits.set_area_limits(
             self.properties['id_lims'],
             self.properties['remark_lim'])
-        delimitation.set_function_limits(
+        self.limits.set_function_limits(
             self.properties['id_lims_fs'],
             self.properties['remark_lim_fs'])
-        return delimitation.__str__()
+        return self.limits.__str__()
 
-    def __get_functioning(self):
-        regime = self.__get_regime()
-        connexion = self.properties['id_connexion']
-        diagnostic = self.__get_diagnostic()
-        functioning = Functioning(regime, connexion, diagnostic)
-        return functioning.__str__()
+    def __set_functioning(self):
+        self.__set_regime()
+        self.__set_connexion()
+        self.__set_diagnostic()
+        return self.functioning.__str__()
 
-    def __get_regime(self):
-        return Regime(
+    def __set_regime(self):
+        self.functioning.regime = Regime()
+        self.functioning.regime.set_regime(
             self.properties['flows'],
             self.properties['id_frequency'],
             self.properties['id_spread']
         )
 
-    def __get_diagnostic(self):
-        return Diagnostic(
+    def __set_connexion(self):
+        self.functioning.connexion = self.properties['id_connexion']
+
+    def __set_diagnostic(self):
+        self.functioning.diagnostic = Diagnostic(
             self.properties['id_diag_hydro'],
             self.properties['id_diag_bio'],
             self.properties['remark_diag']
         )
 
-    def __get_zh_functions(self):
-        hydro = self.__get_functions('fonctions_hydro')
-        bio = self.__get_functions('fonctions_bio')
-        interest = self.__get_functions('interet_patrim')
-        val_soc_eco = self.__get_functions('val_soc_eco')
+    def __set_zh_functions(self):
+        hydro = self.__set_functions('fonctions_hydro')
+        bio = self.__set_functions('fonctions_bio')
+        interest = self.__set_functions('interet_patrim')
+        val_soc_eco = self.__set_functions('val_soc_eco')
         zh_function = ZhFunctions(hydro, bio, interest, val_soc_eco)
         return zh_function.__str__()
 
-    def __get_functions(self, category):
+    def __set_functions(self, category):
         return [
             Function(
                 function["id_function"],
