@@ -8,6 +8,7 @@ from .zh import ZH
 
 
 class Code(ZH):
+
     def __init__(self, id_zh, id_org, zh_geom):
         self.id_zh = id_zh
         self.id_org = id_org
