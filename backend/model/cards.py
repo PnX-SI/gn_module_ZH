@@ -27,6 +27,12 @@ class Utils(ZH):
             return 'Oui'
         return 'Non'
 
+    @staticmethod
+    def get_string(string):
+        if string:
+            return string
+        return 'Non renseigné'
+
 
 class Delimitations:
 
@@ -206,6 +212,79 @@ class Reference:
         }
 
 
+class Regime:
+
+    def __init__(self, flows, frequency, spread):
+        self.inflows = flows[1]['inflows'],
+        self.outflows = flows[0]['outflows'],
+        self.frequency = frequency,
+        self.spread = spread
+
+    def __str__(self):
+        return {
+            "entree": self.__get_flows(self.inflows, type='id_inflow'),
+            "sortie": self.__get_flows(self.outflows, type='id_outflow'),
+            "frequence": Utils.get_mnemo(self.frequency[0]),
+            "etendue": Utils.get_mnemo(self.spread)
+        }
+
+    def __get_flows(self, flows, type):
+        if flows[0]:
+            return [
+                Flow(
+                    flow[type],
+                    flow['id_permanance'],
+                    flow['topo']
+                ).__str__() for flow in flows[0]
+            ]
+        return "Non renseigné"
+
+
+class Flow:
+
+    def __init__(self, type, permanence, topo):
+        self.type = type
+        self.permanence = permanence
+        self.topo = topo
+
+    def __str__(self):
+        return {
+            "type": Utils.get_mnemo(self.type),
+            "permanence": Utils.get_mnemo(self.permanence),
+            "toponymie": Utils.get_string(self.topo)
+        }
+
+
+class Functioning:
+
+    def __init__(self, regime, connexion, diagnostic):
+        self.regime = regime
+        self.connexion = connexion
+        self.diagnostic = diagnostic
+
+    def __str__(self):
+        return {
+            "regime": self.regime.__str__(),
+            "connexion": Utils.get_mnemo(self.connexion),
+            "diagnostic": self.diagnostic.__str__()
+        }
+
+
+class Diagnostic:
+
+    def __init__(self, diag_hydro, diag_bio, comment):
+        self.diag_hydro = diag_hydro
+        self.diag_bio = diag_bio
+        self.comment = comment
+
+    def __str__(self):
+        return {
+            "hydrologique": Utils.get_mnemo(self.diag_hydro),
+            "biologique": Utils.get_mnemo(self.diag_bio),
+            "commentaires": Utils.get_string(self.comment)
+        }
+
+
 class Card(ZH):
 
     def __init__(self, id_zh, type):
@@ -226,7 +305,7 @@ class Card(ZH):
             "renseignements": self.__get_info(),
             "delimitation": self.__get_delimitations(),
             "description": "",
-            "fonctionnement": "",
+            "fonctionnement": self.__get_functioning(),
             "fonctions": "",
             "statuts": "",
             "evaluation": ""
@@ -286,20 +365,29 @@ class Card(ZH):
             self.properties['remark_lim_fs'])
         return delimitation.__str__()
 
+    def __get_functioning(self):
+        regime = self.__get_regime()
+        connexion = self.properties['id_connexion']
+        diagnostic = self.__get_diagnostic()
+        functioning = Functioning(regime, connexion, diagnostic)
+        return functioning.__str__()
+
+    def __get_regime(self):
+        return Regime(
+            self.properties['flows'],
+            self.properties['id_frequency'],
+            self.properties['id_spread']
+        )
+
+    def __get_diagnostic(self):
+        return Diagnostic(
+            self.properties['id_diag_hydro'],
+            self.properties['id_diag_bio'],
+            self.properties['remark_diag']
+        )
+
     def get_na_hab_cover(self):
         return self.__na_hab_cover
-
-    """
-    def get_communes(self, communes):
-        commune_insee = [k for k, v in [(k, v)
-                                        for x in communes for (k, v) in x.items()]]
-        commune_names = [v for k, v in [(k, v)
-                                        for x in communes for (k, v) in x.items()]]
-        return {
-            "communes": commune_names,
-            "code_insee": commune_insee
-        }
-    """
 
     def get_activities(self, activities):
         if activities:
