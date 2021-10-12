@@ -7,8 +7,16 @@
             Critères de délimitation de la zone humide
           </h5>
         </legend>
-        <p class="label"><b>Critères utilisés :</b></p>
-        <p class="label"><b>Remarques :</b></p>
+        <zh-label
+          *ngIf="data.delimitation_zone?.critere"
+          label="Critères utilisés :"
+        >
+          <span>TODO {{ data.delimitation_zone.critere.join(", ") }} </span>
+        </zh-label>
+        <zh-label label="Remarques :">
+          <span>{{ data.delimitation_zone?.remark }} </span>
+        </zh-label>
+        <p class="label"><b></b></p>
       </fieldset>
     </div>
     <div class="col-12 col-xl-6 col-lg-6 col-md-6">
@@ -18,8 +26,17 @@
             Critères de délimitation de l'espace de fonctionalité
           </h5>
         </legend>
-        <p class="label"><b>Critères utilisés :</b></p>
-        <p class="label"><b>Remarques :</b></p>
+        <zh-label
+          *ngIf="data.delimitation_fonctions?.critere"
+          label="Critères utilisés :"
+        >
+          <span
+            >TODO {{ data.delimitation_fonctions.critere.join(", ") }}
+          </span>
+        </zh-label>
+        <zh-label label="Remarques :">
+          <span>{{ data.delimitation_fonctions?.remark }} </span>
+        </zh-label>
       </fieldset>
     </div>
   </div>

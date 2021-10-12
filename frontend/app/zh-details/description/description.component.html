@@ -7,9 +7,15 @@
             Présentation de la zone humide et de ses milieux
           </h5>
         </legend>
-        <p class="label"><b>Typologie SDAGE :</b></p>
-        <p class="label"><b>Typologie locale :</b></p>
-        <p class="label"><b>Remarques :</b></p>
+        <zh-label label="Typologie SDAGE :">
+          <span></span>
+        </zh-label>
+        <zh-label label="Typologie locale :">
+          <span></span>
+        </zh-label>
+        <zh-label label="Remarques :">
+          <span></span>
+        </zh-label>
       </fieldset>
     </div>
     <div class="col-12">
@@ -27,9 +33,11 @@
             Description de l'espace de fonctionnalité
           </h5>
         </legend>
-        <p class="label">
-          <b> Occupation des sols (Nomenclature Corine Land Cover) : </b>
-        </p>
+        <zh-label
+          label=" Occupation des sols (Nomenclature Corine Land Cover) : "
+        >
+          <span></span>
+        </zh-label>
       </fieldset>
     </div>
     <div class="col-12">
@@ -38,18 +46,6 @@
           <h5 class="section-title">Usage ou processus naturels</h5>
         </legend>
         <zh-table [tableCols]="activitiesTableCols"></zh-table>
-      </fieldset>
-    </div>
-    <div class="col-12">
-      <fieldset>
-        <legend>
-          <h5 class="section-title">
-            Présentation de la zone humide et de ses milieux
-          </h5>
-        </legend>
-        <p class="label"><b>Typologie SDAGE :</b></p>
-        <p class="label"><b>Typologie locale :</b></p>
-        <p class="label"><b>Remarques :</b></p>
       </fieldset>
     </div>
   </div>

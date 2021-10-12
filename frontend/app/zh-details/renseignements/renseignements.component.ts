@@ -11,10 +11,10 @@ export class RenseignementsComponent {
   @Input() data: RenseignementsGenerauxModel;
 
   biblioTableCols: TableColumn[] = [
-    { name: "docTitle", label: "Titre du document" },
-    { name: "authors", label: "Auteurs" },
-    { name: "anneeParution", label: "Année de parution" },
-    { name: "bassinsVersants", label: "Bassins versants" },
+    { name: "titre", label: "Titre du document" },
+    { name: "auteurs", label: "Auteurs" },
+    { name: "annee", label: "Année de parution" },
+    { name: "bassins", label: "Bassins versants" },
     { name: "editeur", label: "Editeur" },
     { name: "lieu", label: "Lieu" },
   ];
