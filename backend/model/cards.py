@@ -8,6 +8,7 @@ from geonature.core.ref_geo.models import LAreas
 
 from .zh_schema import *
 from .zh import ZH
+from ..nomenclatures import get_corine_biotope
 
 import pdb
 
@@ -413,6 +414,86 @@ class Functions:
         }
 
 
+class Description:
+
+    def __init__(self):
+        self.presentation: Presentation
+        self.id_corine_landcovers: list(int)
+        self.use: Use
+
+    def __str__(self):
+        return {
+            "presentation": self.presentation.__str__(),
+            "espace": Utils.get_mnemo(self.id_corine_landcovers),
+            "usage": self.use.__str__()
+        }
+
+
+class Presentation:
+
+    def __init__(self, id_sdage, id_sage, cb_codes_corine_biotope, remark_pres):
+        self.id_sdage = id_sdage
+        self.id_sage = id_sage
+        self.cb_codes_corine_biotope = cb_codes_corine_biotope
+        self.remark_pres = remark_pres
+
+    def __str__(self):
+        return {
+            "sdage": Utils.get_mnemo(self.id_sdage),
+            "typologie_locale": Utils.get_mnemo(self.id_sage),
+            "corine_biotope": [cb.__str__() for cb in self.cb_codes_corine_biotope],
+            "remarques": Utils.get_string(self.remark_pres)
+        }
+
+
+class CorineBiotope:
+
+    def __init__(self, cb_code):
+        self.cb_code = cb_code
+
+    def __str__(self):
+        cbs = get_corine_biotope()
+        for cb in cbs:
+            if cb["CB_code"] == self.cb_code:
+                return {
+                    "code": cb["CB_code"],
+                    "label": cb["CB_label"],
+                    "Humidité": cb["CB_humidity"]
+                }
+
+
+class Use:
+
+    def __init__(self):
+        self.activities: list(Activity)
+        self.id_thread: int
+        self.remark_activity: str
+
+    def __str__(self):
+        return {
+            "activities": [activity.__str__() for activity in self.activities],
+            "evaluation_menaces": Utils.get_mnemo(self.id_thread),
+            "Remarques": Utils.get_string(self.remark_activity)
+        }
+
+
+class Activity:
+
+    def __init__(self, id_human_activity, id_localisation, ids_impact, remark_activity):
+        self.id_human_activity = id_human_activity
+        self.id_localisation = id_localisation
+        self.ids_impact = ids_impact
+        self.remark_activity = remark_activity
+
+    def __str__(self):
+        return {
+            "activite": Utils.get_mnemo(self.id_human_activity),
+            "impacts": Utils.get_mnemo(self.ids_impact),
+            "localisation": Utils.get_mnemo(self.id_localisation),
+            "remarques": Utils.get_string(self.remark_activity)
+        }
+
+
 class Card(ZH):
 
     def __init__(self, id_zh, type):
@@ -424,7 +505,7 @@ class Card(ZH):
         self.limits = Limits()
         self.functioning = Functioning()
         self.functions = Functions()
-        # self.description
+        self.description = Description()
         # self.status
         # self.evaluation
 
@@ -438,7 +519,7 @@ class Card(ZH):
         return {
             "renseignements": self.__set_info(),
             "delimitation": self.__set_limits(),
-            "description": "",
+            "description": self.__set_description(),
             "fonctionnement": self.__set_functioning(),
             "fonctions": self.__set_zh_functions(),
             "statuts": "",
@@ -547,32 +628,30 @@ class Card(ZH):
             self.properties['nb_invertebrate_sp']
         )
 
-    def get_activities(self, activities):
-        if activities:
-            return [
-                {
-                    "Activité humaine": self.get_mnemo(activity['id_human_activity']),
-                    "Localisation": self.get_mnemo(activity['id_localisation']),
-                    "Impacts": self.get_mnemo(activity['ids_impact']),
-                    "Remarques": activity['remark_activity']
-                }
-                for activity in activities
-            ]
-        return "Non renseigné"
+    def __set_description(self):
+        self.description.presentation = Presentation(
+            self.properties['id_sdage'],
+            self.properties['id_sage'],
+            [CorineBiotope(cb)
+             for cb in self.properties['cb_codes_corine_biotope']],
+            self.properties['remark_pres']
+        )
+        self.description.id_corine_landcovers = self.properties['id_corine_landcovers']
+        self.__set_use()
+        return self.description.__str__()
 
-    def get_cb(self, cb_ids):
-        if cb_ids:
-            cbs = BibCb.get_label()
-            cbs_info = {}
-            for cb in cbs:
-                if cb.BibCb.lb_code in cb_ids:
-                    cbs_info.update({
-                        "Code Corine Biotope": cb.BibCb.lb_code,
-                        "Libellé Corine Biotope": cb.Habref.lb_hab_fr,
-                        "Humidité": cb.BibCb.humidity
-                    })
-            return cbs_info
-        return "Non renseigné"
+    def __set_use(self):
+        self.description.use = Use()
+        self.description.use.activities = [
+            Activity(
+                activity['id_human_activity'],
+                activity['id_localisation'],
+                activity['ids_impact'],
+                activity['remark_activity']
+            ) for activity in self.properties['activities']
+        ]
+        self.description.use.id_thread = self.properties['id_thread']
+        self.description.use.remark_activity = self.properties['global_remark_activity']
 
     def get_ownerships_info(self, ownerships):
         if ownerships:
