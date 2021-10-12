@@ -501,3 +501,16 @@ def handle_geonature_zh_api(error):
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
     return response
+
+@blueprint.route('/user/cruved', methods=['GET'])
+@permissions.check_cruved_scope('R', True)
+@json_resp
+def returnUserCruved(info_role):
+    # récupérer le CRUVED complet de l'utilisateur courant
+    print (info_role)
+    user_cruved = get_or_fetch_user_cruved(
+        session=session,
+        id_role=info_role.id_role,
+        module_code=blueprint.config['MODULE_CODE']
+    )
+    return user_cruved
