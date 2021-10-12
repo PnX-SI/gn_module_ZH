@@ -33,6 +33,9 @@ class Utils(ZH):
             return string
         return 'Non renseigné'
 
+    def get_int(nb):
+        return nb if nb is not None else 'Non évalué'
+
 
 class Delimitations:
 
@@ -42,10 +45,10 @@ class Delimitations:
 
     def set_area_limits(self, criteria, remark):
         self.area_limits.criteria = criteria
-        self.function_limits.remark = remark
+        self.area_limits.remark = remark
 
     def set_function_limits(self, criteria, remark):
-        self.area_limits.criteria = criteria
+        self.function_limits.criteria = criteria
         self.function_limits.remark = remark
 
     def __str__(self):
@@ -224,7 +227,7 @@ class Regime:
         return {
             "entree": self.__get_flows(self.inflows, type='id_inflow'),
             "sortie": self.__get_flows(self.outflows, type='id_outflow'),
-            "frequence": Utils.get_mnemo(self.frequency[0]),
+            "frequence": Utils.get_mnemo(self.frequency),
             "etendue": Utils.get_mnemo(self.spread)
         }
 
@@ -285,6 +288,59 @@ class Diagnostic:
         }
 
 
+class Function:
+
+    def __init__(self, type, qualification, knowledge, justif):
+        self.type = type
+        self.qualification = qualification
+        self.knowledge = knowledge
+        self.justif = justif
+
+    def __str__(self):
+        return {
+            "type": Utils.get_mnemo(self.type),
+            "qualification": Utils.get_mnemo(self.qualification),
+            "connaissance": Utils.get_mnemo(self.knowledge),
+            "justification": Utils.get_string(self.justif)
+        }
+
+
+class Taxa:
+
+    def __init__(self, nb_flore, nb_vertebre, nb_invertebre):
+        self.nb_flore = nb_flore
+        self.nb_vertebre = nb_vertebre
+        self.nb_invertebre = nb_invertebre
+
+    def __str__(self):
+        return {
+            "nb_flore": Utils.get_int(self.nb_flore),
+            "nb_vertebre": Utils.get_int(self.nb_vertebre),
+            "nb_invertebre": Utils.get_int(self.nb_invertebre)
+        }
+
+
+class ZhFunctions:
+
+    def __init__(self, hydro, bio, interest, val_soc_eco):
+        self.hydro = hydro
+        self.bio = bio
+        self.interest = interest
+        #self.habs = habs
+        #self.taxa = taxa
+        self.val_soc_eco = val_soc_eco
+
+    def __str__(self):
+        return {
+            "hydrologie": self.hydro,
+            "biologie": self.bio,
+            "interet": self.interest,
+            # "habitats": self.habs,
+            # "taxons": self.taxa,
+            "socio": self.val_soc_eco
+        }
+
+
 class Card(ZH):
 
     def __init__(self, id_zh, type):
@@ -306,7 +362,7 @@ class Card(ZH):
             "delimitation": self.__get_delimitations(),
             "description": "",
             "fonctionnement": self.__get_functioning(),
-            "fonctions": "",
+            "fonctions": self.__get_zh_functions(),
             "statuts": "",
             "evaluation": ""
         }
@@ -386,6 +442,25 @@ class Card(ZH):
             self.properties['remark_diag']
         )
 
+    def __get_zh_functions(self):
+        hydro = self.__get_functions('fonctions_hydro')
+        bio = self.__get_functions('fonctions_bio')
+        interest = self.__get_functions('interet_patrim')
+        val_soc_eco = self.__get_functions('val_soc_eco')
+        zh_function = ZhFunctions(hydro, bio, interest, val_soc_eco)
+        return zh_function.__str__()
+
+    def __get_functions(self, category):
+        return [
+            Function(
+                function["id_function"],
+                function["id_qualification"],
+                function["id_knowledge"],
+                function["justification"]
+            ).__str__()
+            for function in self.properties[category]
+        ]
+
     def get_na_hab_cover(self):
         return self.__na_hab_cover
 
@@ -415,42 +490,6 @@ class Card(ZH):
                     })
             return cbs_info
         return "Non renseigné"
-
-    def get_flows(self, flows, type):
-        if type == "inflows":
-            flow_type = "Entrée d'eau"
-            id_key = "id_inflow"
-            flows = flows[1]  # to do : correct json input
-        else:
-            flow_type = "Sortie d'eau"
-            id_key = "id_outflow"
-            flows = flows[0]  # to do : correct json input
-        if flows[type]:
-            return [
-                {
-                    flow_type: self.get_mnemo(flow[id_key]),
-                    "Permanence": self.get_mnemo(flow["id_permanance"]),
-                    "Toponymie et compléments d'information": flow["topo"]
-                }
-                for flow in flows[type]
-            ]
-        return "Non renseigné"
-
-    def get_function_info(self, functions, type):
-        if functions:
-            return [
-                {
-                    type: self.get_mnemo(function['id_function']),
-                    "Justification": function['justification'],
-                    "Qualification": self.get_mnemo(function['id_qualification']),
-                    "Connaissance": self.get_mnemo(function['id_knowledge'])
-                }
-                for function in functions
-            ]
-        return "Non renseigné"
-
-    def get_int(self, nb):
-        return nb if nb is not None else 'Non évalué'
 
     def get_hab_heritages(self, habs):
         if habs:
