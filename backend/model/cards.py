@@ -164,7 +164,6 @@ class Author:
         self.edit_author = self.__get_author(type='co-author')
 
     def __str__(self):
-        # pdb.set_trace()
         return {
             "auteur": self.create_author,
             "auteur_modif": self.edit_author,
@@ -340,21 +339,31 @@ class Taxa:
 class ZhFunctions:
 
     def __init__(self):
-        self.hydro = list(Function)
-        self.bio = list(Function)
-        self.interest = list(Function)
+        self.hydro: list(Function)
+        self.bio: list(Function)
+        self.interest: list(Function)
         #self.habs = habs
         #self.taxa = taxa
-        self.val_soc_eco = list(Function)
+        self.val_soc_eco: list(Function)
+
+    def set_function(self, functions):
+        return [
+            Function(
+                function["id_function"],
+                function["id_qualification"],
+                function["id_knowledge"],
+                function["justification"]
+            ) for function in functions
+        ]
 
     def __str__(self):
         return {
-            "hydrologie": self.hydro,
-            "biologie": self.bio,
-            "interet": self.interest,
+            "hydrologie": [hydro.__str__() for hydro in self.hydro],
+            "biologie": [bio.__str__() for bio in self.bio],
+            "interet": [interest.__str__() for interest in self.interest],
             # "habitats": self.habs,
             # "taxons": self.taxa,
-            "socio": self.val_soc_eco
+            "socio": [val_soc_eco.__str__() for val_soc_eco in self.val_soc_eco]
         }
 
 
@@ -369,7 +378,7 @@ class Card(ZH):
         self.info = Info()
         self.limits = Limits()
         self.functioning = Functioning()
-        #self.functions = ZhFunctions()
+        self.functions = ZhFunctions()
         # self.description
         # self.status
         # self.evaluation
@@ -386,7 +395,7 @@ class Card(ZH):
             "delimitation": self.__set_limits(),
             "description": "",
             "fonctionnement": self.__set_functioning(),
-            "fonctions": "",
+            "fonctions": self.__set_zh_functions(),
             "statuts": "",
             "evaluation": ""
         }
@@ -466,26 +475,16 @@ class Card(ZH):
             self.properties['remark_diag']
         )
 
-    """
     def __set_zh_functions(self):
-        hydro = self.__set_functions('fonctions_hydro')
-        bio = self.__set_functions('fonctions_bio')
-        interest = self.__set_functions('interet_patrim')
-        val_soc_eco = self.__set_functions('val_soc_eco')
-        zh_function = ZhFunctions(hydro, bio, interest, val_soc_eco)
-        return zh_function.__str__()
-    """
-
-    def __set_functions(self, category):
-        return [
-            Function(
-                function["id_function"],
-                function["id_qualification"],
-                function["id_knowledge"],
-                function["justification"]
-            ).__str__()
-            for function in self.properties[category]
-        ]
+        self.functions.hydro = self.functions.set_function(
+            self.properties['fonctions_hydro'])
+        self.functions.bio = self.functions.set_function(
+            self.properties['fonctions_bio'])
+        self.functions.interest = self.functions.set_function(
+            self.properties['interet_patrim'])
+        self.functions.val_soc_eco = self.functions.set_function(
+            self.properties['val_soc_eco'])
+        return self.functions.__str__()
 
     def get_na_hab_cover(self):
         return self.__na_hab_cover
