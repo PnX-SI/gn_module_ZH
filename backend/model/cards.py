@@ -39,13 +39,6 @@ class Utils(ZH):
     def get_int(nb):
         return nb  # if nb is not None else 'Non évalué'
 
-    @staticmethod
-    def is_valid(obj, classe):
-        if isinstance(obj, classe):
-            return obj
-        else:
-            raise ValueError("{} is not of {} class".format(obj, classe))
-
 
 class Limits:
 
@@ -233,14 +226,7 @@ class Regime:
         self.id_frequency: int
         self.id_spread: int
 
-    def __str__(self):
-        return {
-            "entree": [flow.__str__() for flow in self.inflows],
-            "sortie": [flow.__str__() for flow in self.outflows],
-            "etendue": Utils.get_mnemo(self.id_spread),
-            "frequence": Utils.get_mnemo(self.id_frequency)
-        }
-
+    # a refaire avec getters et setters
     def set_regime(self, flows, id_frequency, id_spread):
         self.inflows = self.__set_flows(flows[1]['inflows'], type='id_inflow')
         self.outflows = self.__set_flows(
@@ -258,6 +244,14 @@ class Regime:
                 ) for flow in flows
             ]
         return []
+
+    def __str__(self):
+        return {
+            "entree": [flow.__str__() for flow in self.inflows],
+            "sortie": [flow.__str__() for flow in self.outflows],
+            "etendue": Utils.get_mnemo(self.id_spread),
+            "frequence": Utils.get_mnemo(self.id_frequency)
+        }
 
 
 class Flow:
@@ -278,7 +272,7 @@ class Flow:
 class Functioning:
 
     def __init__(self):
-        self.regime: Regime
+        self.regime = Regime()
         self.id_connexion: int
         self.diagnostic: Diagnostic
 
@@ -362,17 +356,23 @@ class Habs:
         self.total_hab_cover: int
         self.hab_heritage: list(HabHeritage)
 
-    def set_hab_heritage(self, habs):
+    @property
+    def hab_heritage(self):
+        return self.__hab_heritage
+
+    @hab_heritage.setter
+    def hab_heritage(self, habs):
         if habs:
-            self.hab_heritage = [HabHeritage(
-                hab['id_corine_bio'],
-                hab['id_cahier_hab'],
-                hab['id_preservation_state'],
-                int(hab["hab_cover"])
-            ) for hab in habs
+            self.__hab_heritage = [
+                HabHeritage(
+                    hab['id_corine_bio'],
+                    hab['id_cahier_hab'],
+                    hab['id_preservation_state'],
+                    int(hab["hab_cover"])
+                ) for hab in habs
             ]
         else:
-            self.hab_heritage = []
+            self.__hab_heritage = []
 
     def __str__(self):
         return {
@@ -507,17 +507,43 @@ class Status:
         self.protections: list(int)
         self.urban_docs: list(UrbanDoc)
 
-    def set_ownerships(self, ownerships):
-        self.ownerships = [
+    @property
+    def ownerships(self):
+        return self.__ownerships
+
+    @property
+    def managements(self):
+        return self.__managements
+
+    @property
+    def instruments(self):
+        return self.__instruments
+
+    @property
+    def is_other_inventory(self):
+        return self.__is_other_inventory
+
+    @property
+    def protections(self):
+        return self.__protections
+
+    @property
+    def urban_docs(self):
+        return self.__urban_docs
+
+    @ownerships.setter
+    def ownerships(self, value):
+        self.__ownerships = [
             Ownership(
                 ownership['id_status'],
                 ownership['remark']
-            ) for ownership in ownerships
+            ) for ownership in value
         ]
 
-    def set_managements(self, managements):
-        self.managements = []
-        for management in managements:
+    @managements.setter
+    def managements(self, value):
+        self.__managements = []
+        for management in value:
             plans = [
                 Plan(
                     plan['id_nature'],
@@ -530,18 +556,24 @@ class Status:
                 management['structure'],
                 plans
             )
-            self.managements.append(mng)
+            self.__managements.append(mng)
 
-    def set_instruments(self, instruments):
-        self.instruments = [
+    @instruments.setter
+    def instruments(self, instruments):
+        self.__instruments = [
             Instrument(
                 instrument['id_instrument'],
                 instrument['instrument_date']
             ) for instrument in instruments
         ]
 
-    def set_urban_docs(self, urban_docs):
-        self.urban_docs = [
+    @is_other_inventory.setter
+    def is_other_inventory(self, value):
+        self.__is_other_inventory = value
+
+    @urban_docs.setter
+    def urban_docs(self, urban_docs):
+        self.__urban_docs = [
             UrbanDoc(
                 urban_doc['id_area'],
                 urban_doc['id_doc_type'],
@@ -550,8 +582,9 @@ class Status:
             ) for urban_doc in urban_docs
         ]
 
-    def set_protections(self, protections):
-        self.protections = protections
+    @protections.setter
+    def protections(self, protections):
+        self.__protections = protections
 
     def __str_protections(self):
         q_protections = DB.session.query(CorProtectionLevelType)\
@@ -671,24 +704,34 @@ class EvalMainFunction:
         self.hydro: list(Function)
         self.bio: list(Function)
 
-    def set_hydro(self, hydro):
-        self.hydro = [
+    @property
+    def hydro(self):
+        return self.__hydro
+
+    @hydro.setter
+    def hydro(self, val):
+        self.__hydro = [
             Function(
-                h['id_function'],
-                h['id_knowledge'],
-                h['id_qualification'],
-                h['justification']
-            ) for h in hydro
+                v['id_function'],
+                v['id_knowledge'],
+                v['id_qualification'],
+                v['justification']
+            ) for v in val
         ]
 
-    def set_bio(self, bio):
-        self.bio = [
+    @property
+    def bio(self):
+        return self.__bio
+
+    @bio.setter
+    def bio(self, value):
+        self.__bio = [
             Function(
-                b['id_function'],
-                b['id_knowledge'],
-                b['id_qualification'],
-                b['justification']
-            ) for b in bio
+                v['id_function'],
+                v['id_knowledge'],
+                v['id_qualification'],
+                v['justification']
+            ) for v in value
         ]
 
     def __str__(self):
@@ -706,16 +749,48 @@ class EvalInterest:
         self.nb_flora_sp: int
         self.nb_hab: int
         self.total_hab_cover: int
+        self.val_soc_eco: list(Function)
         self.remark_eval_functions: str
 
-    def set_interet_patrim(self, interet_patrim):
-        self.interet_patrim = [
+    @property
+    def interet_patrim(self):
+        return self.__interet_patrim
+
+    @interet_patrim.setter
+    def interet_patrim(self, val):
+        self.__interet_patrim = [
             Function(
                 i['id_function'],
                 i['id_knowledge'],
                 i['id_qualification'],
                 i['justification']
-            ) for i in interet_patrim
+            ) for i in val
+        ]
+
+    @property
+    def val_soc_eco(self):
+        return self.__val_soc_eco
+
+    @val_soc_eco.setter
+    def val_soc_eco(self, val):
+        self.__val_soc_eco = [
+            Function(
+                i['id_function'],
+                i['id_knowledge'],
+                i['id_qualification'],
+                i['justification']
+            ) for i in val
+        ]
+
+    @interet_patrim.setter
+    def interet_patrim(self, val):
+        self.__interet_patrim = [
+            Function(
+                i['id_function'],
+                i['id_knowledge'],
+                i['id_qualification'],
+                i['justification']
+            ) for i in val
         ]
 
     def __str__(self):
@@ -725,6 +800,7 @@ class EvalInterest:
             "floristique": Utils.get_int(self.nb_flora_sp),
             "nb_hab": Utils.get_int(self.nb_hab),
             "total_hab_cover": Utils.get_int(self.total_hab_cover),
+            "valeur": [val.__str__() for val in self.val_soc_eco],
             "Commentaire": Utils.get_int(self.remark_eval_functions)
         }
 
@@ -755,20 +831,30 @@ class EvalThread:
 class EvalAction:
 
     def __init__(self):
-        self.actions: list(Action)
-        self.remark_eval_actions: str
+        self.__actions: list(Action)
+        self.__remark_eval_actions: str
 
-    def set_actions(self, actions):
-        self.actions = [
+    @property
+    def actions(self):
+        return self.__actions
+
+    @actions.setter
+    def actions(self, val):
+        self.__actions = [
             Action(
                 action["id_action"],
                 action["id_priority_level"],
                 action["remark"]
-            ) for action in actions
+            ) for action in val
         ]
 
-    def set_remark_eval_actions(self, remark):
-        self.remark_eval_actions = remark
+    @property
+    def remark_eval_actions(self):
+        return self.__remark_eval_actions
+
+    @remark_eval_actions.setter
+    def remark_eval_actions(self, val):
+        self.__remark_eval_actions = val
 
     def __str__(self):
         return {
@@ -886,7 +972,6 @@ class Card(ZH):
         return self.functioning.__str__()
 
     def __set_regime(self):
-        self.functioning.regime = Regime()
         self.functioning.regime.set_regime(
             self.properties['flows'],
             self.properties['id_frequency'],
@@ -921,7 +1006,7 @@ class Card(ZH):
         self.functions.habs.is_carto_hab = self.properties['is_carto_hab']
         self.functions.habs.nb_hab = self.properties['nb_hab']
         self.functions.habs.total_hab_cover = self.properties['total_hab_cover']
-        self.functions.habs.set_hab_heritage(self.properties['hab_heritages'])
+        self.functions.habs.hab_heritage = self.properties['hab_heritages']
 
     def __set_taxa(self):
         self.functions.taxa = Taxa(
@@ -960,12 +1045,12 @@ class Card(ZH):
         self.description.use.remark_activity = self.properties['global_remark_activity']
 
     def __set_statuses(self):
-        self.status.set_ownerships(self.properties['ownerships'])
-        self.status.set_managements(self.properties['managements'])
-        self.status.set_instruments(self.properties['instruments'])
+        self.status.ownerships = self.properties['ownerships']
+        self.status.managements = self.properties['managements']
+        self.status.instruments = self.properties['instruments']
         self.status.is_other_inventory = self.properties['is_other_inventory']
-        self.status.set_protections(self.properties['protections'])
-        self.status.set_urban_docs(self.properties['urban_docs'])
+        self.status.protections = self.properties['protections']
+        self.status.urban_docs = self.properties['urban_docs']
         return self.status.__str__()
 
     def __set_evaluation(self):
@@ -976,17 +1061,17 @@ class Card(ZH):
         return self.evaluation.__str__()
 
     def __set_interests(self):
-        self.evaluation.interest.set_interet_patrim(
-            self.eval['interet_patrim'])
+        self.evaluation.interest.interet_patrim = self.eval['interet_patrim']
         self.evaluation.interest.nb_fauna_sp = self.eval['nb_fauna_sp']
         self.evaluation.interest.nb_flora_sp = self.eval['nb_flora_sp']
         self.evaluation.interest.nb_hab = self.eval['nb_hab']
         self.evaluation.interest.total_hab_cover = self.eval['total_hab_cover']
+        self.evaluation.interest.val_soc_eco = self.eval['val_soc_eco']
         self.evaluation.interest.remark_eval_functions = self.properties['remark_eval_functions']
 
     def __set_main_functions(self):
-        self.evaluation.main_functions.set_hydro(self.eval['fonctions_hydro'])
-        self.evaluation.main_functions.set_bio(self.eval['fonctions_bio'])
+        self.evaluation.main_functions.hydro = self.eval['fonctions_hydro']
+        self.evaluation.main_functions.bio = self.eval['fonctions_bio']
 
     def __set_threads(self):
         self.evaluation.thread.set_thread(
@@ -997,18 +1082,9 @@ class Card(ZH):
         )
 
     def __set_actions(self):
-        self.evaluation.action.set_actions(self.properties['actions'])
-        self.evaluation.action.set_remark_eval_actions(
-            self.properties['remark_eval_actions'])
+        self.evaluation.action.actions = self.properties['actions']
+        self.evaluation.action.remark_eval_actions = self.properties['remark_eval_actions']
 
-    def get_actions_info(self, actions):
-        if actions:
-            return [
-                {
-                    "Proposition d'action": DB.session.query(BibActions).filter(BibActions.id_action == action['id_action']).one().name,
-                    "Niveau de priorité": self.get_mnemo(action['id_priority_level']),
-                    "Remarques": action['remark']
-                }
-                for action in actions
-            ]
-        return "Non renseigné"
+        # self.evaluation.action.set_actions(self.properties['actions'])
+        # self.evaluation.action.remark_eval_actions(
+        #    self.properties['remark_eval_actions'])
