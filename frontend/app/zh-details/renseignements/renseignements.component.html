@@ -42,9 +42,9 @@
           <ul>
             <li
               class="label-item"
-              *ngFor="let dep of data.localisation?.department"
+              *ngFor="let dep of data.localisation?.departement"
             >
-              <span>TODO</span>
+              <span>{{ dep.nom }} ({{ dep.code }})</span>
             </li>
           </ul>
         </zh-label>
@@ -55,7 +55,11 @@
               *ngFor="let commune of data.localisation?.commune"
               [ngbTooltip]="'Insee : ' + commune.insee"
             >
-              <span>{{ commune.nom }} ({{ commune.couverture }})</span>
+              <span
+                >{{ commune.nom }} ({{
+                  commune.couverture || "non renseigné"
+                }})</span
+              >
             </li>
           </ul>
         </zh-label>
