@@ -5,10 +5,15 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let item of data">
-      <td *ngFor="let col of tableCols">
-        {{ item[col.name]?.mnemonique || item[col.name] }}
-      </td>
+    <ng-container *ngIf="data && data.length > 0">
+      <tr *ngFor="let item of data">
+        <td *ngFor="let col of tableCols">
+          {{ item[col.name]?.mnemonique || item[col.name] }}
+        </td>
+      </tr>
+    </ng-container>
+    <tr *ngIf="!data || data.length == 0">
+      <td colspan="100%">non renseigné</td>
     </tr>
   </tbody>
 </table>
