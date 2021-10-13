@@ -8,6 +8,7 @@ from geonature.core.ref_geo.models import LAreas
 
 from .zh_schema import *
 from .zh import ZH
+from ..nomenclatures import get_corine_biotope
 
 import pdb
 
@@ -164,7 +165,6 @@ class Author:
         self.edit_author = self.__get_author(type='co-author')
 
     def __str__(self):
-        # pdb.set_trace()
         return {
             "auteur": self.create_author,
             "auteur_modif": self.edit_author,
@@ -230,23 +230,23 @@ class Regime:
     def __init__(self):
         self.inflows: list(Flow)
         self.outflows: list(Flow)
-        self.frequency: int
-        self.spread: int
+        self.id_frequency: int
+        self.id_spread: int
 
     def __str__(self):
         return {
             "entree": [flow.__str__() for flow in self.inflows],
             "sortie": [flow.__str__() for flow in self.outflows],
-            "etendue": Utils.get_mnemo(self.spread),
-            "frequence": Utils.get_mnemo(self.frequency)
+            "etendue": Utils.get_mnemo(self.id_spread),
+            "frequence": Utils.get_mnemo(self.id_frequency)
         }
 
-    def set_regime(self, flows, frequency, spread):
+    def set_regime(self, flows, id_frequency, id_spread):
         self.inflows = self.__set_flows(flows[1]['inflows'], type='id_inflow')
         self.outflows = self.__set_flows(
             flows[0]['outflows'], type='id_outflow')
-        self.spread = spread
-        self.frequency = frequency
+        self.id_spread = id_spread
+        self.id_frequency = id_frequency
 
     def __set_flows(self, flows, type):
         if flows:
@@ -262,15 +262,15 @@ class Regime:
 
 class Flow:
 
-    def __init__(self, type, permanence, topo):
-        self.type = type
-        self.permanence = permanence
+    def __init__(self, id_flow, id_permanance, topo):
+        self.id_flow = id_flow
+        self.id_permanance = id_permanance
         self.topo = topo
 
     def __str__(self):
         return {
-            "type": Utils.get_mnemo(self.type),
-            "permanence": Utils.get_mnemo(self.permanence),
+            "type": Utils.get_mnemo(self.id_flow),
+            "permanence": Utils.get_mnemo(self.id_permanance),
             "toponymie": Utils.get_string(self.topo)
         }
 
@@ -279,29 +279,29 @@ class Functioning:
 
     def __init__(self):
         self.regime: Regime
-        self.connexion: int
+        self.id_connexion: int
         self.diagnostic: Diagnostic
 
     def __str__(self):
         return {
             "regime": self.regime.__str__(),
-            "connexion": Utils.get_mnemo(self.connexion),
+            "connexion": Utils.get_mnemo(self.id_connexion),
             "diagnostic": self.diagnostic.__str__()
         }
 
 
 class Diagnostic:
 
-    def __init__(self, diag_hydro, diag_bio, comment):
-        self.diag_hydro = diag_hydro
-        self.diag_bio = diag_bio
-        self.comment = comment
+    def __init__(self, id_diag_hydro, id_diag_bio, remark_diag):
+        self.id_diag_hydro = id_diag_hydro
+        self.id_diag_bio = id_diag_bio
+        self.remark_diag = remark_diag
 
     def __str__(self):
         return {
-            "hydrologique": Utils.get_mnemo(self.diag_hydro),
-            "biologique": Utils.get_mnemo(self.diag_bio),
-            "commentaires": Utils.get_string(self.comment)
+            "hydrologique": Utils.get_mnemo(self.id_diag_hydro),
+            "biologique": Utils.get_mnemo(self.id_diag_bio),
+            "commentaires": Utils.get_string(self.remark_diag)
         }
 
 
@@ -324,37 +324,173 @@ class Function:
 
 class Taxa:
 
-    def __init__(self, nb_flore, nb_vertebre, nb_invertebre):
-        self.nb_flore = nb_flore
-        self.nb_vertebre = nb_vertebre
-        self.nb_invertebre = nb_invertebre
+    def __init__(self, nb_flora_sp, nb_vertebrate_sp, nb_invertebrate_sp):
+        self.nb_flora_sp = nb_flora_sp
+        self.nb_vertebrate_sp = nb_vertebrate_sp
+        self.nb_invertebrate_sp = nb_invertebrate_sp
 
     def __str__(self):
         return {
-            "nb_flore": Utils.get_int(self.nb_flore),
-            "nb_vertebre": Utils.get_int(self.nb_vertebre),
-            "nb_invertebre": Utils.get_int(self.nb_invertebre)
+            "nb_flore": Utils.get_int(self.nb_flora_sp),
+            "nb_vertebre": Utils.get_int(self.nb_vertebrate_sp),
+            "nb_invertebre": Utils.get_int(self.nb_invertebrate_sp)
         }
 
 
-class ZhFunctions:
+class HabHeritage:
 
-    def __init__(self):
-        self.hydro = list(Function)
-        self.bio = list(Function)
-        self.interest = list(Function)
-        #self.habs = habs
-        #self.taxa = taxa
-        self.val_soc_eco = list(Function)
+    def __init__(self, id_corine_bio, id_cahier_hab, id_preservation_state, hab_cover):
+        self.id_corine_bio = id_corine_bio
+        self.id_cahier_hab = id_cahier_hab
+        self.id_preservation_state = id_preservation_state
+        self.hab_cover = hab_cover
 
     def __str__(self):
         return {
-            "hydrologie": self.hydro,
-            "biologie": self.bio,
-            "interet": self.interest,
-            # "habitats": self.habs,
-            # "taxons": self.taxa,
-            "socio": self.val_soc_eco
+            "biotope": DB.session.query(Habref).filter(Habref.lb_code == self.id_corine_bio).filter(Habref.cd_typo == 22).one().lb_hab_fr,
+            "etat": Utils.get_mnemo(self.id_preservation_state),
+            "cahier": DB.session.query(Habref).filter(Habref.cd_hab == self.id_cahier_hab).one().lb_hab_fr,
+            "recouvrement": int(self.hab_cover)
+        }
+
+
+class Habs:
+
+    def __init__(self):
+        self.is_carto_hab: bool
+        self.nb_hab: int
+        self.total_hab_cover: int
+        self.hab_heritage: list(HabHeritage)
+
+    def set_hab_heritage(self, habs):
+        if habs:
+            self.hab_heritage = [HabHeritage(
+                hab['id_corine_bio'],
+                hab['id_cahier_hab'],
+                hab['id_preservation_state'],
+                int(hab["hab_cover"])
+            ) for hab in habs
+            ]
+        else:
+            self.hab_heritage = []
+
+    def __str__(self):
+        return {
+            "cartographie": Utils.get_bool(self.is_carto_hab),
+            "nombre": Utils.get_int(self.nb_hab),
+            "recouvrement": Utils.get_int(int(self.total_hab_cover)),
+            "corine": [hab.__str__() for hab in self.hab_heritage]
+        }
+
+
+class Functions:
+
+    def __init__(self):
+        self.hydro: list(Function)
+        self.bio: list(Function)
+        self.interest: list(Function)
+        self.habs: Habs
+        self.taxa: Taxa
+        self.val_soc_eco: list(Function)
+
+    def set_function(self, functions):
+        return [
+            Function(
+                function["id_function"],
+                function["id_qualification"],
+                function["id_knowledge"],
+                function["justification"]
+            ) for function in functions
+        ]
+
+    def __str__(self):
+        return {
+            "hydrologie": [hydro.__str__() for hydro in self.hydro],
+            "biologie": [bio.__str__() for bio in self.bio],
+            "interet": [interest.__str__() for interest in self.interest],
+            "habitats": self.habs.__str__(),
+            "taxons": self.taxa.__str__(),
+            "socio": [val_soc_eco.__str__() for val_soc_eco in self.val_soc_eco]
+        }
+
+
+class Description:
+
+    def __init__(self):
+        self.presentation: Presentation
+        self.id_corine_landcovers: list(int)
+        self.use: Use
+
+    def __str__(self):
+        return {
+            "presentation": self.presentation.__str__(),
+            "espace": Utils.get_mnemo(self.id_corine_landcovers),
+            "usage": self.use.__str__()
+        }
+
+
+class Presentation:
+
+    def __init__(self, id_sdage, id_sage, cb_codes_corine_biotope, remark_pres):
+        self.id_sdage = id_sdage
+        self.id_sage = id_sage
+        self.cb_codes_corine_biotope = cb_codes_corine_biotope
+        self.remark_pres = remark_pres
+
+    def __str__(self):
+        return {
+            "sdage": Utils.get_mnemo(self.id_sdage),
+            "typologie_locale": Utils.get_mnemo(self.id_sage),
+            "corine_biotope": [cb.__str__() for cb in self.cb_codes_corine_biotope],
+            "remarques": Utils.get_string(self.remark_pres)
+        }
+
+
+class CorineBiotope:
+
+    def __init__(self, cb_code):
+        self.cb_code = cb_code
+
+    def __str__(self):
+        cbs = get_corine_biotope()
+        for cb in cbs:
+            if cb["CB_code"] == self.cb_code:
+                return {
+                    "code": cb["CB_code"],
+                    "label": cb["CB_label"],
+                    "Humidité": cb["CB_humidity"]
+                }
+
+
+class Use:
+
+    def __init__(self):
+        self.activities: list(Activity)
+        self.id_thread: int
+        self.remark_activity: str
+
+    def __str__(self):
+        return {
+            "activities": [activity.__str__() for activity in self.activities],
+            "evaluation_menaces": Utils.get_mnemo(self.id_thread),
+            "Remarques": Utils.get_string(self.remark_activity)
+        }
+
+
+class Activity:
+
+    def __init__(self, id_human_activity, id_localisation, ids_impact, remark_activity):
+        self.id_human_activity = id_human_activity
+        self.id_localisation = id_localisation
+        self.ids_impact = ids_impact
+        self.remark_activity = remark_activity
+
+    def __str__(self):
+        return {
+            "activite": Utils.get_mnemo(self.id_human_activity),
+            "impacts": Utils.get_mnemo(self.ids_impact),
+            "localisation": Utils.get_mnemo(self.id_localisation),
+            "remarques": Utils.get_string(self.remark_activity)
         }
 
 
@@ -365,12 +501,11 @@ class Card(ZH):
         self.type = type
         self.properties = self.get_properties()
         self.eval = self.get_eval()
-        self.na_hab_cover = "999"
         self.info = Info()
         self.limits = Limits()
         self.functioning = Functioning()
-        #self.functions = ZhFunctions()
-        # self.description
+        self.functions = Functions()
+        self.description = Description()
         # self.status
         # self.evaluation
 
@@ -384,9 +519,9 @@ class Card(ZH):
         return {
             "renseignements": self.__set_info(),
             "delimitation": self.__set_limits(),
-            "description": "",
+            "description": self.__set_description(),
             "fonctionnement": self.__set_functioning(),
-            "fonctions": "",
+            "fonctions": self.__set_zh_functions(),
             "statuts": "",
             "evaluation": ""
         }
@@ -457,7 +592,7 @@ class Card(ZH):
         )
 
     def __set_connexion(self):
-        self.functioning.connexion = self.properties['id_connexion']
+        self.functioning.id_connexion = self.properties['id_connexion']
 
     def __set_diagnostic(self):
         self.functioning.diagnostic = Diagnostic(
@@ -466,69 +601,57 @@ class Card(ZH):
             self.properties['remark_diag']
         )
 
-    """
     def __set_zh_functions(self):
-        hydro = self.__set_functions('fonctions_hydro')
-        bio = self.__set_functions('fonctions_bio')
-        interest = self.__set_functions('interet_patrim')
-        val_soc_eco = self.__set_functions('val_soc_eco')
-        zh_function = ZhFunctions(hydro, bio, interest, val_soc_eco)
-        return zh_function.__str__()
-    """
+        self.functions.hydro = self.functions.set_function(
+            self.properties['fonctions_hydro'])
+        self.functions.bio = self.functions.set_function(
+            self.properties['fonctions_bio'])
+        self.functions.interest = self.functions.set_function(
+            self.properties['interet_patrim'])
+        self.__set_habs()
+        self.__set_taxa()
+        self.functions.val_soc_eco = self.functions.set_function(
+            self.properties['val_soc_eco'])
+        return self.functions.__str__()
 
-    def __set_functions(self, category):
-        return [
-            Function(
-                function["id_function"],
-                function["id_qualification"],
-                function["id_knowledge"],
-                function["justification"]
-            ).__str__()
-            for function in self.properties[category]
+    def __set_habs(self):
+        self.functions.habs = Habs()
+        self.functions.habs.is_carto_hab = self.properties['is_carto_hab']
+        self.functions.habs.nb_hab = self.properties['nb_hab']
+        self.functions.habs.total_hab_cover = self.properties['total_hab_cover']
+        self.functions.habs.set_hab_heritage(self.properties['hab_heritages'])
+
+    def __set_taxa(self):
+        self.functions.taxa = Taxa(
+            self.properties['nb_flora_sp'],
+            self.properties['nb_vertebrate_sp'],
+            self.properties['nb_invertebrate_sp']
+        )
+
+    def __set_description(self):
+        self.description.presentation = Presentation(
+            self.properties['id_sdage'],
+            self.properties['id_sage'],
+            [CorineBiotope(cb)
+             for cb in self.properties['cb_codes_corine_biotope']],
+            self.properties['remark_pres']
+        )
+        self.description.id_corine_landcovers = self.properties['id_corine_landcovers']
+        self.__set_use()
+        return self.description.__str__()
+
+    def __set_use(self):
+        self.description.use = Use()
+        self.description.use.activities = [
+            Activity(
+                activity['id_human_activity'],
+                activity['id_localisation'],
+                activity['ids_impact'],
+                activity['remark_activity']
+            ) for activity in self.properties['activities']
         ]
-
-    def get_na_hab_cover(self):
-        return self.__na_hab_cover
-
-    def get_activities(self, activities):
-        if activities:
-            return [
-                {
-                    "Activité humaine": self.get_mnemo(activity['id_human_activity']),
-                    "Localisation": self.get_mnemo(activity['id_localisation']),
-                    "Impacts": self.get_mnemo(activity['ids_impact']),
-                    "Remarques": activity['remark_activity']
-                }
-                for activity in activities
-            ]
-        return "Non renseigné"
-
-    def get_cb(self, cb_ids):
-        if cb_ids:
-            cbs = BibCb.get_label()
-            cbs_info = {}
-            for cb in cbs:
-                if cb.BibCb.lb_code in cb_ids:
-                    cbs_info.update({
-                        "Code Corine Biotope": cb.BibCb.lb_code,
-                        "Libellé Corine Biotope": cb.Habref.lb_hab_fr,
-                        "Humidité": cb.BibCb.humidity
-                    })
-            return cbs_info
-        return "Non renseigné"
-
-    def get_hab_heritages(self, habs):
-        if habs:
-            return [
-                {
-                    "Corine Biotope": DB.session.query(Habref).filter(Habref.lb_code == hab['id_corine_bio']).filter(Habref.cd_typo == 22).one().lb_hab_fr,
-                    "Cahier Habitats": DB.session.query(Habref).filter(Habref.cd_hab == hab['id_cahier_hab']).one().lb_hab_fr,
-                    "Etat de préservation": self.get_mnemo(hab['id_preservation_state']),
-                    "Recouvrement de la ZH (%)": "Non évalué" if hab["hab_cover"] == "999" else hab["hab_cover"]
-                }
-                for hab in habs
-            ]
-        return "Non renseigné"
+        self.description.use.id_thread = self.properties['id_thread']
+        self.description.use.remark_activity = self.properties['global_remark_activity']
 
     def get_ownerships_info(self, ownerships):
         if ownerships:
