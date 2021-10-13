@@ -485,10 +485,13 @@ class Activity:
         self.ids_impact = ids_impact
         self.remark_activity = remark_activity
 
+    def __str_impact(self):
+        return [cor.TNomenclatures.mnemonique for cor in CorImpactTypes.get_impacts() if cor.CorImpactTypes.id_cor_impact_types in self.ids_impact]
+
     def __str__(self):
         return {
             "activite": Utils.get_mnemo(self.id_human_activity),
-            "impacts": Utils.get_mnemo(self.ids_impact),
+            "impacts": self.__str_impact(),
             "localisation": Utils.get_mnemo(self.id_localisation),
             "remarques": Utils.get_string(self.remark_activity)
         }
@@ -798,10 +801,6 @@ class Card(ZH):
     def __set_statuses(self):
         self.status.set_ownerships(self.properties['ownerships'])
         self.status.set_managements(self.properties['managements'])
-        # self.__set_instruments()
-        # self.other_inventory
-        # self.__set_protections()
-        # self.__set_urban_docs()
         return self.status.__str__()
 
     def get_instruments_info(self, instruments):
