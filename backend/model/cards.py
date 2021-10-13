@@ -648,6 +648,150 @@ class UrbanDoc:
         }
 
 
+class Evaluation:
+
+    def __init__(self):
+        self.main_functions = EvalMainFunction()
+        self.interest = EvalInterest()
+        self.thread = EvalThread()
+        self.action = EvalAction()
+
+    def __str__(self):
+        return {
+            "fonctions": self.main_functions.__str__(),
+            "interet": self.interest.__str__(),
+            "bilan": self.thread.__str__(),
+            "strategie": self.action.__str__()
+        }
+
+
+class EvalMainFunction:
+
+    def __init__(self):
+        self.hydro: list(Function)
+        self.bio: list(Function)
+
+    def set_hydro(self, hydro):
+        self.hydro = [
+            Function(
+                h['id_function'],
+                h['id_knowledge'],
+                h['id_qualification'],
+                h['justification']
+            ) for h in hydro
+        ]
+
+    def set_bio(self, bio):
+        self.bio = [
+            Function(
+                b['id_function'],
+                b['id_knowledge'],
+                b['id_qualification'],
+                b['justification']
+            ) for b in bio
+        ]
+
+    def __str__(self):
+        return {
+            "hydrologique": [hydro.__str__() for hydro in self.hydro],
+            "biologique": [bio.__str__() for bio in self.bio]
+        }
+
+
+class EvalInterest:
+
+    def __init__(self):
+        self.interet_patrim: list(Function)
+        self.nb_fauna_sp: int
+        self.nb_flora_sp: int
+        self.nb_hab: int
+        self.total_hab_cover: int
+        self.remark_eval_functions: str
+
+    def set_interet_patrim(self, interet_patrim):
+        self.interet_patrim = [
+            Function(
+                i['id_function'],
+                i['id_knowledge'],
+                i['id_qualification'],
+                i['justification']
+            ) for i in interet_patrim
+        ]
+
+    def __str__(self):
+        return {
+            "interet": [interest.__str__() for interest in self.interet_patrim],
+            "faunistique": Utils.get_int(self.nb_fauna_sp),
+            "floristique": Utils.get_int(self.nb_flora_sp),
+            "nb_hab": Utils.get_int(self.nb_hab),
+            "total_hab_cover": Utils.get_int(self.total_hab_cover),
+            "Commentaire": Utils.get_int(self.remark_eval_functions)
+        }
+
+
+class EvalThread:
+
+    def __init__(self):
+        self.id_thread: int
+        self.id_diag_hydro: int
+        self.id_diag_bio: int
+        self.remark_eval_thread: str
+
+    def set_thread(self, id_thread, id_diag_hydro, id_diag_bio, remark_eval_thread):
+        self.id_thread = id_thread
+        self.id_diag_hydro = id_diag_hydro
+        self.id_diag_bio = id_diag_bio
+        self.remark_eval_thread = remark_eval_thread
+
+    def __str__(self):
+        return {
+            "menaces": Utils.get_int(self.id_thread),
+            "hydrologique": Utils.get_int(self.id_diag_hydro),
+            "biologique": Utils.get_int(self.id_diag_bio),
+            "Commentaire": Utils.get_int(self.remark_eval_thread),
+        }
+
+
+class EvalAction:
+
+    def __init__(self):
+        self.actions: list(Action)
+        self.remark_eval_actions: str
+
+    def set_actions(self, actions):
+        self.actions = [
+            Action(
+                action["id_action"],
+                action["id_priority_level"],
+                action["remark"]
+            ) for action in actions
+        ]
+
+    def set_remark_eval_actions(self, remark):
+        self.remark_eval_actions = remark
+
+    def __str__(self):
+        return {
+            "propositions": [action.__str__() for action in self.actions],
+            "commentaires": Utils.get_string(self.remark_eval_actions)
+        }
+
+
+class Action:
+
+    def __init__(self, id_action, id_priority_level, remark):
+        self.id_action = id_action
+        self.id_priority_level = id_priority_level
+        self.remark = remark
+
+    def __str__(self):
+        return {
+            "proposition": Utils.get_mnemo(self.id_action),
+            "niveau": Utils.get_mnemo(self.id_priority_level),
+            "remarque": Utils.get_string(self.remark)
+        }
+
+
 class Card(ZH):
 
     def __init__(self, id_zh, type):
@@ -661,7 +805,7 @@ class Card(ZH):
         self.functions = Functions()
         self.description = Description()
         self.status = Status()
-        # self.evaluation
+        self.evaluation = Evaluation()
 
     def get_properties(self):
         return ZH(self.id_zh).__repr__()['properties']
@@ -677,7 +821,7 @@ class Card(ZH):
             "fonctionnement": self.__set_functioning(),
             "fonctions": self.__set_zh_functions(),
             "statuts": self.__set_statuses(),
-            "evaluation": "",
+            "evaluation": self.__set_evaluation(),
             "geometry": self.__set_geometry()
         }
 
@@ -823,6 +967,39 @@ class Card(ZH):
         self.status.set_protections(self.properties['protections'])
         self.status.set_urban_docs(self.properties['urban_docs'])
         return self.status.__str__()
+
+    def __set_evaluation(self):
+        self.__set_main_functions()
+        self.__set_interests()
+        self.__set_threads()
+        self.__set_actions()
+        return self.evaluation.__str__()
+
+    def __set_interests(self):
+        self.evaluation.interest.set_interet_patrim(
+            self.eval['interet_patrim'])
+        self.evaluation.interest.nb_fauna_sp = self.eval['nb_fauna_sp']
+        self.evaluation.interest.nb_flora_sp = self.eval['nb_flora_sp']
+        self.evaluation.interest.nb_hab = self.eval['nb_hab']
+        self.evaluation.interest.total_hab_cover = self.eval['total_hab_cover']
+        self.evaluation.interest.remark_eval_functions = self.properties['remark_eval_functions']
+
+    def __set_main_functions(self):
+        self.evaluation.main_functions.set_hydro(self.eval['fonctions_hydro'])
+        self.evaluation.main_functions.set_bio(self.eval['fonctions_bio'])
+
+    def __set_threads(self):
+        self.evaluation.thread.set_thread(
+            self.eval['id_thread'],
+            self.eval['id_diag_hydro'],
+            self.eval['id_diag_bio'],
+            self.properties['remark_eval_thread']
+        )
+
+    def __set_actions(self):
+        self.evaluation.action.set_actions(self.properties['actions'])
+        self.evaluation.action.set_remark_eval_actions(
+            self.properties['remark_eval_actions'])
 
     def get_actions_info(self, actions):
         if actions:
