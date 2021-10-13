@@ -7,16 +7,27 @@
             Présentation de la zone humide et de ses milieux
           </h5>
         </legend>
-        <zh-label label="Typologie SDAGE :">
-          <span>{{ data.presentation.sdage }}</span>
-        </zh-label>
-        <zh-label label="Typologie locale :">
-          <span>{{ data.presentation.typologie_locale }}</span>
-        </zh-label>
+        <div class="row">
+          <div class="col-12 col-xl-6">
+            <zh-label label="Typologie SDAGE :">
+              <span>{{ data.presentation.sdage }}</span>
+            </zh-label>
+          </div>
+          <div class="col-12 col-xl-6">
+            <zh-label label="Typologie locale :">
+              <span>{{ data.presentation.typologie_locale }}</span>
+            </zh-label>
+          </div>
+        </div>
         <zh-label label="Remarques :">
           <span>{{ data.presentation.remarques }}</span>
         </zh-label>
         <p class="section-label">Corine Biotope :</p>
+        <mat-icon
+          class="info-icon"
+          ngbTooltip="Types de milieux Corine Biotope humides (H) ou potentiellement humides (P)"
+          >info</mat-icon
+        >
         <div class="mx-2">
           <zh-table
             [tableCols]="corineTableCols"

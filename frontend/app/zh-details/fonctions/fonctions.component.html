@@ -43,15 +43,23 @@
           Habitats naturels humides patrimoniaux :
         </h5>
         <div class="mx-3">
-          <zh-label label="Cartographie d'habitats :">
-            <span>{{ data.habitats.cartographie }}</span>
-          </zh-label>
-          <zh-label label="Nombre d'habitats :">
-            <span>{{ data.habitats.nombre }}</span>
-          </zh-label>
-          <zh-label label="Recouvrement total de la ZH (%) :">
-            <span>{{ data.habitats.recouvrement }}</span>
-          </zh-label>
+          <div class="row">
+            <div class="col-12 col-xl-4">
+              <zh-label label="Cartographie d'habitats :">
+                <span>{{ data.habitats.cartographie }}</span>
+              </zh-label>
+            </div>
+            <div class="col-12 col-xl-4">
+              <zh-label label="Nombre d'habitats :">
+                <span>{{ data.habitats.nombre }}</span>
+              </zh-label>
+            </div>
+            <div class="col-12 col-xl-4">
+              <zh-label label="Recouvrement total de la ZH (%) :">
+                <span>{{ data.habitats.recouvrement }}</span>
+              </zh-label>
+            </div>
+          </div>
           <zh-table
             [tableCols]="corineTableCol"
             [data]="data.habitats.corine"
@@ -59,15 +67,23 @@
         </div>
         <h5 class="section-title mx-2">Faune et flore patrimoniale :</h5>
         <div class="mx-3">
-          <zh-label label="Flore - nombre d'espèces :">
-            <span>{{ data.taxons.nb_flore }}</span>
-          </zh-label>
-          <zh-label label="Faune vertébrée - nombre d'espèces :">
-            <span>{{ data.taxons.nb_invertebre }}</span>
-          </zh-label>
-          <zh-label label="Faune invertébrée - nombre d'espèces:">
-            <span>{{ data.taxons.nb_vertebre }}</span>
-          </zh-label>
+          <div class="row">
+            <div class="col-12 col-xl-4">
+              <zh-label label="Flore - nombre d'espèces :">
+                <span>{{ data.taxons.nb_flore }}</span>
+              </zh-label>
+            </div>
+            <div class="col-12 col-xl-4">
+              <zh-label label="Faune vertébrée - nombre d'espèces :">
+                <span>{{ data.taxons.nb_invertebre }}</span>
+              </zh-label>
+            </div>
+            <div class="col-12 col-xl-4">
+              <zh-label label="Faune invertébrée - nombre d'espèces:">
+                <span>{{ data.taxons.nb_vertebre }}</span>
+              </zh-label>
+            </div>
+          </div>
         </div>
       </fieldset>
     </div>

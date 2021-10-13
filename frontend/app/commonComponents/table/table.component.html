@@ -8,7 +8,14 @@
     <ng-container *ngIf="data && data.length > 0">
       <tr *ngFor="let item of data">
         <td *ngFor="let col of tableCols">
-          {{ item[col.name]?.mnemonique || item[col.name] }}
+          <ul *ngIf="isArray(item[col.name]); else elseBlock">
+            <li class="item" *ngFor="let item of item[col.name]">
+              {{ item }}
+            </li>
+          </ul>
+          <ng-template #elseBlock>
+            {{ item[col.name] }}
+          </ng-template>
         </td>
       </tr>
     </ng-container>
