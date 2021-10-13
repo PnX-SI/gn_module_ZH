@@ -11,7 +11,7 @@
           *ngIf="data.delimitation_zone?.critere"
           label="Critères utilisés :"
         >
-          <span>TODO {{ data.delimitation_zone.critere.join(", ") }} </span>
+          <span>{{ data.delimitation_zone.critere.join(", ") }} </span>
         </zh-label>
         <zh-label label="Remarques :">
           <span>{{ data.delimitation_zone?.remark }} </span>
@@ -30,9 +30,7 @@
           *ngIf="data.delimitation_fonctions?.critere"
           label="Critères utilisés :"
         >
-          <span
-            >TODO {{ data.delimitation_fonctions.critere.join(", ") }}
-          </span>
+          <span> {{ data.delimitation_fonctions.critere.join(", ") }} </span>
         </zh-label>
         <zh-label label="Remarques :">
           <span>{{ data.delimitation_fonctions?.remark }} </span>
