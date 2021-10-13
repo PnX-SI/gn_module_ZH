@@ -11,7 +11,7 @@ export class FonctionnementComponent {
   @Input() data: FonctionnementModel;
 
   public readonly imgPath = "external_assets/zones_humides";
-  public readonly corConnexionType = {
+  public readonly corConnectionType = {
     "Aucune Connexion": "aucune_connexion.svg",
     "Entrée et sortie": "entree_sortie.svg",
     Entrée: "entree.svg",
@@ -19,7 +19,7 @@ export class FonctionnementComponent {
     Traversée: "traversee.svg",
     "Passe à côté": "passe_a_cote.svg",
   };
-  public connexionImg: string;
+  public connectionImg: string = "";
 
   public entryTableCols: TableColumn[] = [
     { name: "type", label: "Entrée d'eau" },
@@ -33,8 +33,9 @@ export class FonctionnementComponent {
     { name: "toponymie", label: "Toponymie et compléments d'information" },
   ];
   ngOnInit() {
-    this.connexionImg = `${this.imgPath}/${
-      this.corConnexionType[this.data.connexion]
-    }`;
+    if (this.data.connexion in this.corConnectionType) {
+      const connectionType = this.corConnectionType[this.data.connexion];
+      this.connectionImg = `${this.imgPath}/${connectionType}`;
+    }
   }
 }

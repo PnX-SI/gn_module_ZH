@@ -35,13 +35,14 @@
           </h5>
         </legend>
         <zh-label label="Type de connexion :">
-          <div class="img-container">
+          <p *ngIf="!connectionImg">non renseigné</p>
+          <div *ngIf="connectionImg" class="img-container">
             <label class="form-check-label p-3" for="inlineRadio3">
               <p>
                 <b>{{ data.connexion }}</b>
               </p>
             </label>
-            <img [src]="connexionImg" width="90" alt="" />
+            <img [src]="connectionImg" width="90" alt="" />
           </div>
         </zh-label>
       </fieldset>
