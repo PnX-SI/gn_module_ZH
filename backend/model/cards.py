@@ -502,10 +502,10 @@ class Status:
     def __init__(self):
         self.ownerships: list(Ownership)
         self.managements: list(Management)
-        #self.instruments: list(Instrument)
-        #self.other_inventory: bool
-        #self.protections: list(int)
-        #self.urban_docs: list(UrbanDoc)
+        self.instruments: list(Instrument)
+        self.is_other_inventory: bool
+        self.protections: list(int)
+        self.urban_docs: list(UrbanDoc)
 
     def set_ownerships(self, ownerships):
         self.ownerships = [
@@ -532,27 +532,44 @@ class Status:
             )
             self.managements.append(mng)
 
-        """
-        self.managements = [
-            Management(
-                management['structure'],
-                [Plan(
-                    management['id_nature'],
-                    management['plan_date'],
-                    management['duration']
-                ) for management in management['plans']]
-            ) for management in managements
+    def set_instruments(self, instruments):
+        self.instruments = [
+            Instrument(
+                instrument['id_instrument'],
+                instrument['instrument_date']
+            ) for instrument in instruments
         ]
-        """
+
+    def set_urban_docs(self, urban_docs):
+        self.urban_docs = [
+            UrbanDoc(
+                urban_doc['id_area'],
+                urban_doc['id_doc_type'],
+                urban_doc['id_cors'],
+                urban_doc['remark']
+            ) for urban_doc in urban_docs
+        ]
+
+    def set_protections(self, protections):
+        self.protections = protections
+
+    def __str_protections(self):
+        q_protections = DB.session.query(CorProtectionLevelType)\
+            .filter(CorProtectionLevelType.id_protection_status.in_(self.protections))\
+            .all()
+        return [
+            Utils.get_mnemo(protection.id_protection_status)
+            for protection in q_protections
+        ]
 
     def __str__(self):
         return {
             "regime": [ownership.__str__() for ownership in self.ownerships],
             "structure": [management.__str__() for management in self.managements],
-            # "instruments": [instrument.__str__() for instrument in self.instruments],
-            # "autre_invetaire": Utils.get_bool(self.other_inventory),
-            # "statuts": [protection.__str__() for protection in self.protections],
-            # "zonage": [urban_doc.__str__() for urban_doc in self.urban_docs]
+            "instruments": [instrument.__str__() for instrument in self.instruments],
+            "autre_invetaire": Utils.get_bool(self.is_other_inventory),
+            "statuts": self.__str_protections(),
+            "zonage": [urban_doc.__str__() for urban_doc in self.urban_docs]
         }
 
 
@@ -588,9 +605,9 @@ class Management:
 
 class Plan:
 
-    def __init__(self, id_instrument, instrument_date, duration):
-        self.id_nature = id_instrument
-        self.plan_date = instrument_date
+    def __init__(self, id_nature, plan_date, duration):
+        self.id_nature = id_nature
+        self.plan_date = plan_date
         self.duration = duration
 
     def __str__(self):
@@ -603,14 +620,14 @@ class Plan:
 
 class Instrument:
 
-    def __init__(self, id_nature, instrument_date):
-        self.id_nature = id_nature
+    def __init__(self, id_instrument, instrument_date):
+        self.id_instrument = id_instrument
         self.instrument_date = instrument_date
 
     def __str__(self):
         return {
-            "instrument": Utils.get_mnemo(self.id_nature),
-            "date": Utils.get_string(str(self.instrument_date))
+            "instrument": Utils.get_mnemo(self.id_instrument),
+            "date": datetime.strptime(self.instrument_date, '%Y-%m-%d').date().strftime("%d/%m/%Y")
         }
 
 
@@ -801,61 +818,11 @@ class Card(ZH):
     def __set_statuses(self):
         self.status.set_ownerships(self.properties['ownerships'])
         self.status.set_managements(self.properties['managements'])
+        self.status.set_instruments(self.properties['instruments'])
+        self.status.is_other_inventory = self.properties['is_other_inventory']
+        self.status.set_protections(self.properties['protections'])
+        self.status.set_urban_docs(self.properties['urban_docs'])
         return self.status.__str__()
-
-    def get_instruments_info(self, instruments):
-        if instruments:
-            return [
-                {
-                    "Instruments contractuels et financiers": self.get_mnemo(instrument['id_instrument']),
-                    "Date de mise en oeuvre": str(instrument['instrument_date'])
-                }
-                for instrument in instruments
-            ]
-        return "Non renseigné"
-
-    def get_urban_doc_info(self, urban_docs):
-        if urban_docs:
-            return [
-                {
-                    "Communes": DB.session.query(LAreas).filter(LAreas.id_area == urban_doc['id_area']).one().area_name,
-                    "Type de document communal": self.get_mnemo(urban_doc['id_doc_type']),
-                    "Type de classement": [self.get_mnemo(DB.session.query(CorUrbanTypeRange).filter(CorUrbanTypeRange.id_cor == id).one().id_range_type) for id in urban_doc['id_cors']],
-                    "Remarques": urban_doc['remark']
-                }
-                for urban_doc in urban_docs
-            ]
-        return "Non renseigné"
-
-    def get_protection_names(self, protection_ids):
-        q_protections = DB.session.query(CorProtectionLevelType).filter(
-            CorProtectionLevelType.id_protection.in_(protection_ids)).all()
-        return [
-            self.get_mnemo(protection.id_protection_status) for protection in q_protections
-        ]
-
-    def get_managements_info(self, managements):
-        if managements:
-            management_list = []
-            for management in managements:
-                structure_gestion = DB.session.query(BibOrganismes).filter(
-                    BibOrganismes.id_org == management["structure"]).one().name
-                if management["plans"]:
-                    plan_gestion = {}
-                    for plan in management["plans"]:
-                        plan_gestion.update({
-                            "Nature du plan": self.get_mnemo(plan["id_nature"]),
-                            "Date de réalisation": str(plan['plan_date']),
-                            "Durée (années)": plan['duration']
-                        })
-                else:
-                    plan_gestion = 'Pas de plan de gestion de la zone humide renseigné pour cette structure'
-                management_list.append({
-                    "Structure de gestion": structure_gestion,
-                    "Plan de gestion": plan_gestion
-                })
-            return management_list
-        return "Non renseigné"
 
     def get_actions_info(self, actions):
         if actions:
