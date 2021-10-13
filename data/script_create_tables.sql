@@ -692,3 +692,24 @@ ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_sdage_t_nomenclatures FOREIGN KEY 
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_sage_t_nomenclatures FOREIGN KEY ( id_sage ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_id_org FOREIGN KEY ( id_org ) REFERENCES pr_zh.bib_organismes( id_org )  ON UPDATE CASCADE;
+
+CREATE OR REPLACE VIEW pr_zh.taxa AS
+	SELECT
+		taxref.classe AS "Groupe d''étude",
+		taxref.nom_complet AS "Nom Scientifique",
+		taxref.nom_vern AS "Nom vernaculaire",
+		'' AS "Réglementation",
+		'' AS "Article",
+		COUNT(taxref.cd_nom)::integer AS "Nombre d''observations"
+	FROM gn_synthese.synthese synthese
+	LEFT JOIN taxonomie.taxref taxref ON synthese.cd_nom=taxref.cd_nom
+	WHERE ST_INTERSECTS(
+		ST_SetSRID(synthese.the_geom_4326,4326),
+		ST_SetSRID(
+			(
+			SELECT geom 
+			FROM pr_zh.t_zh 
+			WHERE id_zh = 275
+			),4326))
+	GROUP BY taxref.nom_complet,taxref.nom_vern, taxref.classe
+	;
