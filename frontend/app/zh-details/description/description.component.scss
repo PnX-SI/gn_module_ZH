@@ -1,6 +1,10 @@
 @import "../../../app.module";
 
 fieldset {
-  margin: 0 !important;
+  margin: 0 0 16px;
   height: 100%;
+}
+.section-label {
+  margin: 16px 0 12px;
+  font-weight: 600;
 }

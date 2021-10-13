@@ -7,5 +7,5 @@ import { Component, Input } from "@angular/core";
 })
 export class CollapseComponent {
   @Input() title: string;
-  @Input() expanded: boolean = false;
+  @Input() expanded: boolean = true;
 }

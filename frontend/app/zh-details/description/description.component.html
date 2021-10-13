@@ -1,6 +1,6 @@
 <div>
-  <div class="row">
-    <div class="col-12">
+  <div class="row my-3">
+    <div class="col-12 h-100">
       <fieldset>
         <legend>
           <h5 class="section-title">
@@ -8,25 +8,24 @@
           </h5>
         </legend>
         <zh-label label="Typologie SDAGE :">
-          <span></span>
+          <span>{{ data.presentation.sdage }}</span>
         </zh-label>
         <zh-label label="Typologie locale :">
-          <span></span>
+          <span>{{ data.presentation.typologie_locale }}</span>
         </zh-label>
         <zh-label label="Remarques :">
-          <span></span>
+          <span>{{ data.presentation.remarques }}</span>
         </zh-label>
+        <p class="section-label">Corine Biotope :</p>
+        <div class="mx-2">
+          <zh-table
+            [tableCols]="corineTableCols"
+            [data]="data.presentation.corine_biotope"
+          ></zh-table>
+        </div>
       </fieldset>
     </div>
-    <div class="col-12">
-      <fieldset>
-        <legend>
-          <h5 class="section-title">Corine Biotope</h5>
-        </legend>
-        <zh-table [tableCols]="corineTableCols"></zh-table>
-      </fieldset>
-    </div>
-    <div class="col-12">
+    <div class="col-12 h-100">
       <fieldset>
         <legend>
           <h5 class="section-title">
@@ -36,16 +35,27 @@
         <zh-label
           label=" Occupation des sols (Nomenclature Corine Land Cover) : "
         >
-          <span></span>
+          <span> {{ data.espace.join(", ") }} </span>
         </zh-label>
       </fieldset>
     </div>
-    <div class="col-12">
+    <div class="col-12 h-100">
       <fieldset>
         <legend>
           <h5 class="section-title">Usage ou processus naturels</h5>
         </legend>
-        <zh-table [tableCols]="activitiesTableCols"></zh-table>
+        <zh-table
+          [tableCols]="activitiesTableCols"
+          [data]="data.usage.activities"
+        ></zh-table>
+        <zh-label
+          label="Évaluation globale des menaces potentielles ou avérées :"
+        >
+          <span>{{ data.usage.evaluation_menaces }}</span>
+        </zh-label>
+        <zh-label label="Remarques :">
+          <span>{{ data.usage.remarques }}</span>
+        </zh-label>
       </fieldset>
     </div>
   </div>

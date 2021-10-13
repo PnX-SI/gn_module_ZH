@@ -12,15 +12,19 @@ export class DescriptionComponent {
   public corineTableCols: TableColumn[] = [
     { name: "code", label: "Code corine Biotope" },
     { name: "label", label: "Libellé corine biotope" },
-    { name: "humidite", label: "Humidité" },
+    { name: "Humidité", label: "Humidité" },
   ];
   activitiesTableCols: TableColumn[] = [
     { name: "activite", label: "Activités humaines" },
-    { name: "lacalisation", label: "Localisation" },
+    { name: "localisation", label: "Localisation" },
     {
       name: "impacts",
       label: "	Impacts (facteurs influençant l'évolution de la zone)",
     },
     { name: "remarques", label: "Remarques" },
   ];
+
+  ngOnInit() {
+    console.log("desc data", this.data);
+  }
 }
