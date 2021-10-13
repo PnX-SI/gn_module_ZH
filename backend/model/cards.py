@@ -657,8 +657,12 @@ class Card(ZH):
             "fonctionnement": self.__set_functioning(),
             "fonctions": self.__set_zh_functions(),
             "statuts": self.__set_statuses(),
-            "evaluation": ""
+            "evaluation": "",
+            "geometry": self.__set_geometry()
         }
+
+    def __set_geometry(self):
+        return ZH(self.id_zh).__repr__()["geometry"]
 
     def __set_info(self):
         self.__set_identification()
