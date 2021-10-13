@@ -142,13 +142,13 @@
           <table class="table">
             <thead class="thead-inverse table-header">
               <tr>
-                <th *ngFor="let col of fctTableCol">{{ col.label }}</th>
+                <th *ngFor="let col of interetsTableCol">{{ col.label }}</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let item of interetPatTable">
-                <td *ngFor="let col of fctTableCol">
+                <td *ngFor="let col of interetsTableCol">
                   {{ item[col.name]?.mnemonique || item[col.name] }}
                 </td>
                 <td>
@@ -331,13 +331,13 @@
           <table class="table">
             <thead class="thead-inverse table-header">
               <tr>
-                <th *ngFor="let col of fctTableCol">{{ col.label }}</th>
+                <th *ngFor="let col of socioEcoTableCol">{{ col.label }}</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let item of valSocEcoTable">
-                <td *ngFor="let col of fctTableCol">
+                <td *ngFor="let col of socioEcoTableCol">
                   {{ item[col.name]?.mnemonique || item[col.name] }}
                 </td>
                 <td>

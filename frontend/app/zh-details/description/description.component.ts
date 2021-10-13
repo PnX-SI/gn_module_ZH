@@ -23,8 +23,4 @@ export class DescriptionComponent {
     },
     { name: "remarques", label: "Remarques" },
   ];
-
-  ngOnInit() {
-    console.log("desc data", this.data);
-  }
 }

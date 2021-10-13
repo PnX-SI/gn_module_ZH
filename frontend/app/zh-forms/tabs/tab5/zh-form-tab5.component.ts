@@ -54,7 +54,8 @@ export class ZhFormTab5Component implements OnInit {
     { name: "knowledge", label: "Connaissance" },
     { name: "justification", label: "Justifications" },
   ];
-  public fctTableCol = [
+
+  public interetsTableCol = [
     { name: "function", label: "Intérêts patrimoniaux" },
     { name: "qualification", label: "Qualifications" },
     { name: "knowledge", label: "Connaissance" },
@@ -66,6 +67,13 @@ export class ZhFormTab5Component implements OnInit {
     { name: "preservationState", label: "État de conservation" },
     { name: "cahierHab", label: "Cahier Habitats" },
     { name: "habCover", label: "Recouvrement de la ZH (%)" },
+  ];
+
+  public socioEcoTableCol = [
+    { name: "function", label: "Valeurs socio-économiques" },
+    { name: "qualification", label: "Qualifications" },
+    { name: "knowledge", label: "Connaissance" },
+    { name: "justification", label: "Justifications" },
   ];
 
   private tempID: any;
