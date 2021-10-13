@@ -43,16 +43,24 @@ class Utils(ZH):
 class Limits:
 
     def __init__(self):
-        self.area_limits = Criteria([], None)
-        self.function_limits = Criteria([], None)
+        self.area_limits = Criteria
+        self.function_limits = Criteria
 
-    def set_area_limits(self, criteria, remark):
-        self.area_limits.criteria = criteria
-        self.area_limits.remark = remark
+    @property
+    def area_limits(self):
+        return self.__area_limits
 
-    def set_function_limits(self, criteria, remark):
-        self.function_limits.criteria = criteria
-        self.function_limits.remark = remark
+    @area_limits.setter
+    def area_limits(self, val):
+        self.__area_limits = val
+
+    @property
+    def function_limits(self):
+        return self.__function_limits
+
+    @function_limits.setter
+    def function_limits(self, val):
+        self.__function_limits = val
 
     def __str__(self):
         return {
@@ -226,24 +234,49 @@ class Regime:
         self.id_frequency: int
         self.id_spread: int
 
-    # a refaire avec getters et setters
-    def set_regime(self, flows, id_frequency, id_spread):
-        self.inflows = self.__set_flows(flows[1]['inflows'], type='id_inflow')
-        self.outflows = self.__set_flows(
-            flows[0]['outflows'], type='id_outflow')
-        self.id_spread = id_spread
-        self.id_frequency = id_frequency
+    @property
+    def inflows(self):
+        return self.__inflows
 
-    def __set_flows(self, flows, type):
-        if flows:
-            return [
-                Flow(
-                    flow[type],
-                    flow['id_permanance'],
-                    flow['topo']
-                ) for flow in flows
-            ]
-        return []
+    @property
+    def outflows(self):
+        return self.__outflows
+
+    @property
+    def id_frequency(self):
+        return self.__id_frequency
+
+    @property
+    def id_spread(self):
+        return self.__id_spread
+
+    @inflows.setter
+    def inflows(self, value):
+        self.__inflows = [
+            Flow(
+                flow['id_inflow'],
+                flow['id_permanance'],
+                flow['topo']
+            ) for flow in value
+        ]
+
+    @outflows.setter
+    def outflows(self, value):
+        self.__outflows = [
+            Flow(
+                flow['id_outflow'],
+                flow['id_permanance'],
+                flow['topo']
+            ) for flow in value
+        ]
+
+    @id_frequency.setter
+    def id_frequency(self, value):
+        self.__id_frequency = value
+
+    @id_spread.setter
+    def id_spread(self, value):
+        self.__id_spread = value
 
     def __str__(self):
         return {
@@ -957,12 +990,16 @@ class Card(ZH):
         ]
 
     def __set_limits(self):
-        self.limits.set_area_limits(
+        area_limits = Criteria(
             self.properties['id_lims'],
-            self.properties['remark_lim'])
-        self.limits.set_function_limits(
+            self.properties['remark_lim']
+        )
+        self.limits.area_limits = area_limits
+        function_limits = Criteria(
             self.properties['id_lims_fs'],
-            self.properties['remark_lim_fs'])
+            self.properties['remark_lim_fs']
+        )
+        self.limits.function_limits = function_limits
         return self.limits.__str__()
 
     def __set_functioning(self):
@@ -972,11 +1009,11 @@ class Card(ZH):
         return self.functioning.__str__()
 
     def __set_regime(self):
-        self.functioning.regime.set_regime(
-            self.properties['flows'],
-            self.properties['id_frequency'],
-            self.properties['id_spread']
-        )
+        self.functioning.regime = Regime()
+        self.functioning.regime.inflows = self.properties['flows'][1]['inflows']
+        self.functioning.regime.outflows = self.properties['flows'][0]['outflows']
+        self.functioning.regime.id_frequency = self.properties['id_frequency']
+        self.functioning.regime.id_spread = self.properties['id_spread']
 
     def __set_connexion(self):
         self.functioning.id_connexion = self.properties['id_connexion']
