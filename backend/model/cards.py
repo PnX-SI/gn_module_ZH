@@ -494,6 +494,140 @@ class Activity:
         }
 
 
+class Status:
+
+    def __init__(self):
+        self.ownerships: list(Ownership)
+        self.managements: list(Management)
+        #self.instruments: list(Instrument)
+        #self.other_inventory: bool
+        #self.protections: list(int)
+        #self.urban_docs: list(UrbanDoc)
+
+    def set_ownerships(self, ownerships):
+        self.ownerships = [
+            Ownership(
+                ownership['id_status'],
+                ownership['remark']
+            ) for ownership in ownerships
+        ]
+
+    def set_managements(self, managements):
+        self.managements = []
+        for management in managements:
+            plans = [
+                Plan(
+                    plan['id_nature'],
+                    plan['plan_date'],
+                    plan['duration']
+                ) for plan in management['plans']
+            ]
+            mng = Management()
+            mng.set_management(
+                management['structure'],
+                plans
+            )
+            self.managements.append(mng)
+
+        """
+        self.managements = [
+            Management(
+                management['structure'],
+                [Plan(
+                    management['id_nature'],
+                    management['plan_date'],
+                    management['duration']
+                ) for management in management['plans']]
+            ) for management in managements
+        ]
+        """
+
+    def __str__(self):
+        return {
+            "regime": [ownership.__str__() for ownership in self.ownerships],
+            "structure": [management.__str__() for management in self.managements],
+            # "instruments": [instrument.__str__() for instrument in self.instruments],
+            # "autre_invetaire": Utils.get_bool(self.other_inventory),
+            # "statuts": [protection.__str__() for protection in self.protections],
+            # "zonage": [urban_doc.__str__() for urban_doc in self.urban_docs]
+        }
+
+
+class Ownership:
+
+    def __init__(self, id_status, remark):
+        self.id_status = id_status
+        self.remark = remark
+
+    def __str__(self):
+        return {
+            "status": Utils.get_mnemo(self.id_status),
+            "remarques": Utils.get_string(self.remark)
+        }
+
+
+class Management:
+
+    def __init__(self):
+        self.id_org: int
+        self.plans: list(Plan)
+
+    def set_management(self, id_org, plans):
+        self.id_org = id_org
+        self.plans = plans
+
+    def __str__(self):
+        return {
+            "structure": DB.session.query(BibOrganismes).filter(BibOrganismes.id_org == self.id_org).one().name,
+            "plans": [plan.__str__() for plan in self.plans]
+        }
+
+
+class Plan:
+
+    def __init__(self, id_instrument, instrument_date, duration):
+        self.id_nature = id_instrument
+        self.plan_date = instrument_date
+        self.duration = duration
+
+    def __str__(self):
+        return {
+            "plan": Utils.get_mnemo(self.id_nature),
+            "date": Utils.get_string(str(self.plan_date)),
+            "duree": Utils.get_int(self.duration)
+        }
+
+
+class Instrument:
+
+    def __init__(self, id_nature, instrument_date):
+        self.id_nature = id_nature
+        self.instrument_date = instrument_date
+
+    def __str__(self):
+        return {
+            "instrument": Utils.get_mnemo(self.id_nature),
+            "date": Utils.get_string(str(self.instrument_date))
+        }
+
+
+class UrbanDoc:
+
+    def __init__(self, id_area, id_doc_type, id_cors, remark):
+        self.id_area = id_area
+        self.id_doc_type = id_doc_type
+        self.id_cors = id_cors
+        self.remark = remark
+
+    def __str__(self):
+        return {
+            "commune": DB.session.query(LAreas).filter(LAreas.id_area == self.id_area).one().area_name,
+            "type_doc": Utils.get_mnemo(self.id_doc_type),
+            "type_classement": [Utils.get_mnemo(DB.session.query(CorUrbanTypeRange).filter(CorUrbanTypeRange.id_cor == id).one().id_range_type) for id in self.id_cors],
+            "remarque": Utils.get_string(self.remark)
+        }
+
+
 class Card(ZH):
 
     def __init__(self, id_zh, type):
@@ -506,7 +640,7 @@ class Card(ZH):
         self.functioning = Functioning()
         self.functions = Functions()
         self.description = Description()
-        # self.status
+        self.status = Status()
         # self.evaluation
 
     def get_properties(self):
@@ -522,7 +656,7 @@ class Card(ZH):
             "description": self.__set_description(),
             "fonctionnement": self.__set_functioning(),
             "fonctions": self.__set_zh_functions(),
-            "statuts": "",
+            "statuts": self.__set_statuses(),
             "evaluation": ""
         }
 
@@ -632,13 +766,17 @@ class Card(ZH):
         self.description.presentation = Presentation(
             self.properties['id_sdage'],
             self.properties['id_sage'],
-            [CorineBiotope(cb)
-             for cb in self.properties['cb_codes_corine_biotope']],
+            self.__get_cb(),
             self.properties['remark_pres']
         )
         self.description.id_corine_landcovers = self.properties['id_corine_landcovers']
         self.__set_use()
         return self.description.__str__()
+
+    def __get_cb(self):
+        return [
+            CorineBiotope(cb) for cb in self.properties['cb_codes_corine_biotope']
+        ]
 
     def __set_use(self):
         self.description.use = Use()
@@ -653,16 +791,14 @@ class Card(ZH):
         self.description.use.id_thread = self.properties['id_thread']
         self.description.use.remark_activity = self.properties['global_remark_activity']
 
-    def get_ownerships_info(self, ownerships):
-        if ownerships:
-            return [
-                {
-                    "Statut": self.get_mnemo(ownership['id_status']),
-                    "Remarque": ownership['remark']
-                }
-                for ownership in ownerships
-            ]
-        return "Non renseigné"
+    def __set_statuses(self):
+        self.status.set_ownerships(self.properties['ownerships'])
+        self.status.set_managements(self.properties['managements'])
+        # self.__set_instruments()
+        # self.other_inventory
+        # self.__set_protections()
+        # self.__set_urban_docs()
+        return self.status.__str__()
 
     def get_instruments_info(self, instruments):
         if instruments:
