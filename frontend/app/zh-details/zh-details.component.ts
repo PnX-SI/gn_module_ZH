@@ -3,6 +3,8 @@ import { ActivatedRoute } from "@angular/router";
 import { MapService } from "@geonature_common/map/map.service";
 import { ZhDataService } from "../services/zh-data.service";
 import { ToastrService } from "ngx-toastr";
+import { GeoJSON } from "leaflet";
+import * as L from "leaflet";
 
 import { DetailsModel } from "./models/zh-details.model";
 
@@ -33,6 +35,15 @@ export class ZhDetailsComponent implements OnInit, AfterViewInit {
     this._zhService.getZhDetails(this.id_zh).subscribe(
       (data: DetailsModel) => {
         this.zhDetails = data;
+        let geojson: GeoJSON = {
+          geometry: data.geometry,
+          properties: { idZh: this.id_zh },
+          type: "Feature",
+        };
+        setTimeout(() => {
+          let layer = L.geoJSON(geojson).addTo(this._mapService.map);
+          this._mapService.map.fitBounds(layer.getBounds());
+        }, 0);
       },
       (error) => {
         this._toastr.error(error.error, "", {

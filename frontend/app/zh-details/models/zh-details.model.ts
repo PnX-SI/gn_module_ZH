@@ -14,4 +14,5 @@ export interface DetailsModel {
   fonctions: FonctionsModel;
   statuts: StatutsModel;
   evaluation: EvaluationModel;
+  geometry: any;
 }
