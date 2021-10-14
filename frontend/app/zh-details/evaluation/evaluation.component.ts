@@ -1,7 +1,7 @@
 import { Component, Input } from "@angular/core";
 
 import { TableColumn } from "../../commonComponents/table/table-interface";
-import { EvaluationModel } from "../models/fonctionnement.model";
+import { EvaluationModel } from "../models/evaluations.model";
 
 @Component({
   selector: "zh-details-evaluation",

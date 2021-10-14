@@ -14,8 +14,5 @@ export class RenseignementsComponent {
     { name: "titre", label: "Titre du document" },
     { name: "auteurs", label: "Auteurs" },
     { name: "annee", label: "Année de parution" },
-    { name: "bassins", label: "Bassins versants" },
-    { name: "editeur", label: "Editeur" },
-    { name: "lieu", label: "Lieu" },
   ];
 }
