@@ -101,7 +101,7 @@ class Identification:
         }
 
     def __get_site_space_name(self):
-        return TZH.get_site_space_name(self.id_site_space) if self.is_id_site_space and self.id_site_space else "Ne fait pas partie d'un grand ensemble"
+        return TZH.get_site_space_name(self.id_site_space) if self.is_id_site_space and self.id_site_space else ''
 
 
 class Info:
@@ -163,7 +163,7 @@ class Author:
         self.create_date = create_date
         self.update_date = update_date
         self.create_author = self.__get_author()
-        self.edit_author = self.__get_author(type='co-author')
+        self.edit_author = self.__get_author(type='coauthors')
 
     def __str__(self):
         return {
@@ -173,18 +173,14 @@ class Author:
             "date_modif": datetime.strptime(self.update_date, '%Y-%m-%d %H:%M:%S.%f').date().strftime("%d/%m/%Y")
         }
 
-    def __get_author(self, type='author'):
-        if type == 'author':
-            prenom = DB.session.query(TZH).filter(
-                TZH.id_zh == self.id_zh).one().authors.prenom_role
-            nom = DB.session.query(TZH).filter(
-                TZH.id_zh == self.id_zh).one().authors.nom_role
-        else:
-            prenom = DB.session.query(TZH).filter(
-                TZH.id_zh == self.id_zh).one().coauthors.prenom_role
-            nom = DB.session.query(TZH).filter(
-                TZH.id_zh == self.id_zh).one().coauthors.nom_role
-        return prenom + ' ' + nom.upper()
+    def __get_author(self, type='authors'):
+        zh = TZH.get_tzh_by_id(self.id_zh)
+        if type in ['authors', 'coauthors']:
+            prenom = getattr(zh, type).prenom_role
+            nom = getattr(zh, type).nom_role
+            return prenom + ' ' + nom.upper()
+        raise ValueError(
+            '{} value for type variable does not exist'.format(type))
 
 
 class Municipalities:

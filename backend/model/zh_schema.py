@@ -300,6 +300,10 @@ class TZH(ZhModel):
         return DB.session.query(BibSiteSpace).filter(BibSiteSpace.id_site_space == id).one().name
 
     @staticmethod
+    def get_tzh_by_id(id):
+        return DB.session.query(TZH).filter(TZH.id_zh == id).one()
+
+    @staticmethod
     def get_zh_area_intersected(zh_area_type, id_zh_geom):
         if zh_area_type == 'river_basin':
             q = DB.session.query(TRiverBasin).filter(
