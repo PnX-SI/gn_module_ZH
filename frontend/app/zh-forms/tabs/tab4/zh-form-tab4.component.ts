@@ -51,6 +51,16 @@ export class ZhFormTab4Component implements OnInit {
     { name: "topo", label: "Toponymie et compléments d'information" },
   ];
 
+  private readonly corConnectionType = {
+    "Aucune connexion": "aucune_connexion.svg",
+    "Entrée et sortie": "entree_sortie.svg",
+    Entrée: "entree.svg",
+    Sortie: "sortie.svg",
+    Traversée: "traversee.svg",
+    "Passe à coté": "passe_a_cote.svg",
+  };
+  connexionTypes: any[];
+
   constructor(
     private fb: FormBuilder,
     public ngbModal: NgbModal,
@@ -105,6 +115,10 @@ export class ZhFormTab4Component implements OnInit {
     });
     this.outflowInput.map((item: any) => {
       item.disabled = false;
+    });
+    this.connexionTypes = [...this.formMetaData["TYPE_CONNEXION"]];
+    this.connexionTypes.map((item: any) => {
+      item.image = this.corConnectionType[item.mnemonique];
     });
   }
 
