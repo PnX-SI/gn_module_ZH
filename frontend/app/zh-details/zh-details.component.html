@@ -29,9 +29,11 @@
     ><zh-details-fonctions [data]="zhDetails.fonctions"></zh-details-fonctions
   ></collapse>
   <collapse title="Statuts et gestion de la zone humide"
-    ><zh-details-statuts></zh-details-statuts
+    ><zh-details-statuts [data]="zhDetails.statuts"></zh-details-statuts
   ></collapse>
   <collapse title="Évaluation générale du site"
-    ><zh-details-evaluation></zh-details-evaluation
+    ><zh-details-evaluation
+      [data]="zhDetails.evaluation"
+    ></zh-details-evaluation
   ></collapse>
 </div>
