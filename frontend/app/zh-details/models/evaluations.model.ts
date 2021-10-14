@@ -8,48 +8,41 @@ export interface EvaluationModel {
 }
 
 interface FonctionsEtValeursMajeures {
-  hydrologique: HydrologiquesBiogeochimiques[];
-  biologique: BiologiquesEcologiques[];
+  hydrologique: Fonctions[];
+  biologique: Fonctions[];
 }
 
-interface HydrologiquesBiogeochimiques {
-  fonctions_hydro: string;
-  Justification: string;
-  Qualification: string;
-  Connaissance: string;
-}
-
-interface BiologiquesEcologiques {
-  fonctions_bio: string;
-  Justification: string;
-  Qualification: string;
-  Connaissance: string;
+interface Fonctions {
+  type: string;
+  justification: string;
+  qualification: string;
+  connaissance: string;
 }
 
 interface InteretPatrimonialMajeur {
-  interet: InteretsPatrimoniaux;
+  interet: Fonctions[];
   faunistique: number;
   floristique: number;
-  "Nombre d'habitats humides patrimoniaux": number;
-  "Recouvrement total de la ZH (%)": number;
+  nb_hab: number;
+  total_hab_cover: number;
   Commentaire: null | string;
-}
-
-interface InteretsPatrimoniaux {
-  interet_patrim: string;
-  Justification: string;
-  Qualification: string;
-  Connaissance: string;
+  valeur: Fonctions[];
 }
 
 interface BilanMenaces {
-  "Evaluation globale des menaces potentielles ou avérées": string;
-  "Fonctionnalité hydrologique / biogéochimique": string;
-  "Fonctionnalité biologique / écologique (habitats / faune / flore)": string;
+  menaces: string;
+  hydrologique: string;
+  biologique: string;
   Commentaire: null | string;
 }
 
 interface Strategie {
-  "Propositions d'actions": string;
-  Commentaires: null | string;
+  propositions: Proposition[];
+  commentaires: null | string;
+}
+
+interface Proposition {
+  proposition: string;
+  niveau: string;
+  remarque: string;
 }
