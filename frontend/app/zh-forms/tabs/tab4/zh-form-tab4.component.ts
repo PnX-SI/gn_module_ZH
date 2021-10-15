@@ -39,6 +39,8 @@ export class ZhFormTab4Component implements OnInit {
   private $_fromChangeSub: Subscription;
   public currentZh: any;
 
+  private tempId: number;
+
   public inflowTableCol = [
     { name: "inflow", label: "Entrée d'eau" },
     { name: "permanance", label: "Permanence" },
@@ -267,6 +269,8 @@ export class ZhFormTab4Component implements OnInit {
 
   // open the edit inFlow modal
   onEditInflow(modal: any, inflow: any) {
+    this.tempId = inflow.inflow.id_nomenclature;
+    console.log("inflowValues avant", inflow);
     this.patchInflow = true;
     this.inflowModalBtnLabel = "Modifier";
     this.inflowModalTitle = "Modifier l'entrée d'eau";
@@ -307,10 +311,9 @@ export class ZhFormTab4Component implements OnInit {
     this.inflowFormSubmitted = true;
     if (this.inflowForm.valid) {
       let inflowValues = this.inflowForm.value;
+
       this.inflowsTable = this.inflowsTable.map((item: any) =>
-        item.inflow.id_nomenclature != inflowValues.inflow.id_nomenclature
-          ? item
-          : inflowValues
+        item.inflow.id_nomenclature != this.tempId ? item : inflowValues
       );
       this.inflowInput.map((item: any) => {
         if (item.id_nomenclature == inflowValues.inflow.id_nomenclature) {
@@ -323,6 +326,7 @@ export class ZhFormTab4Component implements OnInit {
       this.$_inflowInputSub.unsubscribe();
       this.canChangeTab.emit(false);
       this.inflowFormSubmitted = false;
+      this.tempId = null;
     }
   }
 
@@ -381,6 +385,7 @@ export class ZhFormTab4Component implements OnInit {
 
   // open the edit outFlow modal
   onEditOutflow(modal: any, outflow: any) {
+    this.tempId = outflow.outflow.id_nomenclature;
     this.patchOutflow = true;
     this.outflowModalBtnLabel = "Modifier";
     this.outflowModalTitle = "Modifier la sortie d'eau";
@@ -421,9 +426,7 @@ export class ZhFormTab4Component implements OnInit {
     if (this.outflowForm.valid) {
       let outflowValues = this.outflowForm.value;
       this.outflowsTable = this.outflowsTable.map((item: any) =>
-        item.outflow.id_nomenclature != outflowValues.outflow.id_nomenclature
-          ? item
-          : outflowValues
+        item.outflow.id_nomenclature != this.tempId ? item : outflowValues
       );
       this.outflowInput.map((item: any) => {
         if (item.id_nomenclature == outflowValues.outflow.id_nomenclature) {
@@ -436,6 +439,7 @@ export class ZhFormTab4Component implements OnInit {
       this.$_outflowInputSub.unsubscribe();
       this.canChangeTab.emit(false);
       this.outflowFormSubmitted = false;
+      this.tempId = null;
     }
   }
 

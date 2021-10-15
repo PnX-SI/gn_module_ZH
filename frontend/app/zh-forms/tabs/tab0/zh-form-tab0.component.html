@@ -12,7 +12,9 @@
     </div>
     <div class="col-xl-6 col-lg-5 col-sm-6">
       <div class="d-flex mt-3">
-        <mat-slide-toggle [checked]="true" (change)="slideToggleChanged($event)"
+        <mat-slide-toggle
+          [checked]="toggleChecked"
+          (change)="slideToggleChanged($event)"
           >Afficher toutes les zones humides sur la carte</mat-slide-toggle
         >
       </div>
@@ -91,9 +93,7 @@
               Présentation de la zone humide et de ses milieux
             </h3> -->
             <div class="form-group col-md-12">
-              <small class="required"
-                >Présentation de la zone humide et de ses milieux
-              </small>
+              <small class="required">Type de zone humide SDAGE</small>
               <select class="form-control" [formControl]="form.controls.sdage">
                 <option *ngFor="let sd of sdage" [ngValue]="sd.id_nomenclature">
                   {{ sd.mnemonique }}
