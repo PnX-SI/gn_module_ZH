@@ -313,9 +313,9 @@ class Functioning:
 class Diagnostic:
 
     def __init__(self, id_diag_hydro, id_diag_bio, remark_diag):
-        self.id_diag_hydro = id_diag_hydro
-        self.id_diag_bio = id_diag_bio
-        self.remark_diag = remark_diag
+        self.id_diag_hydro: int = id_diag_hydro
+        self.id_diag_bio: int = id_diag_bio
+        self.remark_diag: str = remark_diag
 
     def __str__(self):
         return {
@@ -328,10 +328,10 @@ class Diagnostic:
 class Function:
 
     def __init__(self, type, qualification, knowledge, justif):
-        self.type = type
-        self.qualification = qualification
-        self.knowledge = knowledge
-        self.justif = justif
+        self.type: int = type
+        self.qualification: int = qualification
+        self.knowledge: int = knowledge
+        self.justif: str = justif
 
     def __str__(self):
         return {
@@ -345,9 +345,9 @@ class Function:
 class Taxa:
 
     def __init__(self, nb_flora_sp, nb_vertebrate_sp, nb_invertebrate_sp):
-        self.nb_flora_sp = nb_flora_sp
-        self.nb_vertebrate_sp = nb_vertebrate_sp
-        self.nb_invertebrate_sp = nb_invertebrate_sp
+        self.nb_flora_sp: int = nb_flora_sp
+        self.nb_vertebrate_sp: int = nb_vertebrate_sp
+        self.nb_invertebrate_sp: int = nb_invertebrate_sp
 
     def __str__(self):
         return {
@@ -360,10 +360,10 @@ class Taxa:
 class HabHeritage:
 
     def __init__(self, id_corine_bio, id_cahier_hab, id_preservation_state, hab_cover):
-        self.id_corine_bio = id_corine_bio
-        self.id_cahier_hab = id_cahier_hab
-        self.id_preservation_state = id_preservation_state
-        self.hab_cover = hab_cover
+        self.id_corine_bio: str = id_corine_bio
+        self.id_cahier_hab: str = id_cahier_hab
+        self.id_preservation_state: int = id_preservation_state
+        self.hab_cover: int = hab_cover
 
     def __str__(self):
         return {
@@ -458,10 +458,11 @@ class Description:
 class Presentation:
 
     def __init__(self, id_sdage, id_sage, cb_codes_corine_biotope, remark_pres):
-        self.id_sdage = id_sdage
-        self.id_sage = id_sage
-        self.cb_codes_corine_biotope = cb_codes_corine_biotope
-        self.remark_pres = remark_pres
+        self.id_sdage: int = id_sdage
+        self.id_sage: int = id_sage
+        self.cb_codes_corine_biotope: list(
+            CorineBiotope) = cb_codes_corine_biotope
+        self.remark_pres: str = remark_pres
 
     def __str__(self):
         return {
@@ -475,7 +476,7 @@ class Presentation:
 class CorineBiotope:
 
     def __init__(self, cb_code):
-        self.cb_code = cb_code
+        self.cb_code: str = cb_code
 
     def __str__(self):
         cbs = get_corine_biotope()
@@ -506,10 +507,10 @@ class Use:
 class Activity:
 
     def __init__(self, id_human_activity, id_localisation, ids_impact, remark_activity):
-        self.id_human_activity = id_human_activity
-        self.id_localisation = id_localisation
-        self.ids_impact = ids_impact
-        self.remark_activity = remark_activity
+        self.id_human_activity: int = id_human_activity
+        self.id_localisation: int = id_localisation
+        self.ids_impact: list(int) = ids_impact
+        self.remark_activity: str = remark_activity
 
     def __str_impact(self):
         return [cor.TNomenclatures.mnemonique for cor in CorImpactTypes.get_impacts() if cor.CorImpactTypes.id_cor_impact_types in self.ids_impact]
@@ -610,7 +611,7 @@ class Status:
 
     @protections.setter
     def protections(self, protections):
-        self.__protections = protections
+        self.__protections: list(int) = protections
 
     def __str_protections(self):
         q_protections = DB.session.query(CorProtectionLevelType)\
@@ -635,8 +636,8 @@ class Status:
 class Ownership:
 
     def __init__(self, id_status, remark):
-        self.id_status = id_status
-        self.remark = remark
+        self.id_status: int = id_status
+        self.remark: str = remark
 
     def __str__(self):
         return {
@@ -665,9 +666,9 @@ class Management:
 class Plan:
 
     def __init__(self, id_nature, plan_date, duration):
-        self.id_nature = id_nature
-        self.plan_date = plan_date
-        self.duration = duration
+        self.id_nature: int = id_nature
+        self.plan_date: str = plan_date
+        self.duration: int = duration
 
     def __str__(self):
         return {
@@ -680,8 +681,8 @@ class Plan:
 class Instrument:
 
     def __init__(self, id_instrument, instrument_date):
-        self.id_instrument = id_instrument
-        self.instrument_date = instrument_date
+        self.id_instrument: int = id_instrument
+        self.instrument_date: str = instrument_date
 
     def __str__(self):
         return {
@@ -693,10 +694,10 @@ class Instrument:
 class UrbanDoc:
 
     def __init__(self, id_area, id_doc_type, id_cors, remark):
-        self.id_area = id_area
-        self.id_doc_type = id_doc_type
-        self.id_cors = id_cors
-        self.remark = remark
+        self.id_area: int = id_area
+        self.id_doc_type: int = id_doc_type
+        self.id_cors: list(int) = id_cors
+        self.remark: str = remark
 
     def __str__(self):
         return {
@@ -892,9 +893,9 @@ class EvalAction:
 class Action:
 
     def __init__(self, id_action, id_priority_level, remark):
-        self.id_action = id_action
-        self.id_priority_level = id_priority_level
-        self.remark = remark
+        self.id_action: int = id_action
+        self.id_priority_level: int = id_priority_level
+        self.remark: str = remark
 
     def __str__(self):
         return {
