@@ -15,12 +15,13 @@ import { TabsService } from "../../../services/tabs.service";
 export class ZhFormTab3Component implements OnInit {
   @Input() formMetaData;
   @Output() canChangeTab = new EventEmitter<boolean>();
+  @Output() nextTab = new EventEmitter<number>();
   form: FormGroup;
   sage: any;
   allSage: any;
   $_currentZhSub: Subscription;
   $_fromChangeSub: Subscription;
-  private _currentZh: any;
+  public currentZh: any;
   corinBioMetaData: any;
   corinTableCol = [
     { name: "CB_code", label: "Code corine Biotope" },
@@ -105,12 +106,12 @@ export class ZhFormTab3Component implements OnInit {
     this.listActivity = [];
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
-        this._currentZh = zh;
+        this.currentZh = zh;
         this.listActivity = [];
         const corineLandcovers = [];
         this.formMetaData.OCCUPATION_SOLS.forEach((critere) => {
           if (
-            this._currentZh.properties.id_corine_landcovers.includes(
+            this.currentZh.properties.id_corine_landcovers.includes(
               critere.id_nomenclature
             )
           ) {
@@ -118,15 +119,15 @@ export class ZhFormTab3Component implements OnInit {
           }
         });
         if (
-          this._currentZh.properties.cb_codes_corine_biotope &&
-          this._currentZh.properties.cb_codes_corine_biotope.length > 0
+          this.currentZh.properties.cb_codes_corine_biotope &&
+          this.currentZh.properties.cb_codes_corine_biotope.length > 0
         ) {
           this.listCorinBio = this.corinBioMetaData.filter((v) =>
-            this._currentZh.properties.cb_codes_corine_biotope.includes(
+            this.currentZh.properties.cb_codes_corine_biotope.includes(
               v.CB_code
             )
           );
-          this._currentZh.properties.activities.forEach((activity) => {
+          this.currentZh.properties.activities.forEach((activity) => {
             let impacts = [];
             activity.ids_impact.forEach((impact) => {
               impacts.push(
@@ -168,13 +169,13 @@ export class ZhFormTab3Component implements OnInit {
           });
         }
         this.form.patchValue({
-          id_sdage: this._currentZh.properties.id_sdage,
-          id_sage: this._currentZh.properties.id_sage,
+          id_sdage: this.currentZh.properties.id_sdage,
+          id_sage: this.currentZh.properties.id_sage,
           id_corine_landcovers: corineLandcovers,
-          remark_pres: this._currentZh.properties.remark_pres,
-          id_thread: this._currentZh.properties.id_thread,
+          remark_pres: this.currentZh.properties.remark_pres,
+          id_thread: this.currentZh.properties.id_thread,
           global_remark_activity:
-            this._currentZh.properties.global_remark_activity,
+            this.currentZh.properties.global_remark_activity,
         });
       }
 
@@ -393,7 +394,7 @@ export class ZhFormTab3Component implements OnInit {
       this.submitted = true;
       this.$_fromChangeSub.unsubscribe();
       let formToPost = {
-        id_zh: Number(this._currentZh.properties.id_zh),
+        id_zh: Number(this.currentZh.properties.id_zh),
         id_sdage: this.form.value.id_sdage,
         id_sage: this.form.value.id_sage,
         id_corine_landcovers: [],
@@ -413,7 +414,7 @@ export class ZhFormTab3Component implements OnInit {
       this._dataService.postDataForm(formToPost, 3).subscribe(
         () => {
           this._dataService
-            .getZhById(this._currentZh.properties.id_zh)
+            .getZhById(this.currentZh.properties.id_zh)
             .subscribe((zh: any) => {
               this._dataService.setCurrentZh(zh);
               this.posted = false;
@@ -421,6 +422,7 @@ export class ZhFormTab3Component implements OnInit {
               this._toastr.success("Vos données sont bien enregistrées", "", {
                 positionClass: "toast-top-right",
               });
+              this.nextTab.emit(4);
             });
         },
         (error) => {

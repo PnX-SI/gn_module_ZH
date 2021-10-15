@@ -1,0 +1,13 @@
+@import "../../../app.module";
+
+mat-expansion-panel {
+  margin: 28px 0 !important;
+}
+mat-expansion-panel-header {
+  background-color: #f0f0f0 !important;
+  font-size: 22px;
+}
+mat-expansion-panel-header:hover {
+  background-color: #e8e8e8 !important;
+  font-size: 22px;
+}

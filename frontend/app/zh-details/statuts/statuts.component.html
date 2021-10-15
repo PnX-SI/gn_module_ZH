@@ -1,0 +1,77 @@
+<div>
+  <div class="row my-3">
+    <div class="col-12 h-100">
+      <fieldset>
+        <legend>
+          <h5 class="section-title">Régime foncier - Statut de propriété</h5>
+        </legend>
+        <div>
+          <zh-table
+            [tableCols]="regimeTableCol"
+            [data]="data.regime"
+          ></zh-table>
+        </div>
+      </fieldset>
+    </div>
+    <div class="col-12 h-100">
+      <fieldset>
+        <legend>
+          <h5 class="section-title">Structure de gestion</h5>
+        </legend>
+        <div class="mb-3" *ngFor="let struct of data.structure">
+          <p class="structure-label">{{ struct.structure }} :</p>
+          <div>
+            <zh-table
+              [tableCols]="plansTableCol"
+              [data]="struct.plans"
+            ></zh-table>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+    <div class="col-12 h-100">
+      <fieldset>
+        <legend>
+          <h5 class="section-title">Instruments contractuels et financiers</h5>
+        </legend>
+        <div>
+          <zh-table
+            [tableCols]="instrumentsTableCol"
+            [data]="data.instruments"
+          ></zh-table>
+        </div>
+        <zh-label label="Autres inventaires :">
+          <span>{{ data.autre_invetaire }}</span>
+        </zh-label>
+      </fieldset>
+    </div>
+    <div class="col-12 h-100">
+      <fieldset>
+        <legend>
+          <h5 class="section-title">Principaux statuts</h5>
+        </legend>
+        <zh-label label="status : ">
+          <ul>
+            <li class="label-item" *ngFor="let item of data.statuts">
+              <span>{{ item }}</span>
+            </li>
+          </ul>
+        </zh-label>
+      </fieldset>
+    </div>
+
+    <div class="col-12 h-100">
+      <fieldset>
+        <legend>
+          <h5 class="section-title">Zonage des documents d'urbanisme</h5>
+        </legend>
+        <div>
+          <zh-table
+            [tableCols]="zonageTableCol"
+            [data]="data.zonage"
+          ></zh-table>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+</div>

@@ -1,4 +1,5 @@
 <div class="container-fluid">
+  <h2 class="tabsTitle">Fonctionnement de la zone humide</h2>
   <form [formGroup]="formTab4">
     <fieldset>
       <legend>
@@ -150,86 +151,26 @@
           Connexion de la zone humide dans son environement
         </h5>
       </legend>
-
       <div class="radio-list">
-        <div class="d-flex flex-column align-items-center">
-          <small>Traversée</small>
-          <label class="form-check-label p-3">
-            <img src="external_assets/zones_humides/traversee.svg" alt=""
-          /></label>
-          <input
-            type="radio"
-            name="inlineRadioOptions"
-            id="inlineRadio1"
-            [formControl]="formTab4.controls.connexion"
-            [value]="728"
-          />
-        </div>
-        <div class="d-flex flex-column align-items-center">
-          <small>Entrée et sortie</small>
-          <label class="form-check-label p-3">
-            <img src="external_assets/zones_humides/entree_sortie.svg" alt=""
-          /></label>
-          <input
-            type="radio"
-            name="inlineRadioOptions"
-            id="inlineRadio2"
-            [formControl]="formTab4.controls.connexion"
-            [value]="729"
-          />
-        </div>
-        <div class="d-flex flex-column align-items-center">
-          <small>Entrée</small>
-          <label class="form-check-label p-3">
-            <img src="external_assets/zones_humides/entree.svg" alt=""
-          /></label>
-          <input
-            type="radio"
-            name="inlineRadioOptions"
-            id="inlineRadio3"
-            [formControl]="formTab4.controls.connexion"
-            [value]="730"
-          />
-        </div>
-        <div class="d-flex flex-column align-items-center">
-          <small>Sortie</small>
-          <label class="form-check-label p-3">
-            <img src="external_assets/zones_humides/sortie.svg" alt=""
-          /></label>
-          <input
-            type="radio"
-            name="inlineRadioOptions"
-            id="inlineRadio4"
-            [formControl]="formTab4.controls.connexion"
-            [value]="731"
-          />
-        </div>
-        <div class="d-flex flex-column align-items-center">
-          <small>Passe à coté</small>
-          <label class="form-check-label p-3">
-            <img src="external_assets/zones_humides/passe_a_cote.svg" alt=""
-          /></label>
-          <input
-            type="radio"
-            name="inlineRadioOptions"
-            id="inlineRadio5"
-            [formControl]="formTab4.controls.connexion"
-            [value]="732"
-          />
-        </div>
-        <div class="d-flex flex-column align-items-center">
-          <small>Aucunne connexion</small>
-          <label class="form-check-label p-3">
+        <div
+          *ngFor="let connexionType of connexionTypes"
+          class="d-flex flex-column align-items-center radio-item"
+        >
+          <label
+            class="form-check-label p-3"
+            [for]="'inlineRadio' + connexionType.id_nomenclature"
+          >
+            <small class="radio-label">{{ connexionType.mnemonique }}</small>
             <img
-              src="external_assets/zones_humides/aucune_connexion.svg"
+              [src]="'external_assets/zones_humides/' + connexionType.image"
               alt=""
           /></label>
           <input
             type="radio"
             name="inlineRadioOptions"
-            id="inlineRadio6"
+            [id]="'inlineRadio' + connexionType.id_nomenclature"
             [formControl]="formTab4.controls.connexion"
-            [value]="733"
+            [value]="connexionType.id_nomenclature"
           />
         </div>
       </div>
@@ -240,7 +181,7 @@
       </legend>
       <div class="form-row">
         <div class="form-group col-md-6">
-          <small>Fonctionalité hydrologique</small>
+          <small>Fonctionnalité hydrologique / biogéochimique</small>
           <select
             class="form-control"
             [formControl]="formTab4.controls.diag_hydro"
@@ -255,7 +196,7 @@
           </select>
         </div>
         <div class="form-group col-md-6">
-          <small>Fonctionalité biologique</small>
+          <small>Fonctionnalité biologique / écologique</small>
           <select
             class="form-control"
             [formControl]="formTab4.controls.diag_bio"
@@ -281,6 +222,10 @@
       </div>
     </fieldset>
     <div class="footer-btn">
+      <zh-cancelButton
+        *ngIf="currentZh"
+        [zhId]="currentZh.properties.id_zh"
+      ></zh-cancelButton>
       <button
         type="submit"
         mat-raised-button

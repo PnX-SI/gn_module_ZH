@@ -1,0 +1,156 @@
+<div class="container-fluid">
+  <form>
+    <fieldset>
+      <legend>
+        <h5 class="section-title">Ressources</h5>
+      </legend>
+      <div class="form-row">
+        <button
+          mat-raised-button
+          class="mb-3"
+          color="primary"
+          (click)="onAddDoc($event, docModal)"
+        >
+          <mat-icon>add_box</mat-icon>
+          Ajouter
+        </button>
+        <div *ngIf="docTable && docTable.length > 0" class="table-responsive">
+          <table class="table">
+            <thead class="thead-inverse table-header">
+              <tr>
+                <th *ngFor="let col of docTableCol">{{ col.label }}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of docTable">
+                <td *ngFor="let col of docTableCol">
+                  {{ item[col.name]?.mnemonique || item[col.name] }}
+                </td>
+                <td>
+                  <div>
+                    <button
+                      mat-icon-button
+                      class="mr-2"
+                      placement="top"
+                      ngbTooltip="Editer"
+                      (click)="onEditStatus(docModal, item)"
+                    >
+                      <mat-icon class="edit-icon">edit</mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      placement="top"
+                      ngbTooltip="Supprimer"
+                      (click)="onDeleteStatus(item)"
+                    >
+                      <mat-icon class="delete-icon">close</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </fieldset>
+
+    <div class="footer-btn">
+      <zh-cancelButton
+        *ngIf="currentZh"
+        [zhId]="currentZh.properties.id_zh"
+      ></zh-cancelButton>
+      <button
+        type="submit"
+        mat-raised-button
+        color="primary"
+        class="ml-3"
+        [disabled]="posted"
+        (click)="onFormSubmit()"
+      >
+        <mat-icon *ngIf="!posted">save_outline</mat-icon>
+        <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
+        Enregister
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Modal recources documentaires -->
+<ng-template #docModal let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h6>{{ modalTitle }}</h6>
+    <button mat-icon-button class="closeModalBtn" (click)="c()">
+      <mat-icon class="cancel-icon">cancel</mat-icon>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="docForm">
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="file">Parcourir</label>
+          <input
+            id="file"
+            type="file"
+            (change)="handleFileInput($event.target.files)"
+          />
+        </div>
+        <div class="form-group col-md-12">
+          <small class="required">Profil</small>
+          <small
+            *ngIf="
+              (docForm.controls.profile.touched || modalFormSubmitted) &&
+              docForm.controls.profile.errors?.required
+            "
+            class="error-msg"
+            >Champ requis</small
+          >
+        </div>
+        <div class="form-group col-md-6">
+          <small class="required">Titre du document</small>
+          <input class="form-control" [formControl]="docForm.controls.title" />
+          <small
+            *ngIf="
+              (docForm.controls.title.touched || modalFormSubmitted) &&
+              docForm.controls.title.errors?.required
+            "
+            class="error-msg"
+            >Champ requis</small
+          >
+        </div>
+        <div class="form-group col-md-6">
+          <small class="required">Auteur du document</small>
+          <input class="form-control" [formControl]="docForm.controls.author" />
+          <small
+            *ngIf="
+              (docForm.controls.author.touched || modalFormSubmitted) &&
+              docForm.controls.author.errors?.required
+            "
+            class="error-msg"
+            >Champ requis</small
+          >
+        </div>
+
+        <div class="form-group col-md-12">
+          <small>Résumé</small>
+          <textarea
+            class="form-control"
+            [formControl]="docForm.controls.summary"
+            rows="3"
+          ></textarea>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      mat-raised-button
+      color="primary"
+      class="uppercase"
+      (click)="patchModal ? onPatchStatus() : onPostStatus()"
+    >
+      {{ addModalBtnLabel }}
+    </button>
+  </div>
+</ng-template>

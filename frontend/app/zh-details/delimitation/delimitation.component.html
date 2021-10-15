@@ -1,0 +1,41 @@
+<div>
+  <div class="row my-3">
+    <div class="col-12 col-xl-6 col-lg-6 col-md-6">
+      <fieldset>
+        <legend>
+          <h5 class="section-title">
+            Critères de délimitation de la zone humide
+          </h5>
+        </legend>
+        <zh-label
+          *ngIf="data.delimitation_zone?.critere"
+          label="Critères utilisés :"
+        >
+          <span>{{ data.delimitation_zone.critere.join(", ") }} </span>
+        </zh-label>
+        <zh-label label="Remarques :">
+          <span>{{ data.delimitation_zone?.remark }} </span>
+        </zh-label>
+        <p class="label"><b></b></p>
+      </fieldset>
+    </div>
+    <div class="col-12 col-xl-6 col-lg-6 col-md-6">
+      <fieldset>
+        <legend>
+          <h5 class="section-title">
+            Critères de délimitation de l'espace de fonctionalité
+          </h5>
+        </legend>
+        <zh-label
+          *ngIf="data.delimitation_fonctions?.critere"
+          label="Critères utilisés :"
+        >
+          <span> {{ data.delimitation_fonctions.critere.join(", ") }} </span>
+        </zh-label>
+        <zh-label label="Remarques :">
+          <span>{{ data.delimitation_fonctions?.remark }} </span>
+        </zh-label>
+      </fieldset>
+    </div>
+  </div>
+</div>

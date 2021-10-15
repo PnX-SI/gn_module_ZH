@@ -1,4 +1,5 @@
 <div class="container-fluid">
+  <h2 class="tabsTitle">Description du bassin versant et de la zone humide</h2>
   <form>
     <fieldset>
       <legend>
@@ -27,7 +28,7 @@
           >
         </div>
         <div class="form-group col-md-6">
-          <small>Typologie locale</small>
+          <small>Sous-type</small>
           <select class="form-control" [formControl]="form.controls.id_sage">
             <option></option>
             <option *ngFor="let sg of sage" [ngValue]="sg.id_nomenclature">
@@ -63,7 +64,15 @@
         <table class="table">
           <thead class="thead-inverse table-header">
             <tr>
-              <th *ngFor="let col of corinTableCol">{{ col.label }}</th>
+              <th *ngFor="let col of corinTableCol">
+                {{ col.label }}
+                <mat-icon
+                  class="info-icon"
+                  *ngIf="col.name == 'CB_humidity'"
+                  ngbTooltip="Types de milieux Corine Biotope humides (H) ou potentiellement humides (P)"
+                  >info</mat-icon
+                >
+              </th>
               <th></th>
             </tr>
           </thead>
@@ -115,7 +124,7 @@
     </fieldset>
     <fieldset>
       <legend>
-        <h5 class="section-title">Usage ou processus naturels</h5>
+        <h5 class="section-title">Usages ou processus naturels</h5>
       </legend>
       <button
         mat-raised-button
@@ -195,6 +204,10 @@
     </fieldset>
   </form>
   <div class="footer-btn">
+    <zh-cancelButton
+      *ngIf="currentZh"
+      [zhId]="currentZh.properties.id_zh"
+    ></zh-cancelButton>
     <button
       type="submit"
       mat-raised-button
