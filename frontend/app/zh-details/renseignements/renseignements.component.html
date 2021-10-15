@@ -14,10 +14,12 @@
         <zh-label label="Partie d’un ensemble :"
           ><span>{{ data.identification?.inclus }}</span>
         </zh-label>
-        <zh-label label="Nom du grand ensemble :"
+        <zh-label
+          *ngIf="data.identification?.inclus != 'Non'"
+          label="Nom du grand ensemble :"
           ><span>{{ data.identification?.ensemble }}</span>
         </zh-label>
-        <zh-label label="Nom du grand ensemble :"
+        <zh-label label="Code de la zone humide :"
           ><span>{{ data.identification?.code }}</span>
         </zh-label>
       </fieldset>
@@ -48,7 +50,7 @@
             </li>
           </ul>
         </zh-label>
-        <zh-label label="Commune (couverture) :">
+        <zh-label label="Commune (surface ZH/surface commune [%]) :">
           <ul>
             <li
               class="label-item"
@@ -70,6 +72,9 @@
         <legend>
           <h5 class="section-title">Auteurs</h5>
         </legend>
+        <zh-label label="Organisme :">
+          <span> TODO </span>
+        </zh-label>
         <zh-label label="Auteur de la fiche :">
           <span>{{ data.auteur?.auteur }}</span></zh-label
         >

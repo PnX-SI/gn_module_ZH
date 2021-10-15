@@ -1,31 +1,43 @@
 <div class="header">
-  <button
-    type="button"
-    ngbAutofocus
-    mat-raised-button
-    color="secondary"
-    class="uppercase"
-    [routerLink]="['/zones_humides']"
-  >
-    <mat-icon> west </mat-icon> Retour
-  </button>
-  <button
-    type="button"
-    ngbAutofocus
-    mat-raised-button
-    color="accent"
-    class="uppercase"
-    [routerLink]="['/zones_humides/forms', zhId]"
-  >
-    Modifier
-  </button>
-  <button
-    type="button"
-    ngbAutofocus
-    mat-raised-button
-    color="warn"
-    class="uppercase"
-  >
-    Supprimer
-  </button>
+  <div class="row">
+    <div class="col-3 backButton">
+      <button
+        type="button"
+        ngbAutofocus
+        mat-raised-button
+        color="secondary"
+        class="uppercase"
+        [routerLink]="['/zones_humides']"
+      >
+        <mat-icon> west </mat-icon> Retour
+      </button>
+    </div>
+    <div class="col-6">
+      <h5 class="d-flex justify-content-center title">
+        FICHE COMPLETE DE LA ZONE HUMIDE
+      </h5>
+    </div>
+    <div class="col-3 changeButtons">
+      <button
+        type="button"
+        ngbAutofocus
+        mat-raised-button
+        color="accent"
+        class="uppercase"
+        [routerLink]="['/zones_humides/forms', zhId]"
+      >
+        Modifier
+      </button>
+      <button
+        type="button"
+        ngbAutofocus
+        mat-raised-button
+        color="warn"
+        class="uppercase ml-3"
+        (click)="onOpen()"
+      >
+        Supprimer
+      </button>
+    </div>
+  </div>
 </div>

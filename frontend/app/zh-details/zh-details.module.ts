@@ -15,6 +15,7 @@ import { CollapseComponent } from "../commonComponents/collapse/collapse.compone
 import { TableComponent } from "../commonComponents/table/table.component";
 import { LabelComponent } from "../commonComponents/label/label.component";
 import { HeaderComponent } from "./header/header.component";
+import { DeleteModalComponent } from "../commonComponents/delete-modal/delete-modal.component";
 
 // my module routing
 const routes: Routes = [
@@ -35,7 +36,9 @@ const routes: Routes = [
     TableComponent,
     LabelComponent,
     HeaderComponent,
+    DeleteModalComponent,
   ],
+  entryComponents: [DeleteModalComponent],
   imports: [GN2CommonModule, CommonModule, RouterModule.forChild(routes)],
 })
 export class ZhDetailsModule {}

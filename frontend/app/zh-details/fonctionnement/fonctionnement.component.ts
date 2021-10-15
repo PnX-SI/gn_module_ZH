@@ -17,7 +17,7 @@ export class FonctionnementComponent {
     Entrée: "entree.svg",
     Sortie: "sortie.svg",
     Traversée: "traversee.svg",
-    "Passe à côté": "passe_a_cote.svg",
+    "Passe à coté": "passe_a_cote.svg",
   };
   public connectionImg: string = "";
 
