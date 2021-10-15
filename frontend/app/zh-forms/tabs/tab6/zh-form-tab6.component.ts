@@ -171,13 +171,13 @@ export class ZhFormTab6Component implements OnInit {
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
         this.currentZh = zh;
-        this.statusTable = [];
-        this.urbanDocTable = [];
-        this.managements = [];
-        this.instrumentTable = [];
         this._dataService
           .getMunicipalitiesByZh(zh.id)
           .subscribe((municipalities: any) => {
+            this.statusTable = [];
+            this.urbanDocTable = [];
+            this.managements = [];
+            this.instrumentTable = [];
             this.municipalities = municipalities;
             //patch forms values
             let protections = [];

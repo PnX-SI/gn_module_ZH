@@ -42,6 +42,7 @@ export class ZhFormTab0Component implements OnInit {
   public posted = false;
   private geomLayers: any;
   public zhId: number;
+  public toggleChecked: boolean = false; // TODO: PUT INTO PARAMETER ?
 
   constructor(
     private fb: FormBuilder,
@@ -94,8 +95,9 @@ export class ZhFormTab0Component implements OnInit {
           if (!zh || zh.properties.id_zh != geom.id_zh) {
             this.geomLayers.push(
               L.geoJSON(geojson, {
-                onEachFeature: function (feature, layer) {
+                onEachFeature: (feature, layer) => {
                   layer.geomTag = "allGeom";
+                  layer.setStyle(this.getLayerStyle(this.toggleChecked));
                 },
               }).addTo(this._mapService.map)
             );
@@ -123,24 +125,24 @@ export class ZhFormTab0Component implements OnInit {
           critere_delim: selectedCritDelim,
           sdage: this._currentZh.properties.id_sdage,
         });
+        this.form.get("id_org").disable();
+        // Must put a set timeout here otherwise
+        // this._mapService is undefined...
         setTimeout(() => {
-          this._mapService.loadGeometryReleve(this._currentZh, false);
+          this.geometry = {
+            geometry: this._currentZh.geometry,
+            properties: { idZh: this._currentZh.properties.id_zh },
+            type: "Feature",
+          };
 
-          this.currentLayer =
-            this._mapService.leafletDrawFeatureGroup.getLayers()[0];
-
-          const coordinates = this._currentZh.geometry.coordinates;
-          const myLatLong = coordinates[0].map((point) => {
-            return L.latLng(point[1], point[0]);
+          const layer = L.geoJSON(this.geometry, {
+            onEachFeature: (feature, layer) => {
+              this._mapService.leafletDrawFeatureGroup.addLayer(layer);
+            },
           });
-          const layer = L.polygon(myLatLong);
-          this.geometry = layer.toGeoJSON();
-          if (this._mapService.map) {
-            setTimeout(() => {
-              this._mapService.map.fitBounds(layer.getBounds());
-            }, 10);
-          }
-          this._mapService.map.invalidateSize();
+          this._mapService.map.fitBounds(layer.getBounds());
+          //this._mapService.leafletDrawFeatureGroup.addTo(this._mapService.map);
+          this.currentLayer = layer;
         }, 0);
         this.canChangeTab.emit(true);
       }
@@ -235,12 +237,16 @@ export class ZhFormTab0Component implements OnInit {
     }
   }
 
+  getLayerStyle(shown: boolean) {
+    return {
+      opacity: 1 * +shown,
+      fillOpacity: 0.2 * +shown,
+    };
+  }
+
   slideToggleChanged(event) {
     this.geomLayers.forEach((layer: any) => {
-      layer.setStyle({
-        opacity: 1 * event.checked,
-        fillOpacity: 0.2 * event.checked,
-      });
+      layer.setStyle(this.getLayerStyle(event.checked));
     });
   }
 
