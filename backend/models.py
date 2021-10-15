@@ -614,12 +614,12 @@ class Code(ZH):
         self.id_zh = id_zh
         self.id_org = id_org
         self.zh_geom = zh_geom
-        self.dep = self.get_departments()
+        self.dep = self.get_deps()
         self.organism = self.get_organism()
         self.number = self.get_number()
         self.is_valid_number = self.set_valid_number()
 
-    def get_departments(self):
+    def get_deps(self):
         departments = CorZhArea.get_departments(self.id_zh)
         area = 0
         my_geom = DB.session.query(func.ST_Transform(func.ST_SetSRID(
@@ -636,7 +636,7 @@ class Code(ZH):
 
     def get_number(self):
         number = DB.session.query(CorZhArea).join(LAreas, LAreas.id_area == CorZhArea.id_area).join(
-            TZH, TZH.id_zh == CorZhArea.id_zh).filter(TZH.id_org == self.id_org, LAreas.area_code == self.get_departments()).count()
+            TZH, TZH.id_zh == CorZhArea.id_zh).filter(TZH.id_org == self.id_org, LAreas.area_code == self.get_deps()).count()
         return number+1
 
     def set_valid_number(self):
