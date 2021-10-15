@@ -175,12 +175,9 @@ class Author:
 
     def __get_author(self, type='authors'):
         zh = TZH.get_tzh_by_id(self.id_zh)
-        if type in ['authors', 'coauthors']:
-            prenom = getattr(zh, type).prenom_role
-            nom = getattr(zh, type).nom_role
-            return prenom + ' ' + nom.upper()
-        raise ValueError(
-            '{} value for type variable does not exist'.format(type))
+        prenom = getattr(zh, type).prenom_role
+        nom = getattr(zh, type).nom_role
+        return prenom + ' ' + nom.upper()
 
 
 class Municipalities:
@@ -1117,7 +1114,3 @@ class Card(ZH):
     def __set_actions(self):
         self.evaluation.action.actions = self.properties['actions']
         self.evaluation.action.remark_eval_actions = self.properties['remark_eval_actions']
-
-        # self.evaluation.action.set_actions(self.properties['actions'])
-        # self.evaluation.action.remark_eval_actions(
-        #    self.properties['remark_eval_actions'])
