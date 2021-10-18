@@ -48,7 +48,7 @@ export class ZhFormTab4Component implements OnInit {
   ];
 
   public outflowTableCol = [
-    { name: "outflow", label: "Sorite d'eau" },
+    { name: "outflow", label: "Sortie d'eau" },
     { name: "permanance", label: "Permanence" },
     { name: "topo", label: "Toponymie et compléments d'information" },
   ];
