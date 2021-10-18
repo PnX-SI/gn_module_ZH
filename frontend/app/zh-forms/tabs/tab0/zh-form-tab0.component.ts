@@ -27,7 +27,7 @@ export class ZhFormTab0Component implements OnInit {
   @Output() activeTabs = new EventEmitter<boolean>();
   @Output() canChangeTab = new EventEmitter<boolean>();
   @Output() nextTab = new EventEmitter<number>();
-  private _currentZh: any;
+  private _currentZh: any = null;
   public form: FormGroup;
   public cardContentHeight: number;
   public critDelim: any;
@@ -125,7 +125,6 @@ export class ZhFormTab0Component implements OnInit {
           critere_delim: selectedCritDelim,
           sdage: this._currentZh.properties.id_sdage,
         });
-        this.form.get("id_org").disable();
         // Must put a set timeout here otherwise
         // this._mapService is undefined...
         setTimeout(() => {

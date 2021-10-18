@@ -25,8 +25,8 @@
           </legend>
           <div class="form-row">
             <!-- <h3 class="section-label">Identification de la zone humide</h3> -->
-            <div class="form-group col-md-12">
-              <small class="required">Organisme de l'opérateur </small>
+            <div class="form-group col-md-12" [hidden]="_currentZh">
+              <small class="required" >Organisme de l'opérateur </small>
               <select
                 class="form-control form-control-sm"
                 [formControl]="form.controls.id_org"
