@@ -26,3 +26,8 @@ select.activities-select option:disabled {
   margin-left: 8px;
   size: 22px;
 }
+
+::ng-deep .pure-checkbox input[type="checkbox"] + label {
+  text-transform: none !important;
+  display: block;
+}
