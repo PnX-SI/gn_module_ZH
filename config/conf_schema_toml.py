@@ -47,6 +47,8 @@ eval_mnemonique = [
     'Moyenne', 'Forte'
 ]
 
+path_to_download = "/download"
+
 
 class GnModuleSchemaConf(Schema):
     default_maplist_columns = fields.List(
@@ -55,3 +57,4 @@ class GnModuleSchemaConf(Schema):
         fields.Dict(), missing=available_maplist_column
     )
     nomenclatures = fields.List(fields.String, missing=nomenclatures)
+    path_to_download = fields.String(missing=path_to_download)

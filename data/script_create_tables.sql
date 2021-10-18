@@ -713,13 +713,15 @@ CREATE OR REPLACE VIEW pr_zh.taxa AS
 		)
 	SELECT
 		id_zh,
-		taxref.classe AS "Groupe d''étude",
-		taxref.nom_complet AS "Nom Scientifique",
-		taxref.nom_vern AS "Nom vernaculaire",
-		'' AS "Réglementation",
-		'' AS "Article",
-		COUNT(taxref.cd_nom)::integer AS "Nombre d''observations"
+		taxref.cd_nom,
+		taxref.classe AS "group",
+		taxref.nom_complet AS "scientific_name",
+		taxref.nom_vern AS "vernac_name",
+		'' AS "reglementation",
+		'' AS "article",
+		COUNT(taxref.cd_nom)::integer AS "obs_nb"
 	FROM synthese_zh
 	LEFT JOIN taxonomie.taxref taxref on synthese_zh.cd_nom=taxref.cd_nom
 	WHERE id_zh IS NOT NULL
-	GROUP BY taxref.nom_complet,taxref.nom_vern, taxref.classe, id_zh;
+	GROUP BY taxref.nom_complet,taxref.nom_vern, taxref.classe, id_zh, taxref.cd_nom;
+

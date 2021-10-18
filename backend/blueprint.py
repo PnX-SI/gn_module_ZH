@@ -5,8 +5,12 @@ from flask import (
     request,
     json,
     jsonify,
-    render_template
+    send_file
 )
+
+import csv
+
+from pathlib import Path
 
 import uuid
 
@@ -504,9 +508,31 @@ def handle_geonature_zh_api(error):
     return response
 
 
-@app.route('/download')
-def download():
-    return send_file('sample.pdf', as_attachment=True)
+@blueprint.route("/<int:id_zh>/download")
+@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
+def download(id_zh, info_role):
+    query = DB.session.query(TaxaView).filter(TaxaView.id_zh == id_zh).all()
+    rows = [
+        {
+            "Groupe d'étude": row.group,
+            "Nom Scientifique": row.scientific_name,
+            "Nom vernaculaire": row.vernac_name,
+            "Réglementation": row.reglementation,
+            "Article": row.article,
+            "Nombre d'observations": row.obs_nb
+        } for row in query
+    ]
+    path_download = blueprint.config['path_to_download']
+    base_path = Path(__file__).absolute().parent
+    name_file = "/taxa" + "_" + str(datetime.now()) + "_" + str(id_zh) + ".csv"
+    full_name = str(base_path) + path_download + name_file
+
+    with open(full_name, 'w', encoding='UTF8', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=rows[0].keys())
+        writer.writeheader()
+        writer.writerows(rows)
+
+    return send_file(full_name, as_attachment=True)
 
 
 @blueprint.route('/user/cruved', methods=['GET'])

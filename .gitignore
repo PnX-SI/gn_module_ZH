@@ -108,3 +108,5 @@ venv.bak/
 .vscode/
 # config module
 frontend/app/module.config.ts
+
+backend/download/

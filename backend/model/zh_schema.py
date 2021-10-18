@@ -35,6 +35,8 @@ from geonature.core.ref_geo.models import (
     LiMunicipalities
 )
 
+from geonature.core.taxonomie.models import Taxref
+
 import pdb
 
 from sqlalchemy.inspection import inspect
@@ -1120,5 +1122,38 @@ class TManagementPlans(DB.Model):
         DB.DateTime
     )
     duration = DB.Column(
+        DB.Integer
+    )
+
+
+class TaxaView(DB.Model):
+    __tablename__ = "taxa"
+    __table_args__ = {"schema": "pr_zh"}
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    cd_nom = DB.Column(
+        DB.Integer,
+        ForeignKey(Taxref.cd_nom),
+        primary_key=True
+    )
+    group = DB.Column(
+        DB.Unicode
+    )
+    scientific_name = DB.Column(
+        DB.Unicode
+    )
+    vernac_name = DB.Column(
+        DB.Unicode
+    )
+    reglementation = DB.Column(
+        DB.Unicode
+    )
+    article = DB.Column(
+        DB.Unicode
+    )
+    obs_nb = DB.Column(
         DB.Integer
     )
