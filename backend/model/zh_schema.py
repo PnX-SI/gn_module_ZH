@@ -4,6 +4,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.sql import select, func, and_, cast
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql.type_api import STRINGTYPE
 
 from pypnnomenclature.models import (
     TNomenclatures
@@ -35,6 +36,7 @@ from geonature.core.ref_geo.models import (
 )
 
 import pdb
+
 from sqlalchemy.inspection import inspect
 
 
@@ -134,6 +136,7 @@ class BibSiteSpace(DB.Model):
     id_site_space = DB.Column(DB.Integer, primary_key=True)
     name = DB.Column(DB.Unicode)
 
+    @staticmethod
     def get_bib_site_spaces():
         bib_site_spaces = DB.session.query(BibSiteSpace).all()
         bib_site_spaces_list = [
@@ -164,11 +167,13 @@ class BibOrganismes(DB.Model):
         nullable=False
     )
 
+    @staticmethod
     def get_abbrevation(id_org):
         org = DB.session.query(BibOrganismes).filter(
             BibOrganismes.id_org == id_org).one()
         return org.abbrevation
 
+    @staticmethod
     def get_bib_organisms(org_type):
         bib_organismes = DB.session.query(BibOrganismes).all()
         if org_type == "operator":
@@ -281,8 +286,22 @@ class TZH(ZhModel):
         primaryjoin=(User.id_role == create_author)
     )
 
+    coauthors = DB.relationship(
+        User,
+        lazy="joined",
+        primaryjoin=(User.id_role == update_author)
+    )
+
     def get_geofeature(self, recursif=True, relationships=()):
         return self.as_geofeature("geom", "id_zh", recursif, relationships=relationships)
+
+    @staticmethod
+    def get_site_space_name(id):
+        return DB.session.query(BibSiteSpace).filter(BibSiteSpace.id_site_space == id).one().name
+
+    @staticmethod
+    def get_tzh_by_id(id):
+        return DB.session.query(TZH).filter(TZH.id_zh == id).one()
 
     @staticmethod
     def get_zh_area_intersected(zh_area_type, id_zh_geom):
@@ -313,342 +332,19 @@ class CorZhArea(DB.Model):
     )
     cover = DB.Column(DB.Integer)
 
+    @staticmethod
     def get_id_type(mnemo):
         return DB.session.query(BibAreasTypes).filter(BibAreasTypes.type_name == mnemo).one().id_type
 
+    @staticmethod
     def get_departments(id_zh):
         return DB.session.query(CorZhArea, LAreas, TZH).join(LAreas).filter(
             CorZhArea.id_zh == id_zh, LAreas.id_type == CorZhArea.get_id_type("Départements"), TZH.id_zh == id_zh).all()
 
+    @staticmethod
     def get_municipalities_info(id_zh):
         return DB.session.query(CorZhArea, LiMunicipalities, TZH).join(LiMunicipalities, LiMunicipalities.id_area == CorZhArea.id_area).filter(
             CorZhArea.id_zh == id_zh, TZH.id_zh == id_zh).all()
-
-
-@serializable
-@geoserializable
-class ZH(TZH):
-    __abstract__ = True
-
-    def __init__(self, id_zh):
-        self.zh = DB.session.query(TZH).filter(
-            TZH.id_zh == id_zh).one()
-        self.geo_info = self.get_geo_info()
-        self.id_lims = self.get_id_lims()
-        self.id_lims_fs = self.get_id_lims_fs()
-        self.id_references = self.get_id_references()
-        self.cb_codes_corine_biotope = self.get_cb_codes()
-        self.id_corine_landcovers = self.get_corine_landcovers()
-        self.activities = self.get_activities()
-        self.flows = self.get_flows()
-        self.fonctions_hydro = self.get_functions('FONCTIONS_HYDRO')
-        self.fonctions_bio = self.get_functions('FONCTIONS_BIO')
-        self.interet_patrim = self.get_functions('INTERET_PATRIM')
-        self.val_soc_eco = self.get_functions('VAL_SOC_ECO')
-        self.hab_heritages = self.get_hab_heritages()
-        self.ownerships = self.get_ownerships()
-        self.managements = self.get_managements()
-        self.instruments = self.get_instruments()
-        self.protections = self.get_protections()
-        self.urban_docs = self.get_urban_docs()
-        self.actions = self.get_actions()
-        self.eval_fonctions_hydro = self.get_functions(
-            'FONCTIONS_HYDRO', is_eval=True)
-        self.eval_fonctions_bio = self.get_functions(
-            'FONCTIONS_BIO', is_eval=True)
-        self.eval_interet_patrim = self.get_functions(
-            'INTERET_PATRIM', is_eval=True)
-        self.eval_val_soc_eco = self.get_functions('VAL_SOC_ECO', is_eval=True)
-
-    def get_id_lims(self):
-        lim_list = CorLimList.get_lims_by_id(self.zh.id_lim_list)
-        return {
-            "id_lims": [id.id_lim for id in lim_list]
-        }
-
-    def get_id_lims_fs(self):
-        lim_fs_list = CorZhLimFs.get_lim_fs_by_id(self.zh.id_zh)
-        return {
-            "id_lims_fs": [id.id_lim_fs for id in lim_fs_list]
-        }
-
-    def get_id_references(self):
-        ref_list = CorZhRef.get_references_by_id(self.zh.id_zh)
-        return {
-            "id_references": [ref.as_dict() for ref in ref_list]
-        }
-
-    def get_cb_codes(self):
-        corine_biotopes = CorZhCb.get_cb_by_id(self.zh.id_zh)
-        return {
-            "cb_codes_corine_biotope": [cb_code.lb_code for cb_code in corine_biotopes]
-        }
-
-    def get_corine_landcovers(self):
-        landcovers = CorZhCorineCover.get_landcovers_by_id(self.zh.id_zh)
-        return {
-            "id_corine_landcovers": [landcover.id_cover for landcover in landcovers]
-        }
-
-    def get_activities(self):
-        return {
-            "activities": [
-                {
-                    'id_human_activity': activity.id_activity,
-                    'id_localisation': activity.id_position,
-                    'ids_impact': [impact.id_cor_impact_types for impact in CorImpactList.get_impacts_by_uuid(activity.id_impact_list)],
-                    'remark_activity': activity.remark_activity
-                } for activity in TActivity.get_activites_by_id(self.zh.id_zh)
-            ]
-        }
-
-    def get_flows(self):
-        q_outflows = TOutflow.get_outflows_by_id(self.zh.id_zh)
-        q_inflows = TInflow.get_inflows_by_id(self.zh.id_zh)
-        flows = [
-            {
-                "outflows": [
-                    {
-                        "id_outflow": flow.id_outflow,
-                        "id_permanance": flow.id_permanance,
-                        "topo": flow.topo
-                    } for flow in q_outflows
-                ]
-            },
-            {
-                "inflows": [
-                    {
-                        "id_inflow": flow.id_inflow,
-                        "id_permanance": flow.id_permanance,
-                        "topo": flow.topo
-                    } for flow in q_inflows
-                ]
-            }
-        ]
-        return {"flows": flows}
-
-    def get_functions(self, category, is_eval=False):
-        return {
-            category.lower(): [
-                {
-                    'id_function': function.id_function,
-                    'justification': function.justification,
-                    'id_qualification': function.id_qualification,
-                    'id_knowledge': function.id_knowledge
-                } for function in TFunctions.get_functions_by_id_and_category(
-                    self.zh.id_zh, category, is_eval)
-            ]
-        }
-
-    def get_hab_heritages(self):
-        return {
-            "hab_heritages": [
-                {
-                    'id_corine_bio': hab_heritage.id_corine_bio,
-                    'id_cahier_hab': hab_heritage.id_cahier_hab,
-                    'id_preservation_state': hab_heritage.id_preservation_state,
-                    'hab_cover': hab_heritage.hab_cover
-                } for hab_heritage in THabHeritage.get_hab_heritage_by_id(self.zh.id_zh)
-            ]
-        }
-
-    def get_ownerships(self):
-        return {
-            "ownerships": [
-                {
-                    'id_status': ownership.id_status,
-                    'remark': ownership.remark
-                } for ownership in TOwnership.get_ownerships_by_id(self.zh.id_zh)
-            ]
-        }
-
-    def get_managements(self):
-        q_management_structures = TManagementStructures.get_management_structures_by_id(
-            self.zh.id_zh)
-        managements = []
-        for management in q_management_structures:
-            q_management_plans = DB.session.query(TManagementPlans).filter(
-                TManagementPlans.id_structure == management.id_structure).all()
-            plans = []
-            if q_management_plans:
-                for plan in q_management_plans:
-                    plans.append({
-                        "id_nature": plan.id_nature,
-                        "plan_date": str(plan.plan_date.date()),
-                        "duration": plan.duration
-                    })
-            managements.append({
-                "structure": management.id_org,
-                "plans": plans
-            })
-        return {
-            "managements": managements
-        }
-
-    def get_instruments(self):
-        return {
-            "instruments": [
-                {
-                    'id_instrument': instrument.id_instrument,
-                    'instrument_date': str(instrument.instrument_date.date())
-                } for instrument in TInstruments.get_instruments_by_id(self.zh.id_zh)
-            ]
-        }
-
-    def get_protections(self):
-        return {
-            "protections": [
-                DB.session.query(CorProtectionLevelType).filter(
-                    CorProtectionLevelType.id_protection == protec).one().id_protection_status
-                for protec in [protection.id_protection for protection in CorZhProtection.get_protections_by_id(self.zh.id_zh)]]
-        }
-
-    def get_urban_docs(self):
-        return {
-            "urban_docs": [
-                {
-                    'id_area': urban_doc.id_area,
-                    'id_doc_type': urban_doc.id_doc_type,
-                    'id_cors': [doc.id_cor for doc in DB.session.query(CorZhDocRange).filter(CorZhDocRange.id_doc == urban_doc.id_doc).all()],
-                    'remark': urban_doc.remark
-                } for urban_doc in TUrbanPlanningDocs.get_urban_docs_by_id(self.zh.id_zh)
-            ]
-        }
-
-    def get_actions(self):
-        return {
-            "actions": [
-                {
-                    'id_action': action.id_action,
-                    'id_priority_level': action.id_priority_level,
-                    'remark': action.remark
-                } for action in TActions.get_actions_by_id(self.zh.id_zh)
-            ]
-        }
-
-    def get_fauna_nb(self):
-        try:
-            vertebrates = int(self.zh.as_dict()['nb_vertebrate_sp'])
-        except TypeError:
-            vertebrates = 0
-        try:
-            invertebrates = int(self.zh.as_dict()['nb_invertebrate_sp'])
-        except TypeError:
-            invertebrates = 0
-        return vertebrates+invertebrates
-
-    def get_departments(self):
-        return [
-            {
-                dep.LAreas.area_code: dep.LAreas.area_name
-            } for dep in CorZhArea.get_departments(self.zh.id_zh)
-        ]
-
-    def get_municipalities(self, query):
-        return [
-            {
-                municipality.LiMunicipalities.insee_com: municipality.LiMunicipalities.nom_com
-            } for municipality in query
-        ]
-
-    def get_regions(self, query):
-        region_list = []
-        for municipality in query:
-            if municipality.LiMunicipalities.insee_reg not in region_list:
-                region_list.append(municipality.LiMunicipalities.insee_reg)
-        q_region = DB.session.query(InseeRegions).filter(
-            InseeRegions.insee_reg.in_(region_list)).all()
-        regions = [region.region_name for region in q_region]
-        return regions
-
-    def get_geo_info(self):
-        departments = self.get_departments()
-        q_municipalities = CorZhArea.get_municipalities_info(self.zh.id_zh)
-        municipalities = self.get_municipalities(q_municipalities)
-        regions = self.get_regions(q_municipalities)
-        return {"geo_info": {"departments": departments, "municipalities": municipalities, "regions": regions}}
-
-    def get_full_zh(self):
-        full_zh = self.zh.get_geofeature()
-        full_zh.properties.update(self.geo_info)
-        full_zh.properties.update(self.id_lims)
-        full_zh.properties.update(self.id_lims_fs)
-        full_zh.properties.update(self.id_references)
-        full_zh.properties.update(self.cb_codes_corine_biotope)
-        full_zh.properties.update(self.id_corine_landcovers)
-        full_zh.properties.update(self.activities)
-        full_zh.properties.update(self.flows)
-        full_zh.properties.update(self.fonctions_hydro)
-        full_zh.properties.update(self.fonctions_bio)
-        full_zh.properties.update(self.interet_patrim)
-        full_zh.properties.update(self.val_soc_eco)
-        full_zh.properties.update(self.hab_heritages)
-        full_zh.properties.update(self.managements)
-        full_zh.properties.update(self.actions)
-        full_zh.properties.update(self.ownerships)
-        full_zh.properties.update(self.instruments)
-        full_zh.properties.update(self.protections)
-        full_zh.properties.update(self.urban_docs)
-        return full_zh
-
-    def get_eval(self):
-        eval = {}
-        eval.update(self.eval_fonctions_hydro)
-        eval.update(self.eval_fonctions_bio)
-        eval.update(self.eval_interet_patrim)
-        eval.update(self.eval_val_soc_eco)
-        eval.update({
-            "nb_flora_sp": self.zh.as_dict()['nb_flora_sp'],
-            "nb_hab": self.zh.as_dict()['nb_flora_sp'],
-            "nb_fauna_sp": self.get_fauna_nb(),
-            "total_hab_cover": self.zh.as_dict()['nb_flora_sp'],
-            "id_thread": self.zh.as_dict()['id_thread'],
-            "id_diag_hydro": self.zh.as_dict()['id_diag_hydro'],
-            "id_diag_bio": self.zh.as_dict()['id_diag_bio']
-        })
-        return eval
-
-
-class Code(ZH):
-    def __init__(self, id_zh, id_org, zh_geom):
-        self.id_zh = id_zh
-        self.id_org = id_org
-        self.zh_geom = zh_geom
-        self.dep = self.get_deps()
-        self.organism = self.get_organism()
-        self.number = self.get_number()
-        self.is_valid_number = self.set_valid_number()
-
-    def get_deps(self):
-        departments = CorZhArea.get_departments(self.id_zh)
-        print('passe bien par là')
-        print(departments)
-        print(self.zh_geom)
-        area = 0
-        my_geom = DB.session.query(func.ST_Transform(func.ST_SetSRID(
-            TZH.geom, 4326), 2154)).filter(TZH.id_zh == self.id_zh).one()[0]
-        for dep in departments:
-            if DB.session.scalar(dep.LAreas.geom.ST_Intersection(my_geom).ST_Area()) > area:
-                area = DB.session.scalar(
-                    dep.LAreas.geom.ST_Intersection(my_geom).ST_Area())
-                main_dep = dep.LAreas.area_code
-        return main_dep
-
-    def get_organism(self):
-        return BibOrganismes.get_abbrevation(self.id_org)
-
-    def get_number(self):
-        number = DB.session.query(CorZhArea).join(LAreas, LAreas.id_area == CorZhArea.id_area).join(
-            TZH, TZH.id_zh == CorZhArea.id_zh).filter(TZH.id_org == self.id_org, LAreas.area_code == self.get_deps()).count()
-        return number+1
-
-    def set_valid_number(self):
-        if self.number > 9999:
-            return False
-        return True
-
-    def __repr__(self):
-        return f'{self.dep}-{self.organism}-{self.number}'
 
 
 class CorLimList(DB.Model):
@@ -802,6 +498,7 @@ class CorZhRef(DB.Model):
         primary_key=True
     )
 
+    @staticmethod
     def get_references_by_id(id_zh):
         return DB.session.query(TReferences).join(
             CorZhRef).filter(CorZhRef.id_zh == id_zh).all()
@@ -821,10 +518,6 @@ class CorZhLimFs(DB.Model):
         primary_key=True
     )
 
-    def get_lim_fs_by_id(id_zh):
-        return DB.session.query(CorZhLimFs).filter(
-            CorZhLimFs.id_zh == id_zh).all()
-
 
 class CorSdageSage(DB.Model):
     __tablename__ = "cor_sdage_sage"
@@ -840,13 +533,18 @@ class CorSdageSage(DB.Model):
         primary_key=True
     )
 
+    @staticmethod
     def get_id_sdage_list():
         q_id_sdages = DB.session.query(
             func.distinct(CorSdageSage.id_sdage)).all()
         return [id[0] for id in q_id_sdages]
 
+    @staticmethod
     def get_sage_by_id(id):
-        return DB.session.query(CorSdageSage, TNomenclatures).join(TNomenclatures, TNomenclatures.id_nomenclature == CorSdageSage.id_sage).filter(CorSdageSage.id_sdage == id).all()
+        return DB.session.query(CorSdageSage, TNomenclatures)\
+            .join(TNomenclatures, TNomenclatures.id_nomenclature == CorSdageSage.id_sage)\
+            .filter(CorSdageSage.id_sdage == id)\
+            .all()
 
 
 class BibCb(DB.Model):
@@ -865,10 +563,12 @@ class BibCb(DB.Model):
         nullable=False
     )
 
+    @staticmethod
     def get_label():
         return DB.session.query(BibCb, Habref).join(
             Habref, BibCb.lb_code == Habref.lb_code).filter(Habref.cd_typo == 22).all()
 
+    @staticmethod
     def get_ch(lb_code):
         # get cd_hab_sortie from lb_code of selected Corine Biotope
         cd_hab_sortie = DB.session.query(Habref).filter(
@@ -908,6 +608,7 @@ class CorImpactTypes(DB.Model):
         nullable=False
     )
 
+    @staticmethod
     def get_impacts():
         return DB.session.query(CorImpactTypes, TNomenclatures).join(
             TNomenclatures, TNomenclatures.id_nomenclature == CorImpactTypes.id_impact).filter(
@@ -950,23 +651,27 @@ class CorMainFct(DB.Model):
         nullable=False
     )
 
+    @staticmethod
     def get_functions(nomenc_ids):
-        return DB.session.query(CorMainFct, TNomenclatures).join(
-            TNomenclatures, TNomenclatures.id_nomenclature == CorMainFct.id_function).filter(
-                CorMainFct.active).filter(
-                    CorMainFct.id_function.in_(nomenc_ids)
-        ).all()
+        return DB.session.query(CorMainFct, TNomenclatures)\
+            .join(TNomenclatures, TNomenclatures.id_nomenclature == CorMainFct.id_function)\
+            .filter(CorMainFct.active)\
+            .filter(CorMainFct.id_function.in_(nomenc_ids))\
+            .all()
 
+    @staticmethod
     def get_main_function_list(ids):
         q_id_types = DB.session.query(
             func.distinct(CorMainFct.id_main_function)).all()
         return [id[0] for id in q_id_types if id[0] in ids]
 
+    @staticmethod
     def get_function_by_main_function(id_main):
         return DB.session.query(CorMainFct, TNomenclatures).join(
             TNomenclatures, TNomenclatures.id_nomenclature == CorMainFct.id_function).filter(
                 and_(CorMainFct.id_main_function == id_main, CorMainFct.active)).all()
 
+    @staticmethod
     def get_mnemo_type(id_type):
         if id_type:
             return DB.session.query(TNomenclatures).filter(
@@ -989,10 +694,6 @@ class CorZhCb(DB.Model):
         primary_key=True
     )
 
-    def get_cb_by_id(id_zh):
-        return DB.session.query(CorZhCb).filter(
-            CorZhCb.id_zh == id_zh).all()
-
 
 class CorZhCorineCover(DB.Model):
     __tablename__ = "cor_zh_corine_cover"
@@ -1007,10 +708,6 @@ class CorZhCorineCover(DB.Model):
         ForeignKey(TZH.id_zh),
         primary_key=True
     )
-
-    def get_landcovers_by_id(id_zh):
-        return DB.session.query(CorZhCorineCover).filter(
-            CorZhCorineCover.id_zh == id_zh).all()
 
 
 class CorImpactList(DB.Model):
@@ -1027,6 +724,7 @@ class CorImpactList(DB.Model):
         primary_key=True
     )
 
+    @staticmethod
     def get_impacts_by_uuid(uuid_activity):
         return DB.session.query(CorImpactList).filter(
             CorImpactList.id_impact_list == uuid_activity).all()
@@ -1059,10 +757,6 @@ class TActivity(DB.Model):
     )
     child = relationship(CorImpactList, backref="parent", passive_deletes=True)
 
-    def get_activites_by_id(id_zh):
-        return DB.session.query(TActivity).filter(
-            TActivity.id_zh == id_zh).all()
-
 
 class TOutflow(DB.Model):
     __tablename__ = "t_outflow"
@@ -1086,10 +780,6 @@ class TOutflow(DB.Model):
         DB.Unicode
     )
 
-    def get_outflows_by_id(id_zh):
-        return DB.session.query(TOutflow).filter(
-            TOutflow.id_zh == id_zh).all()
-
 
 class TInflow(DB.Model):
     __tablename__ = "t_inflow"
@@ -1112,10 +802,6 @@ class TInflow(DB.Model):
     topo = DB.Column(
         DB.Unicode
     )
-
-    def get_inflows_by_id(id_zh):
-        return DB.session.query(TInflow).filter(
-            TInflow.id_zh == id_zh).all()
 
 
 class TFunctions(DB.Model):
@@ -1146,6 +832,7 @@ class TFunctions(DB.Model):
             "FONCTIONS_CONNAISSANCE"),
     )
 
+    @staticmethod
     def get_functions_by_id_and_category(id_zh, category, is_eval=False):
         eval_qualification = ['Moyenne', 'Forte']
         function_ids = [
@@ -1193,10 +880,6 @@ class THabHeritage(DB.Model):
         nullable=False
     )
 
-    def get_hab_heritage_by_id(id_zh):
-        return DB.session.query(THabHeritage).filter(
-            THabHeritage.id_zh == id_zh).all()
-
 
 class CorUrbanTypeRange(DB.Model):
     __tablename__ = "cor_urban_type_range"
@@ -1214,6 +897,7 @@ class CorUrbanTypeRange(DB.Model):
         ForeignKey(TNomenclatures.id_nomenclature)
     )
 
+    @staticmethod
     def get_range_by_doc(doc_id):
         q_ranges = DB.session.query(CorUrbanTypeRange).filter(
             CorUrbanTypeRange.id_doc_type == doc_id).all()
@@ -1251,10 +935,6 @@ class TUrbanPlanningDocs(DB.Model):
     remark = DB.Column(
         DB.Unicode
     )
-
-    def get_urban_docs_by_id(id_zh):
-        return DB.session.query(TUrbanPlanningDocs).filter(
-            TUrbanPlanningDocs.id_zh == id_zh).all()
 
 
 class CorZhDocRange(DB.Model):
@@ -1308,6 +988,7 @@ class BibActions(DB.Model):
         nullable=False
     )
 
+    @staticmethod
     def get_bib_actions():
         q_bib_actions = DB.session.query(BibActions).all()
         bib_actions_list = [
@@ -1338,10 +1019,6 @@ class TActions(DB.Model):
         DB.Unicode(length=2000)
     )
 
-    def get_actions_by_id(id_zh):
-        return DB.session.query(TActions).filter(
-            TActions.id_zh == id_zh).all()
-
 
 class TInstruments(DB.Model):
     __tablename__ = "t_instruments"
@@ -1359,10 +1036,6 @@ class TInstruments(DB.Model):
     instrument_date = DB.Column(
         DB.DateTime
     )
-
-    def get_instruments_by_id(id_zh):
-        return DB.session.query(TInstruments).filter(
-            TInstruments.id_zh == id_zh).all()
 
 
 class TOwnership(DB.Model):
@@ -1382,10 +1055,6 @@ class TOwnership(DB.Model):
         DB.Unicode(length=2000)
     )
 
-    def get_ownerships_by_id(id_zh):
-        return DB.session.query(TOwnership).filter(
-            TOwnership.id_zh == id_zh).all()
-
 
 class CorZhProtection(DB.Model):
     __tablename__ = "cor_zh_protection"
@@ -1400,10 +1069,6 @@ class CorZhProtection(DB.Model):
         ForeignKey(TZH.id_zh),
         primary_key=True
     )
-
-    def get_protections_by_id(id_zh):
-        return DB.session.query(CorZhProtection).filter(
-            CorZhProtection.id_zh == id_zh).all()
 
 
 class InseeRegions(DB.Model):
@@ -1434,10 +1099,6 @@ class TManagementStructures(DB.Model):
         DB.Integer,
         ForeignKey(BibOrganismes.id_org)
     )
-
-    def get_management_structures_by_id(id_zh):
-        return DB.session.query(TManagementStructures).filter(
-            TManagementStructures.id_zh == id_zh).all()
 
 
 class TManagementPlans(DB.Model):

@@ -31,6 +31,7 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
   public rowPerPage: number;
   public cardContentHeight: number;
   public moduleSub: Subscription;
+  private metaData: any;
 
   constructor(
     public mapListService: MapListService,
@@ -81,11 +82,15 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     // FETCH THE DATA
     this.mapListService.refreshUrlQuery();
     this.calculateNbRow();
-    this.mapListService.getData(
-      this.apiEndPoint,
-      [{ param: "limit", value: this.rowPerPage }],
-      this.zhCustomCallBack.bind(this)
-    );
+    this._zhService.getMetaDataForms().subscribe((data: any) => {
+      this.metaData = data;
+      this.mapListService.getData(
+        this.apiEndPoint,
+        [{ param: "limit", value: this.rowPerPage }],
+        this.zhCustomCallBack.bind(this)
+      );
+    });
+
     // end OnInit
   }
 
@@ -149,6 +154,13 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     return moment(element).format("DD-MM-YYYY");
   }
 
+  displaySdageName(sdageID) {
+    const sdage = this.metaData["SDAGE"].find((item: any) => {
+      return item.id_nomenclature == sdageID;
+    });
+    return sdage.mnemonique;
+  }
+
   zhCustomCallBack(feature): any {
     // set Author name
     feature["properties"]["author"] = this.displayAuthorName(
@@ -157,6 +169,10 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     // format Date
     feature["properties"]["create_date"] = this.displayDate(
       feature["properties"]["create_date"]
+    );
+
+    feature["properties"]["sdage"] = this.displaySdageName(
+      feature["properties"]["id_sdage"]
     );
     return feature;
   }
@@ -190,7 +206,9 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
       iElement.parentElement &&
       iElement.parentElement.parentElement &&
       iElement.parentElement.parentElement.blur();
-    this.ngbModal.open(modal);
+    this.ngbModal.open(modal, {
+      centered: true,
+    });
   }
 
   ngOnDestroy() {

@@ -22,6 +22,7 @@ import { ZhDataService } from "../../../services/zh-data.service";
 export class ZhFormTab6Component implements OnInit {
   @Input() public formMetaData: any;
   @Output() public canChangeTab = new EventEmitter<boolean>();
+  @Output() nextTab = new EventEmitter<number>();
   public formTab6: FormGroup;
   public statusForm: FormGroup;
   public instrumentForm: FormGroup;
@@ -71,7 +72,7 @@ export class ZhFormTab6Component implements OnInit {
 
   public dropdownSettings: any;
   public multiselectTypeClassement: any;
-  private _currentZh: any;
+  public currentZh: any;
   selectedManagement: any;
   moreDetails: boolean;
   posted: boolean;
@@ -108,12 +109,12 @@ export class ZhFormTab6Component implements OnInit {
       autoPosition: false,
     };
 
-    this.getCurrentZh();
     this.getMetaData();
     this.initForms();
+
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
       if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
-      this.$_currentZhSub.unsubscribe();
+      if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
       if (tabPosition == 6) {
         this.getCurrentZh();
       }
@@ -169,7 +170,7 @@ export class ZhFormTab6Component implements OnInit {
   getCurrentZh() {
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
-        this._currentZh = zh;
+        this.currentZh = zh;
         this.statusTable = [];
         this.urbanDocTable = [];
         this.managements = [];
@@ -181,10 +182,10 @@ export class ZhFormTab6Component implements OnInit {
             //patch forms values
             let protections = [];
             if (
-              this._currentZh.properties.protections &&
-              this._currentZh.properties.protections.length > 0
+              this.currentZh.properties.protections &&
+              this.currentZh.properties.protections.length > 0
             ) {
-              this._currentZh.properties.protections.forEach((element) => {
+              this.currentZh.properties.protections.forEach((element) => {
                 let portection = this.formMetaData["PROTECTIONS"].find(
                   (item: any) => item.id_protection_status == element
                 );
@@ -194,13 +195,13 @@ export class ZhFormTab6Component implements OnInit {
             }
             this.formTab6.patchValue({
               protections: protections,
-              is_other_inventory: this._currentZh.properties.is_other_inventory,
+              is_other_inventory: this.currentZh.properties.is_other_inventory,
             });
             if (
-              this._currentZh.properties.ownerships &&
-              this._currentZh.properties.ownerships.length > 0
+              this.currentZh.properties.ownerships &&
+              this.currentZh.properties.ownerships.length > 0
             ) {
-              this._currentZh.properties.ownerships.forEach((owner: any) => {
+              this.currentZh.properties.ownerships.forEach((owner: any) => {
                 this.statusTable.push({
                   status: this.formMetaData["STATUT_PROPRIETE"].find(
                     (item: any) => item.id_nomenclature == owner.id_status
@@ -215,10 +216,10 @@ export class ZhFormTab6Component implements OnInit {
               });
             }
             if (
-              this._currentZh.properties.instruments &&
-              this._currentZh.properties.instruments.length > 0
+              this.currentZh.properties.instruments &&
+              this.currentZh.properties.instruments.length > 0
             ) {
-              this._currentZh.properties.instruments.forEach(
+              this.currentZh.properties.instruments.forEach(
                 (instrument: any) => {
                   this.instrumentTable.push({
                     instrument: this.formMetaData["INSTRU_CONTRAC_FINANC"].find(
@@ -236,10 +237,10 @@ export class ZhFormTab6Component implements OnInit {
               );
             }
             if (
-              this._currentZh.properties.managements &&
-              this._currentZh.properties.managements.length > 0
+              this.currentZh.properties.managements &&
+              this.currentZh.properties.managements.length > 0
             ) {
-              this._currentZh.properties.managements.forEach(
+              this.currentZh.properties.managements.forEach(
                 (management: any) => {
                   let structure = this.formMetaData[
                     "BIB_MANAGEMENT_STRUCTURES"
@@ -264,10 +265,10 @@ export class ZhFormTab6Component implements OnInit {
               );
             }
             if (
-              this._currentZh.properties.urban_docs &&
-              this._currentZh.properties.urban_docs.length > 0
+              this.currentZh.properties.urban_docs &&
+              this.currentZh.properties.urban_docs.length > 0
             ) {
-              this._currentZh.properties.urban_docs.forEach((doc: any) => {
+              this.currentZh.properties.urban_docs.forEach((doc: any) => {
                 let docType = this.formMetaData["TYP_DOC_COMM"].find(
                   (item: any) => item.id_nomenclature == doc.id_doc_type
                 );
@@ -942,7 +943,7 @@ export class ZhFormTab6Component implements OnInit {
       }
 
       let formToPost = {
-        id_zh: Number(this._currentZh.properties.id_zh),
+        id_zh: Number(this.currentZh.properties.id_zh),
         ownerships: ownerships,
         managements: managements,
         instruments: instruments,
@@ -955,7 +956,7 @@ export class ZhFormTab6Component implements OnInit {
       this._dataService.postDataForm(formToPost, 6).subscribe(
         () => {
           this._dataService
-            .getZhById(this._currentZh.properties.id_zh)
+            .getZhById(this.currentZh.properties.id_zh)
             .subscribe((zh: any) => {
               this._dataService.setCurrentZh(zh);
               this.posted = false;
@@ -963,6 +964,7 @@ export class ZhFormTab6Component implements OnInit {
               this._toastr.success("Vos données sont bien enregistrées", "", {
                 positionClass: "toast-top-right",
               });
+              this.nextTab.emit(7);
             });
         },
         (error) => {

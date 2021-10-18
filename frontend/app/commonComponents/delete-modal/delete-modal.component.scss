@@ -1,0 +1,13 @@
+@import "../../../app.module";
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-header {
+  padding: 10px;
+  color: white;
+  display: flex;
+  justify-content: center;
+  background-color: #ff6666;
+}

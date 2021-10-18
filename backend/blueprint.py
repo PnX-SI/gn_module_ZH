@@ -33,29 +33,31 @@ from geonature.utils.env import DB
 from geonature.core.gn_permissions import decorators as permissions
 from geonature.core.gn_permissions.tools import get_or_fetch_user_cruved
 
-from .models import (
-    TActivity,
+from .model.zh_schema import (
     TZH,
     CorLimList,
     CorZhArea,
     CorZhRef,
     TReferences,
     BibSiteSpace,
-    CorZhLimFs,
     BibOrganismes,
-    ZH,
-    CorZhCb,
-    CorZhCorineCover,
     BibActions
 )
 
-from .nomenclatures import get_nomenc
+from .model.zh import ZH
+
+from .model.cards import Card
+
+from .nomenclatures import (
+    get_nomenc,
+    get_ch
+)
 
 from .forms import *
 
 from .geometry import set_geom
 
-from .repositories import (
+from .model.repositories import (
     ZhRepository
 )
 
@@ -153,9 +155,21 @@ def get_zh_by_id(id_zh, info_role):
     """Get zh form data by id
     """
     try:
-        full_zh = ZH(id_zh).get_full_zh()
-        return full_zh
+        return ZH(id_zh).__repr__()
+    except Exception as e:
+        if e.__class__.__name__ == 'NoResultFound':
+            raise ZHApiError(message='zh id exist?', details=str(e))
+        raise ZHApiError(message=str(e), details=str(e))
 
+
+@blueprint.route("/<int:id_zh>/complete_card", methods=["GET"])
+@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@json_resp
+def get_complete_info(id_zh, info_role):
+    """Get zh complete info
+    """
+    try:
+        return Card(id_zh, "full").__repr__()
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':
             raise ZHApiError(message='zh id exist?', details=str(e))
@@ -171,7 +185,6 @@ def get_zh_eval(id_zh, info_role):
     try:
         zh_eval = ZH(id_zh).get_eval()
         return zh_eval
-
     except Exception as e:
         if e.__class__.__name__ == 'NoResultFound':
             raise ZHApiError(message='zh id exist?', details=str(e))
@@ -218,24 +231,10 @@ def get_tab(info_role):
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
 def get_cahier_hab(info_role, lb_code):
-    """Get form metadata for all tabs
+    """Get cahier hab list from corine biotope lb_code
     """
     try:
-        # get cd_hab_sortie from lb_code of selected Corine Biotope
-        cd_hab_sortie = DB.session.query(Habref).filter(
-            and_(Habref.lb_code == lb_code, Habref.cd_typo == 22)).one().cd_hab
-        # get all cd_hab_entre corresponding to cd_hab_sortie
-        q_cd_hab_entre = DB.session.query(CorespHab).filter(
-            CorespHab.cd_hab_sortie == cd_hab_sortie).all()
-        # get list of cd_hab_entre/lb_code/lb_hab_fr for each cahier habitat
-        ch = []
-        for q in q_cd_hab_entre:
-            ch.append({
-                "cd_hab": q.cd_hab_entre,
-                "lb_code": DB.session.query(Habref).filter(Habref.cd_hab == q.cd_hab_entre).one().lb_code,
-                "lb_hab_fr": DB.session.query(Habref).filter(Habref.cd_hab == q.cd_hab_entre).one().lb_hab_fr
-            })
-        return ch
+        return get_ch(lb_code)
     except Exception as e:
         raise ZHApiError(message=str(e), details=str(e))
 
@@ -503,3 +502,16 @@ def handle_geonature_zh_api(error):
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
     return response
+
+@blueprint.route('/user/cruved', methods=['GET'])
+@permissions.check_cruved_scope('R', True)
+@json_resp
+def returnUserCruved(info_role):
+    # récupérer le CRUVED complet de l'utilisateur courant
+    print (info_role)
+    user_cruved = get_or_fetch_user_cruved(
+        session=session,
+        id_role=info_role.id_role,
+        module_code=blueprint.config['MODULE_CODE']
+    )
+    return user_cruved

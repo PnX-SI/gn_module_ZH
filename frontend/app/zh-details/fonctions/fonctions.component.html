@@ -1,0 +1,104 @@
+<div>
+  <div class="row my-3">
+    <div class="col-12 h-100">
+      <fieldset>
+        <legend>
+          <h5 class="section-title">
+            Fonctions hydrologiques / biogéochimiques
+          </h5>
+        </legend>
+        <div class="mx-2">
+          <zh-table
+            [tableCols]="hydroFctTableCol"
+            [data]="data.hydrologie"
+          ></zh-table>
+        </div>
+      </fieldset>
+    </div>
+    <div class="col-12 h-100">
+      <fieldset>
+        <legend>
+          <h5 class="section-title">Fonctions biologiques / écologiques</h5>
+        </legend>
+        <div class="mx-2">
+          <zh-table
+            [tableCols]="bioFctTableCol"
+            [data]="data.biologie"
+          ></zh-table>
+        </div>
+      </fieldset>
+    </div>
+    <div class="col-12 h-100">
+      <fieldset>
+        <legend>
+          <h5 class="section-title">Intérêts patrimoniaux</h5>
+        </legend>
+        <div class="mx-2">
+          <zh-table
+            [tableCols]="intertesTableCol"
+            [data]="data.interet"
+          ></zh-table>
+        </div>
+        <h5 class="section-title mx-2">
+          Habitats naturels humides patrimoniaux :
+        </h5>
+        <div class="mx-3">
+          <div class="row">
+            <div class="col-12 col-xl-4">
+              <zh-label label="Cartographie d'habitats :">
+                <span>{{ data.habitats.cartographie }}</span>
+              </zh-label>
+            </div>
+            <div class="col-12 col-xl-4">
+              <zh-label label="Nombre d'habitats :">
+                <span>{{ data.habitats.nombre }}</span>
+              </zh-label>
+            </div>
+            <div class="col-12 col-xl-4">
+              <zh-label label="Recouvrement total de la ZH (%) :">
+                <span>{{ data.habitats.recouvrement }}</span>
+              </zh-label>
+            </div>
+          </div>
+          <zh-table
+            [tableCols]="corineTableCol"
+            [data]="data.habitats.corine"
+          ></zh-table>
+        </div>
+        <h5 class="section-title mx-2">Faune et flore patrimoniale :</h5>
+        <div class="mx-3">
+          <div class="row">
+            <div class="col-12 col-xl-4">
+              <zh-label label="Flore - nombre d'espèces :">
+                <span>{{ data.taxons.nb_flore }}</span>
+              </zh-label>
+            </div>
+            <div class="col-12 col-xl-4">
+              <zh-label label="Faune vertébrée - nombre d'espèces :">
+                <span>{{ data.taxons.nb_invertebre }}</span>
+              </zh-label>
+            </div>
+            <div class="col-12 col-xl-4">
+              <zh-label label="Faune invertébrée - nombre d'espèces:">
+                <span>{{ data.taxons.nb_vertebre }}</span>
+              </zh-label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+    <div class="col-12 h-100">
+      <fieldset>
+        <legend>
+          <h5 class="section-title">Valeurs socio-économiques</h5>
+        </legend>
+        <div class="mx-2">
+          <zh-table
+            [tableCols]="socioEcoTableCol"
+            [data]="data.socio"
+          ></zh-table>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+</div>

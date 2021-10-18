@@ -1,0 +1,25 @@
+<div class="modal-header">
+  <h5 class="modal-title"><i class="fa fa-trash"></i></h5>
+</div>
+<div class="modal-body">
+  {{ message }}
+</div>
+<div class="modal-footer">
+  <button
+    type="button"
+    mat-raised-button
+    class="mr-1 uppercase"
+    (click)="activeModal.dismiss('cancel click')"
+  >
+    Annuler
+  </button>
+  <button
+    type="button"
+    mat-raised-button
+    color="warn"
+    class="uppercase"
+    (click)="activeModal.close('Close click')"
+  >
+    Supprimer
+  </button>
+</div>

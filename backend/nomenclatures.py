@@ -1,4 +1,4 @@
-from .models import (
+from .model.zh_schema import (
     Nomenclatures,
     CorSdageSage,
     BibCb,
@@ -8,9 +8,16 @@ from .models import (
     CorProtectionLevelType
 )
 
+from sqlalchemy import and_
+
 from pypnnomenclature.models import (
     TNomenclatures,
     BibNomenclaturesTypes
+)
+
+from pypn_habref_api.models import (
+    Habref,
+    CorespHab
 )
 
 from geonature.utils.env import DB
@@ -41,6 +48,24 @@ def get_corine_biotope():
             "CB_is_ch": cb.BibCb.is_ch
         } for cb in BibCb.get_label()
     ]
+
+
+def get_ch(lb_code):
+    # get cd_hab_sortie list from lb_code of selected Corine Biotope
+    cd_hab_sortie = DB.session.query(Habref).filter(
+        and_(Habref.lb_code == lb_code, Habref.cd_typo == 22)).one().cd_hab
+    # get all cd_hab_entre corresponding to cd_hab_sortie
+    q_cd_hab_entre = DB.session.query(CorespHab).filter(
+        CorespHab.cd_hab_sortie == cd_hab_sortie).all()
+    # get list of cd_hab_entre/lb_code/lb_hab_fr for each cahier habitat
+    ch = []
+    for q in q_cd_hab_entre:
+        ch.append({
+            "cd_hab": q.cd_hab_entre,
+            "lb_code": DB.session.query(Habref).filter(Habref.cd_hab == q.cd_hab_entre).one().lb_code,
+            "lb_hab_fr": DB.session.query(Habref).filter(Habref.cd_hab == q.cd_hab_entre).one().lb_hab_fr
+        })
+    return ch
 
 
 def get_impact_list():

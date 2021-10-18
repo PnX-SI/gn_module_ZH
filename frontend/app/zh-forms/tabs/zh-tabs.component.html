@@ -10,7 +10,7 @@
       (selectedIndexChange)="selectedIndexChange($event)"
     >
       <mat-tab>
-        <ng-template mat-tab-label> Champs obligatoires </ng-template>
+        <ng-template mat-tab-label>Carte</ng-template>
         <zh-form-tab0
           *ngIf="formMetaData"
           class="d-flex flex-column"
@@ -18,90 +18,100 @@
           [formMetaData]="formMetaData"
           (activeTabs)="onActiveTabs($event)"
           (canChangeTab)="onCanChangeTab($event)"
+          (nextTab)="onNext($event)"
         >
         </zh-form-tab0>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label> Renseignement généraux </ng-template>
+        <ng-template mat-tab-label>1. Renseignement</ng-template>
         <zh-form-tab1
           *ngIf="formMetaData"
           class="d-flex flex-column"
           [ngStyle]="{ 'height.px': cardContentHeight }"
           [formMetaData]="formMetaData"
           (canChangeTab)="onCanChangeTab($event)"
+          (nextTab)="onNext($event)"
         >
         </zh-form-tab1>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label>
-          Délimitation de la zone humide et de l'espace de fonctionnalité
-        </ng-template>
+        <ng-template mat-tab-label>2. Délimitation </ng-template>
         <zh-form-tab2
           *ngIf="formMetaData"
           class="d-flex flex-column"
           [ngStyle]="{ 'height.px': cardContentHeight }"
           [formMetaData]="formMetaData"
           (canChangeTab)="onCanChangeTab($event)"
+          (nextTab)="onNext($event)"
         >
         </zh-form-tab2>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label>
-          Description du bassin versant et de la zone humide
-        </ng-template>
+        <ng-template mat-tab-label>3. Description </ng-template>
         <zh-form-tab3
           *ngIf="formMetaData"
           class="d-flex flex-column"
+          [ngStyle]="{ 'height.px': cardContentHeight }"
           [formMetaData]="formMetaData"
           (canChangeTab)="onCanChangeTab($event)"
+          (nextTab)="onNext($event)"
         >
         </zh-form-tab3>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label>
-          Fonctionnement de la zone humide
-        </ng-template>
+        <ng-template mat-tab-label>4. Fonctionnement </ng-template>
         <zh-form-tab4
           *ngIf="formMetaData"
           class="d-flex flex-column"
           [ngStyle]="{ 'height.px': cardContentHeight }"
           [formMetaData]="formMetaData"
           (canChangeTab)="onCanChangeTab($event)"
+          (nextTab)="onNext($event)"
         ></zh-form-tab4>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label>
-          Fonctions écologiques, valeurs socio-économiques, interét patrimonial
-        </ng-template>
+        <ng-template mat-tab-label>5. Fonctions écologiques </ng-template>
         <zh-form-tab5
           *ngIf="formMetaData"
           class="d-flex flex-column"
           [ngStyle]="{ 'height.px': cardContentHeight }"
           [formMetaData]="formMetaData"
           (canChangeTab)="onCanChangeTab($event)"
+          (nextTab)="onNext($event)"
         ></zh-form-tab5>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label>
-          Statuts et gestion de la zone humide
-        </ng-template>
+        <ng-template mat-tab-label>6. Statuts </ng-template>
         <zh-form-tab6
           *ngIf="formMetaData"
           class="d-flex flex-column"
           [ngStyle]="{ 'height.px': cardContentHeight }"
           [formMetaData]="formMetaData"
           (canChangeTab)="onCanChangeTab($event)"
+          (nextTab)="onNext($event)"
         ></zh-form-tab6>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label> Evaluation géneral du site </ng-template>
+        <ng-template mat-tab-label>7. Evaluation </ng-template>
         <zh-form-tab7
           *ngIf="formMetaData"
           class="d-flex flex-column"
           [ngStyle]="{ 'height.px': cardContentHeight }"
           [formMetaData]="formMetaData"
           (canChangeTab)="onCanChangeTab($event)"
+          (nextTab)="onNext($event)"
         ></zh-form-tab7>
+      </mat-tab>
+      <mat-tab [disabled]="disabledTabs">
+        <ng-template mat-tab-label>8. Ressources documentaires </ng-template>
+        <zh-form-tab8
+          *ngIf="formMetaData"
+          class="d-flex flex-column"
+          [ngStyle]="{ 'height.px': cardContentHeight }"
+          [formMetaData]="formMetaData"
+          (canChangeTab)="onCanChangeTab($event)"
+          (nextTab)="onNext($event)"
+        ></zh-form-tab8>
       </mat-tab>
     </mat-tab-group>
   </div>

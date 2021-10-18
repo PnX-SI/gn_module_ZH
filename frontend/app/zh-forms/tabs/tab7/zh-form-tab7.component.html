@@ -1,4 +1,5 @@
 <div *ngIf="evalZh" class="container-fluid">
+  <h2 class="tabsTitle">Evaluation géneral du site</h2>
   <form>
     <fieldset>
       <legend>
@@ -239,6 +240,10 @@
       </div>
     </fieldset>
     <div class="footer-btn">
+      <zh-cancelButton
+        *ngIf="currentZh"
+        [zhId]="currentZh.properties.id_zh"
+      ></zh-cancelButton>
       <button
         type="submit"
         mat-raised-button

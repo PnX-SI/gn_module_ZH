@@ -4,6 +4,7 @@ import { CommonModule } from "@angular/common";
 import { Routes, RouterModule } from "@angular/router";
 import { GN2CommonModule } from "@geonature_common/GN2Common.module";
 import { MapListService } from "@geonature_common/map-list/map-list.service";
+import { ZhDetailsModule } from "./zh-details/zh-details.module";
 import { NgMultiSelectDropDownModule } from "ng-multiselect-dropdown";
 import { AngularMultiSelectModule } from "angular2-multiselect-dropdown";
 //Components
@@ -21,6 +22,8 @@ import { ZhFormTab7Component } from "./zh-forms/tabs/tab7/zh-form-tab7.component
 import { ZhDataService } from "./services/zh-data.service";
 import { ZhTabsComponent } from "./zh-forms/tabs/zh-tabs.component";
 import { DatepickerI18n } from "./services/datepicker-i18n.service";
+import { CancelButtonComponent } from "./zh-forms/cancelButton/cancelButton.component";
+import { ZhFormTab8Component } from "./zh-forms/tabs/tab8/zh-form-tab8.component";
 
 // my module routing
 const routes: Routes = [
@@ -42,6 +45,8 @@ const routes: Routes = [
     ZhFormTab5Component,
     ZhFormTab6Component,
     ZhFormTab7Component,
+    ZhFormTab8Component,
+    CancelButtonComponent,
   ],
   imports: [
     CommonModule,
@@ -51,6 +56,7 @@ const routes: Routes = [
     AngularMultiSelectModule,
     NgMultiSelectDropDownModule.forRoot(),
     NgbModule,
+    ZhDetailsModule,
   ],
   providers: [ZhDataService, MapListService, DatepickerI18n],
   bootstrap: [ZhMapListComponent],

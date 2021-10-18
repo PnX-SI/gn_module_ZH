@@ -6,7 +6,7 @@ from sqlalchemy import func
 
 from geoalchemy2.shape import to_shape
 
-from .models import TZH
+from .model.zh_schema import TZH
 
 from .api_error import ZHApiError
 
