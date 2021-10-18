@@ -115,7 +115,6 @@ class ZhModel(DB.Model):
         return user.id_role == self.id_digitiser or user.id_role in observers
 
 
-#@serializable
 class Nomenclatures(TNomenclatures):
 
     __abstract__ = True

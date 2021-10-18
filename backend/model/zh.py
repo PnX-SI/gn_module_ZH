@@ -4,8 +4,6 @@ from geonature.utils.env import DB
 from .zh_schema import *
 
 
-#@serializable
-#@geoserializable
 class ZH(TZH):
     __abstract__ = True
 
