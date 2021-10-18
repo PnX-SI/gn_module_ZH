@@ -1,0 +1,26 @@
+<table class="table mb-4">
+  <thead class="thead-inverse table-header">
+    <tr>
+      <th *ngFor="let col of tableCols">{{ col.label }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <ng-container *ngIf="data && data.length > 0">
+      <tr *ngFor="let item of data">
+        <td *ngFor="let col of tableCols">
+          <ul *ngIf="isArray(item[col.name]); else elseBlock">
+            <li class="item" *ngFor="let item of item[col.name]">
+              {{ item }}
+            </li>
+          </ul>
+          <ng-template #elseBlock>
+            {{ item[col.name] }}
+          </ng-template>
+        </td>
+      </tr>
+    </ng-container>
+    <tr *ngIf="!data || data.length == 0">
+      <td colspan="100%">non renseigné</td>
+    </tr>
+  </tbody>
+</table>

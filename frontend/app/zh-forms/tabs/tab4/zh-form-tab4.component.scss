@@ -6,7 +6,30 @@ select.custom-select option:disabled {
   display: flex;
   justify-content: space-evenly;
   align-items: center;
+  flex-flow: wrap;
 }
 input[type="radio"] {
   transform: scale(1.2);
+}
+
+.radio-item {
+  user-select: none;
+  cursor: pointer;
+  label {
+    cursor: pointer;
+    text-align: center;
+
+    img {
+      height: 42px;
+      width: 76px;
+    }
+  }
+  input {
+    cursor: pointer;
+  }
+}
+
+.radio-label {
+  display: block;
+  margin-bottom: 12px;
 }

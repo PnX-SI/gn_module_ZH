@@ -26,6 +26,7 @@ export class ZhFormTab0Component implements OnInit {
   @Input() formMetaData;
   @Output() activeTabs = new EventEmitter<boolean>();
   @Output() canChangeTab = new EventEmitter<boolean>();
+  @Output() nextTab = new EventEmitter<number>();
   private _currentZh: any;
   public form: FormGroup;
   public cardContentHeight: number;
@@ -40,7 +41,7 @@ export class ZhFormTab0Component implements OnInit {
   public submitted = false;
   public posted = false;
   private geomLayers: any;
-  layerGroup: any;
+  public zhId: number;
 
   constructor(
     private fb: FormBuilder,
@@ -103,6 +104,7 @@ export class ZhFormTab0Component implements OnInit {
       });
       if (zh) {
         this._currentZh = zh;
+        this.zhId = this._currentZh.properties.id_zh;
         this._mapService.removeAllLayers(
           this._mapService.map,
           this._mapService.leafletDrawFeatureGroup
@@ -208,11 +210,12 @@ export class ZhFormTab0Component implements OnInit {
             this.posted = false;
             this._dataService.getZhById(data.id_zh).subscribe((zh: any) => {
               this._dataService.setCurrentZh(zh);
-            });
-            this.activeTabs.emit(true);
-            this.canChangeTab.emit(true);
-            this._toastr.success("Vos données sont bien enregistrées", "", {
-              positionClass: "toast-top-right",
+              this.activeTabs.emit(true);
+              this.canChangeTab.emit(true);
+              this._toastr.success("Vos données sont bien enregistrées", "", {
+                positionClass: "toast-top-right",
+              });
+              this.nextTab.emit(1);
             });
           },
           (error) => {

@@ -14,7 +14,7 @@ import { TabsService } from "../../../services/tabs.service";
 export class ZhFormTab7Component implements OnInit {
   @Input() public formMetaData: any;
   @Output() public canChangeTab = new EventEmitter<boolean>();
-
+  @Output() nextTab = new EventEmitter<number>();
   public formTab7: FormGroup;
   public patchModal: boolean;
   public modalFormSubmitted: boolean;
@@ -30,7 +30,7 @@ export class ZhFormTab7Component implements OnInit {
   public menacesComment: any;
   private $_currentZhSub: Subscription;
   public actionTable: any[] = [];
-  private _currentZh: any;
+  public currentZh: any;
 
   public hydroFctTableCol = [
     {
@@ -122,7 +122,7 @@ export class ZhFormTab7Component implements OnInit {
   getCurrentZh() {
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
-        this._currentZh = zh;
+        this.currentZh = zh;
         this.hydroFctData = [];
         this.bioFctData = [];
         this.patrimData = [];
@@ -229,15 +229,15 @@ export class ZhFormTab7Component implements OnInit {
         // patch forms values
         this.formTab7.patchValue({
           remark_eval_functions:
-            this._currentZh.properties.remark_eval_functions,
-          remark_eval_thread: this._currentZh.properties.remark_eval_thread,
-          remark_eval_actions: this._currentZh.properties.remark_eval_actions,
+            this.currentZh.properties.remark_eval_functions,
+          remark_eval_thread: this.currentZh.properties.remark_eval_thread,
+          remark_eval_actions: this.currentZh.properties.remark_eval_actions,
         });
         if (
-          this._currentZh.properties.actions &&
-          this._currentZh.properties.actions.length > 0
+          this.currentZh.properties.actions &&
+          this.currentZh.properties.actions.length > 0
         ) {
-          this._currentZh.properties.actions.forEach((action: any) => {
+          this.currentZh.properties.actions.forEach((action: any) => {
             this.actionTable.push({
               action: this.actionInput.find(
                 (item: any) => item.id_action == action.id_action
@@ -397,7 +397,7 @@ export class ZhFormTab7Component implements OnInit {
       }
 
       let formToPost = {
-        id_zh: Number(this._currentZh.properties.id_zh),
+        id_zh: Number(this.currentZh.properties.id_zh),
         remark_eval_functions: this.formTab7.value.remark_eval_functions,
         remark_eval_thread: this.formTab7.value.remark_eval_thread,
         remark_eval_actions: this.formTab7.value.remark_eval_actions,
@@ -408,7 +408,7 @@ export class ZhFormTab7Component implements OnInit {
       this._dataService.postDataForm(formToPost, 7).subscribe(
         () => {
           this._dataService
-            .getZhById(this._currentZh.properties.id_zh)
+            .getZhById(this.currentZh.properties.id_zh)
             .subscribe((zh: any) => {
               this._dataService.setCurrentZh(zh);
               this.posted = false;

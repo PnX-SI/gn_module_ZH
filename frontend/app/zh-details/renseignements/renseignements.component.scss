@@ -1,0 +1,24 @@
+@import "../../../app.module";
+fieldset {
+  margin: 0 !important;
+  height: 100%;
+}
+.label {
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+.label-item {
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0px;
+  margin-bottom: 0px;
+}
+
+zh-label span {
+  margin-left: 4px;
+}
