@@ -343,22 +343,28 @@ def get_tab_data(id_tab, info_role):
             # set name
             if form_data['main_name'] == "":
                 return 'Empty mandatory field', 400
-
+            intersection = None
             if 'id_zh' not in form_data.keys():
                 # set geometry from coordinates
-                polygon = set_geom(form_data['geom']['geometry'])
+                geom = set_geom(form_data['geom']['geometry'])
                 # create_zh
-                zh = create_zh(form_data, info_role, zh_date, polygon)
+                zh = create_zh(form_data, info_role, zh_date, geom['polygon'])
+                intersection = geom['is_intersected']
             else:
                 # edit geometry
-                polygon = set_geom(
+                geom = set_geom(
                     form_data['geom']['geometry'], form_data['id_zh'])
                 # edit zh
-                zh = update_zh_tab0(form_data, polygon, info_role, zh_date)
+                zh = update_zh_tab0(
+                    form_data, geom['polygon'], info_role, zh_date)
+                intersection = geom['is_intersected']
 
             DB.session.commit()
 
-            return {"id_zh": zh}, 200
+            return {
+                "id_zh": zh,
+                "is_intersected": intersection
+            }, 200
 
         if id_tab == 1:
             update_tzh(form_data)
@@ -503,12 +509,13 @@ def handle_geonature_zh_api(error):
     response.status_code = error.status_code
     return response
 
+
 @blueprint.route('/user/cruved', methods=['GET'])
 @permissions.check_cruved_scope('R', True)
 @json_resp
 def returnUserCruved(info_role):
     # récupérer le CRUVED complet de l'utilisateur courant
-    print (info_role)
+    print(info_role)
     user_cruved = get_or_fetch_user_cruved(
         session=session,
         id_role=info_role.id_role,
