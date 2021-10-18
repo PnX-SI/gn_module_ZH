@@ -24,8 +24,8 @@ export class ZhFormTab3Component implements OnInit {
   public currentZh: any;
   corinBioMetaData: any;
   corinTableCol = [
-    { name: "CB_code", label: "Code corine Biotope" },
-    { name: "CB_label", label: "Libellé corine biotope" },
+    { name: "CB_code", label: "Code Corine Biotope" },
+    { name: "CB_label", label: "Libellé Corine biotope" },
     { name: "CB_humidity", label: "Humidité" },
   ];
   activityTableCol = [
@@ -160,7 +160,7 @@ export class ZhFormTab3Component implements OnInit {
                 mnemonique: impactNames.join("\r\n"),
               },
             });
-
+            this.sortHumanActivities();
             this.activitiesInput.map((item) => {
               if (item.id_nomenclature == activity.id_human_activity) {
                 item.disabled = true;
@@ -258,6 +258,7 @@ export class ZhFormTab3Component implements OnInit {
   }
 
   onAddActivity(event, modal) {
+    this.resetActivityForm();
     this.patchActivity = false;
     this.modalButtonLabel = "Ajouter";
     this.modalTitle = "Ajout d'une activié humaine";
@@ -303,10 +304,10 @@ export class ZhFormTab3Component implements OnInit {
         }
       });
       this.ngbModal.dismissAll();
-      this.activityForm.reset();
-      this.selectedItems = [];
+      this.resetActivityForm();
       this.canChangeTab.emit(false);
       this.formImpactSubmitted = false;
+      this.sortHumanActivities();
     }
   }
 
@@ -365,8 +366,7 @@ export class ZhFormTab3Component implements OnInit {
         }
       });
       this.ngbModal.dismissAll();
-      this.activityForm.reset();
-      this.selectedItems = [];
+      this.resetActivityForm();
       this.$_humanActivitySub.unsubscribe();
       this.canChangeTab.emit(false);
       this.formImpactSubmitted = false;
@@ -433,6 +433,23 @@ export class ZhFormTab3Component implements OnInit {
         }
       );
     }
+  }
+
+  resetActivityForm() {
+    this.activityForm.reset();
+    this.selectedItems = [];
+  }
+
+  sortHumanActivities() {
+    this.listActivity.sort((a, b) =>
+      a.human_activity.mnemonique.slice(0, 2) >
+      b.human_activity.mnemonique.slice(0, 2)
+        ? 1
+        : b.human_activity.mnemonique.slice(0, 2) >
+          a.human_activity.mnemonique.slice(0, 2)
+        ? -1
+        : 0
+    );
   }
 
   ngOnDestroy() {
