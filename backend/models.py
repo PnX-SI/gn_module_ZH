@@ -621,6 +621,9 @@ class Code(ZH):
 
     def get_deps(self):
         departments = CorZhArea.get_departments(self.id_zh)
+        print('passe bien par là')
+        print(departments)
+        print(self.zh_geom)
         area = 0
         my_geom = DB.session.query(func.ST_Transform(func.ST_SetSRID(
             TZH.geom, 4326), 2154)).filter(TZH.id_zh == self.id_zh).one()[0]
