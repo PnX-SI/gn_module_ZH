@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy.sql.expression import true
-from sqlalchemy.util.langhelpers import dependencies
+# from sqlalchemy.util.langhelpers import dependencies
 
 from geonature.utils.env import DB
 from geonature.core.ref_geo.models import LAreas
