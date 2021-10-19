@@ -266,7 +266,7 @@
       </legend>
       <div class="form-row">
         <div class="form-group col-md-12">
-          <small>statut</small>
+          <small>Statuts</small>
           <angular2-multiselect
             [data]="formMetaData.PROTECTIONS"
             [(ngModel)]="selectedItems"
@@ -290,7 +290,7 @@
           (click)="onAddUrbanDoc($event, urbanDocModal)"
         >
           <mat-icon>add_box</mat-icon>
-          zonage des documents
+          Zonage d'urbanisme
         </button>
         <div
           *ngIf="urbanDocTable && urbanDocTable.length > 0"

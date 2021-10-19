@@ -578,7 +578,7 @@ export class ZhFormTab6Component implements OnInit {
   onAddUrbanDoc(event: any, modal: any) {
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
-    this.modalTitle = "Ajout d'une zonage des documents";
+    this.modalTitle = "Ajout d'un zonage d'urbanisme";
     event.stopPropagation();
     const modalRef = this.ngbModal.open(modal, {
       centered: true,
@@ -651,7 +651,7 @@ export class ZhFormTab6Component implements OnInit {
   onEditUrbanDoc(modal: any, urbanDoc: any) {
     this.patchModal = true;
     this.addModalBtnLabel = "Modifier";
-    this.modalTitle = "Modifier la zonage des documents";
+    this.modalTitle = "Modifier le zonage d'urbanisme";
     // init inputs object type
     const selectedArea = this.municipalities.find(
       (item: any) => item.id_area == urbanDoc.area.id_area
