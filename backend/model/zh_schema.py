@@ -1131,13 +1131,13 @@ class TManagementPlans(DB.Model):
     )
 
 
-def get_view_model(table_name):
+def get_view_model(table_name, schema_name):
 
     #DynamicBase = declarative_base(class_registry=dict())
 
     class TaxaView(DB.Model):
         __tablename__ = table_name
-        __table_args__ = {"schema": "pr_zh"}
+        __table_args__ = {"schema": schema_name}
 
         id_zh = DB.Column(
             DB.Integer,

@@ -511,30 +511,35 @@ def handle_geonature_zh_api(error):
 @blueprint.route("/<int:id_zh>/download")
 @ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
 def download(id_zh, info_role):
-    view_model = get_view_model(
-        blueprint.config['taxa_view_name']['table_name'])
-    query = DB.session.query(view_model).filter(
-        view_model.id_zh == id_zh).all()
-    rows = [
-        {
-            "Groupe d'étude": row.group,
-            "Nom Scientifique": row.scientific_name,
-            "Nom vernaculaire": row.vernac_name,
-            "Réglementation": row.reglementation,
-            "Article": row.article,
-            "Nombre d'observations": row.obs_nb
-        } for row in query
-    ]
-    path_download = blueprint.config['path_to_download']
-    base_path = Path(__file__).absolute().parent
-    name_file = "/taxa" + "_" + str(datetime.now()) + "_" + str(id_zh) + ".csv"
-    full_name = str(base_path) + path_download + name_file
+    for i in ['vertebrates_view_name', 'invertebrates_view_name', 'flora_view_name']:
+        model = get_view_model(
+            blueprint.config[i]['table_name'],
+            blueprint.config[i]['schema_name']
+        )
+        query = DB.session.query(model).filter(model.id_zh == id_zh).all()
+        current_date = datetime.now()
+        if query:
+            rows = [
+                {
+                    "Groupe d'étude": row.group,
+                    "Nom Scientifique": row.scientific_name,
+                    "Nom vernaculaire": row.vernac_name,
+                    "Réglementation": row.reglementation,
+                    "Article": row.article,
+                    "Nombre d'observations": row.obs_nb
+                } for row in query
+            ]
+            path_download = blueprint.config['path_to_download']
+            base_path = Path(__file__).absolute().parent
+            name_file = "/" + blueprint.config[i]['category'] + \
+                "_" + str(current_date.strftime("%Y-%m-%d_%H:%M:%S")
+                          ) + "_" + str(id_zh) + ".csv"
+            full_name = str(base_path) + path_download + name_file
 
-    with open(full_name, 'w', encoding='UTF8', newline='') as f:
-        writer = csv.DictWriter(f, fieldnames=rows[0].keys())
-        writer.writeheader()
-        writer.writerows(rows)
-
+            with open(full_name, 'w', encoding='UTF8', newline='') as f:
+                writer = csv.DictWriter(f, fieldnames=rows[0].keys())
+                writer.writeheader()
+                writer.writerows(rows)
     return send_file(full_name, as_attachment=True)
 
 

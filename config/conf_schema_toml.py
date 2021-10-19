@@ -49,9 +49,22 @@ eval_mnemonique = [
 
 path_to_download = "/download"
 
-taxa_view_name = {
+vertebrates_view_name = {
     "schema_name": "pr_zh",
-    "table_name": "taxa"
+    "table_name": "vertebrates",
+    "category": "vertebrates"
+}
+
+invertebrates_view_name = {
+    "schema_name": "pr_zh",
+    "table_name": "invertebrates",
+    "category": "invertebrates"
+}
+
+flora_view_name = {
+    "schema_name": "pr_zh",
+    "table_name": "flora",
+    "category": "flora"
 }
 
 
@@ -63,4 +76,6 @@ class GnModuleSchemaConf(Schema):
     )
     nomenclatures = fields.List(fields.String, missing=nomenclatures)
     path_to_download = fields.String(missing=path_to_download)
-    taxa_view_name = fields.Dict(missing=taxa_view_name)
+    vertebrates_view_name = fields.Dict(missing=vertebrates_view_name)
+    invertebrates_view_name = fields.Dict(missing=invertebrates_view_name)
+    flora_view_name = fields.Dict(missing=flora_view_name)
