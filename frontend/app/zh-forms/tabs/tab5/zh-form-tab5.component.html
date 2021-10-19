@@ -133,7 +133,7 @@
           (click)="onAddInteretPat($event, interetPatModal)"
         >
           <mat-icon>add_box</mat-icon>
-          Intérêt patrimonial
+          Intérêt
         </button>
         <div
           *ngIf="interetPatTable && interetPatTable.length > 0"
@@ -200,9 +200,17 @@
             min="0"
             max="100"
           />
+          <small
+            *ngIf="
+              formTab5.controls.nb_hab.value &&
+              formTab5.controls.nb_hab.errors?.min
+            "
+            class="error-msg"
+            >Le nombre d'habitat(s) doit être supérieur à 0
+          </small>
         </div>
         <div class="form-group col-md-4">
-          <small>Recouvrement total de la ZH (%)</small>
+          <small>Recouvrement total sur ZH (%)</small>
           <input
             class="form-control"
             [formControl]="formTab5.controls.total_hab_cover"
@@ -290,6 +298,14 @@
             [formControl]="formTab5.controls.nb_flora_sp"
             type="number"
           />
+          <small
+            *ngIf="
+              formTab5.controls.nb_flora_sp.value &&
+              formTab5.controls.nb_flora_sp.errors?.min
+            "
+            class="error-msg"
+            >Le nombre d'espèce(s) doit être supérieur à 0
+          </small>
         </div>
         <div class="form-group col-md-4">
           <small>Faune vertébrée - nombre d'espèces</small>
@@ -298,6 +314,14 @@
             [formControl]="formTab5.controls.nb_vertebrate_sp"
             type="number"
           />
+          <small
+            *ngIf="
+              formTab5.controls.nb_vertebrate_sp.value &&
+              formTab5.controls.nb_vertebrate_sp.errors?.min
+            "
+            class="error-msg"
+            >Le nombre d'espèce(s) doit être supérieur à 0
+          </small>
         </div>
         <div class="form-group col-md-4">
           <small>Faune invertébrée - nombre d'espèces</small>
@@ -306,6 +330,14 @@
             [formControl]="formTab5.controls.nb_invertebrate_sp"
             type="number"
           />
+          <small
+            *ngIf="
+              formTab5.controls.nb_invertebrate_sp.value &&
+              formTab5.controls.nb_invertebrate_sp.errors?.min
+            "
+            class="error-msg"
+            >Le nombre d'espèce(s) doit être supérieur à 0
+          </small>
         </div>
       </div>
     </fieldset>
@@ -402,7 +434,7 @@
     <form [formGroup]="hydroFctForm">
       <div class="form-row">
         <div class="form-group col-md-6">
-          <small class="required">Fonctions hydrologiques</small>
+          <small class="required">Fonctions</small>
           <select
             class="form-control custom-select"
             ngbAutofocus
@@ -512,7 +544,7 @@
     <form [formGroup]="bioFctForm">
       <div class="form-row">
         <div class="form-group col-md-6">
-          <small class="required">Fonctions biologiques</small>
+          <small class="required">Fonctions</small>
           <select
             class="form-control custom-select"
             ngbAutofocus
@@ -521,6 +553,7 @@
             <optgroup
               *ngFor="let group of bioFctInput"
               label="{{ group[0].category }}"
+              class="test"
             >
               <option
                 *ngFor="let item of group"
