@@ -186,11 +186,11 @@ export class ZhFormTab6Component implements OnInit {
               this.currentZh.properties.protections.length > 0
             ) {
               this.currentZh.properties.protections.forEach((element) => {
-                let portection = this.formMetaData["PROTECTIONS"].find(
+                let protection = this.formMetaData["PROTECTIONS"].find(
                   (item: any) => item.id_protection_status == element
                 );
 
-                protections.push(portection);
+                protections.push(protection);
               });
             }
             this.formTab6.patchValue({
@@ -210,7 +210,7 @@ export class ZhFormTab6Component implements OnInit {
                 });
                 this.statusInput.map((item: any) => {
                   if (item.id_nomenclature == owner.id_status) {
-                    item.disabled = false;
+                    item.disabled = true;
                   }
                 });
               });
@@ -230,7 +230,7 @@ export class ZhFormTab6Component implements OnInit {
                   });
                   this.instrumentInput.map((item: any) => {
                     if (item.id_nomenclature == instrument.id_instrument) {
-                      item.disabled = false;
+                      item.disabled = true;
                     }
                   });
                 }
@@ -294,6 +294,11 @@ export class ZhFormTab6Component implements OnInit {
                     mnemonique: classementNames.join("\r\n"),
                   },
                   remark: doc.remark,
+                });
+                this.municipalities.map((item: any) => {
+                  if (item.id_area == doc.id_area) {
+                    item.disabled = true;
+                  }
                 });
               });
             }
