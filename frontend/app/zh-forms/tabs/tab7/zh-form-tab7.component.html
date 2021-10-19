@@ -1,5 +1,10 @@
 <div *ngIf="evalZh" class="container-fluid">
-  <h2 class="tabsTitle">Evaluation géneral du site</h2>
+  <h2 class="tabsTitle">Evaluation génerale du site                
+    <mat-icon
+    class="info-icon"
+    ngbTooltip="Cette rubrique met en avant les principaux enjeux liés à la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
+    >info</mat-icon>
+</h2>
   <form>
     <fieldset>
       <legend>
@@ -62,7 +67,7 @@
             <thead class="thead-inverse table-header">
               <tr>
                 <th>
-                  Nombre d'espèces faunistiques patrimoniales patrimoniaux
+                  Nombre d'espèces faunistiques patrimoniales
                 </th>
                 <th>Nombre d'espèces floristiques patrimoniales</th>
               </tr>
@@ -139,8 +144,7 @@
               <th>Évaluation globale des menaces potentielles ou avérées</th>
               <th>Fonctionnalité hydrologique / biogéochimique</th>
               <th>
-                Fonctionnalité biologique / écologique (habitats / faune /
-                flore)
+                Fonctionnalité biologique / écologique
               </th>
             </tr>
           </thead>
@@ -318,7 +322,7 @@
           >
         </div>
         <div class="form-group col-md-12">
-          <small>remarques</small>
+          <small>Remarques</small>
           <textarea
             class="form-control"
             [formControl]="actionForm.controls.remark"
