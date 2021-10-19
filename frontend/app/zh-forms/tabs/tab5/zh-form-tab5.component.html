@@ -354,7 +354,7 @@
           (click)="onAddValSocEco($event, valSocEcoModal)"
         >
           <mat-icon>add_box</mat-icon>
-          Valeur socio-économique
+          Valeur
         </button>
         <div
           *ngIf="valSocEcoTable && valSocEcoTable.length > 0"
@@ -767,7 +767,7 @@
     <form [formGroup]="valSocEcoForm">
       <div class="form-row">
         <div class="form-group col-md-6">
-          <small class="required">Valeur socio-économique</small>
+          <small class="required">Valeur</small>
           <select
             class="form-control custom-select"
             ngbAutofocus
