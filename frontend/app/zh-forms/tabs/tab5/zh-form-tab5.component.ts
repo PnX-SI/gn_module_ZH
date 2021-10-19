@@ -790,7 +790,7 @@ export class ZhFormTab5Component implements OnInit {
   onEditValSocEco(modal: any, valSocEco: any) {
     this.patchModal = true;
     this.addModalBtnLabel = "Modifier";
-    this.modalTitle = "Modifier l'intérêt patrimonal";
+    this.modalTitle = "Modifier une valeur socio-économique";
     // init inputs object type
     const selectedFunction = this.valSocEcoInput
       .flat()
