@@ -65,18 +65,12 @@
       <small>Structure de gestion</small>
       <div class="form-row">
         <div class="form-group col-md-6">
-          <select
-            class="form-control custom-select"
+          <angular2-multiselect
+            [settings]="organismDropdownSettings"
+            [data]="formMetaData.BIB_MANAGEMENT_STRUCTURES"
             [formControl]="formTab6.controls.structure"
           >
-            <option
-              *ngFor="let item of formMetaData.BIB_MANAGEMENT_STRUCTURES"
-              [ngValue]="item"
-              [disabled]="item.disabled"
-            >
-              {{ item.name }}
-            </option>
-          </select>
+          </angular2-multiselect>
         </div>
         <div class="form-group d-flex align-items-end col-md-6">
           <button
@@ -683,6 +677,7 @@
             class="form-control custom-select"
             type="number"
             [formControl]="planForm.controls.duration"
+            min="0"
           />
           <small
             *ngIf="

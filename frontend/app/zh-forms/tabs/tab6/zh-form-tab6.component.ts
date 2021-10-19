@@ -72,6 +72,15 @@ export class ZhFormTab6Component implements OnInit {
 
   public dropdownSettings: any;
   public multiselectTypeClassement: any;
+  public organismDropdownSettings: {
+    enableSearchFilter: boolean;
+    addNewItemOnFilter: boolean;
+    singleSelection: boolean;
+    text: string;
+    labelKey: string;
+    primaryKey: string;
+    enableFilterSelectAll: boolean;
+  };
   public currentZh: any;
   selectedManagement: any;
   moreDetails: boolean;
@@ -96,6 +105,15 @@ export class ZhFormTab6Component implements OnInit {
       searchPlaceholderText: "Rechercher",
       enableCheckAll: false,
       allowSearchFilter: true,
+    };
+    this.organismDropdownSettings = {
+      enableSearchFilter: true,
+      addNewItemOnFilter: true,
+      singleSelection: true,
+      text: "Sélectionner un organisme",
+      labelKey: "name",
+      primaryKey: "id_org",
+      enableFilterSelectAll: false,
     };
     this.dropdownSettings = {
       enableCheckAll: false,
@@ -149,7 +167,10 @@ export class ZhFormTab6Component implements OnInit {
     this.planForm = this.fb.group({
       plan: [null, Validators.required],
       plan_date: [null, Validators.required],
-      duration: [null, Validators.required],
+      duration: [
+        null,
+        Validators.compose([Validators.required, Validators.min(0)]),
+      ],
     });
   }
 
@@ -702,12 +723,14 @@ export class ZhFormTab6Component implements OnInit {
   }
 
   onAddStructure() {
-    if (this.formTab6.value.structure) {
+    // multi select : returns an Array...
+    const structure = this.formTab6.value.structure[0];
+    if (structure) {
       let itemExist = this.managements.some(
-        (item) => item.id_org == this.formTab6.value.structure.id_org
+        (item) => item.id_org == structure.id_org
       );
-      if (!itemExist && this.formTab6.value.structure.id_org) {
-        this.managements.push(this.formTab6.value.structure);
+      if (!itemExist && structure.id_org) {
+        this.managements.push(structure);
       }
       this.formTab6.get("structure").reset();
       this.canChangeTab.emit(false);
@@ -716,6 +739,7 @@ export class ZhFormTab6Component implements OnInit {
 
   //delete Structure from the StructureS array
   onDeleteStructure(structure: any) {
+    structure.plans = [];
     this.managements = this.managements.filter((item: any) => {
       return item.id_org != structure.id_org;
     });
@@ -760,7 +784,7 @@ export class ZhFormTab6Component implements OnInit {
       let formValues = this.planForm.value;
       this.managements.map((item: any) => {
         if (item.id_org == this.selectedManagement.id_org) {
-          if (!item.plans) {
+          if (item.plans.length == 0) {
             formValues.plan_date = this.dateParser.format(formValues.plan_date);
             this.moreDetails = true;
             item.plans = [formValues];
