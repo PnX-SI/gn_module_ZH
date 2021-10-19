@@ -109,4 +109,4 @@ venv.bak/
 # config module
 frontend/app/module.config.ts
 
-backend/download/
+backend/download/*.csv
