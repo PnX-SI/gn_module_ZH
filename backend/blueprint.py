@@ -18,7 +18,7 @@ from sqlalchemy.sql.expression import delete
 
 from geojson import FeatureCollection
 
-from sqlalchemy import func, text, desc, and_
+from sqlalchemy import func, text, desc, and_, inspect
 from sqlalchemy.orm.exc import NoResultFound
 
 import geoalchemy2
@@ -511,7 +511,10 @@ def handle_geonature_zh_api(error):
 @blueprint.route("/<int:id_zh>/download")
 @ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
 def download(id_zh, info_role):
-    query = DB.session.query(TaxaView).filter(TaxaView.id_zh == id_zh).all()
+    view_model = get_view_model(
+        blueprint.config['taxa_view_name']['table_name'])
+    query = DB.session.query(view_model).filter(
+        view_model.id_zh == id_zh).all()
     rows = [
         {
             "Groupe d'étude": row.group,

@@ -49,6 +49,11 @@ eval_mnemonique = [
 
 path_to_download = "/download"
 
+taxa_view_name = {
+    "schema_name": "pr_zh",
+    "table_name": "taxa"
+}
+
 
 class GnModuleSchemaConf(Schema):
     default_maplist_columns = fields.List(
@@ -58,3 +63,4 @@ class GnModuleSchemaConf(Schema):
     )
     nomenclatures = fields.List(fields.String, missing=nomenclatures)
     path_to_download = fields.String(missing=path_to_download)
+    taxa_view_name = fields.Dict(missing=taxa_view_name)

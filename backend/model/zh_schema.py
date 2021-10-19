@@ -1,10 +1,13 @@
-from flask import current_app
+from flask import current_app, Blueprint
 from sqlalchemy import ForeignKey
 # import utiles pour déclarer les classes SQLAlchemy
 from sqlalchemy.sql import select, func, and_, cast
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql.expression import table
 from sqlalchemy.sql.type_api import STRINGTYPE
+from sqlalchemy.ext.declarative import declarative_base
+
 
 from pypnnomenclature.models import (
     TNomenclatures
@@ -40,6 +43,8 @@ from geonature.core.taxonomie.models import Taxref
 import pdb
 
 from sqlalchemy.inspection import inspect
+
+blueprint = Blueprint("pr_zh", __name__)
 
 
 class ZhModel(DB.Model):
@@ -1126,34 +1131,48 @@ class TManagementPlans(DB.Model):
     )
 
 
-class TaxaView(DB.Model):
-    __tablename__ = "taxa"
-    __table_args__ = {"schema": "pr_zh"}
-    id_zh = DB.Column(
-        DB.Integer,
-        ForeignKey(TZH.id_zh),
-        primary_key=True
-    )
-    cd_nom = DB.Column(
-        DB.Integer,
-        ForeignKey(Taxref.cd_nom),
-        primary_key=True
-    )
-    group = DB.Column(
-        DB.Unicode
-    )
-    scientific_name = DB.Column(
-        DB.Unicode
-    )
-    vernac_name = DB.Column(
-        DB.Unicode
-    )
-    reglementation = DB.Column(
-        DB.Unicode
-    )
-    article = DB.Column(
-        DB.Unicode
-    )
-    obs_nb = DB.Column(
-        DB.Integer
-    )
+def get_view_model(table_name):
+
+    #DynamicBase = declarative_base(class_registry=dict())
+
+    class TaxaView(DB.Model):
+        __tablename__ = table_name
+        __table_args__ = {"schema": "pr_zh"}
+
+        id_zh = DB.Column(
+            DB.Integer,
+            ForeignKey(TZH.id_zh),
+            primary_key=True
+        )
+        cd_nom = DB.Column(
+            DB.Integer,
+            ForeignKey(Taxref.cd_nom),
+            primary_key=True
+        )
+        group = DB.Column(
+            DB.Unicode
+        )
+        scientific_name = DB.Column(
+            DB.Unicode
+        )
+        vernac_name = DB.Column(
+            DB.Unicode
+        )
+        reglementation = DB.Column(
+            DB.Unicode
+        )
+        article = DB.Column(
+            DB.Unicode
+        )
+        obs_nb = DB.Column(
+            DB.Integer
+        )
+
+        # def __init__(self, tablename):
+        #    self.__tablename__ = tablename
+
+        # @staticmethod
+        # def get_table_name(blueprint):
+        #    return blueprint.config['taxa_view_name']
+
+    return TaxaView
