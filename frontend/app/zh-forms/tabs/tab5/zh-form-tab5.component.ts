@@ -63,10 +63,10 @@ export class ZhFormTab5Component implements OnInit {
   ];
 
   public corineTableCol = [
-    { name: "corinBio", label: "Corine Biotope" },
+    { name: "corinBio", label: "Corine biotopes" },
+    { name: "cahierHab", label: "Cahier d'habitats" },
     { name: "preservationState", label: "État de conservation" },
-    { name: "cahierHab", label: "Cahier Habitats" },
-    { name: "habCover", label: "Recouvrement de la ZH (%)" },
+    { name: "habCover", label: "Recouvrement sur la ZH (%)" },
   ];
 
   public socioEcoTableCol = [
@@ -860,7 +860,7 @@ export class ZhFormTab5Component implements OnInit {
   onAddCorineBio(event: any, modal: any) {
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
-    this.modalTitle = "Ajout d'une corine biotope";
+    this.modalTitle = "Ajout d'un habitat humide patrimonial";
     event.stopPropagation();
     this.ngbModal.open(modal, {
       centered: true,
@@ -901,7 +901,7 @@ export class ZhFormTab5Component implements OnInit {
   onEditCorineBio(modal: any, corineBio: any) {
     this.patchModal = true;
     this.addModalBtnLabel = "Modifier";
-    this.modalTitle = "Modifier la corine biotope";
+    this.modalTitle = "Modifier un habitat humide patrimonial";
     let selectedCahierHab;
     // init inputs object type
     const selectedCorin = this.corinBioMetaData.find(
