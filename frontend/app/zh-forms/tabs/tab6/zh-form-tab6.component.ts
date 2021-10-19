@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { NgbDateParserFormatter, NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { NgbDatepickerI18n } from "@ng-bootstrap/ng-bootstrap";
 
-import { NgbDateFRParserFormatter } from "../../../services/dateFrFormatter.ts";
+import { NgbDateFRParserFormatter } from "../../../services/dateFrFormatter";
 import { TabsService } from "../../../services/tabs.service";
 
 import { ToastrService } from "ngx-toastr";
