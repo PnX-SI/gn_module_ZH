@@ -243,15 +243,20 @@
           </table>
         </div>
       </div>
+    </fieldset>
+    <fieldset>
+      <legend>
+        <h5 class="section-title">Autres inventaires</h5>
+      </legend>
       <div class="form-row">
         <div class="form-group col-md-6">
           <small style="display: block; margin-bottom: 8px"
-            >Autres inventaires</small
+            >Autres études / inventaires naturalistes </small
           >
           <mat-label ngClass="labelBeforeSlide">Non</mat-label>
           <mat-slide-toggle [formControl]="formTab6.controls.is_other_inventory"
-            >oui</mat-slide-toggle
-          >
+            ></mat-slide-toggle>
+          <mat-label ngClass="labelBeforeSlide">Oui</mat-label>
         </div>
       </div>
     </fieldset>
