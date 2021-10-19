@@ -44,14 +44,14 @@ export class ZhFormTab7Component implements OnInit {
   public bioFctTableCol = [
     {
       name: "function",
-      label: "Principales fonctions biologiques / écologiquess",
+      label: "Principales fonctions biologiques / écologiques",
     },
     { name: "qualification", label: "Qualifications" },
     { name: "knowledge", label: "Connaissance" },
   ];
 
   public patrimTableCol = [
-    { name: "function", label: "Intérêts patrimoniaux" },
+    { name: "function", label: "Principaux intérêts patrimoniaux" },
     { name: "qualification", label: "Qualifications" },
     { name: "knowledge", label: "Connaissance" },
   ];
