@@ -109,14 +109,14 @@ export class ZhFormTab5Component implements OnInit {
   initForms(): void {
     this.formTab5 = this.fb.group({
       is_carto_hab: false,
-      nb_hab: null,
+      nb_hab: [null, Validators.min(0)],
       total_hab_cover: [
         0,
         Validators.compose([Validators.min(0), Validators.max(100)]),
       ],
-      nb_flora_sp: null,
-      nb_vertebrate_sp: null,
-      nb_invertebrate_sp: null,
+      nb_flora_sp: [null, Validators.min(0)],
+      nb_vertebrate_sp: [null, Validators.min(0)],
+      nb_invertebrate_sp: [null, Validators.min(0)],
     });
 
     this.hydroFctForm = this.fb.group({
@@ -259,7 +259,7 @@ export class ZhFormTab5Component implements OnInit {
       });
       this.interetPatInput.flat().map((item: any) => {
         if (item.id_nomenclature == pat.id_function) {
-          item.disabled = false;
+          item.disabled = true;
         }
       });
     });
@@ -281,7 +281,7 @@ export class ZhFormTab5Component implements OnInit {
       });
       this.valSocEcoInput.flat().map((item: any) => {
         if (item.id_nomenclature == valSoc.id_function) {
-          item.disabled = false;
+          item.disabled = true;
         }
       });
     });
@@ -303,7 +303,7 @@ export class ZhFormTab5Component implements OnInit {
       });
       this.bioFctInput.flat().map((item: any) => {
         if (item.id_nomenclature == bioFct.id_function) {
-          item.disabled = false;
+          item.disabled = true;
         }
       });
     });
@@ -325,7 +325,7 @@ export class ZhFormTab5Component implements OnInit {
       });
       this.fctHydroInput.flat().map((item: any) => {
         if (item.id_nomenclature == hydroFct.id_function) {
-          item.disabled = false;
+          item.disabled = true;
         }
       });
     });
@@ -361,7 +361,7 @@ export class ZhFormTab5Component implements OnInit {
   onAddHydroFct(event: any, modal: any) {
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
-    this.modalTitle = "Ajout d'une fonction hydrologique";
+    this.modalTitle = "Ajout d'une fonction hydrologique / biogéochimique";
     event.stopPropagation();
     this.ngbModal.open(modal, {
       centered: true,
@@ -394,6 +394,7 @@ export class ZhFormTab5Component implements OnInit {
       this.hydroFctForm.reset();
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
+      this.sortFunction(this.fctHydroTable);
     }
   }
 
@@ -414,7 +415,7 @@ export class ZhFormTab5Component implements OnInit {
   onEditHydroFct(modal: any, hydroFct: any) {
     this.patchModal = true;
     this.addModalBtnLabel = "Modifier";
-    this.modalTitle = "Modifier la fonction hydrologique";
+    this.modalTitle = "Modifier la fonction hydrologique / biogéochimique";
     // init inputs object type
     const selectedFunction = this.fctHydroInput
       .flat()
@@ -476,6 +477,7 @@ export class ZhFormTab5Component implements OnInit {
       this.$_hydroFctInputSub.unsubscribe();
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
+      this.sortFunction(this.fctHydroTable);
     }
   }
 
@@ -483,7 +485,7 @@ export class ZhFormTab5Component implements OnInit {
   onAddBioFct(event: any, modal: any) {
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
-    this.modalTitle = "Ajout d'une fonction biologique";
+    this.modalTitle = "Ajout d'une fonction biologique / écologique";
     event.stopPropagation();
     this.ngbModal.open(modal, {
       centered: true,
@@ -516,6 +518,7 @@ export class ZhFormTab5Component implements OnInit {
       this.bioFctForm.reset();
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
+      this.sortFunction(this.bioFctTable);
     }
   }
 
@@ -536,7 +539,7 @@ export class ZhFormTab5Component implements OnInit {
   onEditBioFct(modal: any, bioFct: any) {
     this.patchModal = true;
     this.addModalBtnLabel = "Modifier";
-    this.modalTitle = "Modifier la fonction biologique";
+    this.modalTitle = "Modifier la fonction biologique / écologique";
     // init inputs object type
     const selectedFunction = this.bioFctInput
       .flat()
@@ -597,6 +600,7 @@ export class ZhFormTab5Component implements OnInit {
       this.$_bioFctInputSub.unsubscribe();
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
+      this.sortFunction(this.bioFctTable);
     }
   }
 
@@ -637,6 +641,7 @@ export class ZhFormTab5Component implements OnInit {
       this.interetPatForm.reset();
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
+      this.sortFunction(this.interetPatTable);
     }
   }
 
@@ -722,6 +727,7 @@ export class ZhFormTab5Component implements OnInit {
       this.$_interetPatInputSub.unsubscribe();
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
+      this.sortFunction(this.interetPatTable);
     }
   }
 
@@ -761,6 +767,7 @@ export class ZhFormTab5Component implements OnInit {
       this.valSocEcoForm.reset();
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
+      this.sortFunction(this.valSocEcoTable);
     }
   }
 
@@ -845,6 +852,7 @@ export class ZhFormTab5Component implements OnInit {
       this.$_valSocEcoInputSub.unsubscribe();
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
+      this.sortFunction(this.valSocEcoTable);
     }
   }
 
@@ -1074,5 +1082,15 @@ export class ZhFormTab5Component implements OnInit {
         }
       );
     }
+  }
+
+  sortFunction(_function) {
+    _function.sort((a, b) =>
+      a.function.mnemonique.slice(0, 2) > b.function.mnemonique.slice(0, 2)
+        ? 1
+        : b.function.mnemonique.slice(0, 2) > a.function.mnemonique.slice(0, 2)
+        ? -1
+        : 0
+    );
   }
 }
