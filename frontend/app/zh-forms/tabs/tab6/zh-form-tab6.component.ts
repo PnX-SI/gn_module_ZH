@@ -2,6 +2,8 @@ import { Component, EventEmitter, OnInit, Input, Output } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { NgbDateParserFormatter, NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { NgbDatepickerI18n } from "@ng-bootstrap/ng-bootstrap";
+
+import { NgbDateFRParserFormatter } from "../../../services/dateFrFormatter.ts";
 import { TabsService } from "../../../services/tabs.service";
 
 import { ToastrService } from "ngx-toastr";
@@ -17,7 +19,11 @@ import { ZhDataService } from "../../../services/zh-data.service";
   selector: "zh-form-tab6",
   templateUrl: "./zh-form-tab6.component.html",
   styleUrls: ["./zh-form-tab6.component.scss"],
-  providers: [I18n, { provide: NgbDatepickerI18n, useClass: DatepickerI18n }],
+  providers: [
+    I18n,
+    { provide: NgbDatepickerI18n, useClass: DatepickerI18n },
+    { provide: NgbDateParserFormatter, useClass: NgbDateFRParserFormatter },
+  ],
 })
 export class ZhFormTab6Component implements OnInit {
   @Input() public formMetaData: any;
