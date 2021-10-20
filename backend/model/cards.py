@@ -687,7 +687,7 @@ class Instrument:
     def __str__(self):
         return {
             "instrument": Utils.get_mnemo(self.id_instrument),
-            "date": datetime.strptime(self.instrument_date, '%Y-%m-%d').date().strftime("%d/%m/%Y")
+            "date": self.instrument_date
         }
 
 
