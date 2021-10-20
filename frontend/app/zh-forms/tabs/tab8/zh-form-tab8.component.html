@@ -87,24 +87,16 @@
   <div class="modal-body">
     <form [formGroup]="docForm">
       <div class="form-row">
-        <div class="form-group col-md-6">
-          <label for="file">Parcourir</label>
+        <div class="form-group col-md-12">
           <input
+            #fileInput
+            hidden="true"
             id="file"
             type="file"
             (change)="handleFileInput($event.target.files)"
           />
-        </div>
-        <div class="form-group col-md-12">
-          <small class="required">Profil</small>
-          <small
-            *ngIf="
-              (docForm.controls.profile.touched || modalFormSubmitted) &&
-              docForm.controls.profile.errors?.required
-            "
-            class="error-msg"
-            >Champ requis</small
-          >
+          <button mat-raised-button color="primary" (click)="fileInput.click()">Parcourir</button>
+          <small class="file-name" *ngIf="fileToUpload !== null">{{ fileToUpload.name }}</small>
         </div>
         <div class="form-group col-md-6">
           <small class="required">Titre du document</small>

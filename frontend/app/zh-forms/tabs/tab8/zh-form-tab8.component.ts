@@ -7,6 +7,7 @@ import { ToastrService } from "ngx-toastr";
 import { Subscription } from "rxjs";
 
 import { ZhDataService } from "../../../services/zh-data.service";
+import { fileSizeValidator } from "../../../validators/fileSizeValidator";
 
 @Component({
   selector: "zh-form-tab8",
@@ -42,7 +43,10 @@ export class ZhFormTab8Component implements OnInit {
   // initialize forms
   initForms() {
     this.docForm = this.fb.group({
-      file: [null, Validators.required],
+      file: [
+        null,
+        Validators.compose([Validators.required, fileSizeValidator(1500)]),
+      ],
       title: [null, Validators.required],
       profile: [null, Validators.required],
       author: [null, Validators.required],
@@ -70,16 +74,18 @@ export class ZhFormTab8Component implements OnInit {
   }
 
   handleFileInput(files: FileList) {
+    this.fileToUpload = files.item(0);
+    this.docForm.patchValue({
+      file: this.fileToUpload,
+    });
+  }
+  
+  postFile() {
     const reader = new FileReader();
-    const file = files.item(0);
-    console.log(file);
-
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(this.fileToUpload);
 
     reader.onload = () => {
-      this.docForm.patchValue({
-        file: reader.result,
-      });
+      
     };
   }
 
