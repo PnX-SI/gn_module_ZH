@@ -359,6 +359,7 @@ export class ZhFormTab5Component implements OnInit {
 
   // open the add fonction hydrologique modal
   onAddHydroFct(event: any, modal: any) {
+    this.hydroFctForm.reset();
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'une fonction hydrologique / biogéochimique";
@@ -483,6 +484,7 @@ export class ZhFormTab5Component implements OnInit {
 
   // open the add fonction biologique modal
   onAddBioFct(event: any, modal: any) {
+    this.bioFctForm.reset();
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'une fonction biologique / écologique";
@@ -606,6 +608,7 @@ export class ZhFormTab5Component implements OnInit {
 
   // open the add fonction intérêt patrimonal modal
   onAddInteretPat(event: any, modal: any) {
+    this.interetPatForm.reset();
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'un intérêt patrimonal";
@@ -732,6 +735,7 @@ export class ZhFormTab5Component implements OnInit {
   }
 
   onAddValSocEco(event: any, modal: any) {
+    this.valSocEcoForm.reset();
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'une valeur socio-économique";
@@ -858,6 +862,7 @@ export class ZhFormTab5Component implements OnInit {
 
   // open the add CorineBio modal
   onAddCorineBio(event: any, modal: any) {
+    this.corineBioForm.reset();
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'un habitat humide patrimonial";
