@@ -48,6 +48,15 @@ eval_mnemonique = [
 ]
 
 
+allowed_extensions = ['.pdf', '.jpg']
+
+max_pdf_size = 1.5  # Mo
+
+max_jpg_size = 0.5  # Mo
+
+path_to_upload = "/backend/upload"
+
+
 class GnModuleSchemaConf(Schema):
     default_maplist_columns = fields.List(
         fields.Dict(), missing=default_map_list_conf)
@@ -55,3 +64,7 @@ class GnModuleSchemaConf(Schema):
         fields.Dict(), missing=available_maplist_column
     )
     nomenclatures = fields.List(fields.String, missing=nomenclatures)
+    allowed_extensions = fields.List(fields.String, missing=allowed_extensions)
+    max_pdf_size = fields.Integer(missing=max_pdf_size)
+    max_jpg_size = fields.Integer(missing=max_jpg_size)
+    path_to_upload = fields.String(missing=path_to_upload)

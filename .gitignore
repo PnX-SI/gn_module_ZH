@@ -109,4 +109,5 @@ venv.bak/
 # config module
 frontend/app/module.config.ts
 
-backend/upload/
+backend/upload/*
+!backend/upload/.gitkeep

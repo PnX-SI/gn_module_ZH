@@ -9,6 +9,8 @@ from flask import (
 
 import uuid
 
+from werkzeug.utils import secure_filename
+
 from sqlalchemy.sql.expression import delete
 
 from geojson import FeatureCollection
@@ -56,6 +58,8 @@ from .nomenclatures import (
 from .forms import *
 
 from .geometry import set_geom
+
+from .upload import upload
 
 from .model.repositories import (
     ZhRepository
@@ -428,6 +432,30 @@ def get_tab_data(id_tab, info_role):
             DB.session.commit()
             return {"id_zh": form_data['id_zh']}, 200
 
+        if id_tab == 8:
+            try:
+                pdb.set_trace()
+                file_name = request.files["File"].filename
+                file_name = secure_filename(file_name)
+                temp = file_name.split(".")
+                extension = temp[len(temp) - 1]
+            except Exception:
+                file_name = "Filename_error"
+                extension = "Extension_error"
+            id_zh = form_data['id_zh']
+            ALLOWED_EXTENSIONS = blueprint.config['allowed_extensions']
+            MAX_PDF_SIZE = blueprint.config['max_pdf_size']
+            MAX_JPG_SIZE = blueprint.config['max_jpg_size']
+            PATH_TO_UPLOAD = blueprint.config['path_to_upload']
+            uploaded_file = upload(
+                id_zh,
+                request,
+                ALLOWED_EXTENSIONS,
+                MAX_PDF_SIZE,
+                MAX_JPG_SIZE,
+                PATH_TO_UPLOAD
+            )
+
     except Exception as e:
         DB.session.rollback()
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
@@ -515,15 +543,3 @@ def returnUserCruved(info_role):
         module_code=blueprint.config['MODULE_CODE']
     )
     return user_cruved
-
-
-@ blueprint.route("/upload/<int:id_zh>", methods=["POST"])
-@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
-@ json_resp
-def upload(id_zh, info_role):
-    """tab 8 upload files
-    """
-    try:
-        file = request.files
-    except Exception as e:
-        raise ZHApiError(message=str(e), details=str(e))
