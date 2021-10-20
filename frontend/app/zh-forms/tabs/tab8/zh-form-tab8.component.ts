@@ -4,10 +4,11 @@ import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { TabsService } from "../../../services/tabs.service";
 
 import { ToastrService } from "ngx-toastr";
-import { Subscription } from "rxjs";
 
 import { ZhDataService } from "../../../services/zh-data.service";
 import { fileSizeValidator } from "../../../validators/fileSizeValidator";
+import { fileNameValidator } from "../../../validators/fileNameValidator";
+import { fileFormatValidator } from "../../../validators/fileFormatValidator";
 
 @Component({
   selector: "zh-form-tab8",
@@ -18,6 +19,7 @@ export class ZhFormTab8Component implements OnInit {
   @Input() public formMetaData: any;
   @Output() public canChangeTab = new EventEmitter<boolean>();
   @Output() nextTab = new EventEmitter<number>();
+  public zh: any;
   public formTab8: FormGroup;
   public docForm: FormGroup;
   public fileToUpload: File | null = null;
@@ -28,6 +30,8 @@ export class ZhFormTab8Component implements OnInit {
   public submitted: boolean;
   private $_fromChangeSub: any;
 
+  public fileTypeAccepted: string[] = ["application/pdf", "image/*"];
+
   constructor(
     private fb: FormBuilder,
     public ngbModal: NgbModal,
@@ -37,6 +41,7 @@ export class ZhFormTab8Component implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.getCurrentZh();
     this.initForms();
   }
 
@@ -45,12 +50,24 @@ export class ZhFormTab8Component implements OnInit {
     this.docForm = this.fb.group({
       file: [
         null,
-        Validators.compose([Validators.required, fileSizeValidator(1500)]),
+        Validators.compose([
+          Validators.required,
+          fileFormatValidator(this.fileTypeAccepted),
+          fileSizeValidator(500, 1500),
+          fileNameValidator(this.zh.id),
+        ]),
       ],
       title: [null, Validators.required],
       profile: [null, Validators.required],
       author: [null, Validators.required],
       summary: null,
+    });
+  }
+
+  getCurrentZh() {
+    this._dataService.currentZh.subscribe((zh: any) => {
+      this.zh = zh;
+      console.log(this.zh);
     });
   }
 
@@ -78,15 +95,14 @@ export class ZhFormTab8Component implements OnInit {
     this.docForm.patchValue({
       file: this.fileToUpload,
     });
+    console.log(this.docForm);
   }
-  
+
   postFile() {
     const reader = new FileReader();
     reader.readAsDataURL(this.fileToUpload);
 
-    reader.onload = () => {
-      
-    };
+    reader.onload = () => {};
   }
 
   onFormSubmit() {}
