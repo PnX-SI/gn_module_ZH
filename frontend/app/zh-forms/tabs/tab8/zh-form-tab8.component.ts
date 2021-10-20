@@ -80,8 +80,13 @@ export class ZhFormTab8Component implements OnInit {
     });
 
     modalRef.result.then().finally(() => {
-      this.docForm.reset();
+      this.resetForm();
     });
+  }
+
+  resetForm() {
+    this.docForm.reset();
+    this.fileToUpload = null;
   }
 
   onDeleteStatus() {}
