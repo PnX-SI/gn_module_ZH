@@ -513,3 +513,19 @@ def post_actions(id_zh, actions):
             remark=action['remark']
         ))
         DB.session.flush()
+
+
+# tab 8
+
+
+def post_file_info(id_zh, file_name, extension):
+    unique_id_media = DB.session.query(TZH).filter(
+        TZH.id_zh == id_zh).one().zh_uuid
+    if extension == '.pdf':
+        id_nomenclature_media_type = DB.session.query(TNomenclatures).filter(
+            TNomenclatures.mnemonique == 'PDF').one().id_nomenclature
+    else:
+        id_nomenclature_media_type = DB.session.query(TNomenclatures).filter(
+            TNomenclatures.mnemonique == 'Photo').one().id_nomenclature
+
+    pdb.set_trace()

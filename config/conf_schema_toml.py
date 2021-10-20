@@ -54,7 +54,7 @@ max_pdf_size = 1.5  # Mo
 
 max_jpg_size = 0.5  # Mo
 
-path_to_upload = "/backend/upload"
+path_to_upload = "upload"
 
 
 class GnModuleSchemaConf(Schema):
