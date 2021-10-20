@@ -24,8 +24,8 @@ export class ZhFormTab3Component implements OnInit {
   public currentZh: any;
   corinBioMetaData: any;
   corinTableCol = [
-    { name: "CB_code", label: "Code Corine Biotope" },
-    { name: "CB_label", label: "Libellé Corine biotope" },
+    { name: "CB_code", label: "Code Corine biotopes" },
+    { name: "CB_label", label: "Libellé Corine biotopes" },
     { name: "CB_humidity", label: "Humidité" },
   ];
   activityTableCol = [
@@ -69,6 +69,7 @@ export class ZhFormTab3Component implements OnInit {
       searchPlaceholderText: "Rechercher",
       enableCheckAll: false,
       allowSearchFilter: true,
+      maxHeight: 300,
     };
 
     this.settings = {
