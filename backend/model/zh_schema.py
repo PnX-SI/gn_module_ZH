@@ -1133,8 +1133,6 @@ class TManagementPlans(DB.Model):
 
 def get_view_model(table_name, schema_name):
 
-    #DynamicBase = declarative_base(class_registry=dict())
-
     class TaxaView(DB.Model):
         __tablename__ = table_name
         __table_args__ = {"schema": schema_name}
@@ -1167,12 +1165,14 @@ def get_view_model(table_name, schema_name):
         obs_nb = DB.Column(
             DB.Integer
         )
-
-        # def __init__(self, tablename):
-        #    self.__tablename__ = tablename
-
-        # @staticmethod
-        # def get_table_name(blueprint):
-        #    return blueprint.config['taxa_view_name']
+        last_date = DB.Column(
+            DB.DateTime
+        )
+        observer = DB.Column(
+            DB.Unicode
+        )
+        organisme = DB.Column(
+            DB.Unicode
+        )
 
     return TaxaView

@@ -695,76 +695,125 @@ ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_id_org FOREIGN KEY ( id_org ) REFE
 
 CREATE OR REPLACE VIEW pr_zh.vertebrates AS
 	WITH synthese_zh AS (
-		SELECT synthese.id_synthese,
-		( SELECT t_zh.id_zh
+		SELECT 
+			synthese.id_synthese,
+			( 
+				SELECT t_zh.id_zh
 				FROM pr_zh.t_zh
-				WHERE st_intersects(st_setsrid(t_zh.geom, 4326), st_setsrid(synthese.the_geom_point, 4326))) AS id_zh,
-		synthese.cd_nom,
-		synthese.date_max
+				WHERE st_intersects(st_setsrid(t_zh.geom, 4326), st_setsrid(synthese.the_geom_point, 4326))
+			) AS id_zh,
+			synthese.cd_nom,
+			synthese.date_max,
+			synthese.observers,
+			(	
+				SELECT organisme 
+				FROM utilisateurs.v_userslist_forall_applications 
+				WHERE nom_role || ' ' || prenom_role = synthese.observers limit 1
+			)
 		FROM gn_synthese.synthese
 	)
-	SELECT synthese_zh.id_zh,
-	taxref.cd_nom,
-	taxref.classe AS "group",
-	taxref.nom_complet AS scientific_name,
-	taxref.nom_vern AS vernac_name,
-	''::text AS reglementation,
-	''::text AS article,
-	count(taxref.cd_nom)::integer AS obs_nb
+	SELECT 
+		synthese_zh.id_zh,
+		taxref.cd_nom,
+		tpe.cd_protection,
+		taxref.classe AS "group",
+		taxref.nom_complet AS scientific_name,
+		taxref.nom_vern AS vernac_name,
+		tpa.intitule AS reglementation,
+		tpa.article AS article,
+		synthese_zh.date_max AS last_date,
+		synthese_zh.observers AS observer,
+		synthese_zh.organisme AS organisme,
+		count(taxref.cd_nom)::integer AS obs_nb
 	FROM synthese_zh
 	LEFT JOIN taxonomie.taxref taxref ON synthese_zh.cd_nom = taxref.cd_nom
+	LEFT JOIN taxonomie.taxref_protection_especes tpe ON taxref.cd_nom = tpe.cd_nom
+	LEFT JOIN taxonomie.taxref_protection_articles tpa ON tpa.cd_protection = tpe.cd_protection
 	WHERE synthese_zh.id_zh IS NOT NULL
 	AND (synthese_zh.date_max::timestamp > (NOW()::timestamp - interval '20 years'))
 	AND taxref.phylum = 'Chordata'
-	GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, taxref.cd_nom;
+	GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, tpe.cd_protection, tpa.intitule, tpa.article, taxref.cd_nom, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;
 
 CREATE OR REPLACE VIEW pr_zh.invertebrates AS
 	WITH synthese_zh AS (
-		SELECT synthese.id_synthese,
-		( SELECT t_zh.id_zh
+		SELECT 
+			synthese.id_synthese,
+			( 
+				SELECT t_zh.id_zh
 				FROM pr_zh.t_zh
-				WHERE st_intersects(st_setsrid(t_zh.geom, 4326), st_setsrid(synthese.the_geom_point, 4326))) AS id_zh,
-		synthese.cd_nom,
-		synthese.date_max
+				WHERE st_intersects(st_setsrid(t_zh.geom, 4326), st_setsrid(synthese.the_geom_point, 4326))
+			) AS id_zh,
+			synthese.cd_nom,
+			synthese.date_max,
+			synthese.observers,
+			(	
+				SELECT organisme 
+				FROM utilisateurs.v_userslist_forall_applications 
+				WHERE nom_role || ' ' || prenom_role = synthese.observers limit 1
+			)
 		FROM gn_synthese.synthese
 	)
-	SELECT synthese_zh.id_zh,
-	taxref.cd_nom,
-	taxref.classe AS "group",
-	taxref.nom_complet AS scientific_name,
-	taxref.nom_vern AS vernac_name,
-	''::text AS reglementation,
-	''::text AS article,
-	count(taxref.cd_nom)::integer AS obs_nb
+	SELECT 
+		synthese_zh.id_zh,
+		taxref.cd_nom,
+		tpe.cd_protection,
+		taxref.classe AS "group",
+		taxref.nom_complet AS scientific_name,
+		taxref.nom_vern AS vernac_name,
+		tpa.intitule AS reglementation,
+		tpa.article AS article,
+		synthese_zh.date_max AS last_date,
+		synthese_zh.observers AS observer,
+		synthese_zh.organisme AS organisme,
+		count(taxref.cd_nom)::integer AS obs_nb
 	FROM synthese_zh
 	LEFT JOIN taxonomie.taxref taxref ON synthese_zh.cd_nom = taxref.cd_nom
+	LEFT JOIN taxonomie.taxref_protection_especes tpe ON taxref.cd_nom = tpe.cd_nom
+	LEFT JOIN taxonomie.taxref_protection_articles tpa ON tpa.cd_protection = tpe.cd_protection
 	WHERE synthese_zh.id_zh IS NOT NULL
 	AND (synthese_zh.date_max::timestamp > (NOW()::timestamp - interval '20 years'))
 	AND taxref.phylum != 'Chordata'
 	AND taxref.regne = 'Animalia'
-	GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, taxref.cd_nom;
+	GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, tpe.cd_protection, tpa.intitule, tpa.article, taxref.cd_nom, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;
+
 
 CREATE OR REPLACE VIEW pr_zh.flora AS
 	WITH synthese_zh AS (
-			SELECT synthese.id_synthese,
-			( SELECT t_zh.id_zh
-					FROM pr_zh.t_zh
-					WHERE st_intersects(st_setsrid(t_zh.geom, 4326), st_setsrid(synthese.the_geom_point, 4326))) AS id_zh,
+		SELECT 
+			synthese.id_synthese,
+			( 
+				SELECT t_zh.id_zh
+				FROM pr_zh.t_zh
+				WHERE st_intersects(st_setsrid(t_zh.geom, 4326), st_setsrid(synthese.the_geom_point, 4326))
+			) AS id_zh,
 			synthese.cd_nom,
-			synthese.date_max
-			FROM gn_synthese.synthese
-		)
-		SELECT synthese_zh.id_zh,
+			synthese.date_max,
+			synthese.observers,
+			(	
+				SELECT organisme 
+				FROM utilisateurs.v_userslist_forall_applications 
+				WHERE nom_role || ' ' || prenom_role = synthese.observers limit 1
+			)
+		FROM gn_synthese.synthese
+	)
+	SELECT 
+		synthese_zh.id_zh,
 		taxref.cd_nom,
+		tpe.cd_protection,
 		taxref.classe AS "group",
 		taxref.nom_complet AS scientific_name,
 		taxref.nom_vern AS vernac_name,
-		''::text AS reglementation,
-		''::text AS article,
+		tpa.intitule AS reglementation,
+		tpa.article AS article,
+		synthese_zh.date_max AS last_date,
+		synthese_zh.observers AS observer,
+		synthese_zh.organisme AS organisme,
 		count(taxref.cd_nom)::integer AS obs_nb
-		FROM synthese_zh
-		LEFT JOIN taxonomie.taxref taxref ON synthese_zh.cd_nom = taxref.cd_nom
-		WHERE synthese_zh.id_zh IS NOT NULL
-		AND (synthese_zh.date_max::timestamp > (NOW()::timestamp - interval '20 years'))
-		AND taxref.regne = 'Plantae'
-		GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, taxref.cd_nom;
+	FROM synthese_zh
+	LEFT JOIN taxonomie.taxref taxref ON synthese_zh.cd_nom = taxref.cd_nom
+	LEFT JOIN taxonomie.taxref_protection_especes tpe ON taxref.cd_nom = tpe.cd_nom
+	LEFT JOIN taxonomie.taxref_protection_articles tpa ON tpa.cd_protection = tpe.cd_protection
+	WHERE synthese_zh.id_zh IS NOT NULL
+	AND (synthese_zh.date_max::timestamp > (NOW()::timestamp - interval '20 years'))
+	AND taxref.regne = 'Plantae'
+	GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, tpe.cd_protection, tpa.intitule, tpa.article, taxref.cd_nom, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;

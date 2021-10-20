@@ -508,39 +508,51 @@ def handle_geonature_zh_api(error):
     return response
 
 
-@blueprint.route("/<int:id_zh>/download")
+@blueprint.route("/<int:id_zh>/taxa")
 @ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
-def download(id_zh, info_role):
-    for i in ['vertebrates_view_name', 'invertebrates_view_name', 'flora_view_name']:
-        model = get_view_model(
-            blueprint.config[i]['table_name'],
-            blueprint.config[i]['schema_name']
-        )
-        query = DB.session.query(model).filter(model.id_zh == id_zh).all()
-        current_date = datetime.now()
-        if query:
-            rows = [
-                {
-                    "Groupe d'étude": row.group,
-                    "Nom Scientifique": row.scientific_name,
-                    "Nom vernaculaire": row.vernac_name,
-                    "Réglementation": row.reglementation,
-                    "Article": row.article,
-                    "Nombre d'observations": row.obs_nb
-                } for row in query
-            ]
-            path_download = blueprint.config['path_to_download']
-            base_path = Path(__file__).absolute().parent
-            name_file = "/" + blueprint.config[i]['category'] + \
-                "_" + str(current_date.strftime("%Y-%m-%d_%H:%M:%S")
-                          ) + "_" + str(id_zh) + ".csv"
-            full_name = str(base_path) + path_download + name_file
+def write_csv(id_zh, info_role):
+    try:
+        names = []
+        for i in ['vertebrates_view_name', 'invertebrates_view_name', 'flora_view_name']:
+            model = get_view_model(
+                blueprint.config[i]['table_name'],
+                blueprint.config[i]['schema_name']
+            )
+            query = DB.session.query(model).filter(model.id_zh == id_zh).all()
+            current_date = datetime.now()
+            if query:
+                rows = [
+                    {
+                        "Groupe d'étude": row.group,
+                        "Nom Scientifique": row.scientific_name,
+                        "Nom vernaculaire": row.vernac_name,
+                        "Réglementation": row.reglementation,
+                        "Article": row.article,
+                        "Nombre d'observations": row.obs_nb,
+                        "Date de la dernière observation": row.last_date,
+                        "Dernier observateur": row.observer,
+                        "Organisme": row.organisme
+                    } for row in query
+                ]
+                path_download = blueprint.config['path_to_download']
+                base_path = Path(__file__).absolute().parent
+                name_file = "/" + blueprint.config[i]['category'] + \
+                    "_" + str(current_date.strftime("%Y-%m-%d_%H:%M:%S")
+                              ) + "_" + str(id_zh) + ".csv"
+                full_name = str(base_path) + path_download + name_file
+                names.append(full_name)
 
-            with open(full_name, 'w', encoding='UTF8', newline='') as f:
-                writer = csv.DictWriter(f, fieldnames=rows[0].keys())
-                writer.writeheader()
-                writer.writerows(rows)
-    return send_file(full_name, as_attachment=True)
+                with open(full_name, 'w', encoding='UTF8', newline='') as f:
+                    writer = csv.DictWriter(f, fieldnames=rows[0].keys())
+                    writer.writeheader()
+                    writer.writerows(rows)
+        return {"file_names": names}, 200
+    except Exception as e:
+        print(e)
+        DB.session.rollback()
+        raise ZHApiError(message=str(e), details=str(e))
+    finally:
+        DB.session.close()
 
 
 @blueprint.route('/user/cruved', methods=['GET'])
