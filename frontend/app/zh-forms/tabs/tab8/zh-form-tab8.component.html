@@ -164,7 +164,8 @@
       class="uppercase"
       (click)="postFile()"
     >
-      Téléverser
+    <mat-spinner *ngIf="loadingUpload" color="warn" diameter="25"></mat-spinner>
+    Téléverser
     </button>
   </div>
 </ng-template>
