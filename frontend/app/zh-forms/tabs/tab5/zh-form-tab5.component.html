@@ -230,6 +230,11 @@
         </div>
       </div>
       <div class="form-row">
+        <small style="display: block; margin-bottom: 8px"
+            >Liste des habitats</small
+          >
+      </div>
+      <div class="form-row">
         <button
           mat-raised-button
           class="mb-3"
@@ -237,7 +242,7 @@
           (click)="onAddCorineBio($event, corineBioModal)"
         >
           <mat-icon>add_box</mat-icon>
-          Ajout d’un habitat humide patrimonial
+          Habitat
         </button>
         <div
           *ngIf="corineBioTable && corineBioTable.length > 0"
@@ -939,7 +944,7 @@
           >
         </div>
         <div class="form-group col-md-12">
-          <small>Recouvrement total sur la ZH (%)</small>
+          <small>Recouvrement sur la ZH (%)</small>
           <input
             class="form-control"
             [formControl]="corineBioForm.controls.habCover"
