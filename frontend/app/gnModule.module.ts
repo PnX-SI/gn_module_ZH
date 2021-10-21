@@ -24,7 +24,7 @@ import { ZhTabsComponent } from "./zh-forms/tabs/zh-tabs.component";
 import { DatepickerI18n } from "./services/datepicker-i18n.service";
 import { CancelButtonComponent } from "./zh-forms/cancelButton/cancelButton.component";
 import { ZhFormTab8Component } from "./zh-forms/tabs/tab8/zh-form-tab8.component";
-
+import { ZhSearchComponent } from "./zh-search/zh-search.component";
 // my module routing
 const routes: Routes = [
   { path: "", component: ZhMapListComponent },
@@ -36,6 +36,7 @@ const routes: Routes = [
   declarations: [
     ZhMapListComponent,
     ZhTabsComponent,
+    ZhSearchComponent,
     ZhFormMapComponent,
     ZhFormTab0Component,
     ZhFormTab1Component,
