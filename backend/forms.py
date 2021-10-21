@@ -1,5 +1,7 @@
 import uuid
 
+import datetime
+
 from sqlalchemy import (
     func,
     text,
@@ -10,6 +12,11 @@ from sqlalchemy import (
 from sqlalchemy.sql.expression import delete
 
 from geonature.utils.env import DB
+
+from geonature.core.gn_commons.models import (
+    BibTablesLocation,
+    TMedias
+)
 
 from .model.zh_schema import *
 from .model.code import Code
@@ -518,14 +525,28 @@ def post_actions(id_zh, actions):
 # tab 8
 
 
-def post_file_info(id_zh, file_name, extension):
+def post_file_info(metadata, uploaded_resp):
     unique_id_media = DB.session.query(TZH).filter(
-        TZH.id_zh == id_zh).one().zh_uuid
-    if extension == '.pdf':
+        TZH.id_zh == int(metadata['id_zh'])).one().zh_uuid
+    if uploaded_resp['extension'] == '.pdf':
         id_nomenclature_media_type = DB.session.query(TNomenclatures).filter(
             TNomenclatures.mnemonique == 'PDF').one().id_nomenclature
     else:
         id_nomenclature_media_type = DB.session.query(TNomenclatures).filter(
             TNomenclatures.mnemonique == 'Photo').one().id_nomenclature
-
-    pdb.set_trace()
+    id_table_location = DB.session.query(BibTablesLocation).filter(and_(
+        BibTablesLocation.schema_name == 'pr_zh', BibTablesLocation.table_name == 't_zh')).one().id_table_location
+    post_date = datetime.datetime.now()
+    DB.session.add(TMedias(
+        unique_id_media=unique_id_media,
+        id_nomenclature_media_type=id_nomenclature_media_type,
+        id_table_location=id_table_location,
+        title_fr=metadata['title'],
+        media_path=uploaded_resp['media_path'],
+        author=metadata['author'],
+        description_fr=metadata['summary'],
+        is_public=True,
+        meta_create_date=str(post_date),
+        meta_update_date=str(post_date)
+    ))
+    DB.session.flush()

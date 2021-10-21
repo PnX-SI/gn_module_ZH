@@ -7,26 +7,32 @@ from pathlib import Path
 import os
 
 
-def upload(id_zh, request, extensions, pdf_size, jpg_size, upload_path):
+def upload(request, extensions, pdf_size, jpg_size, upload_path, module_name):
     try:
         # to do : set file name : file_name_1, _2, ...
 
-        if "File" not in request.files:
+        # get form data
+        metadata = request.form.to_dict()
+
+        if "file" not in request.files:
             return {"error": "NO_FILE_SENDED"}
 
-        file = request.files["File"]
+        file = request.files["file"]
 
         if file.filename == "":
             return {"error": "NO_FILE_SENDED"}
 
         # get file path
-        filename = filename = secure_filename(file.filename)
+        filename = secure_filename(file.filename)
         filename = secure_filename(filename)
         if len(filename) > 100:
             return {"error": "FILE_NAME_TOO_LONG"}
 
-        base_path = Path(__file__).absolute().parent
-        full_path = os.path.join(base_path, upload_path, filename)
+        base_path = os.path.expanduser('~')
+        full_path = os.path.join(
+            base_path, 'geonature/external_modules', module_name, upload_path, filename)
+        media_path = os.path.join(
+            '/external_modules', module_name, upload_path, filename)
 
         # check user file extension (changer)
         extension = Path(full_path).suffix.lower()
@@ -52,7 +58,7 @@ def upload(id_zh, request, extensions, pdf_size, jpg_size, upload_path):
         return {
             "file_name": filename,
             "full_path": full_path,
-            "is_uploaded": True,
+            "media_path": media_path,
             "extension": extension,
         }
     except Exception:

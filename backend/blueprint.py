@@ -438,31 +438,48 @@ def get_tab_data(id_tab, info_role):
 
         if id_tab == 8:
             try:
-                pdb.set_trace()
+                try:
+                    file_name = secure_filename(request.files["file"].filename)
+                    temp = file_name.split(".")
+                    extension = temp[len(temp) - 1]
+                except Exception as e:
+                    file_name = "Filename_error"
+                    extension = "Extension_error"
+                    raise
 
-                path_download = blueprint.config['path_to_upload']
-                base_path = Path(__file__).absolute().parent
+                ALLOWED_EXTENSIONS = blueprint.config['allowed_extensions']
+                MAX_PDF_SIZE = blueprint.config['max_pdf_size']
+                MAX_JPG_SIZE = blueprint.config['max_jpg_size']
+                FILE_PATH = blueprint.config['file_path']
+                MODULE_NAME = blueprint.config['MODULE_CODE'].lower()
+                uploaded_resp = upload(
+                    request,
+                    ALLOWED_EXTENSIONS,
+                    MAX_PDF_SIZE,
+                    MAX_JPG_SIZE,
+                    FILE_PATH,
+                    MODULE_NAME
+                )
 
-                file_name = request.files["File"].filename
-                file_name = secure_filename(file_name)
-                temp = file_name.split(".")
-                extension = temp[len(temp) - 1]
-            except Exception:
-                file_name = "Filename_error"
-                extension = "Extension_error"
-            id_zh = form_data['id_zh']
-            ALLOWED_EXTENSIONS = blueprint.config['allowed_extensions']
-            MAX_PDF_SIZE = blueprint.config['max_pdf_size']
-            MAX_JPG_SIZE = blueprint.config['max_jpg_size']
-            PATH_TO_UPLOAD = blueprint.config['path_to_upload']
-            uploaded_file = upload(
-                id_zh,
-                request,
-                ALLOWED_EXTENSIONS,
-                MAX_PDF_SIZE,
-                MAX_JPG_SIZE,
-                PATH_TO_UPLOAD
-            )
+                # checks if error in user file or user http request:
+                if "error" in uploaded_resp:
+                    return {"id_zh": request.form.to_dict['id_zh'], "errors": uploaded_resp["error"]}, 400
+
+                # save in db
+                post_file_info(
+                    request.form.to_dict(), uploaded_resp)
+                DB.session.commit()
+
+                return {
+                    "full_path": uploaded_resp["full_path"],
+                    "media_path": uploaded_resp["media_path"],
+                    "secured_file_name": uploaded_resp['file_name'],
+                    "original_file_name": request.files["file"].filename
+                }, 200
+            except Exception as e:
+                print(e)
+                DB.session.rollback()
+                raise
 
     except Exception as e:
         DB.session.rollback()
@@ -551,56 +568,3 @@ def returnUserCruved(info_role):
         module_code=blueprint.config['MODULE_CODE']
     )
     return user_cruved
-
-
-@blueprint.route('/<int:id_zh>/test', methods=['GET'])
-@permissions.check_cruved_scope('R', True)
-@json_resp
-def test(id_zh, info_role):
-    try:
-        is_running = True
-        try:
-            file_name = request.files["File"].filename
-            file_name = secure_filename(file_name)
-            temp = file_name.split(".")
-            extension = temp[len(temp) - 1]
-        except Exception as e:
-            file_name = "Filename_error"
-            extension = "Extension_error"
-            print(e)
-            raise
-
-        ALLOWED_EXTENSIONS = blueprint.config['allowed_extensions']
-        MAX_PDF_SIZE = blueprint.config['max_pdf_size']
-        MAX_JPG_SIZE = blueprint.config['max_jpg_size']
-        PATH_TO_UPLOAD = blueprint.config['path_to_upload']
-        uploaded_file = upload(
-            id_zh,
-            request,
-            ALLOWED_EXTENSIONS,
-            MAX_PDF_SIZE,
-            MAX_JPG_SIZE,
-            PATH_TO_UPLOAD
-        )
-
-        # checks if error in user file or user http request:
-        if "error" in uploaded_file:
-            return {"id_zh": id_zh, "errors": uploaded_file["error"]}, 400
-
-        # save in db
-        post_file_info(id_zh, uploaded_file['file_name'])
-        DB.session.commit()
-
-        is_running = False
-
-        return (
-            {
-                "full_path": uploaded_file["full_path"],
-                "fileName": uploaded_file['file_name'],
-                "is_running": is_running,
-            },
-            200,
-        )
-    except Exception:
-        DB.session.rollback()
-        raise
