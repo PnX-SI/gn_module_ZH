@@ -110,6 +110,7 @@ export class ZhFormTab8Component implements OnInit {
   postFile() {
     this.loadingUpload = true;
     const uploadForm = new FormData();
+    uploadForm.append("id_zh", this.zh.id);
     uploadForm.append("title", this.docForm.value.title);
     uploadForm.append("author", this.docForm.value.author);
     uploadForm.append("summary", this.docForm.value.summary);
