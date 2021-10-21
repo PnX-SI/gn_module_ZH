@@ -1,6 +1,6 @@
 import { Component, EventEmitter, OnInit, Input, Output } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 import { TabsService } from "../../../services/tabs.service";
 
 import { ToastrService } from "ngx-toastr";
@@ -25,6 +25,7 @@ export class ZhFormTab8Component implements OnInit {
   public fileToUpload: File | null = null;
 
   public modalTitle: string;
+  public activeModal: NgbModalRef;
   public addModalBtnLabel: string;
   public posted: boolean;
   public submitted: boolean;
@@ -58,7 +59,6 @@ export class ZhFormTab8Component implements OnInit {
         ]),
       ],
       title: [null, Validators.required],
-      profile: [null, Validators.required],
       author: [null, Validators.required],
       summary: null,
     });
@@ -67,19 +67,18 @@ export class ZhFormTab8Component implements OnInit {
   getCurrentZh() {
     this._dataService.currentZh.subscribe((zh: any) => {
       this.zh = zh;
-      console.log(this.zh);
     });
   }
 
   onAddDoc(event: any, modal: any) {
     this.modalTitle = "Ajout d'un fichier";
-    const modalRef = this.ngbModal.open(modal, {
+    this.activeModal = this.ngbModal.open(modal, {
       centered: true,
       size: "lg",
       windowClass: "bib-modal",
     });
 
-    modalRef.result.then().finally(() => {
+    this.activeModal.result.then().finally(() => {
       this.resetForm();
     });
   }
@@ -100,14 +99,33 @@ export class ZhFormTab8Component implements OnInit {
     this.docForm.patchValue({
       file: this.fileToUpload,
     });
-    console.log(this.docForm);
   }
 
   postFile() {
-    const reader = new FileReader();
-    reader.readAsDataURL(this.fileToUpload);
+    const uploadForm = new FormData();
+    uploadForm.append("title", this.docForm.value.title);
+    uploadForm.append("author", this.docForm.value.author);
+    uploadForm.append("summary", this.docForm.value.summary);
+    uploadForm.append("file", this.fileToUpload, this.fileToUpload.name);
+    this._dataService
+      .postDataForm(uploadForm, 8)
+      .toPromise()
+      .then((res) => {
+        this.activeModal.close();
+        this.displayInfo("Fichier téléversé avec succès !");
+      })
+      .catch((error) => {
+        this.displayError(
+          `Une erreur est survenue, impossible d'uploader un fichier : <${error.message}>`
+        );
+      });
+  }
 
-    reader.onload = () => {};
+  displayInfo(message: string) {
+    this._toastr.success(message);
+  }
+  displayError(error: string) {
+    this._toastr.error(error);
   }
 
   onFormSubmit() {}
