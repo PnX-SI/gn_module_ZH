@@ -23,6 +23,7 @@ export class ZhFormTab8Component implements OnInit {
   public formTab8: FormGroup;
   public docForm: FormGroup;
   public fileToUpload: File | null = null;
+  public loadingUpload: boolean = false;
 
   public modalTitle: string;
   public activeModal: NgbModalRef;
@@ -72,6 +73,15 @@ export class ZhFormTab8Component implements OnInit {
 
   onAddDoc(event: any, modal: any) {
     this.modalTitle = "Ajout d'un fichier";
+    this.onOpenModal(modal);
+  }
+
+  onEditDoc(event: any, modal: any) {
+    this.modalTitle = "Edition d'un fichier";
+    this.onOpenModal(modal);
+  }
+
+  onOpenModal(modal) {
     this.activeModal = this.ngbModal.open(modal, {
       centered: true,
       size: "lg",
@@ -90,10 +100,6 @@ export class ZhFormTab8Component implements OnInit {
 
   onDeleteStatus() {}
 
-  onEditDoc() {
-    this.modalTitle = "Editer un fichier";
-  }
-
   handleFileInput(files: FileList) {
     this.fileToUpload = files.item(0);
     this.docForm.patchValue({
@@ -102,6 +108,7 @@ export class ZhFormTab8Component implements OnInit {
   }
 
   postFile() {
+    this.loadingUpload = true;
     const uploadForm = new FormData();
     uploadForm.append("title", this.docForm.value.title);
     uploadForm.append("author", this.docForm.value.author);
@@ -118,6 +125,9 @@ export class ZhFormTab8Component implements OnInit {
         this.displayError(
           `Une erreur est survenue, impossible d'uploader un fichier : <${error.message}>`
         );
+      })
+      .finally(() => {
+        this.loadingUpload = false;
       });
   }
 
