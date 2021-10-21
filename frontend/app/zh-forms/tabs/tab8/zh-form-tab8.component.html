@@ -87,25 +87,39 @@
   <div class="modal-body">
     <form [formGroup]="docForm">
       <div class="form-row">
-        <div class="form-group col-md-6">
-          <label for="file">Parcourir</label>
+        <div class="form-group col-md-12">
           <input
+            #fileInput
+            hidden="true"
             id="file"
             type="file"
             (change)="handleFileInput($event.target.files)"
+            accept="image/*,.pdf"
           />
-        </div>
+          <button mat-raised-button color="primary" (click)="fileInput.click()">Parcourir</button>
+          <small class="file-name" *ngIf="fileToUpload !== null">Fichier renseigné : {{ fileToUpload.name }}</small>
+          </div>
         <div class="form-group col-md-12">
-          <small class="required">Profil</small>
+          <small
+              *ngIf="
+                docForm.controls.file.errors?.fileSizeValidator
+              "
+              class="error-msg"
+              >Le fichier excède le poids maximum autorisé (500ko pour les photos, 1500ko pour les pdf)<br></small>
           <small
             *ngIf="
-              (docForm.controls.profile.touched || modalFormSubmitted) &&
-              docForm.controls.profile.errors?.required
+              docForm.controls.file.errors?.fileNameValidator
             "
             class="error-msg"
-            >Champ requis</small
-          >
+            >Le fichier ne respecte pas le format suivant : &lt;ZHID&gt;_&lt;nombre&gt;. Exemple : 84PNRL125_3<br></small>
+          <small
+          *ngIf="
+            docForm.controls.file.errors?.fileFormatValidator
+          "
+          class="error-msg"
+          >Le fichier n'est pas du bon format (image ou pdf)<br></small>
         </div>
+
         <div class="form-group col-md-6">
           <small class="required">Titre du document</small>
           <input class="form-control" [formControl]="docForm.controls.title" />
@@ -148,9 +162,9 @@
       mat-raised-button
       color="primary"
       class="uppercase"
-      (click)="patchModal ? onPatchStatus() : onPostStatus()"
+      (click)="postFile()"
     >
-      {{ addModalBtnLabel }}
+      Téléverser
     </button>
   </div>
 </ng-template>
