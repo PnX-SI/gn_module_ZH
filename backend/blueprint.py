@@ -14,6 +14,13 @@ from pathlib import Path
 
 import uuid
 
+from pathlib import Path
+
+import os
+from flask.helpers import send_file, send_from_directory
+
+from werkzeug.utils import secure_filename
+
 from sqlalchemy.sql.expression import delete
 
 from geojson import FeatureCollection
@@ -32,7 +39,7 @@ from geonature.core.ref_geo.models import LAreas, BibAreasTypes
 
 from geonature.utils.utilssqlalchemy import json_resp
 from geonature.utils.env import DB
-# from geonature.utils.env import get_id_module
+from geonature.core.gn_commons.models import TMedias
 
 # import des fonctions utiles depuis le sous-module d'authentification
 from geonature.core.gn_permissions import decorators as permissions
@@ -61,6 +68,8 @@ from .nomenclatures import (
 from .forms import *
 
 from .geometry import set_geom
+
+from .upload import upload
 
 from .model.repositories import (
     ZhRepository
@@ -334,6 +343,56 @@ def patch_reference(info_role):
     return form_data
 
 
+@ blueprint.route("/<int:id_zh>/files", methods=["GET"])
+@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
+@ json_resp
+def get_file_list(id_zh, info_role):
+    """get a list of the zh files contained in static repo
+    """
+    zh_uuid = DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().zh_uuid
+    q_medias = DB.session.query(TMedias).filter(
+        TMedias.unique_id_media == zh_uuid).all()
+    return [media.as_dict() for media in q_medias]
+
+
+@ blueprint.route("files/<int:id_media>", methods=["DELETE"])
+# @ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
+def delete_file(id_media):
+    """delete file by id_media in TMedias and static directory
+    """
+    try:
+        media_path = DB.session.query(TMedias).filter(
+            TMedias.id_media == id_media).one().media_path
+        base_path = os.path.expanduser('~')
+        full_path = os.path.join(base_path, 'geonature', media_path)
+        os.remove(full_path)
+        DB.session.query(TMedias).filter(TMedias.id_media == id_media).delete()
+        DB.session.commit()
+    except Exception as e:
+        DB.session.rollback()
+        raise ZHApiError(message="no_row", details=str(e))
+    finally:
+        DB.session.close()
+
+
+@ blueprint.route("files/<int:id_media>", methods=["GET"])
+@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
+def download_file(id_media, info_role):
+    """download file by id_media in static directory
+    """
+    try:
+        media_path = DB.session.query(TMedias).filter(
+            TMedias.id_media == id_media).one().media_path
+        root_path = os.path.expanduser('~')
+        full_path = os.path.join(root_path, 'geonature', media_path)
+        return send_file(full_path, as_attachment=True)
+    except Exception as e:
+        DB.session.rollback()
+        raise ZHApiError(message=str(e), details=str(e))
+    finally:
+        DB.session.close()
+
+
 @ blueprint.route("/form/<int:id_tab>", methods=["POST", "PATCH"])
 @ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
 @ json_resp
@@ -344,7 +403,7 @@ def get_tab_data(id_tab, info_role):
     try:
         if id_tab == 0:
             # set date
-            zh_date = datetime.now(timezone.utc)
+            zh_date = datetime.datetime.now()
             # set name
             if form_data['main_name'] == "":
                 return 'Empty mandatory field', 400
@@ -433,7 +492,50 @@ def get_tab_data(id_tab, info_role):
             DB.session.commit()
             return {"id_zh": form_data['id_zh']}, 200
 
+        if id_tab == 8:
+            # to do :
+            #   add main_picture attribute in pr_zh.t_zh when implemented in frontend (radio ?)
+            try:
+                file_name = secure_filename(request.files["file"].filename)
+                temp = file_name.split(".")
+                extension = temp[len(temp) - 1]
+            except Exception as e:
+                file_name = "Filename_error"
+                extension = "Extension_error"
+                raise
+
+            ALLOWED_EXTENSIONS = blueprint.config['allowed_extensions']
+            MAX_PDF_SIZE = blueprint.config['max_pdf_size']
+            MAX_JPG_SIZE = blueprint.config['max_jpg_size']
+            FILE_PATH = blueprint.config['file_path']
+            MODULE_NAME = blueprint.config['MODULE_CODE'].lower()
+            uploaded_resp = upload(
+                request,
+                ALLOWED_EXTENSIONS,
+                MAX_PDF_SIZE,
+                MAX_JPG_SIZE,
+                FILE_PATH,
+                MODULE_NAME
+            )
+
+            # checks if error in user file or user http request:
+            if "error" in uploaded_resp:
+                return {"id_zh": request.form.to_dict['id_zh'], "errors": uploaded_resp["error"]}, 400
+
+            # save in db
+            id_media = post_file_info(
+                request.form.to_dict(), uploaded_resp)
+            DB.session.commit()
+
+            return {
+                "media_path": uploaded_resp["media_path"],
+                "secured_file_name": uploaded_resp['file_name'],
+                "original_file_name": request.files["file"].filename,
+                "id_media": id_media
+            }, 200
+
     except Exception as e:
+        print(e)
         DB.session.rollback()
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
             return 'Empty mandatory field ?', 400
@@ -455,15 +557,26 @@ def deleteOneZh(id_zh, info_role):
     """
     try:
         zhRepository = ZhRepository(TZH)
+
         # delete references
         DB.session.query(CorZhRef).filter(CorZhRef.id_zh == id_zh).delete()
+
         # delete criteres delim
         id_lim_list = DB.session.query(TZH).filter(
             TZH.id_zh == id_zh).one().id_lim_list
         DB.session.query(CorLimList).filter(
             CorLimList.id_lim_list == id_lim_list).delete()
+
         # delete cor_zh_area
         DB.session.query(CorZhArea).filter(CorZhArea.id_zh == id_zh).delete()
+
+        # delete files in TMedias and repos
+        zh_uuid = DB.session.query(TZH).filter(
+            TZH.id_zh == id_zh).one().zh_uuid
+        q_medias = DB.session.query(TMedias).filter(
+            TMedias.unique_id_media == zh_uuid).all()
+        for media in q_medias:
+            delete_file(media.id_media)
 
         zhRepository.delete(id_zh, info_role)
         DB.session.commit()
@@ -519,7 +632,7 @@ def write_csv(id_zh, info_role):
                 blueprint.config[i]['schema_name']
             )
             query = DB.session.query(model).filter(model.id_zh == id_zh).all()
-            current_date = datetime.now()
+            current_date = datetime.datetime.now()
             if query:
                 rows = [
                     {
@@ -534,12 +647,12 @@ def write_csv(id_zh, info_role):
                         "Organisme": row.organisme
                     } for row in query
                 ]
-                path_download = blueprint.config['path_to_download']
-                base_path = Path(__file__).absolute().parent
-                name_file = "/" + blueprint.config[i]['category'] + \
-                    "_" + str(current_date.strftime("%Y-%m-%d_%H:%M:%S")
-                              ) + "_" + str(id_zh) + ".csv"
-                full_name = str(base_path) + path_download + name_file
+                path_download = blueprint.config['file_path']
+                name_file = blueprint.config[i]['category'] + "_" + \
+                    current_date.strftime("%Y-%m-%d_%H:%M:%S") + ".csv"
+                base_path = Path(__file__).absolute().parent.parent
+                media_path = os.path.join(path_download, name_file)
+                full_name = os.path.join(base_path, media_path)
                 names.append(full_name)
 
                 with open(full_name, 'w', encoding='UTF8', newline='') as f:
@@ -548,7 +661,6 @@ def write_csv(id_zh, info_role):
                     writer.writerows(rows)
         return {"file_names": names}, 200
     except Exception as e:
-        print(e)
         DB.session.rollback()
         raise ZHApiError(message=str(e), details=str(e))
     finally:
