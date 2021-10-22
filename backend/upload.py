@@ -9,7 +9,7 @@ import os
 
 def upload(request, extensions, pdf_size, jpg_size, upload_path, module_name):
     try:
-        # to do : set file name : file_name_1, _2, ...
+        # to do : set file name : file_name_1, _2, ... for main_picture
 
         # get form data
         metadata = request.form.to_dict()
@@ -29,10 +29,10 @@ def upload(request, extensions, pdf_size, jpg_size, upload_path, module_name):
             return {"error": "FILE_NAME_TOO_LONG"}
 
         base_path = os.path.expanduser('~')
-        full_path = os.path.join(
-            base_path, 'geonature/external_modules', module_name, upload_path, filename)
         media_path = os.path.join(
-            '/external_modules', module_name, upload_path, filename)
+            'external_modules', module_name, upload_path, filename)
+        full_path = os.path.join(
+            base_path, 'geonature', media_path)
 
         # check user file extension (changer)
         extension = Path(full_path).suffix.lower()

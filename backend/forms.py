@@ -528,6 +528,7 @@ def post_actions(id_zh, actions):
 def post_file_info(metadata, uploaded_resp):
     unique_id_media = DB.session.query(TZH).filter(
         TZH.id_zh == int(metadata['id_zh'])).one().zh_uuid
+    uuid_attached_row = uuid.uuid4()
     if uploaded_resp['extension'] == '.pdf':
         id_nomenclature_media_type = DB.session.query(TNomenclatures).filter(
             TNomenclatures.mnemonique == 'PDF').one().id_nomenclature
@@ -541,6 +542,7 @@ def post_file_info(metadata, uploaded_resp):
         unique_id_media=unique_id_media,
         id_nomenclature_media_type=id_nomenclature_media_type,
         id_table_location=id_table_location,
+        uuid_attached_row=uuid_attached_row,
         title_fr=metadata['title'],
         media_path=uploaded_resp['media_path'],
         author=metadata['author'],
@@ -550,3 +552,5 @@ def post_file_info(metadata, uploaded_resp):
         meta_update_date=str(post_date)
     ))
     DB.session.flush()
+    id_media = DB.session.query(TMedias).filter(TMedias.uuid_attached_row == uuid_attached_row).one().id_media
+    return id_media
