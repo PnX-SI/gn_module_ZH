@@ -525,16 +525,18 @@ def post_actions(id_zh, actions):
 # tab 8
 
 
-def post_file_info(metadata, uploaded_resp):
+def post_file_info(id_zh, title, author, description, media_path, extension):
     unique_id_media = DB.session.query(TZH).filter(
-        TZH.id_zh == int(metadata['id_zh'])).one().zh_uuid
+        TZH.id_zh == int(id_zh)).one().zh_uuid
     uuid_attached_row = uuid.uuid4()
-    if uploaded_resp['extension'] == '.pdf':
-        id_nomenclature_media_type = DB.session.query(TNomenclatures).filter(
-            TNomenclatures.mnemonique == 'PDF').one().id_nomenclature
+    if extension == '.pdf':
+        mnemo = 'PDF'
+    elif extension == '.csv':
+        mnemo = 'Tableur'
     else:
-        id_nomenclature_media_type = DB.session.query(TNomenclatures).filter(
-            TNomenclatures.mnemonique == 'Photo').one().id_nomenclature
+        mnemo = 'Photo'
+    id_nomenclature_media_type = DB.session.query(TNomenclatures).filter(
+        TNomenclatures.mnemonique == mnemo).one().id_nomenclature
     id_table_location = DB.session.query(BibTablesLocation).filter(and_(
         BibTablesLocation.schema_name == 'pr_zh', BibTablesLocation.table_name == 't_zh')).one().id_table_location
     post_date = datetime.datetime.now()
@@ -543,14 +545,15 @@ def post_file_info(metadata, uploaded_resp):
         id_nomenclature_media_type=id_nomenclature_media_type,
         id_table_location=id_table_location,
         uuid_attached_row=uuid_attached_row,
-        title_fr=metadata['title'],
-        media_path=uploaded_resp['media_path'],
-        author=metadata['author'],
-        description_fr=metadata['summary'],
+        title_fr=title,
+        media_path=media_path,
+        author=author,
+        description_fr=description,
         is_public=True,
         meta_create_date=str(post_date),
         meta_update_date=str(post_date)
     ))
     DB.session.flush()
-    id_media = DB.session.query(TMedias).filter(TMedias.uuid_attached_row == uuid_attached_row).one().id_media
+    id_media = DB.session.query(TMedias).filter(
+        TMedias.uuid_attached_row == uuid_attached_row).one().id_media
     return id_media

@@ -356,16 +356,20 @@ def get_file_list(id_zh, info_role):
 
 
 @ blueprint.route("files/<int:id_media>", methods=["DELETE"])
-# @ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
-def delete_file(id_media):
+@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
+def delete_file(id_media, info_role):
     """delete file by id_media in TMedias and static directory
     """
     try:
         media_path = DB.session.query(TMedias).filter(
             TMedias.id_media == id_media).one().media_path
         base_path = os.path.expanduser('~')
-        full_path = os.path.join(base_path, 'geonature', media_path)
-        os.remove(full_path)
+        full_path = os.path.join(base_path, 'geonature/external_modules',
+                                 blueprint.config['MODULE_CODE'].lower(), media_path)
+        try:
+            os.remove(full_path)
+        except:
+            pass
         DB.session.query(TMedias).filter(TMedias.id_media == id_media).delete()
         DB.session.commit()
     except Exception as e:
@@ -524,7 +528,12 @@ def get_tab_data(id_tab, info_role):
 
             # save in db
             id_media = post_file_info(
-                request.form.to_dict(), uploaded_resp)
+                request.form.to_dict['id_zh'],
+                request.form.to_dict['title'],
+                request.form.to_dict['author'],
+                request.form.to_dict['description'],
+                uploaded_resp['media_path'],
+                uploaded_resp['extension'])
             DB.session.commit()
 
             return {
@@ -576,13 +585,14 @@ def deleteOneZh(id_zh, info_role):
         q_medias = DB.session.query(TMedias).filter(
             TMedias.unique_id_media == zh_uuid).all()
         for media in q_medias:
-            delete_file(media.id_media)
+            delete_file(media.id_media, info_role)
 
         zhRepository.delete(id_zh, info_role)
         DB.session.commit()
 
         return {"message": "delete with success"}, 200
     except Exception as e:
+        print(e)
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
             return 'Empty mandatory field', 400
         if e.__class__.__name__ == 'IntegrityError':
@@ -626,6 +636,13 @@ def handle_geonature_zh_api(error):
 def write_csv(id_zh, info_role):
     try:
         names = []
+
+        # author name
+        prenom = DB.session.query(User).filter(
+            User.id_role == info_role.id_role).one().prenom_role
+        nom = DB.session.query(User).filter(
+            User.id_role == info_role.id_role).one().nom_role
+        author = prenom + ' ' + nom
         for i in ['vertebrates_view_name', 'invertebrates_view_name', 'flora_view_name']:
             model = get_view_model(
                 blueprint.config[i]['table_name'],
@@ -659,6 +676,16 @@ def write_csv(id_zh, info_role):
                     writer = csv.DictWriter(f, fieldnames=rows[0].keys())
                     writer.writeheader()
                     writer.writerows(rows)
+
+                post_file_info(
+                    id_zh,
+                    blueprint.config[i]['category'] + "_" +
+                    current_date.strftime("%Y-%m-%d_%H:%M:%S"),
+                    author,
+                    'liste des taxons générée sur demande de l''utilisateur dans l''onglet 5',
+                    media_path,
+                    '.csv')
+                DB.session.commit()
         return {"file_names": names}, 200
     except Exception as e:
         DB.session.rollback()
