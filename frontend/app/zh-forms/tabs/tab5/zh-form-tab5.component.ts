@@ -6,6 +6,7 @@ import { Subscription, Observable } from "rxjs";
 import { debounceTime, distinctUntilChanged, map } from "rxjs/operators";
 import { ZhDataService } from "../../../services/zh-data.service";
 import { TabsService } from "../../../services/tabs.service";
+import { ModalService } from "../../../services/modal.service";
 
 @Component({
   selector: "zh-form-tab5",
@@ -89,6 +90,7 @@ export class ZhFormTab5Component implements OnInit {
     public ngbModal: NgbModal,
     private _toastr: ToastrService,
     private _dataService: ZhDataService,
+    private _modalService: ModalService,
     private _tabService: TabsService
   ) {}
 
@@ -257,11 +259,6 @@ export class ZhFormTab5Component implements OnInit {
         ),
         justification: pat.justification,
       });
-      this.interetPatInput.flat().map((item: any) => {
-        if (item.id_nomenclature == pat.id_function) {
-          item.disabled = true;
-        }
-      });
     });
   }
 
@@ -278,11 +275,6 @@ export class ZhFormTab5Component implements OnInit {
           (item: any) => item.id_nomenclature == valSoc.id_knowledge
         ),
         justification: valSoc.justification,
-      });
-      this.valSocEcoInput.flat().map((item: any) => {
-        if (item.id_nomenclature == valSoc.id_function) {
-          item.disabled = true;
-        }
       });
     });
   }
@@ -301,11 +293,6 @@ export class ZhFormTab5Component implements OnInit {
         ),
         justification: bioFct.justification,
       });
-      this.bioFctInput.flat().map((item: any) => {
-        if (item.id_nomenclature == bioFct.id_function) {
-          item.disabled = true;
-        }
-      });
     });
   }
 
@@ -322,11 +309,6 @@ export class ZhFormTab5Component implements OnInit {
           (item: any) => item.id_nomenclature == hydroFct.id_knowledge
         ),
         justification: hydroFct.justification,
-      });
-      this.fctHydroInput.flat().map((item: any) => {
-        if (item.id_nomenclature == hydroFct.id_function) {
-          item.disabled = true;
-        }
       });
     });
   }
@@ -364,11 +346,12 @@ export class ZhFormTab5Component implements OnInit {
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'une fonction hydrologique / biogéochimique";
     event.stopPropagation();
-    this.ngbModal.open(modal, {
-      centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
-    });
+
+    this._modalService.open(
+      modal,
+      this.fctHydroTable.flat().map((item) => item.function),
+      this.fctHydroInput.flat()
+    );
   }
 
   // add a new hydroFct to hydroFcts array
@@ -384,12 +367,6 @@ export class ZhFormTab5Component implements OnInit {
       if (!itemExist) {
         this.fctHydroTable.push(formValues);
       }
-      // disable the added hydroFct on the select input list
-      this.fctHydroInput.flat().map((item: any) => {
-        if (item.id_nomenclature == formValues.function.id_nomenclature) {
-          item.disabled = true;
-        }
-      });
 
       this.ngbModal.dismissAll();
       this.hydroFctForm.reset();
@@ -403,11 +380,6 @@ export class ZhFormTab5Component implements OnInit {
   onDeleteHydroFct(hydroFct: any) {
     this.fctHydroTable = this.fctHydroTable.filter((item: any) => {
       return item.function.id_nomenclature != hydroFct.function.id_nomenclature;
-    });
-    this.fctHydroInput.flat().map((item: any) => {
-      if (item.id_nomenclature == hydroFct.function.id_nomenclature) {
-        item.disabled = false;
-      }
     });
     this.canChangeTab.emit(false);
   }
@@ -439,22 +411,12 @@ export class ZhFormTab5Component implements OnInit {
       justification: hydroFct.justification,
     });
     this.tempID = hydroFct.function.id_nomenclature;
-    // manger disabled hydroFct input items
-    this.$_hydroFctInputSub = this.hydroFctForm
-      .get("function")
-      .valueChanges.subscribe(() => {
-        this.fctHydroInput.flat().map((item: any) => {
-          if (item.id_nomenclature == hydroFct.function.id_nomenclature) {
-            item.disabled = false;
-          }
-        });
-      });
-
-    this.ngbModal.open(modal, {
-      centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
-    });
+    this._modalService.open(
+      modal,
+      this.fctHydroTable.flat().map((item) => item.function),
+      this.fctHydroInput.flat(),
+      hydroFct.function
+    );
   }
 
   // edit hydroFct and save into hydroFcts array
@@ -467,11 +429,6 @@ export class ZhFormTab5Component implements OnInit {
         item.function.id_nomenclature != this.tempID ? item : formValues
       );
       this.tempID = null;
-      this.fctHydroInput.flat().map((item: any) => {
-        if (item.id_nomenclature == formValues.function.id_nomenclature) {
-          item.disabled = true;
-        }
-      });
       this.ngbModal.dismissAll();
       this.hydroFctForm.reset();
 
@@ -489,11 +446,11 @@ export class ZhFormTab5Component implements OnInit {
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'une fonction biologique / écologique";
     event.stopPropagation();
-    this.ngbModal.open(modal, {
-      centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
-    });
+    this._modalService.open(
+      modal,
+      this.bioFctTable.flat().map((item) => item.function),
+      this.bioFctInput.flat()
+    );
   }
 
   // add a new bioFct to bioFcts array
@@ -509,13 +466,6 @@ export class ZhFormTab5Component implements OnInit {
       if (!itemExist) {
         this.bioFctTable.push(formValues);
       }
-      // disable the added bioFct on the select input list
-      this.bioFctInput.flat().map((item: any) => {
-        if (item.id_nomenclature == formValues.function.id_nomenclature) {
-          item.disabled = true;
-        }
-      });
-
       this.ngbModal.dismissAll();
       this.bioFctForm.reset();
       this.canChangeTab.emit(false);
@@ -528,11 +478,6 @@ export class ZhFormTab5Component implements OnInit {
   onDeleteBioFct(bioFct: any) {
     this.bioFctTable = this.bioFctTable.filter((item: any) => {
       return item.function.id_nomenclature != bioFct.function.id_nomenclature;
-    });
-    this.bioFctInput.flat().map((item: any) => {
-      if (item.id_nomenclature == bioFct.function.id_nomenclature) {
-        item.disabled = false;
-      }
     });
     this.canChangeTab.emit(false);
   }
@@ -564,22 +509,13 @@ export class ZhFormTab5Component implements OnInit {
       justification: bioFct.justification,
     });
     this.tempID = bioFct.function.id_nomenclature;
-    // manger disabled bioFct input items
-    this.$_bioFctInputSub = this.bioFctForm
-      .get("function")
-      .valueChanges.subscribe(() => {
-        this.bioFctInput.flat().map((item: any) => {
-          if (item.id_nomenclature == bioFct.function.id_nomenclature) {
-            item.disabled = false;
-          }
-        });
-      });
 
-    this.ngbModal.open(modal, {
-      centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
-    });
+    this._modalService.open(
+      modal,
+      this.bioFctTable.map((item) => item.function),
+      this.bioFctInput,
+      bioFct.function
+    );
   }
   // edit bioFct and save into bioFcts array
   onPatchBioFct() {
@@ -591,11 +527,6 @@ export class ZhFormTab5Component implements OnInit {
         item.function.id_nomenclature != this.tempID ? item : formValues
       );
       this.tempID = null;
-      this.bioFctInput.flat().map((item: any) => {
-        if (item.id_nomenclature == formValues.function.id_nomenclature) {
-          item.disabled = true;
-        }
-      });
       this.ngbModal.dismissAll();
       this.bioFctForm.reset();
 
@@ -613,11 +544,11 @@ export class ZhFormTab5Component implements OnInit {
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'un intérêt patrimonal";
     event.stopPropagation();
-    this.ngbModal.open(modal, {
-      centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
-    });
+    this._modalService.open(
+      modal,
+      this.interetPatTable.flat().map((item) => item.function),
+      this.interetPatInput.flat()
+    );
   }
 
   // add a new bioFct to bioFcts array
@@ -633,12 +564,6 @@ export class ZhFormTab5Component implements OnInit {
       if (!itemExist) {
         this.interetPatTable.push(formValues);
       }
-      // disable the added interetPat on the select input list
-      this.interetPatInput.flat().map((item: any) => {
-        if (item.id_nomenclature == formValues.function.id_nomenclature) {
-          item.disabled = true;
-        }
-      });
 
       this.ngbModal.dismissAll();
       this.interetPatForm.reset();
@@ -655,11 +580,7 @@ export class ZhFormTab5Component implements OnInit {
         item.function.id_nomenclature != interetPat.function.id_nomenclature
       );
     });
-    this.interetPatInput.flat().map((item: any) => {
-      if (item.id_nomenclature == interetPat.function.id_nomenclature) {
-        item.disabled = false;
-      }
-    });
+
     this.canChangeTab.emit(false);
   }
 
@@ -692,22 +613,13 @@ export class ZhFormTab5Component implements OnInit {
       justification: interetPat.justification,
     });
     this.tempID = interetPat.function.id_nomenclature;
-    // manger disabled interetPat input items
-    this.$_interetPatInputSub = this.interetPatForm
-      .get("function")
-      .valueChanges.subscribe(() => {
-        this.interetPatInput.flat().map((item: any) => {
-          if (item.id_nomenclature == interetPat.function.id_nomenclature) {
-            item.disabled = false;
-          }
-        });
-      });
 
-    this.ngbModal.open(modal, {
-      centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
-    });
+    this._modalService.open(
+      modal,
+      this.interetPatTable.flat().map((item) => item.function),
+      this.interetPatInput.flat(),
+      interetPat.function
+    );
   }
   // edit interetPat and save into interetPats array
   onPatchInteretPat() {
@@ -719,11 +631,6 @@ export class ZhFormTab5Component implements OnInit {
         item.function.id_nomenclature != this.tempID ? item : formValues
       );
       this.tempID = null;
-      this.interetPatInput.flat().map((item: any) => {
-        if (item.id_nomenclature == formValues.function.id_nomenclature) {
-          item.disabled = true;
-        }
-      });
       this.ngbModal.dismissAll();
       this.interetPatForm.reset();
 
@@ -740,11 +647,11 @@ export class ZhFormTab5Component implements OnInit {
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'une valeur socio-économique";
     event.stopPropagation();
-    this.ngbModal.open(modal, {
-      centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
-    });
+    this._modalService.open(
+      modal,
+      this.valSocEcoTable.flat().map((item) => item.function),
+      this.valSocEcoInput.flat()
+    );
   }
 
   // add a new valSocEco to valSocEco array
@@ -760,12 +667,6 @@ export class ZhFormTab5Component implements OnInit {
       if (!itemExist) {
         this.valSocEcoTable.push(formValues);
       }
-      // disable the added valSocEco on the select input list
-      this.valSocEcoInput.flat().map((item: any) => {
-        if (item.id_nomenclature == formValues.function.id_nomenclature) {
-          item.disabled = true;
-        }
-      });
 
       this.ngbModal.dismissAll();
       this.valSocEcoForm.reset();
@@ -781,11 +682,6 @@ export class ZhFormTab5Component implements OnInit {
       return (
         item.function.id_nomenclature != valSocEco.function.id_nomenclature
       );
-    });
-    this.valSocEcoInput.flat().map((item: any) => {
-      if (item.id_nomenclature == valSocEco.function.id_nomenclature) {
-        item.disabled = false;
-      }
     });
     this.canChangeTab.emit(false);
   }
@@ -819,21 +715,13 @@ export class ZhFormTab5Component implements OnInit {
     });
     this.tempID = valSocEco.function.id_nomenclature;
     // manger disabled valSocEco input items
-    this.$_valSocEcoInputSub = this.valSocEcoForm
-      .get("function")
-      .valueChanges.subscribe(() => {
-        this.valSocEcoInput.flat().map((item: any) => {
-          if (item.id_nomenclature == valSocEco.function.id_nomenclature) {
-            item.disabled = false;
-          }
-        });
-      });
 
-    this.ngbModal.open(modal, {
-      centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
-    });
+    this._modalService.open(
+      modal,
+      this.valSocEcoTable.flat().map((item) => item.function),
+      this.valSocEcoInput.flat(),
+      valSocEco.function
+    );
   }
   // edit valSocEco and save into valSocEcos array
   onPatchValSocEco() {
@@ -845,11 +733,6 @@ export class ZhFormTab5Component implements OnInit {
         item.function.id_nomenclature != this.tempID ? item : formValues
       );
       this.tempID = null;
-      this.valSocEcoInput.flat().map((item: any) => {
-        if (item.id_nomenclature == formValues.function.id_nomenclature) {
-          item.disabled = true;
-        }
-      });
       this.ngbModal.dismissAll();
       this.valSocEcoForm.reset();
 
