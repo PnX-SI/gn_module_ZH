@@ -110,13 +110,6 @@ export class ZhFormTab4Component implements OnInit {
   getMetaData() {
     this.inflowInput = [...this.formMetaData["ENTREE_EAU"]];
     this.outflowInput = [...this.formMetaData["SORTIE_EAU"]];
-    // add disabled property to inflowInput options list
-    this.inflowInput.map((item: any) => {
-      item.disabled = false;
-    });
-    this.outflowInput.map((item: any) => {
-      item.disabled = false;
-    });
     this.connexionTypes = [...this.formMetaData["TYPE_CONNEXION"]];
     this.connexionTypes.map((item: any) => {
       item.image = this.corConnectionType[item.mnemonique];
