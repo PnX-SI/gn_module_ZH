@@ -339,21 +339,6 @@ export class ZhFormTab3Component implements OnInit {
       this.activitiesInput,
       activity.human_activity
     );
-    // this.$_humanActivitySub = this.activityForm
-    //   .get("human_activity")
-    //   .valueChanges.subscribe(() => {
-    //     this.activitiesInput.map((item) => {
-    //       if (item.id_nomenclature == activity.human_activity.id_nomenclature) {
-    //         item.disabled = false;
-    //       }
-    //     });
-    //   });
-
-    // const modalRef = this.ngbModal.open(modal, {
-    //   centered: true,
-    //   size: "lg",
-    //   windowClass: "bib-modal",
-    // });
   }
 
   onPatchActivity() {
