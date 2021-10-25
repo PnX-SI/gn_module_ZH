@@ -11,6 +11,13 @@ from sqlalchemy.sql.expression import delete
 
 from geonature.utils.env import DB
 
+from geonature.core.ref_geo.models import BibAreasTypes
+
+from geonature.core.gn_commons.models import (
+    BibTablesLocation,
+    TMedias
+)
+
 from .model.zh_schema import *
 from .model.code import Code
 
@@ -59,9 +66,26 @@ def create_zh(form_data, info_role, zh_date, polygon):
     DB.session.flush()
 
     # fill cor_zh_area for municipalities
-    post_cor_zh_area(polygon, new_zh.id_zh, 25)
+    post_cor_zh_area(polygon, new_zh.id_zh, DB.session.query(
+        BibAreasTypes).filter(BibAreasTypes.type_code == 'COM').one().id_type)
     # fill cor_zh_area for departements
-    post_cor_zh_area(polygon, new_zh.id_zh, 26)
+    post_cor_zh_area(polygon, new_zh.id_zh, DB.session.query(
+        BibAreasTypes).filter(BibAreasTypes.type_code == 'DEP').one().id_type)
+    # fill cor_zh_area for ZNIEFF2
+    post_cor_zh_area(polygon, new_zh.id_zh, DB.session.query(
+        BibAreasTypes).filter(BibAreasTypes.type_code == 'ZNIEFF2').one().id_type)
+    # fill cor_zh_area for ZNIEFF1
+    post_cor_zh_area(polygon, new_zh.id_zh, DB.session.query(
+        BibAreasTypes).filter(BibAreasTypes.type_code == 'ZNIEFF1').one().id_type)
+    # fill cor_zh_area for Natura 2000 - Zones de protection spéciales
+    post_cor_zh_area(polygon, new_zh.id_zh, DB.session.query(
+        BibAreasTypes).filter(BibAreasTypes.type_code == 'ZPS').one().id_type)
+    # fill cor_zh_area for Natura 2000 - Sites d'importance communautaire
+    post_cor_zh_area(polygon, new_zh.id_zh, DB.session.query(
+        BibAreasTypes).filter(BibAreasTypes.type_code == 'SIC').one().id_type)
+    # fill cor_zh_area for Sites Ramsar
+    post_cor_zh_area(polygon, new_zh.id_zh, DB.session.query(
+        BibAreasTypes).filter(BibAreasTypes.type_code == 'SRAM').one().id_type)
     # fill cor_zh_rb
     post_cor_zh_rb(form_data['geom']['geometry'], new_zh.id_zh)
     # fill cor_zh_hydro
@@ -164,8 +188,20 @@ def check_polygon(polygon, id_zh):
 def update_cor_zh_area(polygon, id_zh):
     DB.session.query(CorZhArea).filter(
         CorZhArea.id_zh == id_zh).delete()
-    post_cor_zh_area(polygon, id_zh, 25)
-    post_cor_zh_area(polygon, id_zh, 26)
+    post_cor_zh_area(polygon, id_zh, DB.session.query(BibAreasTypes).filter(
+        BibAreasTypes.type_code == 'COM').one().id_type)
+    post_cor_zh_area(polygon, id_zh, DB.session.query(BibAreasTypes).filter(
+        BibAreasTypes.type_code == 'DEP').one().id_type)
+    post_cor_zh_area(polygon, id_zh, DB.session.query(BibAreasTypes).filter(
+        BibAreasTypes.type_code == 'ZNIEFF1').one().id_type)
+    post_cor_zh_area(polygon, id_zh, DB.session.query(BibAreasTypes).filter(
+        BibAreasTypes.type_code == 'ZNIEFF2').one().id_type)
+    post_cor_zh_area(polygon, id_zh, DB.session.query(BibAreasTypes).filter(
+        BibAreasTypes.type_code == 'SRAM').one().id_type)
+    post_cor_zh_area(polygon, id_zh, DB.session.query(BibAreasTypes).filter(
+        BibAreasTypes.type_code == 'ZSP').one().id_type)
+    post_cor_zh_area(polygon, id_zh, DB.session.query(BibAreasTypes).filter(
+        BibAreasTypes.type_code == 'SIC').one().id_type)
 
 
 def update_cor_zh_rb(geom, id_zh):
