@@ -38,10 +38,6 @@ export class ZhFormTab5Component implements OnInit {
   public interetPatTable: any[] = [];
   public valSocEcoTable: any[] = [];
   public corineBioTable: any[] = [];
-  private $_hydroFctInputSub: Subscription;
-  private $_interetPatInputSub: Subscription;
-  private $_bioFctInputSub: Subscription;
-  private $_valSocEcoInputSub: Subscription;
 
   public hydroFctTableCol = [
     { name: "function", label: "Fonctions hydrologiques / biogéochimiques" },
@@ -349,7 +345,7 @@ export class ZhFormTab5Component implements OnInit {
 
     this._modalService.open(
       modal,
-      this.fctHydroTable.flat().map((item) => item.function),
+      this.fctHydroTable.map((item) => item.function),
       this.fctHydroInput.flat()
     );
   }
@@ -413,7 +409,7 @@ export class ZhFormTab5Component implements OnInit {
     this.tempID = hydroFct.function.id_nomenclature;
     this._modalService.open(
       modal,
-      this.fctHydroTable.flat().map((item) => item.function),
+      this.fctHydroTable.map((item) => item.function),
       this.fctHydroInput.flat(),
       hydroFct.function
     );
@@ -432,7 +428,6 @@ export class ZhFormTab5Component implements OnInit {
       this.ngbModal.dismissAll();
       this.hydroFctForm.reset();
 
-      this.$_hydroFctInputSub.unsubscribe();
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
       this.sortFunction(this.fctHydroTable);
@@ -448,7 +443,7 @@ export class ZhFormTab5Component implements OnInit {
     event.stopPropagation();
     this._modalService.open(
       modal,
-      this.bioFctTable.flat().map((item) => item.function),
+      this.bioFctTable.map((item) => item.function),
       this.bioFctInput.flat()
     );
   }
@@ -513,7 +508,7 @@ export class ZhFormTab5Component implements OnInit {
     this._modalService.open(
       modal,
       this.bioFctTable.map((item) => item.function),
-      this.bioFctInput,
+      this.bioFctInput.flat(),
       bioFct.function
     );
   }
@@ -530,7 +525,6 @@ export class ZhFormTab5Component implements OnInit {
       this.ngbModal.dismissAll();
       this.bioFctForm.reset();
 
-      this.$_bioFctInputSub.unsubscribe();
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
       this.sortFunction(this.bioFctTable);
@@ -546,7 +540,7 @@ export class ZhFormTab5Component implements OnInit {
     event.stopPropagation();
     this._modalService.open(
       modal,
-      this.interetPatTable.flat().map((item) => item.function),
+      this.interetPatTable.map((item) => item.function),
       this.interetPatInput.flat()
     );
   }
@@ -616,7 +610,7 @@ export class ZhFormTab5Component implements OnInit {
 
     this._modalService.open(
       modal,
-      this.interetPatTable.flat().map((item) => item.function),
+      this.interetPatTable.map((item) => item.function),
       this.interetPatInput.flat(),
       interetPat.function
     );
@@ -634,7 +628,6 @@ export class ZhFormTab5Component implements OnInit {
       this.ngbModal.dismissAll();
       this.interetPatForm.reset();
 
-      this.$_interetPatInputSub.unsubscribe();
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
       this.sortFunction(this.interetPatTable);
@@ -649,7 +642,7 @@ export class ZhFormTab5Component implements OnInit {
     event.stopPropagation();
     this._modalService.open(
       modal,
-      this.valSocEcoTable.flat().map((item) => item.function),
+      this.valSocEcoTable.map((item) => item.function),
       this.valSocEcoInput.flat()
     );
   }
@@ -718,7 +711,7 @@ export class ZhFormTab5Component implements OnInit {
 
     this._modalService.open(
       modal,
-      this.valSocEcoTable.flat().map((item) => item.function),
+      this.valSocEcoTable.map((item) => item.function),
       this.valSocEcoInput.flat(),
       valSocEco.function
     );
@@ -736,7 +729,6 @@ export class ZhFormTab5Component implements OnInit {
       this.ngbModal.dismissAll();
       this.valSocEcoForm.reset();
 
-      this.$_valSocEcoInputSub.unsubscribe();
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
       this.sortFunction(this.valSocEcoTable);
