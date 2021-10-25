@@ -17,7 +17,7 @@ export class ModalService {
     if (currentItem != null) {
       this._enableOneItem(currentItem, allItems);
     }
-    const modalRef = this.ngbModal.open(modal, {
+    this.ngbModal.open(modal, {
       centered: true,
       size: "lg",
       windowClass: "bib-modal",
@@ -37,6 +37,8 @@ export class ModalService {
     allItems.forEach((item) => {
       if (ids.includes(item.id_nomenclature)) {
         item.disabled = true;
+      } else {
+        item.disabled = false;
       }
     });
   }
