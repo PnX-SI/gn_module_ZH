@@ -1,4 +1,4 @@
-export interface ZhFile {
+export type ZhFile = {
   id_media: number;
   id_nomenclature_media_type: number;
   id_table_location: number;
@@ -20,4 +20,4 @@ export interface ZhFile {
   is_public: boolean;
   meta_create_date: Date;
   meta_update_date: Date;
-}
+};
