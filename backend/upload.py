@@ -6,6 +6,8 @@ from pathlib import Path
 
 import os
 
+from geonature.utils.env import ROOT_DIR
+
 
 def upload(request, extensions, pdf_size, jpg_size, upload_path, module_name):
     try:
@@ -28,11 +30,9 @@ def upload(request, extensions, pdf_size, jpg_size, upload_path, module_name):
         if len(filename) > 100:
             return {"error": "FILE_NAME_TOO_LONG"}
 
-        base_path = os.path.expanduser('~')
-        media_path = os.path.join(
+        media_path = Path(
             'external_modules', module_name, upload_path, filename)
-        full_path = os.path.join(
-            base_path, 'geonature', media_path)
+        full_path = ROOT_DIR / media_path
 
         # check user file extension (changer)
         extension = Path(full_path).suffix.lower()
@@ -57,8 +57,8 @@ def upload(request, extensions, pdf_size, jpg_size, upload_path, module_name):
 
         return {
             "file_name": filename,
-            "full_path": full_path,
-            "media_path": media_path,
+            "full_path": str(full_path),
+            "media_path": str(media_path),
             "extension": extension,
         }
     except Exception:

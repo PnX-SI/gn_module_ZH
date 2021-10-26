@@ -528,10 +528,10 @@ def get_tab_data(id_tab, info_role):
 
             # save in db
             id_media = post_file_info(
-                request.form.to_dict['id_zh'],
-                request.form.to_dict['title'],
-                request.form.to_dict['author'],
-                request.form.to_dict['description'],
+                request.form.to_dict()['id_zh'],
+                request.form.to_dict()['title'],
+                request.form.to_dict()['author'],
+                request.form.to_dict()['summary'],
                 uploaded_resp['media_path'],
                 uploaded_resp['extension'])
             DB.session.commit()
