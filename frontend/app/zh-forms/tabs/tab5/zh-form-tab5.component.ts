@@ -95,7 +95,7 @@ export class ZhFormTab5Component implements OnInit {
     this.initForms();
     this.getCurrentZh();
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
-      this.$_fromChangeSub.unsubscribe();
+      if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
       this.$_currentZhSub.unsubscribe();
       if (tabPosition == 5) {
         this.getCurrentZh();
