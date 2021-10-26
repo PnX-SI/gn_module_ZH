@@ -52,7 +52,6 @@ export class ZhFormTab3Component implements OnInit {
   activitiesInput: any = [];
   submitted: boolean;
   formImpactSubmitted: boolean;
-  $_humanActivitySub: Subscription;
 
   constructor(
     private fb: FormBuilder,
@@ -335,7 +334,7 @@ export class ZhFormTab3Component implements OnInit {
     });
     this._modalService.open(
       modal,
-      this.listActivity,
+      this.listActivity.map((item) => item.human_activity),
       this.activitiesInput,
       activity.human_activity
     );
@@ -363,7 +362,6 @@ export class ZhFormTab3Component implements OnInit {
       });
       this.ngbModal.dismissAll();
       this.resetActivityForm();
-      this.$_humanActivitySub.unsubscribe();
       this.canChangeTab.emit(false);
       this.formImpactSubmitted = false;
     }
