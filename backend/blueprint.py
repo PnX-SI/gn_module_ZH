@@ -663,8 +663,7 @@ def write_csv(id_zh, info_role):
                 media_path = Path('external_modules',
                                   MODULE_NAME, FILE_PATH, name_file)
                 full_name = ROOT_DIR / media_path
-                names.append(full_name)
-
+                names.append(str(full_name))
                 with open(full_name, 'w', encoding='UTF8', newline='') as f:
                     writer = csv.DictWriter(f, fieldnames=rows[0].keys())
                     writer.writeheader()
@@ -676,7 +675,7 @@ def write_csv(id_zh, info_role):
                     current_date.strftime("%Y-%m-%d_%H:%M:%S"),
                     author,
                     'liste des taxons générée sur demande de l''utilisateur dans l''onglet 5',
-                    media_path,
+                    str(media_path),
                     '.csv')
                 DB.session.commit()
         return {"file_names": names}, 200
