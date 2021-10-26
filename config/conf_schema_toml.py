@@ -48,6 +48,38 @@ eval_mnemonique = [
 ]
 
 
+vertebrates_view_name = {
+    "schema_name": "pr_zh",
+    "table_name": "vertebrates",
+    "category": "vertebrates"
+}
+
+
+invertebrates_view_name = {
+    "schema_name": "pr_zh",
+    "table_name": "invertebrates",
+    "category": "invertebrates"
+}
+
+
+flora_view_name = {
+    "schema_name": "pr_zh",
+    "table_name": "flora",
+    "category": "flora"
+}
+
+
+allowed_extensions = ['.pdf', '.jpg']
+
+max_pdf_size = 1.5  # Mo
+
+max_jpg_size = 0.5  # Mo
+
+file_path = "static"
+
+module_dir_name = 'gn_module_zones_humides'
+
+
 class GnModuleSchemaConf(Schema):
     default_maplist_columns = fields.List(
         fields.Dict(), missing=default_map_list_conf)
@@ -55,3 +87,11 @@ class GnModuleSchemaConf(Schema):
         fields.Dict(), missing=available_maplist_column
     )
     nomenclatures = fields.List(fields.String, missing=nomenclatures)
+    vertebrates_view_name = fields.Dict(missing=vertebrates_view_name)
+    invertebrates_view_name = fields.Dict(missing=invertebrates_view_name)
+    flora_view_name = fields.Dict(missing=flora_view_name)
+    allowed_extensions = fields.List(fields.String, missing=allowed_extensions)
+    max_pdf_size = fields.Float(missing=max_pdf_size)
+    max_jpg_size = fields.Float(missing=max_jpg_size)
+    file_path = fields.String(missing=file_path)
+    module_dir_name = fields.String(missing=module_dir_name)
