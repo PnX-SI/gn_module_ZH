@@ -8,6 +8,8 @@ import os
 
 from geonature.utils.env import ROOT_DIR
 
+from .utils import get_file_path
+
 
 def upload(request, extensions, pdf_size, jpg_size, upload_path, module_name):
     try:

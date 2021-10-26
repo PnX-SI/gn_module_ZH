@@ -71,6 +71,8 @@ from .geometry import set_geom
 
 from .upload import upload
 
+from .utils import get_file_path
+
 from .model.repositories import (
     ZhRepository
 )
@@ -361,20 +363,15 @@ def delete_file(id_media, info_role):
     """delete file by id_media in TMedias and static directory
     """
     try:
-        media_path = DB.session.query(TMedias).filter(
-            TMedias.id_media == id_media).one().media_path
-        base_path = os.path.expanduser('~')
-        full_path = os.path.join(base_path, 'geonature/external_modules',
-                                 blueprint.config['MODULE_CODE'].lower(), media_path)
         try:
-            os.remove(full_path)
+            os.remove(get_file_path(id_media))
         except:
             pass
         DB.session.query(TMedias).filter(TMedias.id_media == id_media).delete()
         DB.session.commit()
     except Exception as e:
         DB.session.rollback()
-        raise ZHApiError(message="no_row", details=str(e))
+        raise ZHApiError(message=str(e), details=str(e))
     finally:
         DB.session.close()
 
@@ -385,11 +382,7 @@ def download_file(id_media, info_role):
     """download file by id_media in static directory
     """
     try:
-        media_path = DB.session.query(TMedias).filter(
-            TMedias.id_media == id_media).one().media_path
-        root_path = os.path.expanduser('~')
-        full_path = os.path.join(root_path, 'geonature', media_path)
-        return send_file(full_path, as_attachment=True)
+        return send_file(get_file_path(id_media), as_attachment=True)
     except Exception as e:
         DB.session.rollback()
         raise ZHApiError(message=str(e), details=str(e))
