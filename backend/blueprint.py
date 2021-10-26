@@ -38,7 +38,7 @@ from pypn_habref_api.models import (
 from geonature.core.ref_geo.models import LAreas, BibAreasTypes
 
 from geonature.utils.utilssqlalchemy import json_resp
-from geonature.utils.env import DB
+from geonature.utils.env import DB, ROOT_DIR
 from geonature.core.gn_commons.models import TMedias
 
 # import des fonctions utiles depuis le sous-module d'authentification
@@ -629,7 +629,8 @@ def handle_geonature_zh_api(error):
 def write_csv(id_zh, info_role):
     try:
         names = []
-
+        FILE_PATH = blueprint.config['file_path']
+        MODULE_NAME = blueprint.config['MODULE_CODE'].lower()
         # author name
         prenom = DB.session.query(User).filter(
             User.id_role == info_role.id_role).one().prenom_role
@@ -657,12 +658,11 @@ def write_csv(id_zh, info_role):
                         "Organisme": row.organisme
                     } for row in query
                 ]
-                path_download = blueprint.config['file_path']
                 name_file = blueprint.config[i]['category'] + "_" + \
                     current_date.strftime("%Y-%m-%d_%H:%M:%S") + ".csv"
-                base_path = Path(__file__).absolute().parent.parent
-                media_path = os.path.join(path_download, name_file)
-                full_name = os.path.join(base_path, media_path)
+                media_path = Path('external_modules',
+                                  MODULE_NAME, FILE_PATH, name_file)
+                full_name = ROOT_DIR / media_path
                 names.append(full_name)
 
                 with open(full_name, 'w', encoding='UTF8', newline='') as f:
