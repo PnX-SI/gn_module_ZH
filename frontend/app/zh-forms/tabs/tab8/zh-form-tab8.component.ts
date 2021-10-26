@@ -56,7 +56,6 @@ export class ZhFormTab8Component implements OnInit {
 
   ngOnInit() {
     this.getCurrentZh();
-    this.initForms();
   }
 
   // initialize forms
@@ -77,10 +76,13 @@ export class ZhFormTab8Component implements OnInit {
     });
   }
 
-  async getCurrentZh() {
+  getCurrentZh() {
     this._dataService.currentZh.subscribe((zh: any) => {
-      this.zh = zh;
-      this.getFiles();
+      if (zh) {
+        this.zh = zh;
+        this.initForms();
+        this.getFiles();
+      }
     });
   }
 
@@ -92,6 +94,7 @@ export class ZhFormTab8Component implements OnInit {
         this.files = res;
       })
       .catch((error) => {
+        console.log(error);
         this.displayError(
           `Une erreur est survenue, impossible de récupérer les fichiers : <${error.message}>`
         );
