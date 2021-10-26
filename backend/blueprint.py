@@ -169,7 +169,8 @@ def get_complete_info(id_zh, info_role):
     """Get zh complete info
     """
     try:
-        ref_geo_config = blueprint.config['ref_geo_referentiels']
+        ref_geo_config = [
+            ref for ref in blueprint.config['ref_geo_referentiels'] if ref['active']]
         return Card(id_zh, "full", ref_geo_config).__repr__()
     except Exception as e:
         print(e)
@@ -346,17 +347,23 @@ def get_tab_data(id_tab, info_role):
             if form_data['main_name'] == "":
                 return 'Empty mandatory field', 400
 
+            # select active geo refs in config
+            active_geo_refs = [
+                ref for ref in blueprint.config['ref_geo_referentiels'] if ref['active']]
+
             if 'id_zh' not in form_data.keys():
                 # set geometry from coordinates
                 polygon = set_geom(form_data['geom']['geometry'])
                 # create_zh
-                zh = create_zh(form_data, info_role, zh_date, polygon)
+                zh = create_zh(form_data, info_role, zh_date,
+                               polygon, active_geo_refs)
             else:
                 # edit geometry
                 polygon = set_geom(
                     form_data['geom']['geometry'], form_data['id_zh'])
                 # edit zh
-                zh = update_zh_tab0(form_data, polygon, info_role, zh_date)
+                zh = update_zh_tab0(form_data, polygon,
+                                    info_role, zh_date, active_geo_refs)
 
             DB.session.commit()
 
