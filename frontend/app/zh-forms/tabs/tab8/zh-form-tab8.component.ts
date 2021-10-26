@@ -29,12 +29,22 @@ export class ZhFormTab8Component implements OnInit {
   public loadingUpload: boolean = false;
 
   public modalTitle: string;
+  public patchModal: boolean = false;
   public activeModal: NgbModalRef;
   public addModalBtnLabel: string;
   public posted: boolean;
   public submitted: boolean;
 
   public fileTypeAccepted: string[] = ["application/pdf", "image/*"];
+
+  public docTableCol = [
+    {
+      name: "title_fr",
+      label: "Titre du document",
+    },
+    { name: "author", label: "Auteur" },
+    { name: "description_fr", label: "Résumé" },
+  ];
 
   constructor(
     private fb: FormBuilder,
@@ -44,10 +54,9 @@ export class ZhFormTab8Component implements OnInit {
     private _tabService: TabsService
   ) {}
 
-  async ngOnInit() {
-    await this.getCurrentZh();
+  ngOnInit() {
+    this.getCurrentZh();
     this.initForms();
-    this.getFiles();
   }
 
   // initialize forms
@@ -69,8 +78,9 @@ export class ZhFormTab8Component implements OnInit {
   }
 
   async getCurrentZh() {
-    this._dataService.currentZh.toPromise().then((zh) => {
+    this._dataService.currentZh.subscribe((zh: any) => {
       this.zh = zh;
+      this.getFiles();
     });
   }
 
@@ -78,8 +88,8 @@ export class ZhFormTab8Component implements OnInit {
     this._dataService
       .getZhFiles(this.zh.id)
       .toPromise()
-      .then((res) => {
-        this.activeModal.close();
+      .then((res: ZhFile[]) => {
+        this.files = res;
       })
       .catch((error) => {
         this.displayError(
@@ -90,11 +100,13 @@ export class ZhFormTab8Component implements OnInit {
 
   onAddDoc(event: any, modal: any) {
     this.modalTitle = "Ajout d'un fichier";
+    this.patchModal = false;
     this.onOpenModal(modal);
   }
 
   onEditDoc(event: any, modal: any) {
     this.modalTitle = "Edition d'un fichier";
+    this.patchModal = true;
     this.onOpenModal(modal);
   }
 
@@ -146,6 +158,7 @@ export class ZhFormTab8Component implements OnInit {
       })
       .finally(() => {
         this.loadingUpload = false;
+        this.getFiles();
       });
   }
 
@@ -155,6 +168,4 @@ export class ZhFormTab8Component implements OnInit {
   displayError(error: string) {
     this._toastr.error(error);
   }
-
-  onFormSubmit() {}
 }

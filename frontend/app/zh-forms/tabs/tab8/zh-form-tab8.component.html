@@ -14,7 +14,16 @@
           <mat-icon>add_box</mat-icon>
           Ajouter
         </button>
-        <div *ngIf="docTable && docTable.length > 0" class="table-responsive">
+      </div>
+        <!-- <zh-table
+        [tableCols]="fileTableCol"
+        [data]="data"
+        [deletable]="true"
+        [editable]="true"
+        (onDelete)="onDeleteFile($event)"
+        (onEdit)="onEditFile($event)"
+      ></zh-table> -->
+        <div *ngIf="files && files.length > 0" class="table-responsive">
           <table class="table">
             <thead class="thead-inverse table-header">
               <tr>
@@ -23,7 +32,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let item of docTable">
+              <tr *ngFor="let item of files">
                 <td *ngFor="let col of docTableCol">
                   {{ item[col.name]?.mnemonique || item[col.name] }}
                 </td>
@@ -52,26 +61,13 @@
             </tbody>
           </table>
         </div>
-      </div>
     </fieldset>
 
     <div class="footer-btn">
       <zh-cancelButton
-        *ngIf="currentZh"
-        [zhId]="currentZh.properties.id_zh"
+        *ngIf="zh"
+        [zhId]="zh.properties.id_zh"
       ></zh-cancelButton>
-      <button
-        type="submit"
-        mat-raised-button
-        color="primary"
-        class="ml-3"
-        [disabled]="posted"
-        (click)="onFormSubmit()"
-      >
-        <mat-icon *ngIf="!posted">save_outline</mat-icon>
-        <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
-        Enregister
-      </button>
     </div>
   </form>
 </div>
