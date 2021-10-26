@@ -4,20 +4,32 @@ from flask import (
     session,
     request,
     json,
-    jsonify
+    jsonify,
+    send_file
 )
 
+import csv
+
+from pathlib import Path
+
 import uuid
+
+from pathlib import Path
+
+import os
+from flask.helpers import send_file, send_from_directory
+
+from werkzeug.utils import secure_filename
 
 from sqlalchemy.sql.expression import delete
 
 from geojson import FeatureCollection
 
-from sqlalchemy import func, text, desc, and_
+from sqlalchemy import func, text, desc, and_, inspect
 from sqlalchemy.orm.exc import NoResultFound
 
 import geoalchemy2
-from datetime import datetime, timezone
+from datetime import datetime as dt, timezone
 
 from pypn_habref_api.models import (
     Habref,
@@ -26,8 +38,8 @@ from pypn_habref_api.models import (
 from geonature.core.ref_geo.models import LAreas, BibAreasTypes
 
 from geonature.utils.utilssqlalchemy import json_resp
-from geonature.utils.env import DB
-# from geonature.utils.env import get_id_module
+from geonature.utils.env import DB, ROOT_DIR
+from geonature.core.gn_commons.models import TMedias
 
 # import des fonctions utiles depuis le sous-module d'authentification
 from geonature.core.gn_permissions import decorators as permissions
@@ -56,6 +68,10 @@ from .nomenclatures import (
 from .forms import *
 
 from .geometry import set_geom
+
+from .upload import upload
+
+from .utils import get_file_path
 
 from .model.repositories import (
     ZhRepository
@@ -329,6 +345,51 @@ def patch_reference(info_role):
     return form_data
 
 
+@ blueprint.route("/<int:id_zh>/files", methods=["GET"])
+@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
+@ json_resp
+def get_file_list(id_zh, info_role):
+    """get a list of the zh files contained in static repo
+    """
+    zh_uuid = DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().zh_uuid
+    q_medias = DB.session.query(TMedias).filter(
+        TMedias.unique_id_media == zh_uuid).all()
+    return [media.as_dict() for media in q_medias]
+
+
+@ blueprint.route("files/<int:id_media>", methods=["DELETE"])
+@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
+def delete_file(id_media, info_role):
+    """delete file by id_media in TMedias and static directory
+    """
+    try:
+        try:
+            os.remove(get_file_path(id_media))
+        except:
+            pass
+        DB.session.query(TMedias).filter(TMedias.id_media == id_media).delete()
+        DB.session.commit()
+    except Exception as e:
+        DB.session.rollback()
+        raise ZHApiError(message=str(e), details=str(e))
+    finally:
+        DB.session.close()
+
+
+@ blueprint.route("files/<int:id_media>", methods=["GET"])
+@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
+def download_file(id_media, info_role):
+    """download file by id_media in static directory
+    """
+    try:
+        return send_file(get_file_path(id_media), as_attachment=True)
+    except Exception as e:
+        DB.session.rollback()
+        raise ZHApiError(message=str(e), details=str(e))
+    finally:
+        DB.session.close()
+
+
 @ blueprint.route("/form/<int:id_tab>", methods=["POST", "PATCH"])
 @ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
 @ json_resp
@@ -339,7 +400,7 @@ def get_tab_data(id_tab, info_role):
     try:
         if id_tab == 0:
             # set date
-            zh_date = datetime.now(timezone.utc)
+            zh_date = dt.now(timezone.utc)
             # set name
             if form_data['main_name'] == "":
                 return 'Empty mandatory field', 400
@@ -428,7 +489,55 @@ def get_tab_data(id_tab, info_role):
             DB.session.commit()
             return {"id_zh": form_data['id_zh']}, 200
 
+        if id_tab == 8:
+            # to do :
+            #   add main_picture attribute in pr_zh.t_zh when implemented in frontend (radio ?)
+            try:
+                file_name = secure_filename(request.files["file"].filename)
+                temp = file_name.split(".")
+                extension = temp[len(temp) - 1]
+            except Exception as e:
+                file_name = "Filename_error"
+                extension = "Extension_error"
+                raise
+
+            ALLOWED_EXTENSIONS = blueprint.config['allowed_extensions']
+            MAX_PDF_SIZE = blueprint.config['max_pdf_size']
+            MAX_JPG_SIZE = blueprint.config['max_jpg_size']
+            FILE_PATH = blueprint.config['file_path']
+            MODULE_NAME = blueprint.config['MODULE_CODE'].lower()
+            uploaded_resp = upload(
+                request,
+                ALLOWED_EXTENSIONS,
+                MAX_PDF_SIZE,
+                MAX_JPG_SIZE,
+                FILE_PATH,
+                MODULE_NAME
+            )
+
+            # checks if error in user file or user http request:
+            if "error" in uploaded_resp:
+                return {"id_zh": request.form.to_dict['id_zh'], "errors": uploaded_resp["error"]}, 400
+
+            # save in db
+            id_media = post_file_info(
+                request.form.to_dict()['id_zh'],
+                request.form.to_dict()['title'],
+                request.form.to_dict()['author'],
+                request.form.to_dict()['summary'],
+                uploaded_resp['media_path'],
+                uploaded_resp['extension'])
+            DB.session.commit()
+
+            return {
+                "media_path": uploaded_resp["media_path"],
+                "secured_file_name": uploaded_resp['file_name'],
+                "original_file_name": request.files["file"].filename,
+                "id_media": id_media
+            }, 200
+
     except Exception as e:
+        print(e)
         DB.session.rollback()
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
             return 'Empty mandatory field ?', 400
@@ -450,21 +559,33 @@ def deleteOneZh(id_zh, info_role):
     """
     try:
         zhRepository = ZhRepository(TZH)
+
         # delete references
         DB.session.query(CorZhRef).filter(CorZhRef.id_zh == id_zh).delete()
+
         # delete criteres delim
         id_lim_list = DB.session.query(TZH).filter(
             TZH.id_zh == id_zh).one().id_lim_list
         DB.session.query(CorLimList).filter(
             CorLimList.id_lim_list == id_lim_list).delete()
+
         # delete cor_zh_area
         DB.session.query(CorZhArea).filter(CorZhArea.id_zh == id_zh).delete()
+
+        # delete files in TMedias and repos
+        zh_uuid = DB.session.query(TZH).filter(
+            TZH.id_zh == id_zh).one().zh_uuid
+        q_medias = DB.session.query(TMedias).filter(
+            TMedias.unique_id_media == zh_uuid).all()
+        for media in q_medias:
+            delete_file(media.id_media, info_role)
 
         zhRepository.delete(id_zh, info_role)
         DB.session.commit()
 
         return {"message": "delete with success"}, 200
     except Exception as e:
+        print(e)
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
             return 'Empty mandatory field', 400
         if e.__class__.__name__ == 'IntegrityError':
@@ -502,12 +623,75 @@ def handle_geonature_zh_api(error):
     response.status_code = error.status_code
     return response
 
+
+@blueprint.route("/<int:id_zh>/taxa")
+@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
+def write_csv(id_zh, info_role):
+    try:
+        names = []
+        FILE_PATH = blueprint.config['file_path']
+        MODULE_NAME = blueprint.config['MODULE_CODE'].lower()
+        # author name
+        prenom = DB.session.query(User).filter(
+            User.id_role == info_role.id_role).one().prenom_role
+        nom = DB.session.query(User).filter(
+            User.id_role == info_role.id_role).one().nom_role
+        author = prenom + ' ' + nom
+        for i in ['vertebrates_view_name', 'invertebrates_view_name', 'flora_view_name']:
+            model = get_view_model(
+                blueprint.config[i]['table_name'],
+                blueprint.config[i]['schema_name']
+            )
+            query = DB.session.query(model).filter(model.id_zh == id_zh).all()
+            current_date = dt.now(timezone.utc)
+            if query:
+                rows = [
+                    {
+                        "Groupe d'étude": row.group,
+                        "Nom Scientifique": row.scientific_name,
+                        "Nom vernaculaire": row.vernac_name,
+                        "Réglementation": row.reglementation,
+                        "Article": row.article,
+                        "Nombre d'observations": row.obs_nb,
+                        "Date de la dernière observation": row.last_date,
+                        "Dernier observateur": row.observer,
+                        "Organisme": row.organisme
+                    } for row in query
+                ]
+                name_file = blueprint.config[i]['category'] + "_" + \
+                    current_date.strftime("%Y-%m-%d_%H:%M:%S") + ".csv"
+                media_path = Path('external_modules',
+                                  MODULE_NAME, FILE_PATH, name_file)
+                full_name = ROOT_DIR / media_path
+                names.append(str(full_name))
+                with open(full_name, 'w', encoding='UTF8', newline='') as f:
+                    writer = csv.DictWriter(f, fieldnames=rows[0].keys())
+                    writer.writeheader()
+                    writer.writerows(rows)
+
+                post_file_info(
+                    id_zh,
+                    blueprint.config[i]['category'] + "_" +
+                    current_date.strftime("%Y-%m-%d_%H:%M:%S"),
+                    author,
+                    'liste des taxons générée sur demande de l''utilisateur dans l''onglet 5',
+                    str(media_path),
+                    '.csv')
+                DB.session.commit()
+        return {"file_names": names}, 200
+    except Exception as e:
+        DB.session.rollback()
+        raise ZHApiError(message=str(e), details=str(e))
+    finally:
+        DB.session.close()
+
+
 @blueprint.route('/user/cruved', methods=['GET'])
 @permissions.check_cruved_scope('R', True)
 @json_resp
 def returnUserCruved(info_role):
     # récupérer le CRUVED complet de l'utilisateur courant
-    print (info_role)
+    print(info_role)
     user_cruved = get_or_fetch_user_cruved(
         session=session,
         id_role=info_role.id_role,
