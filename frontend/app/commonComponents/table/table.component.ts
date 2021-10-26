@@ -1,5 +1,6 @@
 import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
 import { Output, EventEmitter } from "@angular/core";
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 
 import { TableColumn } from "./table-interface";
 
@@ -10,23 +11,36 @@ import { TableColumn } from "./table-interface";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TableComponent {
+  constructor(public deleteModal: NgbModal) {}
+
   @Input() tableCols: TableColumn[];
   @Input() data: any;
   @Input() deletable: boolean;
   @Input() editable: boolean;
-  @Output() onDelete = new EventEmitter<string>();
-  @Output() onEdit = new EventEmitter<string>();
+  @Output() onDelete = new EventEmitter<object>();
+  @Output() onEdit = new EventEmitter<object>();
 
   isArray(value) {
     return Array.isArray(value);
   }
 
-  editItem(value: string) {
+  onEditItem(value: object) {
     this.onEdit.emit(value);
   }
 
-  deleteItem(value: string) {
-    // Show a modal first
-    this.onDelete.emit(value);
+  onDeleteItem(modal, value: object) {
+    this.deleteModal
+      .open(modal, {
+        centered: true,
+        size: "lg",
+        windowClass: "bib-modal",
+      })
+      .result.then(
+        () => {
+          //When suppr is clicked
+          this.onDelete.emit(value);
+        },
+        () => {}
+      );
   }
 }
