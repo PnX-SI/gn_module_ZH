@@ -10,6 +10,8 @@ import { fileSizeValidator } from "../../../validators/fileSizeValidator";
 import { fileNameValidator } from "../../../validators/fileNameValidator";
 import { fileFormatValidator } from "../../../validators/fileFormatValidator";
 
+import { ZhFile } from "./zh-form-tab8.models";
+
 @Component({
   selector: "zh-form-tab8",
   templateUrl: "./zh-form-tab8.component.html",
@@ -22,6 +24,7 @@ export class ZhFormTab8Component implements OnInit {
   public zh: any;
   public formTab8: FormGroup;
   public docForm: FormGroup;
+  public files: ZhFile[];
   public fileToUpload: File | null = null;
   public loadingUpload: boolean = false;
 
@@ -30,7 +33,6 @@ export class ZhFormTab8Component implements OnInit {
   public addModalBtnLabel: string;
   public posted: boolean;
   public submitted: boolean;
-  private $_fromChangeSub: any;
 
   public fileTypeAccepted: string[] = ["application/pdf", "image/*"];
 
@@ -42,9 +44,10 @@ export class ZhFormTab8Component implements OnInit {
     private _tabService: TabsService
   ) {}
 
-  ngOnInit() {
-    this.getCurrentZh();
+  async ngOnInit() {
+    await this.getCurrentZh();
     this.initForms();
+    this.getFiles();
   }
 
   // initialize forms
@@ -65,10 +68,24 @@ export class ZhFormTab8Component implements OnInit {
     });
   }
 
-  getCurrentZh() {
-    this._dataService.currentZh.subscribe((zh: any) => {
+  async getCurrentZh() {
+    this._dataService.currentZh.toPromise().then((zh) => {
       this.zh = zh;
     });
+  }
+
+  getFiles() {
+    this._dataService
+      .getZhFiles(this.zh.id)
+      .toPromise()
+      .then((res) => {
+        this.activeModal.close();
+      })
+      .catch((error) => {
+        this.displayError(
+          `Une erreur est survenue, impossible de récupérer les fichiers : <${error.message}>`
+        );
+      });
   }
 
   onAddDoc(event: any, modal: any) {

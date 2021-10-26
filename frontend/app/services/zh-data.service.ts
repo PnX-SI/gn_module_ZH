@@ -93,4 +93,10 @@ export class ZhDataService {
       `${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/complete_card`
     );
   }
+
+  getZhFiles(zhId: number) {
+    return this._api.get(
+      `${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/files`
+    );
+  }
 }
