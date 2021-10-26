@@ -123,11 +123,12 @@ class Info:
 
 class Localisation:
 
-    def __init__(self, id_zh, regions, departments):
+    def __init__(self, id_zh, regions, departments, ref_geo_config):
         self.id_zh = id_zh
         self.regions = regions
         self.departments = departments
         self.municipalities = self.__get_municipalities_info()
+        self.other_ref_geo = self.__get_other_ref_geo(ref_geo_config)
         self.river_basin = self.__get_river_basin()
 
     def __str__(self):
@@ -135,6 +136,7 @@ class Localisation:
             "region": self.regions,
             "departement": self.departments,
             "commune": self.municipalities,
+            "other_ref": self.other_ref_geo,
             "bassin_versant": self.river_basin
         }
 
@@ -154,6 +156,22 @@ class Localisation:
             ).__str__()
             for municipality in CorZhArea.get_municipalities_info(self.id_zh)
         ]
+
+    def __get_other_ref_geo(self, ref_geo_config):
+        id_types = CorZhArea.get_id_types_ref_geo(self.id_zh, ref_geo_config)
+        refs = []
+        for ref in CorZhArea.get_ref_geo_info(self.id_zh, id_types):
+            for i in ref:
+                type_code = DB.session.query(BibAreasTypes).filter(
+                    BibAreasTypes.id_type == i.LAreas.id_type).one().type_code
+                refs.append({
+                    "area_name": i.LAreas.area_name,
+                    "area_code": i.LAreas.area_code,
+                    "url": i.LAreas.source,
+                    "type_code": type_code,
+                    "zh_type_name": [ref['zh_name'] for ref in ref_geo_config if ref['type_code_ref_geo'] == type_code][0]
+                })
+        return refs
 
 
 class Author:
@@ -907,9 +925,10 @@ class Action:
 
 class Card(ZH):
 
-    def __init__(self, id_zh, type):
+    def __init__(self, id_zh, type, ref_geo_config):
         self.id_zh = id_zh
         self.type = type
+        self.ref_geo_config = ref_geo_config
         self.properties = self.get_properties()
         self.eval = self.get_eval()
         self.info = Info()
@@ -961,7 +980,8 @@ class Card(ZH):
         self.info.localisation = Localisation(
             self.id_zh,
             self.properties['geo_info']['regions'],
-            self.properties['geo_info']['departments']
+            self.properties['geo_info']['departments'],
+            self.ref_geo_config
         )
 
     def __set_author(self):

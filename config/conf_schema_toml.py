@@ -48,6 +48,38 @@ eval_mnemonique = [
 ]
 
 
+ref_geo_referentiels = [
+    {
+        "zh_name": "ZNIEFF Terre Type 1",
+        "type_code_ref_geo": "ZNIEFF1",
+        "active": True
+    },
+    {
+        "zh_name": "ZNIEFF Terre Type 2",
+        "type_code_ref_geo": "ZNIEFF2",
+        "active": True
+    },
+    {
+        "zh_name": "RAMSAR",
+        "type_code_ref_geo": "SRAM",
+        "active": True
+    },
+    {
+        "zh_name": "Natura 2000 - Directive Habitat (ZSC)",
+        "type_code_ref_geo": "SIC",
+        "active": True
+    },
+    {
+        "zh_name": "Site de l’observatoire national des zones humides",
+        "type_code_ref_geo": "",
+        "active": False
+    }
+]
+# pour ajouter un référentiel :
+# - créer dans ref_geo.bib_areas_types la ligne correspondante au référentiel si celui n'est pas déjà répertorié
+# - reporter le type_code du référentiel dans "type_code_ref_geo" et mettre "active"=True dans conf_schema_toml.py
+
+
 class GnModuleSchemaConf(Schema):
     default_maplist_columns = fields.List(
         fields.Dict(), missing=default_map_list_conf)
@@ -55,3 +87,6 @@ class GnModuleSchemaConf(Schema):
         fields.Dict(), missing=available_maplist_column
     )
     nomenclatures = fields.List(fields.String, missing=nomenclatures)
+    ref_geo_referentiels = fields.List(
+        fields.Dict(), missing=ref_geo_referentiels
+    )

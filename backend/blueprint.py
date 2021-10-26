@@ -169,8 +169,10 @@ def get_complete_info(id_zh, info_role):
     """Get zh complete info
     """
     try:
-        return Card(id_zh, "full").__repr__()
+        ref_geo_config = blueprint.config['ref_geo_referentiels']
+        return Card(id_zh, "full", ref_geo_config).__repr__()
     except Exception as e:
+        print(e)
         if e.__class__.__name__ == 'NoResultFound':
             raise ZHApiError(message='zh id exist?', details=str(e))
         raise ZHApiError(message=str(e), details=str(e))
@@ -502,12 +504,13 @@ def handle_geonature_zh_api(error):
     response.status_code = error.status_code
     return response
 
+
 @blueprint.route('/user/cruved', methods=['GET'])
 @permissions.check_cruved_scope('R', True)
 @json_resp
 def returnUserCruved(info_role):
     # récupérer le CRUVED complet de l'utilisateur courant
-    print (info_role)
+    print(info_role)
     user_cruved = get_or_fetch_user_cruved(
         session=session,
         id_role=info_role.id_role,
