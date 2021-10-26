@@ -21,14 +21,20 @@ export class TableComponent {
   @Output() onEdit = new EventEmitter<object>();
 
   isArray(value) {
+    // Since Array cannot be called in the template,
+    // do it inside a method
     return Array.isArray(value);
   }
 
   onEditItem(value: object) {
+    // No modal to open, just an event with the object
+    // to emit
     this.onEdit.emit(value);
   }
 
   onDeleteItem(modal, value: object) {
+    // Opens the modal to check if the user really wants
+    // to delete the object
     this.deleteModal
       .open(modal, {
         centered: true,

@@ -1,6 +1,7 @@
 <table class="table mb-4">
   <thead class="thead-inverse table-header">
     <tr>
+      <!-- size can be provided in the columns object -->
       <th *ngFor="let col of tableCols"  [style.width]="col.size" >{{ col.label }}</th>
       <th *ngIf="editable || deletable"></th>
     </tr>
