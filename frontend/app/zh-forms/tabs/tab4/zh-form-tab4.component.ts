@@ -243,7 +243,6 @@ export class ZhFormTab4Component implements OnInit {
   // open the edit inFlow modal
   onEditInflow(modal: any, inflow: any) {
     this.tempId = inflow.inflow.id_nomenclature;
-    console.log("inflowValues avant", inflow);
     this.patchInflow = true;
     this.inflowModalBtnLabel = "Modifier";
     this.inflowModalTitle = "Modifier l'entrée d'eau";
