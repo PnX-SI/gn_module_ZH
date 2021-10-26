@@ -29,7 +29,7 @@ from sqlalchemy import func, text, desc, and_, inspect
 from sqlalchemy.orm.exc import NoResultFound
 
 import geoalchemy2
-from datetime import datetime, timezone
+from datetime import datetime as dt, timezone
 
 from pypn_habref_api.models import (
     Habref,
@@ -407,7 +407,7 @@ def get_tab_data(id_tab, info_role):
     try:
         if id_tab == 0:
             # set date
-            zh_date = datetime.datetime.now()
+            zh_date = dt.now(timezone.utc)
             # set name
             if form_data['main_name'] == "":
                 return 'Empty mandatory field', 400
@@ -649,7 +649,7 @@ def write_csv(id_zh, info_role):
                 blueprint.config[i]['schema_name']
             )
             query = DB.session.query(model).filter(model.id_zh == id_zh).all()
-            current_date = datetime.datetime.now()
+            current_date = dt.now(timezone.utc)
             if query:
                 rows = [
                     {
