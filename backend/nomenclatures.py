@@ -154,6 +154,14 @@ def get_nomenc(config):
             nomenc_info = {**nomenc_info, mnemo: get_urban_docs()}
         elif mnemo == 'PROTECTIONS':
             nomenc_info = {**nomenc_info, mnemo: get_protections()}
+        elif mnemo == 'SDAGE':
+            nomenc_list = [
+                {
+                    "id_nomenclature": nomenc.id_nomenclature,
+                    "mnemonique": nomenc.label_default
+                } for nomenc in Nomenclatures.get_nomenclature_info(mnemo)
+            ]
+            nomenc_info = {**nomenc_info, mnemo: nomenc_list}
         else:
             nomenc_list = [
                 {
