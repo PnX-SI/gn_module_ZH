@@ -308,6 +308,21 @@
           />
         </div>
       </div>
+      <fieldset>
+        <legend>
+          <h5 class="section-title">Liste des espèces à statut de protection</h5>
+        </legend>
+        <button
+          mat-raised-button
+          class="mb-3"
+          color="primary"
+          (click)="onGenerateTaxa()"
+        >
+          <mat-icon>add_box</mat-icon>
+          <mat-spinner *ngIf="taxaLoading" color="warn" diameter="25"></mat-spinner>
+          Générer la liste des espèces
+        </button>
+      </fieldset>
     </fieldset>
 
     <fieldset>

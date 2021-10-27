@@ -83,6 +83,7 @@ export class ZhFormTab5Component implements OnInit {
   private $_fromChangeSub: Subscription;
   public currentZh: any;
   posted: boolean;
+  public taxaLoading: boolean;
 
   constructor(
     private fb: FormBuilder,
@@ -708,6 +709,26 @@ export class ZhFormTab5Component implements OnInit {
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
     }
+  }
+
+  onGenerateTaxa() {
+    this.taxaLoading = true;
+    this._dataService
+      .getTaxa(this.currentZh.id)
+      .toPromise()
+      .then((res) => {
+        const files = res.file_names.map((file) =>
+          file.replace(/^.*[\\\/]/, "")
+        );
+        const msg = `Les fichiers suivants ont été générés ${files.join(", ")}`;
+        this._toastr.success(msg, "", {
+          disableTimeOut: true, // to be sure the user sees the toast
+          closeButton: true,
+        });
+      })
+      .finally(() => {
+        this.taxaLoading = false;
+      });
   }
 
   onAddValSocEco(event: any, modal: any) {
