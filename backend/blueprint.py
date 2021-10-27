@@ -38,6 +38,7 @@ from pypn_habref_api.models import (
 from geonature.core.ref_geo.models import LAreas, BibAreasTypes
 
 from geonature.utils.utilssqlalchemy import json_resp
+from utils_flask_sqla.response import json_resp_accept_empty_list
 from geonature.utils.env import DB, ROOT_DIR
 from geonature.core.gn_commons.models import TMedias
 
@@ -350,7 +351,7 @@ def patch_reference(info_role):
 
 @ blueprint.route("/<int:id_zh>/files", methods=["GET"])
 @ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
-@ json_resp
+@ json_resp_accept_empty_list
 def get_file_list(id_zh, info_role):
     """get a list of the zh files contained in static repo
     """
