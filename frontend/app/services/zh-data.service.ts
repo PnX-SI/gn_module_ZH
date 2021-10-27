@@ -112,4 +112,10 @@ export class ZhDataService {
       { responseType: "blob" }
     );
   }
+
+  getTaxa(zhId: number) {
+    return this._api.get(
+      `${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/taxa`
+    );
+  }
 }
