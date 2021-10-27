@@ -485,5 +485,12 @@ INSERT INTO ref_nomenclatures.defaults_nomenclatures_value VALUES
 ON CONFLICT (mnemonique_type, id_organism) DO NOTHING;
 ;
 
+
+-- add csv in media_types
+INSERT INTO ref_nomenclatures.t_nomenclatures(id_type,cd_nomenclature,mnemonique,label_fr,label_default,source,statut) VALUES    
+    ((select ref_nomenclatures.get_id_nomenclature_type('TYPE_MEDIA')),'csv','Tableur','Tableur','Tableur','ZONES_HUMIDES','non validé')
+ON CONFLICT (id_type, cd_nomenclature) DO NOTHING;
+;
+
     
 COMMIT;
