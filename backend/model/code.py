@@ -37,4 +37,4 @@ class Code(ZH):
         return number+1
 
     def __repr__(self):
-        return f'{self.get_departments()}-{self.get_organism()}-{self.get_number()}'
+        return f'{self.get_departments()}{self.get_organism()}{self.get_number():04d}'

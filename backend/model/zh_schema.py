@@ -352,6 +352,27 @@ class CorZhArea(DB.Model):
         return DB.session.query(CorZhArea, LiMunicipalities, TZH).join(LiMunicipalities, LiMunicipalities.id_area == CorZhArea.id_area).filter(
             CorZhArea.id_zh == id_zh, TZH.id_zh == id_zh).all()
 
+    @staticmethod
+    def get_id_types_ref_geo(id_zh, ref_geo_config):
+        ids = []
+        for ref in ref_geo_config:
+            if ref['active']:
+                ids.append(
+                    DB.session.query(BibAreasTypes).filter(
+                        BibAreasTypes.type_code == ref['type_code_ref_geo']).one().id_type
+                )
+        return ids
+
+    @staticmethod
+    def get_ref_geo_info(id_zh, id_types):
+        return [
+            DB.session.query(CorZhArea, LAreas, TZH)
+            .join(LAreas)
+            .filter(CorZhArea.id_zh == id_zh, LAreas.id_type == id_type, TZH.id_zh == id_zh)
+            .all()
+            for id_type in id_types
+        ]
+
 
 class CorLimList(DB.Model):
     __tablename__ = "cor_lim_list"
