@@ -107,7 +107,7 @@
               docForm.controls.file.errors?.fileNameValidator
             "
             class="error-msg"
-            >Le fichier ne respecte pas le format suivant : &lt;ZHID&gt;_&lt;nombre&gt;. Exemple : 84PNRL125_3<br></small>
+            >Le fichier ne respecte pas le format suivant : &lt;ZHCODE&gt;_&lt;nombre&gt;. Exemple : {{ zh.properties.code }}_3<br></small>
           <small
           *ngIf="
             docForm.controls.file.errors?.fileFormatValidator

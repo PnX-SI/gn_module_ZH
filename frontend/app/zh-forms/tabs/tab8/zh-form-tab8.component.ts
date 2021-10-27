@@ -67,7 +67,7 @@ export class ZhFormTab8Component implements OnInit {
           Validators.required,
           fileFormatValidator(this.fileTypeAccepted),
           fileSizeValidator(500, 1500),
-          fileNameValidator(this.zh.id),
+          fileNameValidator(this.zh.properties.code),
         ]),
       ],
       title: [null, Validators.required],
