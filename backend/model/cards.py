@@ -1,6 +1,9 @@
 from datetime import datetime
 
 from sqlalchemy.sql.expression import true
+from sqlalchemy.sql.sqltypes import BLOB
+from sqlalchemy import text
+#from pypnusershub.db.models import Organisme
 
 from geonature.utils.env import DB
 from geonature.core.ref_geo.models import LAreas
@@ -175,19 +178,22 @@ class Localisation:
 
 class Author:
 
-    def __init__(self, id_zh, create_date, update_date):
+    def __init__(self, id_zh, create_date, update_date, id_organisme):
         self.id_zh = id_zh
         self.create_date = create_date
         self.update_date = update_date
         self.create_author = self.__get_author()
         self.edit_author = self.__get_author(type='coauthors')
+        self.id_organisme = id_organisme
 
     def __str__(self):
         return {
             "auteur": self.create_author,
             "auteur_modif": self.edit_author,
             "date": datetime.strptime(self.create_date, '%Y-%m-%d %H:%M:%S').date().strftime("%d/%m/%Y"),
-            "date_modif": datetime.strptime(self.update_date, '%Y-%m-%d %H:%M:%S.%f').date().strftime("%d/%m/%Y")
+            "date_modif": datetime.strptime(self.update_date, '%Y-%m-%d %H:%M:%S.%f').date().strftime("%d/%m/%Y"),
+            # "organism": DB.session.query(Organisme).filter(Organisme.id_organisme == self.id_organisme).one().nom_organisme
+            "organism": self.__temporary_get_organism(self.id_organisme)
         }
 
     def __get_author(self, type='authors'):
@@ -195,6 +201,16 @@ class Author:
         prenom = getattr(zh, type).prenom_role
         nom = getattr(zh, type).nom_role
         return prenom + ' ' + nom.upper()
+
+    def __temporary_get_organism(self, id_organism):
+        # waiting for update of pypnusershub with Organisme class
+        query = \
+            """
+                SELECT nom_organisme
+                FROM utilisateurs.bib_organismes
+                WHERE id_organisme = {id_organisme}
+            """.format(id_organisme=id_organism)
+        return DB.session.execute(text(query)).fetchone().nom_organisme
 
 
 class Municipalities:
@@ -987,7 +1003,8 @@ class Card(ZH):
         self.info.authors = Author(
             self.id_zh,
             self.properties['create_date'],
-            self.properties['update_date']
+            self.properties['update_date'],
+            self.properties['authors']['id_organisme']
         )
 
     def __set_references(self):
