@@ -18,6 +18,7 @@ from pathlib import Path
 
 import os
 from flask.helpers import send_file, send_from_directory
+from werkzeug import utils
 
 from werkzeug.utils import secure_filename
 
@@ -72,7 +73,7 @@ from .geometry import set_geom
 
 from .upload import upload
 
-from .utils import get_file_path
+from .utils import get_file_path, delete_file
 
 from .model.repositories import (
     ZhRepository
@@ -363,16 +364,11 @@ def get_file_list(id_zh, info_role):
 
 @ blueprint.route("files/<int:id_media>", methods=["DELETE"])
 @ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
-def delete_file(id_media, info_role):
+def delete_one_file(id_media, info_role):
     """delete file by id_media in TMedias and static directory
     """
     try:
-        try:
-            os.remove(get_file_path(id_media))
-        except:
-            pass
-        DB.session.query(TMedias).filter(TMedias.id_media == id_media).delete()
-        DB.session.commit()
+        delete_file(id_media)
     except Exception as e:
         DB.session.rollback()
         raise ZHApiError(message=str(e), details=str(e))
@@ -594,7 +590,7 @@ def deleteOneZh(id_zh, info_role):
         q_medias = DB.session.query(TMedias).filter(
             TMedias.unique_id_media == zh_uuid).all()
         for media in q_medias:
-            delete_file(media.id_media, info_role)
+            delete_file(media.id_media)
 
         zhRepository.delete(id_zh, info_role)
         DB.session.commit()
