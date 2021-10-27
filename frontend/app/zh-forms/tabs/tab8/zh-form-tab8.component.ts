@@ -50,6 +50,8 @@ export class ZhFormTab8Component implements OnInit {
   public corFilesExt = [];
   public imageFiles = {};
 
+  public fileTypeAccepted: string[] = ["application/pdf", "image/*"];
+
   constructor(
     private fb: FormBuilder,
     public ngbModal: NgbModal,
