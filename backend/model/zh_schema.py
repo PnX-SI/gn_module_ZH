@@ -899,10 +899,7 @@ class THabHeritage(DB.Model):
         ForeignKey(TNomenclatures.id_nomenclature),
         default=TNomenclatures.get_default_nomenclature("ETAT_CONSERVATION")
     )
-    hab_cover = DB.Column(
-        DB.Unicode,
-        nullable=False
-    )
+    hab_cover = DB.Column(DB.Integer)
 
 
 class CorUrbanTypeRange(DB.Model):
