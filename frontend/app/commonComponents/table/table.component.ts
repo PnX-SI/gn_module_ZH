@@ -17,8 +17,10 @@ export class TableComponent {
   @Input() data: any;
   @Input() deletable: boolean;
   @Input() editable: boolean;
+  @Input() downloadable: boolean;
   @Output() onDelete = new EventEmitter<object>();
   @Output() onEdit = new EventEmitter<object>();
+  @Output() onDownload = new EventEmitter<object>();
 
   isArray(value) {
     // Since Array cannot be called in the template,
@@ -48,5 +50,9 @@ export class TableComponent {
         },
         () => {}
       );
+  }
+
+  onDownloadItem(value: object) {
+    this.onDownload.emit(value);
   }
 }
