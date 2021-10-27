@@ -65,6 +65,13 @@
             </li>
           </ul>
         </zh-label>
+        <zh-label label="Référentiels géographiques :">
+          <ul>
+            <li class="label-item" *ngFor="let ref of data.localisation?.other_ref">
+              <a href="{{ ref.url }}" target="_blank">{{ ref.area_name }}</a> ({{ ref.area_code }})
+            </li>
+          </ul>
+        </zh-label>
       </fieldset>
     </div>
     <div class="col-12 col-xl-4 col-lg-4 col-md-6">
