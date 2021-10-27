@@ -1,13 +1,23 @@
 import { Component, Input } from "@angular/core";
 import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
+import { Output, EventEmitter } from "@angular/core";
+
 @Component({
   selector: "zh-delete-modal",
   templateUrl: "./delete-modal.component.html",
   styleUrls: ["./delete-modal.component.scss"],
 })
 export class DeleteModalComponent {
-  constructor(public activeModal: NgbActiveModal) {}
+  constructor() {}
 
-  @Input() title: string;
-  @Input() message: string; // name of the thing to delete
+  @Output() onDelete = new EventEmitter<string>();
+  @Output() onCancel = new EventEmitter<string>();
+
+  onDeleteClicked() {
+    this.onDelete.emit();
+  }
+
+  onCancelClicked() {
+    this.onCancel.emit();
+  }
 }
