@@ -4,8 +4,6 @@ from geonature.utils.env import DB
 from .zh_schema import *
 
 
-@serializable
-@geoserializable
 class ZH(TZH):
     __abstract__ = True
 
@@ -132,7 +130,7 @@ class ZH(TZH):
                 for plan in q_management_plans:
                     plans.append({
                         "id_nature": plan.id_nature,
-                        "plan_date": str(plan.plan_date.date()),
+                        "plan_date": plan.plan_date.date().strftime('%d/%m/%Y'),
                         "duration": plan.duration
                     })
             managements.append({
@@ -148,7 +146,7 @@ class ZH(TZH):
             "instruments": [
                 {
                     'id_instrument': instrument.id_instrument,
-                    'instrument_date': str(instrument.instrument_date.date())
+                    'instrument_date': instrument.instrument_date.date().strftime('%d/%m/%Y')
                 } for instrument in ZH.get_data_by_id(TInstruments, self.zh.id_zh)
             ]
         }
