@@ -23,44 +23,48 @@
         (onDelete)="onDeleteFile($event)"
         (onEdit)="onEditFile($event)"
       ></zh-table> -->
-        <div *ngIf="files && files.length > 0" class="table-responsive">
-          <table class="table">
-            <thead class="thead-inverse table-header">
-              <tr>
-                <th *ngFor="let col of docTableCol">{{ col.label }}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of files">
-                <td *ngFor="let col of docTableCol">
-                  {{ item[col.name]?.mnemonique || item[col.name] }}
-                </td>
-                <td>
-                  <div>
-                    <button
-                      mat-icon-button
-                      class="mr-2"
-                      placement="top"
-                      ngbTooltip="Editer"
-                      (click)="onEditStatus(docModal, item)"
-                    >
-                      <mat-icon class="edit-icon">edit</mat-icon>
-                    </button>
-                    <button
-                      mat-icon-button
-                      placement="top"
-                      ngbTooltip="Supprimer"
-                      (click)="onDeleteStatus(item)"
-                    >
-                      <mat-icon class="delete-icon">close</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <ng-container *ngFor="let item of corFilesExt">
+        <collapse [title]="item.name" *ngIf="item.files && item.files.length > 0">
+          <div class="table-responsive mt-2">
+            <table class="table">
+              <thead class="thead-inverse table-header">
+                <tr>
+                  <th *ngFor="let col of docTableCol">{{ col.label }}</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of item.files">
+                  <td *ngFor="let col of docTableCol">
+                    {{ item[col.name]?.mnemonique || item[col.name] }}
+                  </td>
+                  <td>
+                    <div>
+                      <button
+                        mat-icon-button
+                        class="mr-2"
+                        placement="top"
+                        ngbTooltip="Editer"
+                        (click)="onEditStatus(docModal, item)"
+                      >
+                        <mat-icon class="edit-icon">edit</mat-icon>
+                      </button>
+                      <button
+                        mat-icon-button
+                        placement="top"
+                        ngbTooltip="Supprimer"
+                        (click)="onDeleteStatus(item)"
+                      >
+                        <mat-icon class="delete-icon">close</mat-icon>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </collapse>
+      </ng-container>
     </fieldset>
 
     <div class="footer-btn">

@@ -12,6 +12,23 @@ import { fileFormatValidator } from "../../../validators/fileFormatValidator";
 
 import { ZhFile } from "./zh-form-tab8.models";
 
+const EXT_CSV = ["csv"];
+const EXT_PDF = ["pdf"];
+const EXT_IMAGES = [
+  "png",
+  "tif",
+  "tiff",
+  "wbmp",
+  "ico",
+  "jng",
+  "bmp",
+  "svg",
+  "webp",
+  "gif",
+  "jpeg",
+  "jpg",
+];
+
 @Component({
   selector: "zh-form-tab8",
   templateUrl: "./zh-form-tab8.component.html",
@@ -46,6 +63,8 @@ export class ZhFormTab8Component implements OnInit {
     { name: "description_fr", label: "Résumé" },
   ];
 
+  public corFilesExt = [];
+
   constructor(
     private fb: FormBuilder,
     public ngbModal: NgbModal,
@@ -76,6 +95,18 @@ export class ZhFormTab8Component implements OnInit {
     });
   }
 
+  initExtensions() {
+    this.corFilesExt = [
+      { name: "Fichiers pdf", files: this.getFilesByExtensions(EXT_PDF) },
+      { name: "Photos", files: this.getFilesByExtensions(EXT_IMAGES) },
+      { name: "Fichiers CSV", files: this.getFilesByExtensions(EXT_CSV) },
+      {
+        name: "Autres fichiers",
+        files: this.getOtherFiles(EXT_PDF.concat(EXT_IMAGES, EXT_CSV)),
+      },
+    ];
+  }
+
   getCurrentZh() {
     this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
@@ -92,6 +123,7 @@ export class ZhFormTab8Component implements OnInit {
       .toPromise()
       .then((res: ZhFile[]) => {
         this.files = res;
+        this.initExtensions();
       })
       .catch((error) => {
         console.log(error);
@@ -99,6 +131,22 @@ export class ZhFormTab8Component implements OnInit {
           `Une erreur est survenue, impossible de récupérer les fichiers : <${error.message}>`
         );
       });
+  }
+
+  // Enables to filter files from their extension
+  // so that they can be separated in the html
+  getFilesByExtensions(extensions: string[]): ZhFile[] {
+    return this.files.filter((file) =>
+      extensions.includes(file.media_path.split(".").slice(-1)[0])
+    );
+  }
+
+  // Function to gather all the files that do not
+  // respect the extensions provided
+  getOtherFiles(extensions: string[]): ZhFile[] {
+    return this.files.filter(
+      (file) => !extensions.includes(file.media_path.split(".").slice(-1)[0])
+    );
   }
 
   onAddDoc(event: any, modal: any) {
