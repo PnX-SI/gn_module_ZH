@@ -1,5 +1,7 @@
 import uuid
 
+import datetime
+
 from sqlalchemy import (
     func,
     text,
@@ -10,6 +12,13 @@ from sqlalchemy import (
 from sqlalchemy.sql.expression import delete
 
 from geonature.utils.env import DB
+
+from geonature.core.ref_geo.models import BibAreasTypes
+
+from geonature.core.gn_commons.models import (
+    BibTablesLocation,
+    TMedias
+)
 
 from .model.zh_schema import *
 from .model.code import Code
@@ -34,7 +43,7 @@ def update_tzh(data):
 # tab 0
 
 
-def create_zh(form_data, info_role, zh_date, polygon):
+def create_zh(form_data, info_role, zh_date, polygon, ref_geo_referentiels):
 
     uuid_id_lim_list = uuid.uuid4()
     post_cor_lim_list(uuid_id_lim_list, form_data['critere_delim'])
@@ -59,9 +68,16 @@ def create_zh(form_data, info_role, zh_date, polygon):
     DB.session.flush()
 
     # fill cor_zh_area for municipalities
-    post_cor_zh_area(polygon, new_zh.id_zh, 25)
+    post_cor_zh_area(polygon, new_zh.id_zh, DB.session.query(
+        BibAreasTypes).filter(BibAreasTypes.type_code == 'COM').one().id_type)
     # fill cor_zh_area for departements
-    post_cor_zh_area(polygon, new_zh.id_zh, 26)
+    post_cor_zh_area(polygon, new_zh.id_zh, DB.session.query(
+        BibAreasTypes).filter(BibAreasTypes.type_code == 'DEP').one().id_type)
+    # fill cor_zh_area for other geo referentials
+    for ref in ref_geo_referentiels:
+        post_cor_zh_area(polygon, new_zh.id_zh, DB.session.query(
+            BibAreasTypes).filter(BibAreasTypes.type_code == ref['type_code_ref_geo']).one().id_type)
+
     # fill cor_zh_rb
     post_cor_zh_rb(form_data['geom']['geometry'], new_zh.id_zh)
     # fill cor_zh_hydro
@@ -123,7 +139,7 @@ def post_cor_zh_fct_area(geom, id_zh):
         DB.session.flush()
 
 
-def update_zh_tab0(form_data, polygon, info_role, zh_date):
+def update_zh_tab0(form_data, polygon, info_role, zh_date, geo_refs):
     is_geom_new = check_polygon(polygon, form_data['id_zh'])
 
     # update pr_zh.cor_lim_list
@@ -145,7 +161,7 @@ def update_zh_tab0(form_data, polygon, info_role, zh_date):
     DB.session.flush()
 
     if is_geom_new:
-        update_cor_zh_area(polygon, form_data['id_zh'])
+        update_cor_zh_area(polygon, form_data['id_zh'], geo_refs)
         update_cor_zh_rb(form_data['geom']['geometry'], form_data['id_zh'])
         update_cor_zh_hydro(form_data['geom']['geometry'], form_data['id_zh'])
         update_cor_zh_fct_area(
@@ -161,11 +177,17 @@ def check_polygon(polygon, id_zh):
     return False
 
 
-def update_cor_zh_area(polygon, id_zh):
+def update_cor_zh_area(polygon, id_zh, geo_refs):
     DB.session.query(CorZhArea).filter(
         CorZhArea.id_zh == id_zh).delete()
-    post_cor_zh_area(polygon, id_zh, 25)
-    post_cor_zh_area(polygon, id_zh, 26)
+    post_cor_zh_area(polygon, id_zh, DB.session.query(BibAreasTypes).filter(
+        BibAreasTypes.type_code == 'COM').one().id_type)
+    post_cor_zh_area(polygon, id_zh, DB.session.query(BibAreasTypes).filter(
+        BibAreasTypes.type_code == 'DEP').one().id_type)
+    # fill cor_zh_area for other geo referentials
+    for ref in geo_refs:
+        post_cor_zh_area(polygon, id_zh, DB.session.query(
+            BibAreasTypes).filter(BibAreasTypes.type_code == ref['type_code_ref_geo']).one().id_type)
 
 
 def update_cor_zh_rb(geom, id_zh):
@@ -513,3 +535,40 @@ def post_actions(id_zh, actions):
             remark=action['remark']
         ))
         DB.session.flush()
+
+
+# tab 8
+
+
+def post_file_info(id_zh, title, author, description, media_path, extension):
+    unique_id_media = DB.session.query(TZH).filter(
+        TZH.id_zh == int(id_zh)).one().zh_uuid
+    uuid_attached_row = uuid.uuid4()
+    if extension == '.pdf':
+        mnemo = 'PDF'
+    elif extension == '.csv':
+        mnemo = 'Tableur'
+    else:
+        mnemo = 'Photo'
+    id_nomenclature_media_type = DB.session.query(TNomenclatures).filter(
+        TNomenclatures.mnemonique == mnemo).one().id_nomenclature
+    id_table_location = DB.session.query(BibTablesLocation).filter(and_(
+        BibTablesLocation.schema_name == 'pr_zh', BibTablesLocation.table_name == 't_zh')).one().id_table_location
+    post_date = datetime.datetime.now()
+    DB.session.add(TMedias(
+        unique_id_media=unique_id_media,
+        id_nomenclature_media_type=id_nomenclature_media_type,
+        id_table_location=id_table_location,
+        uuid_attached_row=uuid_attached_row,
+        title_fr=title,
+        media_path=media_path,
+        author=author,
+        description_fr=description,
+        is_public=True,
+        meta_create_date=str(post_date),
+        meta_update_date=str(post_date)
+    ))
+    DB.session.flush()
+    id_media = DB.session.query(TMedias).filter(
+        TMedias.uuid_attached_row == uuid_attached_row).one().id_media
+    return id_media

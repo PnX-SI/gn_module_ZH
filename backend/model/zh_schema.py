@@ -1,10 +1,13 @@
-from flask import current_app
+from flask import current_app, Blueprint
 from sqlalchemy import ForeignKey
 # import utiles pour déclarer les classes SQLAlchemy
 from sqlalchemy.sql import select, func, and_, cast
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql.expression import table
 from sqlalchemy.sql.type_api import STRINGTYPE
+from sqlalchemy.ext.declarative import declarative_base
+
 
 from pypnnomenclature.models import (
     TNomenclatures
@@ -35,9 +38,13 @@ from geonature.core.ref_geo.models import (
     LiMunicipalities
 )
 
+from geonature.core.taxonomie.models import Taxref
+
 import pdb
 
 from sqlalchemy.inspection import inspect
+
+blueprint = Blueprint("pr_zh", __name__)
 
 
 class ZhModel(DB.Model):
@@ -115,7 +122,6 @@ class ZhModel(DB.Model):
         return user.id_role == self.id_digitiser or user.id_role in observers
 
 
-@serializable
 class Nomenclatures(TNomenclatures):
 
     __abstract__ = True
@@ -345,6 +351,27 @@ class CorZhArea(DB.Model):
     def get_municipalities_info(id_zh):
         return DB.session.query(CorZhArea, LiMunicipalities, TZH).join(LiMunicipalities, LiMunicipalities.id_area == CorZhArea.id_area).filter(
             CorZhArea.id_zh == id_zh, TZH.id_zh == id_zh).all()
+
+    @staticmethod
+    def get_id_types_ref_geo(id_zh, ref_geo_config):
+        ids = []
+        for ref in ref_geo_config:
+            if ref['active']:
+                ids.append(
+                    DB.session.query(BibAreasTypes).filter(
+                        BibAreasTypes.type_code == ref['type_code_ref_geo']).one().id_type
+                )
+        return ids
+
+    @staticmethod
+    def get_ref_geo_info(id_zh, id_types):
+        return [
+            DB.session.query(CorZhArea, LAreas, TZH)
+            .join(LAreas)
+            .filter(CorZhArea.id_zh == id_zh, LAreas.id_type == id_type, TZH.id_zh == id_zh)
+            .all()
+            for id_type in id_types
+        ]
 
 
 class CorLimList(DB.Model):
@@ -1122,3 +1149,53 @@ class TManagementPlans(DB.Model):
     duration = DB.Column(
         DB.Integer
     )
+
+
+def get_view_model(table_name, schema_name):
+
+    class TaxaView(DB.Model):
+        __tablename__ = table_name
+        __table_args__ = {
+            'extend_existing': True,
+            "schema": schema_name
+        }
+
+        id_zh = DB.Column(
+            DB.Integer,
+            ForeignKey(TZH.id_zh),
+            primary_key=True
+        )
+        cd_nom = DB.Column(
+            DB.Integer,
+            ForeignKey(Taxref.cd_nom),
+            primary_key=True
+        )
+        group = DB.Column(
+            DB.Unicode
+        )
+        scientific_name = DB.Column(
+            DB.Unicode
+        )
+        vernac_name = DB.Column(
+            DB.Unicode
+        )
+        reglementation = DB.Column(
+            DB.Unicode
+        )
+        article = DB.Column(
+            DB.Unicode
+        )
+        obs_nb = DB.Column(
+            DB.Integer
+        )
+        last_date = DB.Column(
+            DB.DateTime
+        )
+        observer = DB.Column(
+            DB.Unicode
+        )
+        organisme = DB.Column(
+            DB.Unicode
+        )
+
+    return TaxaView
