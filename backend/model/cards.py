@@ -1,7 +1,5 @@
 from datetime import datetime
 
-from sqlalchemy.sql.expression import true
-from sqlalchemy.sql.sqltypes import BLOB
 from sqlalchemy import text
 #from pypnusershub.db.models import Organisme
 
