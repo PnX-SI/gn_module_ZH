@@ -930,7 +930,7 @@ class Action:
 
     def __str__(self):
         return {
-            "proposition": Utils.get_mnemo(self.id_action),
+            "proposition": DB.session.query(BibActions).filter(BibActions.id_action == self.id_action).one().name,
             "niveau": Utils.get_mnemo(self.id_priority_level),
             "remarque": Utils.get_string(self.remark)
         }
