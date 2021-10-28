@@ -369,6 +369,7 @@ def delete_one_file(id_media, info_role):
     """
     try:
         delete_file(id_media)
+        return ('', 204)
     except Exception as e:
         DB.session.rollback()
         raise ZHApiError(message=str(e), details=str(e))
