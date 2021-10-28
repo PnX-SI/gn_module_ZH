@@ -34,10 +34,6 @@ class Utils(ZH):
             return string
         return ''
 
-    @staticmethod
-    def get_int(nb):
-        return nb  # if nb is not None else 'Non évalué'
-
 
 class Limits:
 
@@ -368,9 +364,9 @@ class Taxa:
 
     def __str__(self):
         return {
-            "nb_flore": Utils.get_int(self.nb_flora_sp),
-            "nb_vertebre": Utils.get_int(self.nb_vertebrate_sp),
-            "nb_invertebre": Utils.get_int(self.nb_invertebrate_sp)
+            "nb_flore": self.nb_flora_sp,
+            "nb_vertebre": self.nb_vertebrate_sp,
+            "nb_invertebre": self.nb_invertebrate_sp
         }
 
 
@@ -420,8 +416,8 @@ class Habs:
     def __str__(self):
         return {
             "cartographie": Utils.get_bool(self.is_carto_hab),
-            "nombre": Utils.get_int(self.nb_hab),
-            "recouvrement": Utils.get_int(int(self.total_hab_cover)),
+            "nombre": self.nb_hab,
+            "recouvrement": self.total_hab_cover,
             "corine": [hab.__str__() for hab in self.hab_heritage]
         }
 
@@ -691,7 +687,7 @@ class Plan:
         return {
             "plan": Utils.get_mnemo(self.id_nature),
             "date": Utils.get_string(str(self.plan_date)),
-            "duree": Utils.get_int(self.duration)
+            "duree": self.duration
         }
 
 
@@ -840,12 +836,12 @@ class EvalInterest:
     def __str__(self):
         return {
             "interet": [interest.__str__() for interest in self.interet_patrim],
-            "faunistique": Utils.get_int(self.nb_fauna_sp),
-            "floristique": Utils.get_int(self.nb_flora_sp),
-            "nb_hab": Utils.get_int(self.nb_hab),
-            "total_hab_cover": Utils.get_int(self.total_hab_cover),
+            "faunistique": self.nb_fauna_sp,
+            "floristique": self.nb_flora_sp,
+            "nb_hab": self.nb_hab,
+            "total_hab_cover": self.total_hab_cover,
             "valeur": [val.__str__() for val in self.val_soc_eco],
-            "Commentaire": Utils.get_int(self.remark_eval_functions)
+            "Commentaire": self.remark_eval_functions
         }
 
 
@@ -865,10 +861,10 @@ class EvalThread:
 
     def __str__(self):
         return {
-            "menaces": Utils.get_int(self.id_thread),
-            "hydrologique": Utils.get_int(self.id_diag_hydro),
-            "biologique": Utils.get_int(self.id_diag_bio),
-            "Commentaire": Utils.get_int(self.remark_eval_thread),
+            "menaces": self.id_thread,
+            "hydrologique": self.id_diag_hydro,
+            "biologique": self.id_diag_bio,
+            "Commentaire": self.remark_eval_thread,
         }
 
 
