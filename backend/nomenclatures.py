@@ -158,7 +158,15 @@ def get_nomenc(config):
             nomenc_list = [
                 {
                     "id_nomenclature": nomenc.id_nomenclature,
-                    "mnemonique": nomenc.label_default
+                    "mnemonique": nomenc.label_default                
+                } for nomenc in Nomenclatures.get_nomenclature_info(mnemo)
+            ]
+            nomenc_info = {**nomenc_info, mnemo: nomenc_list}
+        elif mnemo == 'OCCUPATION_SOLS':
+            nomenc_list = [
+                {
+                    "id_nomenclature": nomenc.id_nomenclature,
+                    "mnemonique": nomenc.cd_nomenclature + '- ' + nomenc.mnemonique
                 } for nomenc in Nomenclatures.get_nomenclature_info(mnemo)
             ]
             nomenc_info = {**nomenc_info, mnemo: nomenc_list}

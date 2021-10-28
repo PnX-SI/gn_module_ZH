@@ -44,14 +44,14 @@ export class ZhFormTab7Component implements OnInit {
   public bioFctTableCol = [
     {
       name: "function",
-      label: "Principales fonctions biologiques / écologiquess",
+      label: "Principales fonctions biologiques / écologiques",
     },
     { name: "qualification", label: "Qualifications" },
     { name: "knowledge", label: "Connaissance" },
   ];
 
   public patrimTableCol = [
-    { name: "function", label: "Intérêts patrimoniaux" },
+    { name: "function", label: "Principaux intérêts patrimoniaux" },
     { name: "qualification", label: "Qualifications" },
     { name: "knowledge", label: "Connaissance" },
   ];
@@ -123,13 +123,13 @@ export class ZhFormTab7Component implements OnInit {
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
         this.currentZh = zh;
-        this.hydroFctData = [];
-        this.bioFctData = [];
-        this.patrimData = [];
-        this.socEcoData = [];
-        this.actionTable = [];
         this._dataService.getEvalZh(zh.id).subscribe((evalZh: any) => {
           this.evalZh = evalZh;
+          this.hydroFctData = [];
+          this.bioFctData = [];
+          this.patrimData = [];
+          this.socEcoData = [];
+          this.actionTable = [];
           if (evalZh.fonctions_bio && evalZh.fonctions_bio.length > 0) {
             evalZh.fonctions_bio.forEach((fctBio: any) => {
               let namefctBio = this.formMetaData["FONCTIONS_BIO"].find(

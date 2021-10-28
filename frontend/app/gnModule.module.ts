@@ -24,6 +24,7 @@ import { ZhTabsComponent } from "./zh-forms/tabs/zh-tabs.component";
 import { DatepickerI18n } from "./services/datepicker-i18n.service";
 import { CancelButtonComponent } from "./zh-forms/cancelButton/cancelButton.component";
 import { ZhFormTab8Component } from "./zh-forms/tabs/tab8/zh-form-tab8.component";
+import { ErrorTranslatorService } from "./services/error-translator.service";
 
 // my module routing
 const routes: Routes = [
@@ -58,7 +59,12 @@ const routes: Routes = [
     NgbModule,
     ZhDetailsModule,
   ],
-  providers: [ZhDataService, MapListService, DatepickerI18n],
+  providers: [
+    ZhDataService,
+    MapListService,
+    DatepickerI18n,
+    ErrorTranslatorService,
+  ],
   bootstrap: [ZhMapListComponent],
 })
 export class GeonatureModule {}
