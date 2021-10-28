@@ -1,5 +1,4 @@
 import { Component, Input } from "@angular/core";
-import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
 import { Output, EventEmitter } from "@angular/core";
 
 @Component({
