@@ -369,6 +369,7 @@ def delete_file(id_media, info_role):
             pass
         DB.session.query(TMedias).filter(TMedias.id_media == id_media).delete()
         DB.session.commit()
+        return ('', 204)
     except Exception as e:
         DB.session.rollback()
         raise ZHApiError(message=str(e), details=str(e))
