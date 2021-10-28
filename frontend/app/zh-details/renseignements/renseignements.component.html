@@ -1,7 +1,7 @@
 <div>
   <div class="row my-3">
-    <div class="col-12 col-xl-4 col-lg-4 col-md-6">
-      <fieldset>
+    <div class="col-12 col-xl-6 col-lg-6 col-md-6">
+      <fieldset class="twoFields">
         <legend>
           <h5 class="section-title">Identification de la zone Humide</h5>
         </legend>
@@ -23,8 +23,28 @@
           ><span>{{ data.identification?.code }}</span>
         </zh-label>
       </fieldset>
+      <fieldset class="twoFields">
+        <legend>
+          <h5 class="section-title">Auteurs</h5>
+        </legend>
+        <zh-label label="Organisme :">
+          <span> TODO </span>
+        </zh-label>
+        <zh-label label="Auteur de la fiche :">
+          <span>{{ data.auteur?.auteur }}</span></zh-label
+        >
+        <zh-label label="Auteur des dernières modifications :">
+          <span>{{ data.auteur?.auteur_modif }}</span>
+        </zh-label>
+        <zh-label label="Date d’établissement :">
+          <span>{{ data.auteur?.date }}</span>
+        </zh-label>
+        <zh-label label="Date des dernières modifications :">
+          <span>{{ data.auteur?.date_modif }}</span>
+        </zh-label>
+      </fieldset>
     </div>
-    <div class="col-12 col-xl-4 col-lg-4 col-md-6">
+    <div class="col-12 col-xl-6 col-lg-6 col-md-6">
       <fieldset>
         <legend>
           <h5 class="section-title">Localisation de la zone humide</h5>
@@ -65,27 +85,12 @@
             </li>
           </ul>
         </zh-label>
-      </fieldset>
-    </div>
-    <div class="col-12 col-xl-4 col-lg-4 col-md-6">
-      <fieldset>
-        <legend>
-          <h5 class="section-title">Auteurs</h5>
-        </legend>
-        <zh-label label="Organisme :">
-          <span> TODO </span>
-        </zh-label>
-        <zh-label label="Auteur de la fiche :">
-          <span>{{ data.auteur?.auteur }}</span></zh-label
-        >
-        <zh-label label="Auteur des dernières modifications :">
-          <span>{{ data.auteur?.auteur_modif }}</span>
-        </zh-label>
-        <zh-label label="Date d’établissement :">
-          <span>{{ data.auteur?.date }}</span>
-        </zh-label>
-        <zh-label label="Date des dernières modifications :">
-          <span>{{ data.auteur?.date_modif }}</span>
+        <zh-label label="Référentiels géographiques :">
+          <ul>
+            <li class="label-item" *ngFor="let ref of data.localisation?.other_ref">
+              <a href="{{ ref.url }}" target="_blank"  [ngbTooltip]="ref.zh_type_name + ' (' + ref.area_code + ')'">{{ ref.area_name }}</a>
+            </li>
+          </ul>
         </zh-label>
       </fieldset>
     </div>
