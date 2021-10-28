@@ -475,9 +475,6 @@ def get_tab_data(id_tab, info_role):
 
             update_functions(form_data['id_zh'],
                              form_data['val_soc_eco'], 'VAL_SOC_ECO')
-            if form_data['total_hab_cover'] is None:
-                form_data['total_hab_cover'] = DB.session.query(TZH).filter(
-                    TZH.id_zh == form_data['id_zh']).one().total_hab_cover
             update_tzh(form_data)
             update_hab_heritages(
                 form_data['id_zh'], form_data['hab_heritages'])

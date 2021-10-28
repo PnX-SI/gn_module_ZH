@@ -274,10 +274,7 @@ class TZH(ZhModel):
     is_other_inventory = DB.Column(DB.Boolean, default=False)
     is_carto_hab = DB.Column(DB.Boolean, default=False)
     nb_hab = DB.Column(DB.Integer)
-    total_hab_cover = DB.Column(
-        DB.Unicode,
-        default='999',
-        nullable=False)
+    total_hab_cover = DB.Column(DB.Integer)
     nb_flora_sp = DB.Column(DB.Integer)
     nb_vertebrate_sp = DB.Column(DB.Integer)
     nb_invertebrate_sp = DB.Column(DB.Integer)
@@ -902,10 +899,7 @@ class THabHeritage(DB.Model):
         ForeignKey(TNomenclatures.id_nomenclature),
         default=TNomenclatures.get_default_nomenclature("ETAT_CONSERVATION")
     )
-    hab_cover = DB.Column(
-        DB.Unicode,
-        nullable=False
-    )
+    hab_cover = DB.Column(DB.Integer)
 
 
 class CorUrbanTypeRange(DB.Model):
