@@ -2,14 +2,14 @@
   <h5 class="modal-title"><i class="fa fa-trash"></i></h5>
 </div>
 <div class="modal-body">
-  {{ message }}
+  <ng-content></ng-content>
 </div>
 <div class="modal-footer">
   <button
     type="button"
     mat-raised-button
     class="mr-1 uppercase"
-    (click)="activeModal.dismiss('cancel click')"
+    (click)="onCancelClicked()"
   >
     Annuler
   </button>
@@ -18,7 +18,7 @@
     mat-raised-button
     color="warn"
     class="uppercase"
-    (click)="activeModal.close('Close click')"
+    (click)="onDeleteClicked()"
   >
     Supprimer
   </button>
