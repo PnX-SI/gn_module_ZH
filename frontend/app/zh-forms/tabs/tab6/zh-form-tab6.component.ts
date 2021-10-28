@@ -750,8 +750,9 @@ export class ZhFormTab6Component implements OnInit {
     if (this.planForm.valid) {
       let formValues = this.planForm.value;
       this.managements.map((item: any) => {
+        console.log(item);
         if (item.id_org == this.selectedManagement.id_org) {
-          if (item.plans.length == 0) {
+          if (!item.plans) {
             formValues.plan_date = this.dateParser.format(formValues.plan_date);
             this.moreDetails = true;
             item.plans = [formValues];
