@@ -88,7 +88,7 @@
         <zh-label label="Référentiels géographiques :">
           <ul>
             <li class="label-item" *ngFor="let ref of data.localisation?.other_ref">
-              <a href="{{ ref.url }}" target="_blank">{{ ref.area_name }}</a> ({{ ref.area_code }})
+              <a href="{{ ref.url }}" target="_blank"  [ngbTooltip]="ref.zh_type_name + ' (' + ref.area_code + ')'">{{ ref.area_name }}</a>
             </li>
           </ul>
         </zh-label>
