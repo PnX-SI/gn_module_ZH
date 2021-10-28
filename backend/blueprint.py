@@ -18,6 +18,7 @@ from pathlib import Path
 
 import os
 from flask.helpers import send_file, send_from_directory
+from werkzeug import utils
 
 from werkzeug.utils import secure_filename
 
@@ -38,6 +39,7 @@ from pypn_habref_api.models import (
 from geonature.core.ref_geo.models import LAreas, BibAreasTypes
 
 from geonature.utils.utilssqlalchemy import json_resp
+from utils_flask_sqla.response import json_resp_accept_empty_list
 from geonature.utils.env import DB, ROOT_DIR
 from geonature.core.gn_commons.models import TMedias
 
@@ -71,7 +73,7 @@ from .geometry import set_geom
 
 from .upload import upload
 
-from .utils import get_file_path
+from .utils import get_file_path, delete_file
 
 from .model.repositories import (
     ZhRepository
@@ -350,7 +352,7 @@ def patch_reference(info_role):
 
 @ blueprint.route("/<int:id_zh>/files", methods=["GET"])
 @ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
-@ json_resp
+@ json_resp_accept_empty_list
 def get_file_list(id_zh, info_role):
     """get a list of the zh files contained in static repo
     """
@@ -362,16 +364,12 @@ def get_file_list(id_zh, info_role):
 
 @ blueprint.route("files/<int:id_media>", methods=["DELETE"])
 @ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
-def delete_file(id_media, info_role):
+def delete_one_file(id_media, info_role):
     """delete file by id_media in TMedias and static directory
     """
     try:
-        try:
-            os.remove(get_file_path(id_media))
-        except:
-            pass
-        DB.session.query(TMedias).filter(TMedias.id_media == id_media).delete()
-        DB.session.commit()
+        delete_file(id_media)
+        return ('', 204)
     except Exception as e:
         DB.session.rollback()
         raise ZHApiError(message=str(e), details=str(e))
@@ -593,7 +591,7 @@ def deleteOneZh(id_zh, info_role):
         q_medias = DB.session.query(TMedias).filter(
             TMedias.unique_id_media == zh_uuid).all()
         for media in q_medias:
-            delete_file(media.id_media, info_role)
+            delete_file(media.id_media)
 
         zhRepository.delete(id_zh, info_role)
         DB.session.commit()
