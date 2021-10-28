@@ -242,11 +242,9 @@ export class ZhFormTab0Component implements OnInit {
         );
       }
     } else {
-      this._toastr.error(
-        "Veuillez tracer ou importer une zone humide sur la carte",
-        "",
-        { positionClass: "toast-top-right" }
-      );
+      this._toastr.error("Veuillez tracer une zone humide sur la carte", "", {
+        positionClass: "toast-top-right",
+      });
     }
   }
 
