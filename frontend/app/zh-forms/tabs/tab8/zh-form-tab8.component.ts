@@ -126,7 +126,6 @@ export class ZhFormTab8Component implements OnInit {
         this.initExtensions();
       })
       .catch((error) => {
-        console.log(error);
         this.displayError(
           `Une erreur est survenue, impossible de récupérer les fichiers : <${error.message}>`
         );
@@ -157,8 +156,46 @@ export class ZhFormTab8Component implements OnInit {
 
   onEditDoc(event: any, modal: any) {
     this.modalTitle = "Edition d'un fichier";
+    this.fillForm(
+      event.media_path,
+      event.title_fr,
+      event.author,
+      event.description_fr
+    );
     this.patchModal = true;
     this.onOpenModal(modal);
+  }
+
+  //TODO: filename, filecontent
+  fillForm(filepath: string, title: string, author: string, summary: string) {
+    const filename: string = filepath.split(/(\\|\/)/g).pop();
+    this.fileToUpload = new File([""], filename);
+    this.docForm.patchValue({
+      title: title,
+      author: author,
+      summary: summary,
+    });
+  }
+
+  onDeleteDoc(event) {
+    this._dataService
+      .deleteFile(event.id_media)
+      .toPromise()
+      .then((res) => {
+        this.displayInfo("Fichier supprimé avec succès");
+      })
+      .catch((error) => {
+        this.displayError(
+          `Une erreur est survenue, impossible de supprimer ce fichier. Erreur : <${error.message}>`
+        );
+      })
+      .finally(() => {
+        this.getFiles();
+      });
+  }
+
+  onDownloadDoc(event) {
+    this._dataService.downloadFile(event.id_media);
   }
 
   onOpenModal(modal) {
@@ -177,8 +214,6 @@ export class ZhFormTab8Component implements OnInit {
     this.docForm.reset();
     this.fileToUpload = null;
   }
-
-  onDeleteStatus() {}
 
   handleFileInput(files: FileList) {
     this.fileToUpload = files.item(0);
@@ -211,6 +246,11 @@ export class ZhFormTab8Component implements OnInit {
         this.loadingUpload = false;
         this.getFiles();
       });
+  }
+
+  patchFile() {
+    // Check if file is empty: not changed
+    console.log("Not implemented yet");
   }
 
   displayInfo(message: string) {

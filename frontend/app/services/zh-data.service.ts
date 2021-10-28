@@ -99,4 +99,16 @@ export class ZhDataService {
       `${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/files`
     );
   }
+
+  deleteFile(mediaId: number) {
+    return this._api.delete(
+      `${AppConfig.API_ENDPOINT}/zones_humides/files/${mediaId}`
+    );
+  }
+
+  downloadFile(mediaId: number) {
+    return this._api.get(
+      `${AppConfig.API_ENDPOINT}/zones_humides/files/${mediaId}`
+    );
+  }
 }

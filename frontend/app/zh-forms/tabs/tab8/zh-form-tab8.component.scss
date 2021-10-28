@@ -27,3 +27,9 @@ select.custom-select option:disabled {
 .file-name {
   margin-left: 10px;
 }
+
+zh-table {
+  // It should be padding-top here
+  // But who knows, it does not work
+  padding-left: 5px;
+}
