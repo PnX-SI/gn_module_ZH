@@ -16,6 +16,7 @@ import { IDropdownSettings } from "ng-multiselect-dropdown";
 import { ToastrService } from "ngx-toastr";
 import { ZhDataService } from "../../../services/zh-data.service";
 import { TabsService } from "../../../services/tabs.service";
+import { ErrorTranslatorService } from "../../../services/error-translator.service";
 
 @Component({
   selector: "zh-form-tab0",
@@ -49,7 +50,8 @@ export class ZhFormTab0Component implements OnInit {
     private _tabService: TabsService,
     private _mapService: MapService,
     private _router: Router,
-    private _toastr: ToastrService
+    private _toastr: ToastrService,
+    private _error: ErrorTranslatorService
   ) {}
 
   ngOnInit() {
@@ -212,7 +214,17 @@ export class ZhFormTab0Component implements OnInit {
               this._dataService.setCurrentZh(zh);
               this.activeTabs.emit(true);
               this.canChangeTab.emit(true);
-              this._toastr.success("Vos données sont bien enregistrées", "", {
+              var msg: string = "Vos données sont bien enregistrées";
+              var timeOut: number = 5000;
+              if (data.is_intersected) {
+                timeOut = 10000; // stay a little bit longer
+                msg +=
+                  "</br>La géométrie a été découpée car elle intersectait une autre zone humide";
+              }
+              this._toastr.success(msg, "", {
+                enableHtml: true,
+                timeOut: timeOut, // to be sure the user sees
+                closeButton: true,
                 positionClass: "toast-top-right",
               });
               this.nextTab.emit(1);
@@ -220,7 +232,9 @@ export class ZhFormTab0Component implements OnInit {
           },
           (error) => {
             this.posted = false;
-            this._toastr.error(error.error, "", {
+            var msg: string = "Impossible de créer la zone humide : ";
+            msg += this._error.getFrontError(error.error.message);
+            this._toastr.error(msg, "", {
               positionClass: "toast-top-right",
             });
           }
