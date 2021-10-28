@@ -12,23 +12,7 @@ import { fileNameValidator } from "../../../validators/fileNameValidator";
 import { fileFormatValidator } from "../../../validators/fileFormatValidator";
 
 import { ZhFile } from "./zh-form-tab8.models";
-
-const EXT_CSV = ["csv"];
-const EXT_PDF = ["pdf"];
-const EXT_IMAGES = [
-  "png",
-  "tif",
-  "tiff",
-  "wbmp",
-  "ico",
-  "jng",
-  "bmp",
-  "svg",
-  "webp",
-  "gif",
-  "jpeg",
-  "jpg",
-];
+import { FilesService } from "../../../services/files.service";
 
 @Component({
   selector: "zh-form-tab8",
@@ -41,7 +25,7 @@ export class ZhFormTab8Component implements OnInit {
   @Output() nextTab = new EventEmitter<number>();
   public zh: any;
   public formTab8: FormGroup;
-  public docForm: FormGroup;
+  public fileForm: FormGroup;
   public files: ZhFile[];
   public fileToUpload: File | null = null;
   public loadingUpload: boolean = false;
@@ -55,7 +39,7 @@ export class ZhFormTab8Component implements OnInit {
 
   public fileTypeAccepted: string[] = ["application/pdf", "image/*"];
 
-  public docTableCol = [
+  public fileTableCol = [
     {
       name: "title_fr",
       label: "Titre du document",
@@ -71,7 +55,8 @@ export class ZhFormTab8Component implements OnInit {
     public ngbModal: NgbModal,
     private _dataService: ZhDataService,
     private _toastr: ToastrService,
-    private _tabService: TabsService
+    private _tabService: TabsService,
+    private _filesService: FilesService
   ) {}
 
   ngOnInit() {
@@ -80,7 +65,7 @@ export class ZhFormTab8Component implements OnInit {
 
   // initialize forms
   initForms() {
-    this.docForm = this.fb.group({
+    this.fileForm = this.fb.group({
       file: [
         null,
         Validators.compose([
@@ -97,6 +82,9 @@ export class ZhFormTab8Component implements OnInit {
   }
 
   initExtensions() {
+    const EXT_PDF = this._filesService.EXT_PDF;
+    const EXT_IMAGES = this._filesService.EXT_IMAGES;
+    const EXT_CSV = this._filesService.EXT_CSV;
     this.corFilesExt = [
       { name: "Fichiers pdf", files: this.getFilesByExtensions(EXT_PDF) },
       { name: "Photos", files: this.getFilesByExtensions(EXT_IMAGES) },
@@ -118,6 +106,47 @@ export class ZhFormTab8Component implements OnInit {
     });
   }
 
+  // Enables to filter files from their extension
+  // so that they can be separated in the html
+  getFilesByExtensions(extensions: string[]): ZhFile[] {
+    return this._filesService.filterByExtension(this.files, extensions);
+  }
+
+  // Function to gather all the files that do not
+  // respect the extensions provided
+  getOtherFiles(extensions: string[]): ZhFile[] {
+    return this._filesService.unfilterByExtension(this.files, extensions);
+  }
+
+  onAddFile(event: any, modal: any) {
+    this.modalTitle = "Ajout d'un fichier";
+    this.patchModal = false;
+    this.onOpenModal(modal);
+  }
+
+  onEditFile(event: any, modal: any) {
+    this.modalTitle = "Edition d'un fichier";
+    this.fillForm(
+      event.media_path,
+      event.title_fr,
+      event.author,
+      event.description_fr
+    );
+    this.patchModal = true;
+    this.onOpenModal(modal);
+  }
+
+  fillForm(filepath: string, title: string, author: string, summary: string) {
+    const filename: string = this._filesService.getFileNameFromPath(filepath);
+    // Set empty file, to be checked in PATCH
+    this.fileToUpload = new File([""], filename);
+    this.fileForm.patchValue({
+      title: title,
+      author: author,
+      summary: summary,
+    });
+  }
+
   getFiles() {
     this._dataService
       .getZhFiles(this.zh.id)
@@ -133,60 +162,11 @@ export class ZhFormTab8Component implements OnInit {
       });
   }
 
-  // Enables to filter files from their extension
-  // so that they can be separated in the html
-  getFilesByExtensions(extensions: string[]): ZhFile[] {
-    return this.files.filter((file) =>
-      extensions.includes(file.media_path.split(".").slice(-1)[0])
-    );
-  }
-
-  // Function to gather all the files that do not
-  // respect the extensions provided
-  getOtherFiles(extensions: string[]): ZhFile[] {
-    return this.files.filter(
-      (file) => !extensions.includes(file.media_path.split(".").slice(-1)[0])
-    );
-  }
-
-  onAddDoc(event: any, modal: any) {
-    this.modalTitle = "Ajout d'un fichier";
-    this.patchModal = false;
-    this.onOpenModal(modal);
-  }
-
-  onEditDoc(event: any, modal: any) {
-    this.modalTitle = "Edition d'un fichier";
-    this.fillForm(
-      event.media_path,
-      event.title_fr,
-      event.author,
-      event.description_fr
-    );
-    this.patchModal = true;
-    this.onOpenModal(modal);
-  }
-
-  //TODO: filename, filecontent
-  fillForm(filepath: string, title: string, author: string, summary: string) {
-    const filename: string = this.getFileNameFromPath(filepath);
-    this.fileToUpload = new File([""], filename);
-    this.docForm.patchValue({
-      title: title,
-      author: author,
-      summary: summary,
-    });
-  }
-
-  getFileNameFromPath(path: string): string {
-    return path.split(/(\\|\/)/g).pop();
-  }
-
-  onDeleteDoc(event) {
+  onDeleteFile(event) {
     this._dataService
       .deleteFile(event.id_media)
       .toPromise()
-      .then((res) => {
+      .then(() => {
         this.displayInfo("Fichier supprimé avec succès");
       })
       .catch((error) => {
@@ -199,16 +179,14 @@ export class ZhFormTab8Component implements OnInit {
       });
   }
 
-  onDownloadDoc(event) {
+  onDownloadFile(event) {
     this._dataService
       .downloadFile(event.id_media)
       .toPromise()
       .then((res) => {
-        let blob = new Blob([res]);
-        saveAs(blob, this.getFileNameFromPath(event.media_path));
+        this._filesService.saveFile(res, event.media_path);
       })
       .catch((error) => {
-        console.log(error);
         this.displayError(
           `Une erreur est survenue, impossible de télécharger ce fichier. Erreur : <${error.message}>`
         );
@@ -227,14 +205,9 @@ export class ZhFormTab8Component implements OnInit {
     });
   }
 
-  resetForm() {
-    this.docForm.reset();
-    this.fileToUpload = null;
-  }
-
   handleFileInput(files: FileList) {
     this.fileToUpload = files.item(0);
-    this.docForm.patchValue({
+    this.fileForm.patchValue({
       file: this.fileToUpload,
     });
   }
@@ -243,14 +216,14 @@ export class ZhFormTab8Component implements OnInit {
     this.loadingUpload = true;
     const uploadForm = new FormData();
     uploadForm.append("id_zh", this.zh.id);
-    uploadForm.append("title", this.docForm.value.title);
-    uploadForm.append("author", this.docForm.value.author);
-    uploadForm.append("summary", this.docForm.value.summary);
+    uploadForm.append("title", this.fileForm.value.title);
+    uploadForm.append("author", this.fileForm.value.author);
+    uploadForm.append("summary", this.fileForm.value.summary);
     uploadForm.append("file", this.fileToUpload, this.fileToUpload.name);
     this._dataService
       .postDataForm(uploadForm, 8)
       .toPromise()
-      .then((res) => {
+      .then(() => {
         this.activeModal.close();
         this.displayInfo("Fichier téléversé avec succès !");
       })
@@ -268,6 +241,11 @@ export class ZhFormTab8Component implements OnInit {
   patchFile() {
     // Check if file is empty: not changed
     console.log("Not implemented yet");
+  }
+
+  resetForm() {
+    this.fileForm.reset();
+    this.fileToUpload = null;
   }
 
   displayInfo(message: string) {
