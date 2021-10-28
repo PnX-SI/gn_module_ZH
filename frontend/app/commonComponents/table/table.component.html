@@ -1,7 +1,9 @@
 <table class="table mb-4">
   <thead class="thead-inverse table-header">
     <tr>
-      <th *ngFor="let col of tableCols">{{ col.label }}</th>
+      <!-- size can be provided in the columns object -->
+      <th *ngFor="let col of tableCols"  [style.width]="col.size" >{{ col.label }}</th>
+      <th *ngIf="editable || deletable"></th>
     </tr>
   </thead>
   <tbody>
@@ -17,6 +19,43 @@
             {{ item[col.name] }}
           </ng-template>
         </td>
+        <td 
+          class="tab-buttons" 
+          *ngIf="editable || deletable || downloadable">
+          <ng-container *ngIf="editable">
+            <button
+              mat-icon-button
+              class="mr-2"
+              placement="top"
+              ngbTooltip="Editer"
+              (click)="onEditItem(item)"
+            >
+              <mat-icon class="edit-icon">edit</mat-icon>
+            </button>
+          </ng-container>
+          <ng-container *ngIf="deletable">
+            <button
+              mat-icon-button
+              class="mr-2"
+              placement="top"
+              ngbTooltip="Supprimer"
+              (click)="onDeleteItem(content, item)"
+            >
+              <mat-icon class="delete-icon">close</mat-icon>
+            </button>
+          </ng-container>
+          <ng-container *ngIf="downloadable">
+            <button
+              mat-icon-button
+              class="mr-2"
+              placement="top"
+              ngbTooltip="Télécharger"
+              (click)="onDownloadItem(item)"
+            >
+              <mat-icon class="download-icon">download</mat-icon>
+            </button>
+          </ng-container>
+        </td>
       </tr>
     </ng-container>
     <tr *ngIf="!data || data.length == 0">
@@ -24,3 +63,8 @@
     </tr>
   </tbody>
 </table>
+<ng-template #content let-c="close" let-d="dismiss">
+  <zh-delete-modal (onCancel)="d()" (onDelete)=c()>
+    <p>Etes-vous sûr de vouloir supprimer cette ligne ?</p>
+  </zh-delete-modal>
+</ng-template>
