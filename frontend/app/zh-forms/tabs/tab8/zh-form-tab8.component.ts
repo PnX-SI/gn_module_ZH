@@ -2,6 +2,7 @@ import { Component, EventEmitter, OnInit, Input, Output } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 import { TabsService } from "../../../services/tabs.service";
+import { saveAs } from "file-saver";
 
 import { ToastrService } from "ngx-toastr";
 
@@ -168,13 +169,17 @@ export class ZhFormTab8Component implements OnInit {
 
   //TODO: filename, filecontent
   fillForm(filepath: string, title: string, author: string, summary: string) {
-    const filename: string = filepath.split(/(\\|\/)/g).pop();
+    const filename: string = this.getFileNameFromPath(filepath);
     this.fileToUpload = new File([""], filename);
     this.docForm.patchValue({
       title: title,
       author: author,
       summary: summary,
     });
+  }
+
+  getFileNameFromPath(path: string): string {
+    return path.split(/(\\|\/)/g).pop();
   }
 
   onDeleteDoc(event) {
@@ -195,7 +200,19 @@ export class ZhFormTab8Component implements OnInit {
   }
 
   onDownloadDoc(event) {
-    this._dataService.downloadFile(event.id_media);
+    this._dataService
+      .downloadFile(event.id_media)
+      .toPromise()
+      .then((res) => {
+        let blob = new Blob([res]);
+        saveAs(blob, this.getFileNameFromPath(event.media_path));
+      })
+      .catch((error) => {
+        console.log(error);
+        this.displayError(
+          `Une erreur est survenue, impossible de télécharger ce fichier. Erreur : <${error.message}>`
+        );
+      });
   }
 
   onOpenModal(modal) {

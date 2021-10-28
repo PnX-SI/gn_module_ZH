@@ -108,7 +108,8 @@ export class ZhDataService {
 
   downloadFile(mediaId: number) {
     return this._api.get(
-      `${AppConfig.API_ENDPOINT}/zones_humides/files/${mediaId}`
+      `${AppConfig.API_ENDPOINT}/zones_humides/files/${mediaId}`,
+      { responseType: "blob" }
     );
   }
 }
