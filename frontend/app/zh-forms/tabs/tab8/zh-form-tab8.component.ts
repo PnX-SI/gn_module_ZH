@@ -2,7 +2,6 @@ import { Component, EventEmitter, OnInit, Input, Output } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 import { TabsService } from "../../../services/tabs.service";
-import { saveAs } from "file-saver";
 
 import { ToastrService } from "ngx-toastr";
 
@@ -49,6 +48,7 @@ export class ZhFormTab8Component implements OnInit {
   ];
 
   public corFilesExt = [];
+  public imageFiles = {};
 
   constructor(
     private fb: FormBuilder,
@@ -85,15 +85,32 @@ export class ZhFormTab8Component implements OnInit {
     const EXT_PDF = this._filesService.EXT_PDF;
     const EXT_IMAGES = this._filesService.EXT_IMAGES;
     const EXT_CSV = this._filesService.EXT_CSV;
+    this.handleImages();
     this.corFilesExt = [
       { name: "Fichiers pdf", files: this.getFilesByExtensions(EXT_PDF) },
-      { name: "Photos", files: this.getFilesByExtensions(EXT_IMAGES) },
       { name: "Fichiers CSV", files: this.getFilesByExtensions(EXT_CSV) },
       {
         name: "Autres fichiers",
         files: this.getOtherFiles(EXT_PDF.concat(EXT_IMAGES, EXT_CSV)),
       },
     ];
+  }
+
+  handleImages() {
+    let files = this.getFilesByExtensions(this._filesService.EXT_IMAGES);
+    files.map((item) => {
+      this.downloadFile(item.id_media).then((res) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(res);
+        reader.onloadend = () => {
+          item.image = reader.result;
+        };
+      });
+    });
+    this.imageFiles = {
+      name: "Photos",
+      files: files,
+    };
   }
 
   getCurrentZh() {
@@ -180,9 +197,7 @@ export class ZhFormTab8Component implements OnInit {
   }
 
   onDownloadFile(event) {
-    this._dataService
-      .downloadFile(event.id_media)
-      .toPromise()
+    this.downloadFile(event.id_media)
       .then((res) => {
         this._filesService.saveFile(res, event.media_path);
       })
@@ -191,6 +206,10 @@ export class ZhFormTab8Component implements OnInit {
           `Une erreur est survenue, impossible de télécharger ce fichier. Erreur : <${error.message}>`
         );
       });
+  }
+
+  downloadFile(id: number) {
+    return this._dataService.downloadFile(id).toPromise();
   }
 
   onOpenModal(modal) {

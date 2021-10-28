@@ -20,4 +20,5 @@ export type ZhFile = {
   is_public: boolean;
   meta_create_date: Date;
   meta_update_date: Date;
+  image?: string | ArrayBuffer;
 };

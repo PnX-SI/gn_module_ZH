@@ -28,7 +28,8 @@ select.custom-select option:disabled {
   margin-left: 10px;
 }
 
-zh-table {
+zh-table,
+zh-image-table {
   // It should be padding-top here
   // But who knows, it does not work
   padding-left: 5px;
