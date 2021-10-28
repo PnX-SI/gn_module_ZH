@@ -65,18 +65,12 @@
       <small>Structure de gestion</small>
       <div class="form-row">
         <div class="form-group col-md-6">
-          <select
-            class="form-control custom-select"
+          <angular2-multiselect
+            [settings]="organismDropdownSettings"
+            [data]="formMetaData.BIB_MANAGEMENT_STRUCTURES"
             [formControl]="formTab6.controls.structure"
           >
-            <option
-              *ngFor="let item of formMetaData.BIB_MANAGEMENT_STRUCTURES"
-              [ngValue]="item"
-              [disabled]="item.disabled"
-            >
-              {{ item.name }}
-            </option>
-          </select>
+          </angular2-multiselect>
         </div>
         <div class="form-group d-flex align-items-end col-md-6">
           <button
@@ -249,15 +243,20 @@
           </table>
         </div>
       </div>
+    </fieldset>
+    <fieldset>
+      <legend>
+        <h5 class="section-title">Autres inventaires</h5>
+      </legend>
       <div class="form-row">
         <div class="form-group col-md-6">
           <small style="display: block; margin-bottom: 8px"
-            >Autres inventaires</small
+            >Autres études / inventaires naturalistes </small
           >
           <mat-label ngClass="labelBeforeSlide">Non</mat-label>
           <mat-slide-toggle [formControl]="formTab6.controls.is_other_inventory"
-            >oui</mat-slide-toggle
-          >
+            ></mat-slide-toggle>
+          <mat-label ngClass="labelBeforeSlide">Oui</mat-label>
         </div>
       </div>
     </fieldset>
@@ -267,7 +266,7 @@
       </legend>
       <div class="form-row">
         <div class="form-group col-md-12">
-          <small>statut</small>
+          <small>Statuts</small>
           <angular2-multiselect
             [data]="formMetaData.PROTECTIONS"
             [(ngModel)]="selectedItems"
@@ -291,7 +290,7 @@
           (click)="onAddUrbanDoc($event, urbanDocModal)"
         >
           <mat-icon>add_box</mat-icon>
-          zonage des documents
+          Zonage d'urbanisme
         </button>
         <div
           *ngIf="urbanDocTable && urbanDocTable.length > 0"
@@ -683,6 +682,7 @@
             class="form-control custom-select"
             type="number"
             [formControl]="planForm.controls.duration"
+            min="0"
           />
           <small
             *ngIf="
