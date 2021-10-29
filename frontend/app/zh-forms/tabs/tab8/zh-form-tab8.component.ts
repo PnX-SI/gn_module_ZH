@@ -203,7 +203,7 @@ export class ZhFormTab8Component implements OnInit {
       })
       .catch((error) => {
         this.displayError(
-          `Une erreur est survenue, impossible de télécharger ce fichier. Erreur : <${error.message}>`
+          `Une erreur est survenue ! Impossible de télécharger ce fichier. Erreur : <${error.message}>`
         );
       });
   }
