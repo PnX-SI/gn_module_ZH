@@ -26,7 +26,6 @@ export class ZhFormTab8Component implements OnInit {
   public formTab8: FormGroup;
   public fileForm: FormGroup;
   public files: ZhFile[];
-  public mainPictureId: number;
   public fileToUpload: File | null = null;
   public loadingUpload: boolean = false;
 
