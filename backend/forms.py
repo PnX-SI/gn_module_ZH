@@ -1,5 +1,7 @@
 import uuid
 
+import math
+
 import datetime
 
 from sqlalchemy import (
@@ -119,7 +121,7 @@ def post_cor_zh_area(polygon, id_zh, id_type):
                 func.ST_Intersection(municipality_geom, polygon_2154))).scalar()
             municipality_area = DB.session.query(
                 func.ST_Area(municipality_geom)).scalar()
-            cover = int((intersect_area * 100)/municipality_area)
+            cover = math.ceil((intersect_area * 100)/municipality_area)
         else:
             cover = None
         DB.session.add(
