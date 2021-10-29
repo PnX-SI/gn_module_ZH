@@ -7,6 +7,7 @@ import { debounceTime, distinctUntilChanged, map } from "rxjs/operators";
 import { ZhDataService } from "../../../services/zh-data.service";
 import { TabsService } from "../../../services/tabs.service";
 import { ModalService } from "../../../services/modal.service";
+import { TaxaFile } from "./zh-form-tab5.models";
 
 @Component({
   selector: "zh-form-tab5",
@@ -80,6 +81,7 @@ export class ZhFormTab5Component implements OnInit {
   private $_fromChangeSub: Subscription;
   public currentZh: any;
   posted: boolean;
+  public taxaLoading: boolean;
 
   constructor(
     private fb: FormBuilder,
@@ -632,6 +634,37 @@ export class ZhFormTab5Component implements OnInit {
       this.modalFormSubmitted = false;
       this.sortFunction(this.interetPatTable);
     }
+  }
+
+  onGenerateTaxa() {
+    this.taxaLoading = true;
+    this._dataService
+      .getTaxa(this.currentZh.id)
+      .toPromise()
+      .then((res: TaxaFile) => {
+        if (res.file_names.length == 0) {
+          const msg =
+            "Aucun fichier n'a été généré car aucune espèce n'a été trouvée dans la zone humide";
+          this._toastr.error(msg, "", {
+            disableTimeOut: true, // to be sure the user sees the toast
+            closeButton: true,
+          });
+        } else {
+          const files = res.file_names.map((file) =>
+            file.replace(/^.*[\\\/]/, "")
+          );
+          const msg = `Les fichiers suivants ont été générés ${files.join(
+            ", "
+          )}`;
+          this._toastr.success(msg, "", {
+            disableTimeOut: true, // to be sure the user sees the toast
+            closeButton: true,
+          });
+        }
+      })
+      .finally(() => {
+        this.taxaLoading = false;
+      });
   }
 
   onAddValSocEco(event: any, modal: any) {
