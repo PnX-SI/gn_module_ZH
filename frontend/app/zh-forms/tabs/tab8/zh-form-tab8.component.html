@@ -88,7 +88,7 @@
               fileForm.controls.file.errors?.fileNameValidator
             "
             class="error-msg"
-            >Le fichier ne respecte pas le format suivant : &lt;ZHCODE&gt;_&lt;nombre&gt;. Exemple : {{ zh.properties.code }}_3<br></small>
+            >Le fichier ne respecte pas le format suivant : &lt;ZHCODE&gt;_&lt;nombre&gt;. Pour cette zone humide, un nom correct serait : {{ zh.properties.code }}_3.jpg<br></small>
           <small
           *ngIf="
             fileForm.controls.file.errors?.fileFormatValidator
