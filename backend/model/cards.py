@@ -397,7 +397,7 @@ class HabHeritage:
             "biotope": DB.session.query(Habref).filter(Habref.lb_code == self.id_corine_bio).filter(Habref.cd_typo == 22).one().lb_hab_fr,
             "etat": Utils.get_mnemo(self.id_preservation_state),
             "cahier": DB.session.query(Habref).filter(Habref.cd_hab == self.id_cahier_hab).one().lb_hab_fr,
-            "recouvrement": int(self.hab_cover)
+            "recouvrement": self.hab_cover
         }
 
 
@@ -421,7 +421,7 @@ class Habs:
                     hab['id_corine_bio'],
                     hab['id_cahier_hab'],
                     hab['id_preservation_state'],
-                    int(hab["hab_cover"])
+                    hab["hab_cover"]
                 ) for hab in habs
             ]
         else:
