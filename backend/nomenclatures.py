@@ -102,7 +102,7 @@ def get_function_list(mnemo):
             "id_nomenclature": function.CorMainFct.id_function,
             "mnemonique": function.TNomenclatures.mnemonique,
             "id_category": function.CorMainFct.id_main_function,
-            "category": DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == function.CorMainFct.id_main_function).one().mnemonique
+            "category": DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == function.CorMainFct.id_main_function).one().mnemonique.upper()
         } for function in CorMainFct.get_functions(nomenclature_ids)
     ]
 
@@ -158,7 +158,7 @@ def get_nomenc(config):
             nomenc_list = [
                 {
                     "id_nomenclature": nomenc.id_nomenclature,
-                    "mnemonique": nomenc.label_default                
+                    "mnemonique": nomenc.label_default
                 } for nomenc in Nomenclatures.get_nomenclature_info(mnemo)
             ]
             nomenc_info = {**nomenc_info, mnemo: nomenc_list}
