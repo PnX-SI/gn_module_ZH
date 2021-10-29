@@ -119,12 +119,11 @@ class Info:
 
 class Localisation:
 
-    def __init__(self, id_zh, regions, departments, ref_geo_config):
+    def __init__(self, id_zh, regions, departments):
         self.id_zh = id_zh
         self.regions = regions
         self.departments = departments
         self.municipalities = self.__get_municipalities_info()
-        self.other_ref_geo = self.__get_other_ref_geo(ref_geo_config)
         self.river_basin = self.__get_river_basin()
 
     def __str__(self):
@@ -132,7 +131,6 @@ class Localisation:
             "region": self.regions,
             "departement": self.departments,
             "commune": self.municipalities,
-            "other_ref": self.other_ref_geo,
             "bassin_versant": self.river_basin
         }
 
@@ -152,22 +150,6 @@ class Localisation:
             ).__str__()
             for municipality in CorZhArea.get_municipalities_info(self.id_zh)
         ]
-
-    def __get_other_ref_geo(self, ref_geo_config):
-        id_types = CorZhArea.get_id_types_ref_geo(self.id_zh, ref_geo_config)
-        refs = []
-        for ref in CorZhArea.get_ref_geo_info(self.id_zh, id_types):
-            for i in ref:
-                type_code = DB.session.query(BibAreasTypes).filter(
-                    BibAreasTypes.id_type == i.LAreas.id_type).one().type_code
-                refs.append({
-                    "area_name": i.LAreas.area_name,
-                    "area_code": i.LAreas.area_code,
-                    "url": i.LAreas.source,
-                    "type_code": type_code,
-                    "zh_type_name": [ref['zh_name'] for ref in ref_geo_config if ref['type_code_ref_geo'] == type_code][0]
-                })
-        return refs
 
 
 class Author:
@@ -554,12 +536,18 @@ class Activity:
 class Status:
 
     def __init__(self):
+        self.id_zh: int
         self.ownerships: list(Ownership)
         self.managements: list(Management)
         self.instruments: list(Instrument)
+        self.other_ref_geo: list(dict)
         self.is_other_inventory: bool
         self.protections: list(int)
         self.urban_docs: list(UrbanDoc)
+
+    @property
+    def id_zh(self):
+        return self.__id_zh
 
     @property
     def ownerships(self):
@@ -574,6 +562,10 @@ class Status:
         return self.__instruments
 
     @property
+    def other_ref_geo(self):
+        return self.__other_ref_geo
+
+    @property
     def is_other_inventory(self):
         return self.__is_other_inventory
 
@@ -584,6 +576,10 @@ class Status:
     @property
     def urban_docs(self):
         return self.__urban_docs
+
+    @id_zh.setter
+    def id_zh(self, value):
+        self.__id_zh = value
 
     @ownerships.setter
     def ownerships(self, value):
@@ -621,6 +617,23 @@ class Status:
             ) for instrument in instruments
         ]
 
+    @other_ref_geo.setter
+    def other_ref_geo(self, ref_geo):
+        id_types = CorZhArea.get_id_types_ref_geo(self.id_zh, ref_geo)
+        refs = []
+        for ref in CorZhArea.get_ref_geo_info(self.id_zh, id_types):
+            for i in ref:
+                type_code = DB.session.query(BibAreasTypes).filter(
+                    BibAreasTypes.id_type == i.LAreas.id_type).one().type_code
+                refs.append({
+                    "area_name": i.LAreas.area_name,
+                    "area_code": i.LAreas.area_code,
+                    "url": i.LAreas.source,
+                    "type_code": type_code,
+                    "zh_type_name": [ref['zh_name'] for ref in ref_geo if ref['type_code_ref_geo'] == type_code][0]
+                })
+        self.__other_ref_geo = refs
+
     @is_other_inventory.setter
     def is_other_inventory(self, value):
         self.__is_other_inventory = value
@@ -654,7 +667,8 @@ class Status:
             "regime": [ownership.__str__() for ownership in self.ownerships],
             "structure": [management.__str__() for management in self.managements],
             "instruments": [instrument.__str__() for instrument in self.instruments],
-            "autre_invetaire": Utils.get_bool(self.is_other_inventory),
+            "autre_inventaire": self.__other_ref_geo,
+            "autre_etude": Utils.get_bool(self.is_other_inventory),
             "statuts": self.__str_protections(),
             "zonage": [urban_doc.__str__() for urban_doc in self.urban_docs]
         }
@@ -989,8 +1003,8 @@ class Card(ZH):
         self.info.localisation = Localisation(
             self.id_zh,
             self.properties['geo_info']['regions'],
-            self.properties['geo_info']['departments'],
-            self.ref_geo_config
+            self.properties['geo_info']['departments']
+            # self.ref_geo_config
         )
 
     def __set_author(self):
@@ -1106,9 +1120,11 @@ class Card(ZH):
         self.description.use.remark_activity = self.properties['global_remark_activity']
 
     def __set_statuses(self):
+        self.status.id_zh = self.id_zh
         self.status.ownerships = self.properties['ownerships']
         self.status.managements = self.properties['managements']
         self.status.instruments = self.properties['instruments']
+        self.status.other_ref_geo = self.ref_geo_config
         self.status.is_other_inventory = self.properties['is_other_inventory']
         self.status.protections = self.properties['protections']
         self.status.urban_docs = self.properties['urban_docs']
