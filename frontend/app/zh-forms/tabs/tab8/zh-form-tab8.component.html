@@ -24,7 +24,8 @@
           downloadable="true"
           (onDelete)="onDeleteFile($event)"
           (onEdit)="onEditFile($event, fileModal)"
-          (onDownload)="onDownloadFile($event)">
+          (onDownload)="onDownloadFile($event)"
+          (onRadioChanged)="onChangeMainPhoto($event)">
         </zh-image-table>
       </collapse>
       <ng-container *ngFor="let item of corFilesExt">

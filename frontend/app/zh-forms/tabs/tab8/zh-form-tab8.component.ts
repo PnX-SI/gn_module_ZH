@@ -212,6 +212,10 @@ export class ZhFormTab8Component implements OnInit {
     return this._dataService.downloadFile(id).toPromise();
   }
 
+  onChangeMainPhoto(event) {
+    console.log("yoooo", event.title_fr);
+  }
+
   onOpenModal(modal) {
     this.activeModal = this.ngbModal.open(modal, {
       centered: true,

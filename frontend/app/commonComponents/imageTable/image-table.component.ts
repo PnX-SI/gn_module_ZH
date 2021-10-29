@@ -10,6 +10,8 @@ import { TableColumn } from "../table/table-interface";
   styleUrls: ["./image-table.component.scss"],
 })
 export class ImageTableComponent {
+  public mainPhoto: any;
+
   constructor(public deleteModal: NgbModal) {}
 
   @Input() tableCols: TableColumn[];
@@ -20,6 +22,7 @@ export class ImageTableComponent {
   @Output() onDelete = new EventEmitter<object>();
   @Output() onEdit = new EventEmitter<object>();
   @Output() onDownload = new EventEmitter<object>();
+  @Output() onRadioChanged = new EventEmitter<object>();
 
   onEditItem(value: object) {
     // No modal to open, just an event with the object
@@ -48,5 +51,9 @@ export class ImageTableComponent {
 
   onDownloadItem(value: object) {
     this.onDownload.emit(value);
+  }
+
+  onRadioChangedItem(event) {
+    this.onRadioChanged.emit(event);
   }
 }

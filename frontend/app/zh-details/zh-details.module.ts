@@ -1,6 +1,8 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Routes, RouterModule } from "@angular/router";
+import { MatRadioModule } from "@angular/material/radio";
+
 import { GN2CommonModule } from "@geonature_common/GN2Common.module";
 import { ZhDetailsComponent } from "./zh-details.component";
 import { DescriptionComponent } from "./description/description.component";
@@ -41,7 +43,12 @@ const routes: Routes = [
     DeleteModalComponent,
   ],
   entryComponents: [DeleteModalComponent],
-  imports: [GN2CommonModule, CommonModule, RouterModule.forChild(routes)],
+  imports: [
+    GN2CommonModule,
+    CommonModule,
+    RouterModule.forChild(routes),
+    MatRadioModule,
+  ],
   exports: [CollapseComponent, TableComponent, ImageTableComponent],
 })
 export class ZhDetailsModule {}

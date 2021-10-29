@@ -13,14 +13,21 @@
       <tr *ngFor="let item of data">
         <td>
           <div class="radio">
-            <input type="radio" id='regular' name="optradio">
+            <!-- <input type="radio"
+               name="radio"
+               id="radio-{{item.id_media}}"
+               [(ngModel)]="value"
+               [value]="item.main_pict_id"
+               /> -->
+               <mat-radio-button [checked]="item.main_pict_id" (change)="onRadioChangedItem(item)"></mat-radio-button>
+            <!-- <input type="radio" id='regular' name="optradio" [(ngModel)]="mainPhoto" (change)="onRadioChangedItem($event, item.id)"> -->
           </div>
         </td>
         <td>
           <img [src]="item.image"/>
         </td>
         <td *ngFor="let col of tableCols">
-            {{ item[col.name] }}
+            {{ item[col.name] !== "null" ? item[col.name] : "" }}
         </td>
         <td 
           class="tab-buttons" 
