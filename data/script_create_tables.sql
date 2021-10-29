@@ -694,6 +694,8 @@ ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_sage_t_nomenclatures FOREIGN KEY (
 
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_id_org FOREIGN KEY ( id_org ) REFERENCES pr_zh.bib_organismes( id_org )  ON UPDATE CASCADE;
 
+ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_id_media FOREIGN KEY ( main_pict_id ) REFERENCES gn_commons.t_medias( id_media )  ON UPDATE CASCADE;
+
 CREATE OR REPLACE VIEW pr_zh.vertebrates AS
 	WITH synthese_zh AS (
 		SELECT 
