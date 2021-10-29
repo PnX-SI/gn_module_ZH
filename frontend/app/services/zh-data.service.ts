@@ -113,6 +113,13 @@ export class ZhDataService {
     );
   }
 
+  postMainPicture(zhId: number, mediaId: number) {
+    return this._api.patch(
+      `${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/main_pict/${mediaId}`,
+      {}
+    );
+  }
+
   getTaxa(zhId: number) {
     return this._api.get(
       `${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/taxa`

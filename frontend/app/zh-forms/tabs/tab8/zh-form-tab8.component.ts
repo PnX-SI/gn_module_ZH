@@ -10,7 +10,7 @@ import { fileSizeValidator } from "../../../validators/fileSizeValidator";
 import { fileNameValidator } from "../../../validators/fileNameValidator";
 import { fileFormatValidator } from "../../../validators/fileFormatValidator";
 
-import { ZhFile } from "./zh-form-tab8.models";
+import { ZhFile, ZhFiles } from "./zh-form-tab8.models";
 import { FilesService } from "../../../services/files.service";
 
 @Component({
@@ -26,6 +26,7 @@ export class ZhFormTab8Component implements OnInit {
   public formTab8: FormGroup;
   public fileForm: FormGroup;
   public files: ZhFile[];
+  public mainPictureId: number;
   public fileToUpload: File | null = null;
   public loadingUpload: boolean = false;
 
@@ -168,8 +169,9 @@ export class ZhFormTab8Component implements OnInit {
     this._dataService
       .getZhFiles(this.zh.id)
       .toPromise()
-      .then((res: ZhFile[]) => {
-        this.files = res;
+      .then((res: ZhFiles) => {
+        this.files = res.media_data;
+        this.files.map((item) => (item.mainPictureId = res.main_pict_id));
         this.initExtensions();
       })
       .catch((error) => {
@@ -213,7 +215,11 @@ export class ZhFormTab8Component implements OnInit {
   }
 
   onChangeMainPhoto(event) {
-    console.log("yoooo", event.title_fr);
+    console.log(event);
+    this._dataService
+      .postMainPicture(this.zh.id, event.id_media)
+      .toPromise()
+      .then(() => this.getFiles());
   }
 
   onOpenModal(modal) {

@@ -19,7 +19,7 @@
                [(ngModel)]="value"
                [value]="item.main_pict_id"
                /> -->
-               <mat-radio-button [checked]="item.main_pict_id" (change)="onRadioChangedItem(item)"></mat-radio-button>
+               <mat-radio-button [checked]="item.mainPictureId == item.id_media" (change)="onRadioChangedItem(item)"></mat-radio-button>
             <!-- <input type="radio" id='regular' name="optradio" [(ngModel)]="mainPhoto" (change)="onRadioChangedItem($event, item.id)"> -->
           </div>
         </td>
