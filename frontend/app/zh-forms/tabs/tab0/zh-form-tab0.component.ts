@@ -16,6 +16,7 @@ import { IDropdownSettings } from "ng-multiselect-dropdown";
 import { ToastrService } from "ngx-toastr";
 import { ZhDataService } from "../../../services/zh-data.service";
 import { TabsService } from "../../../services/tabs.service";
+import { ErrorTranslatorService } from "../../../services/error-translator.service";
 
 @Component({
   selector: "zh-form-tab0",
@@ -27,7 +28,7 @@ export class ZhFormTab0Component implements OnInit {
   @Output() activeTabs = new EventEmitter<boolean>();
   @Output() canChangeTab = new EventEmitter<boolean>();
   @Output() nextTab = new EventEmitter<number>();
-  private _currentZh: any;
+  private _currentZh: any = null;
   public form: FormGroup;
   public cardContentHeight: number;
   public critDelim: any;
@@ -42,6 +43,7 @@ export class ZhFormTab0Component implements OnInit {
   public posted = false;
   private geomLayers: any;
   public zhId: number;
+  public toggleChecked: boolean = false; // TODO: PUT INTO PARAMETER ?
 
   constructor(
     private fb: FormBuilder,
@@ -49,7 +51,8 @@ export class ZhFormTab0Component implements OnInit {
     private _tabService: TabsService,
     private _mapService: MapService,
     private _router: Router,
-    private _toastr: ToastrService
+    private _toastr: ToastrService,
+    private _error: ErrorTranslatorService
   ) {}
 
   ngOnInit() {
@@ -94,8 +97,9 @@ export class ZhFormTab0Component implements OnInit {
           if (!zh || zh.properties.id_zh != geom.id_zh) {
             this.geomLayers.push(
               L.geoJSON(geojson, {
-                onEachFeature: function (feature, layer) {
+                onEachFeature: (feature, layer) => {
                   layer.geomTag = "allGeom";
+                  layer.setStyle(this.getLayerStyle(this.toggleChecked));
                 },
               }).addTo(this._mapService.map)
             );
@@ -123,24 +127,23 @@ export class ZhFormTab0Component implements OnInit {
           critere_delim: selectedCritDelim,
           sdage: this._currentZh.properties.id_sdage,
         });
+        // Must put a set timeout here otherwise
+        // this._mapService is undefined...
         setTimeout(() => {
-          this._mapService.loadGeometryReleve(this._currentZh, false);
+          this.geometry = {
+            geometry: this._currentZh.geometry,
+            properties: { idZh: this._currentZh.properties.id_zh },
+            type: "Feature",
+          };
 
-          this.currentLayer =
-            this._mapService.leafletDrawFeatureGroup.getLayers()[0];
-
-          const coordinates = this._currentZh.geometry.coordinates;
-          const myLatLong = coordinates[0].map((point) => {
-            return L.latLng(point[1], point[0]);
+          const layer = L.geoJSON(this.geometry, {
+            onEachFeature: (feature, layer) => {
+              this._mapService.leafletDrawFeatureGroup.addLayer(layer);
+            },
           });
-          const layer = L.polygon(myLatLong);
-          this.geometry = layer.toGeoJSON();
-          if (this._mapService.map) {
-            setTimeout(() => {
-              this._mapService.map.fitBounds(layer.getBounds());
-            }, 10);
-          }
-          this._mapService.map.invalidateSize();
+          this._mapService.map.fitBounds(layer.getBounds());
+          //this._mapService.leafletDrawFeatureGroup.addTo(this._mapService.map);
+          this.currentLayer = layer;
         }, 0);
         this.canChangeTab.emit(true);
       }
@@ -212,7 +215,17 @@ export class ZhFormTab0Component implements OnInit {
               this._dataService.setCurrentZh(zh);
               this.activeTabs.emit(true);
               this.canChangeTab.emit(true);
-              this._toastr.success("Vos données sont bien enregistrées", "", {
+              var msg: string = "Vos données sont bien enregistrées";
+              var timeOut: number = 5000;
+              if (data.is_intersected) {
+                timeOut = 10000; // stay a little bit longer
+                msg +=
+                  "</br>La géométrie a été découpée car elle intersectait une autre zone humide";
+              }
+              this._toastr.success(msg, "", {
+                enableHtml: true,
+                timeOut: timeOut, // to be sure the user sees
+                closeButton: true,
                 positionClass: "toast-top-right",
               });
               this.nextTab.emit(1);
@@ -220,27 +233,31 @@ export class ZhFormTab0Component implements OnInit {
           },
           (error) => {
             this.posted = false;
-            this._toastr.error(error.error, "", {
+            var msg: string = "Impossible de créer la zone humide : ";
+            msg += this._error.getFrontError(error.error.message);
+            this._toastr.error(msg, "", {
               positionClass: "toast-top-right",
             });
           }
         );
       }
     } else {
-      this._toastr.error(
-        "Veuillez tracer ou importer une zone humide sur la carte",
-        "",
-        { positionClass: "toast-top-right" }
-      );
+      this._toastr.error("Veuillez tracer une zone humide sur la carte", "", {
+        positionClass: "toast-top-right",
+      });
     }
+  }
+
+  getLayerStyle(shown: boolean) {
+    return {
+      opacity: 1 * +shown,
+      fillOpacity: 0.2 * +shown,
+    };
   }
 
   slideToggleChanged(event) {
     this.geomLayers.forEach((layer: any) => {
-      layer.setStyle({
-        opacity: 1 * event.checked,
-        fillOpacity: 0.2 * event.checked,
-      });
+      layer.setStyle(this.getLayerStyle(event.checked));
     });
   }
 

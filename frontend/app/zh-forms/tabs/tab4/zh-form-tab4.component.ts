@@ -5,7 +5,7 @@ import { ToastrService } from "ngx-toastr";
 import { Subscription } from "rxjs";
 import { ZhDataService } from "../../../services/zh-data.service";
 import { TabsService } from "../../../services/tabs.service";
-
+import { ModalService } from "../../../services/modal.service";
 @Component({
   selector: "zh-form-tab4",
   templateUrl: "./zh-form-tab4.component.html",
@@ -23,7 +23,6 @@ export class ZhFormTab4Component implements OnInit {
   public inflowFormSubmitted: boolean;
   public inflowInput: any[];
   public inflowsTable: any = [];
-  private $_inflowInputSub: Subscription;
 
   public patchOutflow: boolean;
   public outflowModalTitle: string;
@@ -32,12 +31,13 @@ export class ZhFormTab4Component implements OnInit {
   public outflowFormSubmitted: boolean;
   public outflowInput: any[];
   public outflowsTable: any = [];
-  private $_outflowInputSub: Subscription;
   posted: boolean;
   public submitted: boolean;
   private $_currentZhSub: Subscription;
   private $_fromChangeSub: Subscription;
   public currentZh: any;
+
+  private tempId: number;
 
   public inflowTableCol = [
     { name: "inflow", label: "Entrée d'eau" },
@@ -46,7 +46,7 @@ export class ZhFormTab4Component implements OnInit {
   ];
 
   public outflowTableCol = [
-    { name: "outflow", label: "Sorite d'eau" },
+    { name: "outflow", label: "Sortie d'eau" },
     { name: "permanance", label: "Permanence" },
     { name: "topo", label: "Toponymie et compléments d'information" },
   ];
@@ -66,6 +66,7 @@ export class ZhFormTab4Component implements OnInit {
     public ngbModal: NgbModal,
     private _toastr: ToastrService,
     private _dataService: ZhDataService,
+    private _modalService: ModalService,
     private _tabService: TabsService
   ) {}
 
@@ -109,13 +110,6 @@ export class ZhFormTab4Component implements OnInit {
   getMetaData() {
     this.inflowInput = [...this.formMetaData["ENTREE_EAU"]];
     this.outflowInput = [...this.formMetaData["SORTIE_EAU"]];
-    // add disabled property to inflowInput options list
-    this.inflowInput.map((item: any) => {
-      item.disabled = false;
-    });
-    this.outflowInput.map((item: any) => {
-      item.disabled = false;
-    });
     this.connexionTypes = [...this.formMetaData["TYPE_CONNEXION"]];
     this.connexionTypes.map((item: any) => {
       item.image = this.corConnectionType[item.mnemonique];
@@ -150,11 +144,6 @@ export class ZhFormTab4Component implements OnInit {
                       ),
                       topo: inflow.topo,
                     });
-                    this.inflowInput.map((item: any) => {
-                      if (item.id_nomenclature == inflow.id_inflow) {
-                        item.disabled = true;
-                      }
-                    });
                   });
                 }
               }
@@ -171,11 +160,6 @@ export class ZhFormTab4Component implements OnInit {
                         }
                       ),
                       topo: outflow.topo,
-                    });
-                    this.outflowInput.map((item: any) => {
-                      if (item.id_nomenclature == outflow.id_outflow) {
-                        item.disabled = true;
-                      }
                     });
                   });
                 }
@@ -214,15 +198,17 @@ export class ZhFormTab4Component implements OnInit {
 
   // open the add inFlow modal
   onAddInflow(event: any, modal: any) {
+    this.inflowForm.reset();
     this.patchInflow = false;
     this.inflowModalBtnLabel = "Ajouter";
     this.inflowModalTitle = "Ajout d'une entrée d'eau";
     event.stopPropagation();
-    this.ngbModal.open(modal, {
-      centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
-    });
+
+    this._modalService.open(
+      modal,
+      this.inflowsTable.map((item) => item.inflow),
+      this.inflowInput
+    );
   }
 
   // add a new inflow to inflows array
@@ -238,12 +224,6 @@ export class ZhFormTab4Component implements OnInit {
       if (!itemExist) {
         this.inflowsTable.push(inflowValues);
       }
-      // disable the added inflow on the select input list
-      this.inflowInput.map((item: any) => {
-        if (item.id_nomenclature == inflowValues.inflow.id_nomenclature) {
-          item.disabled = true;
-        }
-      });
 
       this.ngbModal.dismissAll();
       this.inflowForm.reset();
@@ -257,16 +237,12 @@ export class ZhFormTab4Component implements OnInit {
     this.inflowsTable = this.inflowsTable.filter((item: any) => {
       return item.inflow.id_nomenclature != inflow.inflow.id_nomenclature;
     });
-    this.inflowInput.map((item: any) => {
-      if (item.id_nomenclature == inflow.inflow.id_nomenclature) {
-        item.disabled = false;
-      }
-    });
     this.canChangeTab.emit(false);
   }
 
   // open the edit inFlow modal
   onEditInflow(modal: any, inflow: any) {
+    this.tempId = inflow.inflow.id_nomenclature;
     this.patchInflow = true;
     this.inflowModalBtnLabel = "Modifier";
     this.inflowModalTitle = "Modifier l'entrée d'eau";
@@ -283,22 +259,12 @@ export class ZhFormTab4Component implements OnInit {
       permanance: selectePermanance,
       topo: inflow.topo,
     });
-    // manger disabled inflow input items
-    this.$_inflowInputSub = this.inflowForm
-      .get("inflow")
-      .valueChanges.subscribe(() => {
-        this.inflowInput.map((item: any) => {
-          if (item.id_nomenclature == inflow.inflow.id_nomenclature) {
-            item.disabled = false;
-          }
-        });
-      });
-
-    this.ngbModal.open(modal, {
-      centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
-    });
+    this._modalService.open(
+      modal,
+      this.inflowsTable.map((item) => item.inflow),
+      this.inflowInput,
+      inflow.inflow
+    );
   }
 
   // edit inflow and save into inflows array
@@ -307,36 +273,31 @@ export class ZhFormTab4Component implements OnInit {
     this.inflowFormSubmitted = true;
     if (this.inflowForm.valid) {
       let inflowValues = this.inflowForm.value;
+
       this.inflowsTable = this.inflowsTable.map((item: any) =>
-        item.inflow.id_nomenclature != inflowValues.inflow.id_nomenclature
-          ? item
-          : inflowValues
+        item.inflow.id_nomenclature != this.tempId ? item : inflowValues
       );
-      this.inflowInput.map((item: any) => {
-        if (item.id_nomenclature == inflowValues.inflow.id_nomenclature) {
-          item.disabled = true;
-        }
-      });
       this.ngbModal.dismissAll();
       this.inflowForm.reset();
 
-      this.$_inflowInputSub.unsubscribe();
       this.canChangeTab.emit(false);
       this.inflowFormSubmitted = false;
+      this.tempId = null;
     }
   }
 
   // open the add outFlow modal
   onAddOutflow(event: any, modal: any) {
+    this.outflowForm.reset();
     this.patchOutflow = false;
     this.outflowModalBtnLabel = "Ajouter";
     this.outflowModalTitle = "Ajout d'une sortie d'eau";
     event.stopPropagation();
-    this.ngbModal.open(modal, {
-      centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
-    });
+    this._modalService.open(
+      modal,
+      this.outflowsTable.map((item) => item.outflow),
+      this.outflowInput
+    );
   }
 
   // add a new outflow to outflows array
@@ -352,12 +313,6 @@ export class ZhFormTab4Component implements OnInit {
       if (!itemExist) {
         this.outflowsTable.push(outflowValues);
       }
-      // disable the added outflow on the select input list
-      this.outflowInput.map((item: any) => {
-        if (item.id_nomenclature == outflowValues.outflow.id_nomenclature) {
-          item.disabled = true;
-        }
-      });
 
       this.ngbModal.dismissAll();
       this.outflowForm.reset();
@@ -371,16 +326,12 @@ export class ZhFormTab4Component implements OnInit {
     this.outflowsTable = this.outflowsTable.filter((item: any) => {
       return item.outflow.id_nomenclature != outflow.outflow.id_nomenclature;
     });
-    this.outflowInput.map((item: any) => {
-      if (item.id_nomenclature == outflow.outflow.id_nomenclature) {
-        item.disabled = false;
-      }
-    });
     this.canChangeTab.emit(false);
   }
 
   // open the edit outFlow modal
   onEditOutflow(modal: any, outflow: any) {
+    this.tempId = outflow.outflow.id_nomenclature;
     this.patchOutflow = true;
     this.outflowModalBtnLabel = "Modifier";
     this.outflowModalTitle = "Modifier la sortie d'eau";
@@ -397,22 +348,12 @@ export class ZhFormTab4Component implements OnInit {
       permanance: selectePermanance,
       topo: outflow.topo,
     });
-    // manger disabled outflow input items
-    this.$_outflowInputSub = this.outflowForm
-      .get("outflow")
-      .valueChanges.subscribe(() => {
-        this.outflowInput.map((item: any) => {
-          if (item.id_nomenclature == outflow.outflow.id_nomenclature) {
-            item.disabled = false;
-          }
-        });
-      });
-
-    this.ngbModal.open(modal, {
-      centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
-    });
+    this._modalService.open(
+      modal,
+      this.outflowsTable.map((item) => item.outflow),
+      this.outflowInput,
+      outflow.outflow
+    );
   }
   // edit outflow and save into outflows array
   onPatchOutflow() {
@@ -421,21 +362,14 @@ export class ZhFormTab4Component implements OnInit {
     if (this.outflowForm.valid) {
       let outflowValues = this.outflowForm.value;
       this.outflowsTable = this.outflowsTable.map((item: any) =>
-        item.outflow.id_nomenclature != outflowValues.outflow.id_nomenclature
-          ? item
-          : outflowValues
+        item.outflow.id_nomenclature != this.tempId ? item : outflowValues
       );
-      this.outflowInput.map((item: any) => {
-        if (item.id_nomenclature == outflowValues.outflow.id_nomenclature) {
-          item.disabled = true;
-        }
-      });
       this.ngbModal.dismissAll();
       this.outflowForm.reset();
 
-      this.$_outflowInputSub.unsubscribe();
       this.canChangeTab.emit(false);
       this.outflowFormSubmitted = false;
+      this.tempId = null;
     }
   }
 

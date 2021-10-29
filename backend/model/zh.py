@@ -238,7 +238,7 @@ class ZH(TZH):
             "nb_flora_sp": self.zh.as_dict()['nb_flora_sp'],
             "nb_hab": self.zh.as_dict()['nb_flora_sp'],
             "nb_fauna_sp": self.get_fauna_nb(),
-            "total_hab_cover": self.zh.as_dict()['nb_flora_sp'],
+            "total_hab_cover": self.zh.as_dict()['total_hab_cover'],
             "id_thread": self.zh.as_dict()['id_thread'],
             "id_diag_hydro": self.zh.as_dict()['id_diag_hydro'],
             "id_diag_bio": self.zh.as_dict()['id_diag_bio']

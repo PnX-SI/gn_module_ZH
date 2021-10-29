@@ -2,7 +2,10 @@ import { Component, EventEmitter, OnInit, Input, Output } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { NgbDateParserFormatter, NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { NgbDatepickerI18n } from "@ng-bootstrap/ng-bootstrap";
+
+import { NgbDateFRParserFormatter } from "../../../services/dateFrFormatter";
 import { TabsService } from "../../../services/tabs.service";
+import { ModalService } from "../../../services/modal.service";
 
 import { ToastrService } from "ngx-toastr";
 import { Subscription } from "rxjs";
@@ -17,7 +20,11 @@ import { ZhDataService } from "../../../services/zh-data.service";
   selector: "zh-form-tab6",
   templateUrl: "./zh-form-tab6.component.html",
   styleUrls: ["./zh-form-tab6.component.scss"],
-  providers: [I18n, { provide: NgbDatepickerI18n, useClass: DatepickerI18n }],
+  providers: [
+    I18n,
+    { provide: NgbDatepickerI18n, useClass: DatepickerI18n },
+    { provide: NgbDateParserFormatter, useClass: NgbDateFRParserFormatter },
+  ],
 })
 export class ZhFormTab6Component implements OnInit {
   @Input() public formMetaData: any;
@@ -43,8 +50,6 @@ export class ZhFormTab6Component implements OnInit {
   public managements: any[] = [];
   public plans: any[] = [];
   private tempID: any;
-  private $_statusInputSub: Subscription;
-  private $_instrumentInputSub: Subscription;
   private $_currentZhSub: Subscription;
   public selectedItems = [];
 
@@ -72,6 +77,15 @@ export class ZhFormTab6Component implements OnInit {
 
   public dropdownSettings: any;
   public multiselectTypeClassement: any;
+  public organismDropdownSettings: {
+    enableSearchFilter: boolean;
+    addNewItemOnFilter: boolean;
+    singleSelection: boolean;
+    text: string;
+    labelKey: string;
+    primaryKey: string;
+    enableFilterSelectAll: boolean;
+  };
   public currentZh: any;
   selectedManagement: any;
   moreDetails: boolean;
@@ -85,6 +99,7 @@ export class ZhFormTab6Component implements OnInit {
     public ngbModal: NgbModal,
     private _dataService: ZhDataService,
     private _toastr: ToastrService,
+    private _modalService: ModalService,
     private _tabService: TabsService
   ) {}
 
@@ -96,6 +111,15 @@ export class ZhFormTab6Component implements OnInit {
       searchPlaceholderText: "Rechercher",
       enableCheckAll: false,
       allowSearchFilter: true,
+    };
+    this.organismDropdownSettings = {
+      enableSearchFilter: true,
+      addNewItemOnFilter: true,
+      singleSelection: true,
+      text: "Sélectionner un organisme",
+      labelKey: "name",
+      primaryKey: "id_org",
+      enableFilterSelectAll: false,
     };
     this.dropdownSettings = {
       enableCheckAll: false,
@@ -149,7 +173,10 @@ export class ZhFormTab6Component implements OnInit {
     this.planForm = this.fb.group({
       plan: [null, Validators.required],
       plan_date: [null, Validators.required],
-      duration: [null, Validators.required],
+      duration: [
+        null,
+        Validators.compose([Validators.required, Validators.min(0)]),
+      ],
     });
   }
 
@@ -171,13 +198,13 @@ export class ZhFormTab6Component implements OnInit {
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
         this.currentZh = zh;
-        this.statusTable = [];
-        this.urbanDocTable = [];
-        this.managements = [];
-        this.instrumentTable = [];
         this._dataService
           .getMunicipalitiesByZh(zh.id)
           .subscribe((municipalities: any) => {
+            this.statusTable = [];
+            this.urbanDocTable = [];
+            this.managements = [];
+            this.instrumentTable = [];
             this.municipalities = municipalities;
             //patch forms values
             let protections = [];
@@ -186,11 +213,11 @@ export class ZhFormTab6Component implements OnInit {
               this.currentZh.properties.protections.length > 0
             ) {
               this.currentZh.properties.protections.forEach((element) => {
-                let portection = this.formMetaData["PROTECTIONS"].find(
+                let protection = this.formMetaData["PROTECTIONS"].find(
                   (item: any) => item.id_protection_status == element
                 );
 
-                protections.push(portection);
+                protections.push(protection);
               });
             }
             this.formTab6.patchValue({
@@ -210,7 +237,7 @@ export class ZhFormTab6Component implements OnInit {
                 });
                 this.statusInput.map((item: any) => {
                   if (item.id_nomenclature == owner.id_status) {
-                    item.disabled = false;
+                    item.disabled = true;
                   }
                 });
               });
@@ -230,7 +257,7 @@ export class ZhFormTab6Component implements OnInit {
                   });
                   this.instrumentInput.map((item: any) => {
                     if (item.id_nomenclature == instrument.id_instrument) {
-                      item.disabled = false;
+                      item.disabled = true;
                     }
                   });
                 }
@@ -295,6 +322,11 @@ export class ZhFormTab6Component implements OnInit {
                   },
                   remark: doc.remark,
                 });
+                this.municipalities.map((item: any) => {
+                  if (item.id_area == doc.id_area) {
+                    item.disabled = true;
+                  }
+                });
               });
             }
             this.$_fromChangeSub = this.formTab6.valueChanges.subscribe(() => {
@@ -307,16 +339,16 @@ export class ZhFormTab6Component implements OnInit {
 
   // open the add status modal
   onAddStatus(event: any, modal: any) {
+    this.statusForm.reset();
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'un statut de propriété";
     event.stopPropagation();
-    const modalRef = this.ngbModal.open(modal, {
-      centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
-    });
-    modalRef.result.then().finally(() => this.statusForm.reset());
+    this._modalService.open(
+      modal,
+      this.statusTable.map((item) => item.status),
+      this.statusInput
+    );
   }
 
   // add a new status to status array
@@ -374,26 +406,13 @@ export class ZhFormTab6Component implements OnInit {
       remark: status.remark,
     });
     this.tempID = status.status.id_nomenclature;
-    // manger disabled status input items
-    this.$_statusInputSub = this.statusForm
-      .get("status")
-      .valueChanges.subscribe(() => {
-        this.statusInput.map((item: any) => {
-          if (item.id_nomenclature == status.status.id_nomenclature) {
-            item.disabled = false;
-          }
-        });
-      });
 
-    const modalRef = this.ngbModal.open(modal, {
-      centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
-    });
-    modalRef.result.then().finally(() => {
-      this.$_statusInputSub.unsubscribe();
-      this.statusForm.reset();
-    });
+    this._modalService.open(
+      modal,
+      this.statusTable.map((item) => item.status),
+      this.statusInput,
+      status.status
+    );
   }
 
   // edit status and save into status array
@@ -412,7 +431,6 @@ export class ZhFormTab6Component implements OnInit {
         }
       });
       this.ngbModal.dismissAll();
-      this.$_statusInputSub.unsubscribe();
       this.statusForm.reset();
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
@@ -421,16 +439,16 @@ export class ZhFormTab6Component implements OnInit {
 
   // open the add instrument modal
   onAddInstrument(event: any, modal: any) {
+    this.instrumentForm.reset();
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'un instrument contractuel et financier";
     event.stopPropagation();
-    const modalRef = this.ngbModal.open(modal, {
-      centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
-    });
-    modalRef.result.then().finally(() => this.instrumentForm.reset());
+    this._modalService.open(
+      modal,
+      this.instrumentTable.map((item) => item.instrument),
+      this.instrumentInput
+    );
   }
 
   // add a new Instrument to Instrument array
@@ -450,12 +468,6 @@ export class ZhFormTab6Component implements OnInit {
       if (!itemExist) {
         this.instrumentTable.push(formValues);
       }
-      // disable the added instrument on the select input list
-      this.instrumentInput.map((item: any) => {
-        if (item.id_nomenclature == formValues.instrument.id_nomenclature) {
-          item.disabled = true;
-        }
-      });
 
       this.ngbModal.dismissAll();
       this.instrumentForm.reset();
@@ -470,11 +482,6 @@ export class ZhFormTab6Component implements OnInit {
       return (
         item.instrument.id_nomenclature != instrument.instrument.id_nomenclature
       );
-    });
-    this.instrumentInput.map((item: any) => {
-      if (item.id_nomenclature == instrument.instrument.id_nomenclature) {
-        item.disabled = false;
-      }
     });
     this.canChangeTab.emit(false);
   }
@@ -495,25 +502,12 @@ export class ZhFormTab6Component implements OnInit {
       instrument_date: this.dateParser.parse(instrument.instrument_date),
     });
     this.tempID = instrument.instrument.id_nomenclature;
-    // manger disabled instrument input items
-    this.$_instrumentInputSub = this.instrumentForm
-      .get("instrument")
-      .valueChanges.subscribe(() => {
-        this.instrumentInput.map((item: any) => {
-          if (item.id_nomenclature == instrument.instrument.id_nomenclature) {
-            item.disabled = false;
-          }
-        });
-      });
-    const modalRef = this.ngbModal.open(modal, {
-      centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
-    });
-    modalRef.result.then().finally(() => {
-      this.$_instrumentInputSub.unsubscribe();
-      this.instrumentForm.reset();
-    });
+    this._modalService.open(
+      modal,
+      this.instrumentTable.map((item) => item.instrument),
+      this.instrumentInput,
+      instrument.instrument
+    );
   }
 
   // edit instrument and save into instruments array
@@ -535,7 +529,6 @@ export class ZhFormTab6Component implements OnInit {
         }
       });
       this.ngbModal.dismissAll();
-      this.$_instrumentInputSub.unsubscribe();
       this.instrumentForm.reset();
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
@@ -546,7 +539,7 @@ export class ZhFormTab6Component implements OnInit {
   onAddUrbanDoc(event: any, modal: any) {
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
-    this.modalTitle = "Ajout d'une zonage des documents";
+    this.modalTitle = "Ajout d'un zonage d'urbanisme";
     event.stopPropagation();
     const modalRef = this.ngbModal.open(modal, {
       centered: true,
@@ -619,7 +612,7 @@ export class ZhFormTab6Component implements OnInit {
   onEditUrbanDoc(modal: any, urbanDoc: any) {
     this.patchModal = true;
     this.addModalBtnLabel = "Modifier";
-    this.modalTitle = "Modifier la zonage des documents";
+    this.modalTitle = "Modifier le zonage d'urbanisme";
     // init inputs object type
     const selectedArea = this.municipalities.find(
       (item: any) => item.id_area == urbanDoc.area.id_area
@@ -697,12 +690,14 @@ export class ZhFormTab6Component implements OnInit {
   }
 
   onAddStructure() {
-    if (this.formTab6.value.structure) {
+    // multi select : returns an Array...
+    const structure = this.formTab6.value.structure[0];
+    if (structure) {
       let itemExist = this.managements.some(
-        (item) => item.id_org == this.formTab6.value.structure.id_org
+        (item) => item.id_org == structure.id_org
       );
-      if (!itemExist && this.formTab6.value.structure.id_org) {
-        this.managements.push(this.formTab6.value.structure);
+      if (!itemExist && structure.id_org) {
+        this.managements.push(structure);
       }
       this.formTab6.get("structure").reset();
       this.canChangeTab.emit(false);
@@ -711,6 +706,7 @@ export class ZhFormTab6Component implements OnInit {
 
   //delete Structure from the StructureS array
   onDeleteStructure(structure: any) {
+    structure.plans = [];
     this.managements = this.managements.filter((item: any) => {
       return item.id_org != structure.id_org;
     });
@@ -754,6 +750,7 @@ export class ZhFormTab6Component implements OnInit {
     if (this.planForm.valid) {
       let formValues = this.planForm.value;
       this.managements.map((item: any) => {
+        console.log(item);
         if (item.id_org == this.selectedManagement.id_org) {
           if (!item.plans) {
             formValues.plan_date = this.dateParser.format(formValues.plan_date);

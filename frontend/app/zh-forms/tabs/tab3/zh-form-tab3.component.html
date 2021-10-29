@@ -28,7 +28,7 @@
           >
         </div>
         <div class="form-group col-md-6">
-          <small>Sous-type</small>
+          <small>Sous-type SAGE</small>
           <select class="form-control" [formControl]="form.controls.id_sage">
             <option></option>
             <option *ngFor="let sg of sage" [ngValue]="sg.id_nomenclature">
@@ -39,11 +39,12 @@
       </div>
       <div class="form-row">
         <div class="form-group col-md-6">
-          <small>Corine Biotope</small>
+          <small>Types d’habitats Corine Biotopes humides (H) ou potentiellement humides (P)</small>
           <input
             id="typeahead-basic"
             type="text"
             class="form-control"
+            placeholder="Tapez les premières lettres..."
             [formControl]="form.controls.corinBio"
             [resultFormatter]="formatter"
             [inputFormatter]="formatter"
@@ -66,12 +67,6 @@
             <tr>
               <th *ngFor="let col of corinTableCol">
                 {{ col.label }}
-                <mat-icon
-                  class="info-icon"
-                  *ngIf="col.name == 'CB_humidity'"
-                  ngbTooltip="Types de milieux Corine Biotope humides (H) ou potentiellement humides (P)"
-                  >info</mat-icon
-                >
               </th>
               <th></th>
             </tr>
@@ -133,7 +128,7 @@
         (click)="onAddActivity($event, activityModal)"
       >
         <mat-icon>add_box</mat-icon>
-        Ajouter une activié humaine
+        Ajouter une activité humaine
       </button>
       <div
         *ngIf="listActivity && listActivity.length > 0"
@@ -283,7 +278,7 @@
           >
         </div>
         <div class="form-group col-md-12">
-          <small class="required">Impacts</small>
+          <small class="required">Impacts (facteurs influençant l’évolution de la zone) </small>
           <angular2-multiselect
             [data]="formMetaData.IMPACTS"
             [(ngModel)]="selectedItems"

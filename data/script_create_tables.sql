@@ -220,7 +220,7 @@ CREATE  TABLE pr_zh.t_zh (
 	is_other_inventory   boolean DEFAULT false NOT NULL ,
 	is_carto_hab         boolean DEFAULT false NOT NULL ,
 	nb_hab               integer   ,
-	total_hab_cover      varchar(3) DEFAULT 999 NOT NULL ,
+	total_hab_cover      integer   ,
 	nb_flora_sp          integer   ,
 	nb_vertebrate_sp     integer   ,
 	nb_invertebrate_sp   integer   ,
@@ -441,7 +441,7 @@ CREATE  TABLE pr_zh.t_hab_heritage (
 	id_corine_bio        varchar(50)  NOT NULL ,
 	id_cahier_hab        varchar(50)  NOT NULL ,
 	id_preservation_state integer DEFAULT ref_nomenclatures.get_default_nomenclature_value('ETAT_CONSERVATION') NOT NULL ,
-	hab_cover            varchar(3) DEFAULT 999 NOT NULL ,
+	hab_cover            integer ,
 	CONSTRAINT pk_t_hab PRIMARY KEY ( id_zh, id_corine_bio, id_cahier_hab )
  );
 

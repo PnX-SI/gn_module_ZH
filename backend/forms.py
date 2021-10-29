@@ -1,5 +1,7 @@
 import uuid
 
+import math
+
 import datetime
 
 from sqlalchemy import (
@@ -102,14 +104,33 @@ def post_cor_lim_list(uuid_lim, criteria):
 
 
 def post_cor_zh_area(polygon, id_zh, id_type):
-    query = """
-        SELECT (ref_geo.fct_get_area_intersection(
-        ST_SetSRID('{geom}'::geometry,4326), {type})).id_area
+    query = \
+        """
+            SELECT (ref_geo.fct_get_area_intersection(
+            ST_SetSRID('{geom}'::geometry,4326), {type})).id_area
         """.format(geom=str(polygon), type=id_type)
     q_list = DB.session.execute(text(query)).fetchall()
-    for q in q_list:
+    for element in q_list:
+        # if 'Communes', % of zh in the municipality must be calculated
+        if id_type == CorZhArea.get_id_type('Communes'):
+            municipality_geom = DB.session.query(LAreas).filter(
+                LAreas.id_area == element[0]).one().geom
+            polygon_2154 = DB.session.query(func.ST_Transform(
+                func.ST_SetSRID(func.ST_AsText(polygon), 4326), 2154)).one()[0]
+            intersect_area = DB.session.query(func.ST_Area(
+                func.ST_Intersection(municipality_geom, polygon_2154))).scalar()
+            municipality_area = DB.session.query(
+                func.ST_Area(municipality_geom)).scalar()
+            cover = math.ceil((intersect_area * 100)/municipality_area)
+        else:
+            cover = None
         DB.session.add(
-            CorZhArea(id_area=q[0], id_zh=id_zh))
+            CorZhArea(
+                id_area=element[0],
+                id_zh=id_zh,
+                cover=cover
+            )
+        )
         DB.session.flush()
 
 
