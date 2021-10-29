@@ -1,12 +1,14 @@
 import { Component, EventEmitter, OnInit, Input, Output } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 import { TabsService } from "../../../services/tabs.service";
 
 import { ToastrService } from "ngx-toastr";
-import { Subscription } from "rxjs";
 
 import { ZhDataService } from "../../../services/zh-data.service";
+import { fileSizeValidator } from "../../../validators/fileSizeValidator";
+import { fileNameValidator } from "../../../validators/fileNameValidator";
+import { fileFormatValidator } from "../../../validators/fileFormatValidator";
 
 import { ZhFile } from "./zh-form-tab8.models";
 import { FilesService } from "../../../services/files.service";
@@ -20,10 +22,12 @@ export class ZhFormTab8Component implements OnInit {
   @Input() public formMetaData: any;
   @Output() public canChangeTab = new EventEmitter<boolean>();
   @Output() nextTab = new EventEmitter<number>();
+  public zh: any;
   public formTab8: FormGroup;
   public fileForm: FormGroup;
   public files: ZhFile[];
   public fileToUpload: File | null = null;
+  public loadingUpload: boolean = false;
 
   public modalTitle: string;
   public patchModal: boolean = false;
@@ -72,7 +76,6 @@ export class ZhFormTab8Component implements OnInit {
         ]),
       ],
       title: [null, Validators.required],
-      profile: [null, Validators.required],
       author: [null, Validators.required],
       summary: null,
     });
@@ -220,8 +223,8 @@ export class ZhFormTab8Component implements OnInit {
       windowClass: "bib-modal",
     });
 
-    modalRef.result.then().finally(() => {
-      this.docForm.reset();
+    this.activeModal.result.then().finally(() => {
+      this.resetForm();
     });
   }
 
