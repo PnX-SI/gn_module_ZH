@@ -70,7 +70,7 @@
             </li>
           </ul>
         </zh-label>
-        <zh-label label="Commune (surface ZH/surface commune [%]) :">
+        <zh-label label="Commune (surface ZH/surface commune) :">
           <ul>
             <li
               class="label-item"
@@ -79,7 +79,7 @@
             >
               <span
                 >{{ commune.nom }} ({{
-                  commune.couverture || "non renseigné"
+                  commune.couverture + '%' || "non renseigné"
                 }})</span
               >
             </li>
