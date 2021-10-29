@@ -40,7 +40,21 @@
             [data]="data.instruments"
           ></zh-table>
         </div>
-        <zh-label label="Autres inventaires :">
+      </fieldset>
+    </div>
+    <div class="col-12 h-100">
+      <fieldset>
+        <legend>
+          <h5 class="section-title">Autres inventaires</h5>
+        </legend>
+        <zh-label label="">
+          <ul>
+            <li class="label-item" *ngFor="let ref of data.localisation?.other_ref">
+              <a href="{{ ref.url }}" target="_blank"  [ngbTooltip]="ref.zh_type_name + ' (' + ref.area_code + ')'">{{ ref.area_name }}</a>
+            </li>
+          </ul>
+        </zh-label>
+        <zh-label label="Autres études / inventaires naturalistes : ">
           <span>{{ data.autre_invetaire }}</span>
         </zh-label>
       </fieldset>
