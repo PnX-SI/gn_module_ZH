@@ -875,9 +875,9 @@ class EvalThread:
 
     def __str__(self):
         return {
-            "menaces": self.id_thread,
-            "hydrologique": self.id_diag_hydro,
-            "biologique": self.id_diag_bio,
+            "menaces": Utils.get_mnemo(self.id_thread),
+            "hydrologique": Utils.get_mnemo(self.id_diag_hydro),
+            "biologique": Utils.get_mnemo(self.id_diag_bio),
             "Commentaire": self.remark_eval_thread,
         }
 
