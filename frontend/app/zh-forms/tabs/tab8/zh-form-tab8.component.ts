@@ -216,7 +216,17 @@ export class ZhFormTab8Component implements OnInit {
     this._dataService
       .postMainPicture(this.zh.id, event.id_media)
       .toPromise()
-      .then(() => this.getFiles());
+      .then(() => {
+        this.displayInfo("Photo principale changée avec succès");
+      })
+      .catch((error) => {
+        this.displayError(
+          `Une erreur est survenue ! Impossible de changer la photo principale. Erreur : <${error.message}>`
+        );
+      })
+      .finally(() => {
+        this.getFiles();
+      });
   }
 
   onOpenModal(modal) {
