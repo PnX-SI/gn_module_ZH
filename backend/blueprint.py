@@ -403,6 +403,7 @@ def post_main_pict(id_zh, id_media, info_role):
         DB.session.query(TZH).filter(TZH.id_zh == id_zh).update({
             TZH.main_pict_id: id_media})
         DB.session.commit()
+        return ('', 204)
     except Exception as e:
         DB.session.rollback()
         raise ZHApiError(message=str(e), details=str(e))
