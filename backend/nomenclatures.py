@@ -68,12 +68,16 @@ def get_ch(lb_code):
     return ch
 
 
+def set_select_list(cd, mnemo):
+    return cd + '- ' + mnemo.capitalize()
+
+
 def get_impact_list():
     return [
         {
             "id_cor_impact_types": impact.CorImpactTypes.id_cor_impact_types,
             "id_nomenclature": impact.CorImpactTypes.id_impact,
-            "mnemonique": impact.TNomenclatures.mnemonique,
+            "mnemonique": set_select_list(impact.TNomenclatures.cd_nomenclature, impact.TNomenclatures.mnemonique),
             "id_category": impact.CorImpactTypes.id_impact_type,
             "category": get_impact_category(impact)
         } for impact in CorImpactTypes.get_impacts()
@@ -158,7 +162,7 @@ def get_nomenc(config):
             nomenc_list = [
                 {
                     "id_nomenclature": nomenc.id_nomenclature,
-                    "mnemonique": nomenc.label_default                
+                    "mnemonique": nomenc.label_default
                 } for nomenc in Nomenclatures.get_nomenclature_info(mnemo)
             ]
             nomenc_info = {**nomenc_info, mnemo: nomenc_list}
