@@ -234,6 +234,12 @@ export class ZhFormTab3Component implements OnInit {
                   v.CB_code.toLowerCase().indexOf(term.toLowerCase()) > -1
               )
               .slice(0, 10)
+      ),
+      // Not to display a Corine that is already in the table
+      map((term) =>
+        term.filter(
+          (t) => !this.listCorinBio.map((c) => c.CB_code).includes(t.CB_code)
+        )
       )
     );
 
