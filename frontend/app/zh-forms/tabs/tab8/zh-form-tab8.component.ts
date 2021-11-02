@@ -1,7 +1,6 @@
 import { Component, EventEmitter, OnInit, Input, Output } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
-import { TabsService } from "../../../services/tabs.service";
 
 import { ToastrService } from "ngx-toastr";
 
@@ -55,7 +54,6 @@ export class ZhFormTab8Component implements OnInit {
     public ngbModal: NgbModal,
     private _dataService: ZhDataService,
     private _toastr: ToastrService,
-    private _tabService: TabsService,
     private _filesService: FilesService
   ) {}
 
