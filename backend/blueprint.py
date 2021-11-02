@@ -344,7 +344,7 @@ def patch_reference(info_role):
         TReferences.pub_year: form_data["pub_year"],
         TReferences.title: form_data["title"],
         TReferences.editor: form_data["editor"],
-        TReferences.editor_location: form_data["editor_location"],
+        TReferences.editor_location: form_data["editor_location"]
     })
     DB.session.commit()
     return form_data
@@ -359,7 +359,10 @@ def get_file_list(id_zh, info_role):
     zh_uuid = DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().zh_uuid
     q_medias = DB.session.query(TMedias).filter(
         TMedias.unique_id_media == zh_uuid).all()
-    return [media.as_dict() for media in q_medias]
+    return {
+        "media_data": [media.as_dict() for media in q_medias],
+        "main_pict_id": DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().main_pict_id
+    }
 
 
 @ blueprint.route("files/<int:id_media>", methods=["DELETE"])
@@ -384,6 +387,23 @@ def download_file(id_media, info_role):
     """
     try:
         return send_file(get_file_path(id_media), as_attachment=True)
+    except Exception as e:
+        DB.session.rollback()
+        raise ZHApiError(message=str(e), details=str(e))
+    finally:
+        DB.session.close()
+
+
+@ blueprint.route("<int:id_zh>/main_pict/<int:id_media>", methods=["PATCH"])
+@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
+def post_main_pict(id_zh, id_media, info_role):
+    """post main picture id in tzh
+    """
+    try:
+        DB.session.query(TZH).filter(TZH.id_zh == id_zh).update({
+            TZH.main_pict_id: id_media})
+        DB.session.commit()
+        return ('', 204)
     except Exception as e:
         DB.session.rollback()
         raise ZHApiError(message=str(e), details=str(e))

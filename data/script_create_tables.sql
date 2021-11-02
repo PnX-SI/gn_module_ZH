@@ -228,6 +228,7 @@ CREATE  TABLE pr_zh.t_zh (
 	remark_eval_heritage varchar(2000)   ,
 	remark_eval_thread   varchar(2000)   ,
 	remark_eval_actions  varchar(2000)   ,
+	main_pict_id         integer   ,
 	CONSTRAINT pk_t_zh_zh_id PRIMARY KEY ( id_zh ),
 	CONSTRAINT unq_t_zh_code UNIQUE ( code ) ,
 	CONSTRAINT unq_t_zh_name UNIQUE ( main_name ) ,
@@ -692,6 +693,8 @@ ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_sdage_t_nomenclatures FOREIGN KEY 
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_sage_t_nomenclatures FOREIGN KEY ( id_sage ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_id_org FOREIGN KEY ( id_org ) REFERENCES pr_zh.bib_organismes( id_org )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_id_media FOREIGN KEY ( main_pict_id ) REFERENCES gn_commons.t_medias( id_media )  ON UPDATE CASCADE;
 
 CREATE OR REPLACE VIEW pr_zh.vertebrates AS
 	WITH synthese_zh AS (
