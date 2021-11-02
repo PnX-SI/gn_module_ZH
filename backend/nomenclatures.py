@@ -106,7 +106,7 @@ def get_function_list(mnemo):
             "id_nomenclature": function.CorMainFct.id_function,
             "mnemonique": function.TNomenclatures.mnemonique,
             "id_category": function.CorMainFct.id_main_function,
-            "category": DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == function.CorMainFct.id_main_function).one().mnemonique
+            "category": DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == function.CorMainFct.id_main_function).one().mnemonique.upper()
         } for function in CorMainFct.get_functions(nomenclature_ids)
     ]
 
