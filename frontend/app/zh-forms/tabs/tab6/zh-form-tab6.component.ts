@@ -47,6 +47,13 @@ export class ZhFormTab6Component implements OnInit {
   public statusTable: any[] = [];
   public instrumentTable: any[] = [];
   public urbanDocTable: any[] = [];
+  public structures: {
+    id_org: number;
+    name: string;
+    abbreviation: string;
+    is_op_org: boolean;
+    plans: [];
+  }[] = [];
   public managements: any[] = [];
   public plans: any[] = [];
   private tempID: any;
@@ -85,6 +92,7 @@ export class ZhFormTab6Component implements OnInit {
     labelKey: string;
     primaryKey: string;
     enableFilterSelectAll: boolean;
+    noDataLabel: string;
   };
   public currentZh: any;
   selectedManagement: any;
@@ -120,6 +128,7 @@ export class ZhFormTab6Component implements OnInit {
       labelKey: "name",
       primaryKey: "id_org",
       enableFilterSelectAll: false,
+      noDataLabel: "Aucun organisme disponible",
     };
     this.dropdownSettings = {
       enableCheckAll: false,
@@ -687,6 +696,14 @@ export class ZhFormTab6Component implements OnInit {
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
     }
+  }
+
+  onStructureOpened() {
+    // When the multiselect is opened
+    // Filter the structure with the ones present in the table
+    this.structures = this.formMetaData.BIB_MANAGEMENT_STRUCTURES.filter(
+      (item) => !this.managements.map((m) => m.id_org).includes(item.id_org)
+    );
   }
 
   onAddStructure() {

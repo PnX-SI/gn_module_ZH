@@ -67,8 +67,9 @@
         <div class="form-group col-md-6">
           <angular2-multiselect
             [settings]="organismDropdownSettings"
-            [data]="formMetaData.BIB_MANAGEMENT_STRUCTURES"
+            [data]="structures"
             [formControl]="formTab6.controls.structure"
+            (onOpen)="onStructureOpened()"
           >
           </angular2-multiselect>
         </div>
