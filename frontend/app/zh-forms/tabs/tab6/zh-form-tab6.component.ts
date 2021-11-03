@@ -88,7 +88,7 @@ export class ZhFormTab6Component implements OnInit {
   };
   public currentZh: any;
   selectedManagement: any;
-  moreDetails: boolean;
+  moreDetails: boolean = true;
   posted: boolean;
   submitted: boolean;
   $_fromChangeSub: any;
