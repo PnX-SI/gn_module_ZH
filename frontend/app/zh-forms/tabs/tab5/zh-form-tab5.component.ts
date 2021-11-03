@@ -42,22 +42,22 @@ export class ZhFormTab5Component implements OnInit {
 
   public hydroFctTableCol = [
     { name: "function", label: "Fonctions hydrologiques / biogéochimiques" },
+    { name: "justification", label: "Justifications" },
     { name: "qualification", label: "Qualifications" },
     { name: "knowledge", label: "Connaissance" },
-    { name: "justification", label: "Justifications" },
   ];
   public bioFctTableCol = [
     { name: "function", label: "Fonctions biologiques / écologiques" },
+    { name: "justification", label: "Justifications" },
     { name: "qualification", label: "Qualifications" },
     { name: "knowledge", label: "Connaissance" },
-    { name: "justification", label: "Justifications" },
   ];
 
   public interetsTableCol = [
     { name: "function", label: "Intérêts patrimoniaux" },
+    { name: "justification", label: "Justifications" },
     { name: "qualification", label: "Qualifications" },
     { name: "knowledge", label: "Connaissance" },
-    { name: "justification", label: "Justifications" },
   ];
 
   public corineTableCol = [
@@ -69,9 +69,9 @@ export class ZhFormTab5Component implements OnInit {
 
   public socioEcoTableCol = [
     { name: "function", label: "Valeurs socio-économiques" },
+    { name: "justification", label: "Justifications" },
     { name: "qualification", label: "Qualifications" },
     { name: "knowledge", label: "Connaissance" },
-    { name: "justification", label: "Justifications" },
   ];
 
   private tempID: any;
