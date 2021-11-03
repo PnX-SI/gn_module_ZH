@@ -879,12 +879,22 @@ export class ZhFormTab5Component implements OnInit {
                   v.CB_code.toLowerCase().indexOf(term.toLowerCase()) > -1
               )
               .slice(0, 10)
+      ),
+      // Not to display a Corine that is already in the table
+      map((term) =>
+        term.filter(
+          (t) =>
+            !this.corineBioTable
+              .map((c) => c.corinBio.CB_code)
+              .includes(t.CB_code)
+        )
       )
     );
 
   formatter = (result: any) => `${result.CB_code} ${result.CB_label}`;
 
   onSelectedCorin(corineBio: any) {
+    console.log(this.corineBioTable);
     this._dataService
       .getHabitatByCorine(corineBio.CB_code)
       .subscribe((habitats: any) => {
