@@ -11,6 +11,7 @@ import { fileFormatValidator } from "../../../validators/fileFormatValidator";
 
 import { ZhFile, ZhFiles } from "./zh-form-tab8.models";
 import { FilesService } from "../../../services/files.service";
+import { TabsService } from "../../../services/tabs.service";
 
 @Component({
   selector: "zh-form-tab8",
@@ -54,10 +55,16 @@ export class ZhFormTab8Component implements OnInit {
     public ngbModal: NgbModal,
     private _dataService: ZhDataService,
     private _toastr: ToastrService,
-    private _filesService: FilesService
+    private _filesService: FilesService,
+    private _tabService: TabsService
   ) {}
 
   ngOnInit() {
+    this._tabService.getTabChange().subscribe((tabPosition: number) => {
+      if (tabPosition == 8) {
+        this.getCurrentZh();
+      }
+    });
     this.getCurrentZh();
   }
 
