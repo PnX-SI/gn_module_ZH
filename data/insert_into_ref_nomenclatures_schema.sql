@@ -468,19 +468,19 @@ INSERT INTO ref_nomenclatures.t_nomenclatures(id_type,cd_nomenclature,mnemonique
 -- fill ref_nomenclatures.defaults_nomenclatures_value
 
 INSERT INTO ref_nomenclatures.defaults_nomenclatures_value VALUES
-('CRIT_DEF_ESP_FCT',0,(SELECT ref_nomenclatures.get_id_nomenclature('CRIT_DEF_ESP_FCT','0'))),
-('EVAL_GLOB_MENACES',0,(SELECT ref_nomenclatures.get_id_nomenclature('EVAL_GLOB_MENACES','0'))),
-('PERMANENCE_ENTREE',0,(SELECT ref_nomenclatures.get_id_nomenclature('PERMANENCE_ENTREE','0'))),
-('PERMANENCE_SORTIE',0,(SELECT ref_nomenclatures.get_id_nomenclature('PERMANENCE_SORTIE','0'))),
-('SUBMERSION_FREQ',0,(SELECT ref_nomenclatures.get_id_nomenclature('SUBMERSION_FREQ','0'))),
-('SUBMERSION_ETENDUE',0,(SELECT ref_nomenclatures.get_id_nomenclature('SUBMERSION_ETENDUE','0'))),
-('FONCTIONNALITE_HYDRO',0,(SELECT ref_nomenclatures.get_id_nomenclature('FONCTIONNALITE_HYDRO','0'))),
-('FONCTIONNALITE_BIO',0,(SELECT ref_nomenclatures.get_id_nomenclature('FONCTIONNALITE_BIO','0'))),
-('FONCTIONS_QUALIF',0,(SELECT ref_nomenclatures.get_id_nomenclature('FONCTIONS_QUALIF','0'))),
-('FONCTIONS_CONNAISSANCE',0,(SELECT ref_nomenclatures.get_id_nomenclature('FONCTIONS_CONNAISSANCE','0'))),
-('ETAT_CONSERVATION',0,(SELECT ref_nomenclatures.get_id_nomenclature('ETAT_CONSERVATION','0'))),
-('STATUT_PROPRIETE',0,(SELECT ref_nomenclatures.get_id_nomenclature('STATUT_PROPRIETE','0'))),
-('STATUT_PROTECTION',0,(SELECT ref_nomenclatures.get_id_nomenclature('STATUT_PROTECTION','0')))
+('CRIT_DEF_ESP_FCT',(select id_organisme from utilisateurs.bib_organismes where nom_organisme = 'ALL'),(SELECT ref_nomenclatures.get_id_nomenclature('CRIT_DEF_ESP_FCT','0'))),
+('EVAL_GLOB_MENACES',(select id_organisme from utilisateurs.bib_organismes where nom_organisme = 'ALL'),(SELECT ref_nomenclatures.get_id_nomenclature('EVAL_GLOB_MENACES','0'))),
+('PERMANENCE_ENTREE',(select id_organisme from utilisateurs.bib_organismes where nom_organisme = 'ALL'),(SELECT ref_nomenclatures.get_id_nomenclature('PERMANENCE_ENTREE','0'))),
+('PERMANENCE_SORTIE',(select id_organisme from utilisateurs.bib_organismes where nom_organisme = 'ALL'),(SELECT ref_nomenclatures.get_id_nomenclature('PERMANENCE_SORTIE','0'))),
+('SUBMERSION_FREQ',(select id_organisme from utilisateurs.bib_organismes where nom_organisme = 'ALL'),(SELECT ref_nomenclatures.get_id_nomenclature('SUBMERSION_FREQ','0'))),
+('SUBMERSION_ETENDUE',(select id_organisme from utilisateurs.bib_organismes where nom_organisme = 'ALL'),(SELECT ref_nomenclatures.get_id_nomenclature('SUBMERSION_ETENDUE','0'))),
+('FONCTIONNALITE_HYDRO',(select id_organisme from utilisateurs.bib_organismes where nom_organisme = 'ALL'),(SELECT ref_nomenclatures.get_id_nomenclature('FONCTIONNALITE_HYDRO','0'))),
+('FONCTIONNALITE_BIO',(select id_organisme from utilisateurs.bib_organismes where nom_organisme = 'ALL'),(SELECT ref_nomenclatures.get_id_nomenclature('FONCTIONNALITE_BIO','0'))),
+('FONCTIONS_QUALIF',(select id_organisme from utilisateurs.bib_organismes where nom_organisme = 'ALL'),(SELECT ref_nomenclatures.get_id_nomenclature('FONCTIONS_QUALIF','0'))),
+('FONCTIONS_CONNAISSANCE',(select id_organisme from utilisateurs.bib_organismes where nom_organisme = 'ALL'),(SELECT ref_nomenclatures.get_id_nomenclature('FONCTIONS_CONNAISSANCE','0'))),
+('ETAT_CONSERVATION',(select id_organisme from utilisateurs.bib_organismes where nom_organisme = 'ALL'),(SELECT ref_nomenclatures.get_id_nomenclature('ETAT_CONSERVATION','0'))),
+('STATUT_PROPRIETE',(select id_organisme from utilisateurs.bib_organismes where nom_organisme = 'ALL'),(SELECT ref_nomenclatures.get_id_nomenclature('STATUT_PROPRIETE','0'))),
+('STATUT_PROTECTION',(select id_organisme from utilisateurs.bib_organismes where nom_organisme = 'ALL'),(SELECT ref_nomenclatures.get_id_nomenclature('STATUT_PROTECTION','0')))
 ON CONFLICT (mnemonique_type, id_organism) DO NOTHING;
 ;
 
