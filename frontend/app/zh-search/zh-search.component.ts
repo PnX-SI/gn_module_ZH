@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Input } from "@angular/core";
 
 @Component({
   selector: "zh-search",
@@ -6,6 +6,8 @@ import { Component, OnInit } from "@angular/core";
   styleUrls: ["./zh-search.component.scss"],
 })
 export class ZhSearchComponent implements OnInit {
+  @Input() forms: any;
+
   constructor() {}
 
   ngOnInit() {}

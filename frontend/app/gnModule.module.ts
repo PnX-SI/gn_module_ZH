@@ -24,8 +24,8 @@ import { ZhTabsComponent } from "./zh-forms/tabs/zh-tabs.component";
 import { DatepickerI18n } from "./services/datepicker-i18n.service";
 import { CancelButtonComponent } from "./zh-forms/cancelButton/cancelButton.component";
 import { ZhFormTab8Component } from "./zh-forms/tabs/tab8/zh-form-tab8.component";
-import { ZhSearchComponent } from "./zh-search/zh-search.component";
 import { ErrorTranslatorService } from "./services/error-translator.service";
+import { ZhSearchModule } from "./zh-search/zh-search.module";
 
 // my module routing
 const routes: Routes = [
@@ -38,7 +38,6 @@ const routes: Routes = [
   declarations: [
     ZhMapListComponent,
     ZhTabsComponent,
-    ZhSearchComponent,
     ZhFormMapComponent,
     ZhFormTab0Component,
     ZhFormTab1Component,
@@ -60,6 +59,7 @@ const routes: Routes = [
     NgMultiSelectDropDownModule.forRoot(),
     NgbModule,
     ZhDetailsModule,
+    ZhSearchModule,
   ],
   providers: [
     ZhDataService,

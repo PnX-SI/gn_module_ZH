@@ -1,0 +1,10 @@
+<zh-label label="Type SDAGE de la zone humide">
+  <select>
+    <option
+      *ngFor="let item of sdage"
+      [ngValue]="item"
+    >
+      {{ item.mnemonique }}
+    </option>
+  </select>
+</zh-label>
