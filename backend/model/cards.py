@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from sqlalchemy.sql.expression import true
-from sqlalchemy.util.langhelpers import dependencies
+from sqlalchemy import text
+#from pypnusershub.db.models import Organisme
 
 from geonature.utils.env import DB
 from geonature.core.ref_geo.models import LAreas
@@ -34,10 +34,6 @@ class Utils(ZH):
         if string:
             return string
         return ''
-
-    @staticmethod
-    def get_int(nb):
-        return nb  # if nb is not None else 'Non évalué'
 
 
 class Limits:
@@ -158,19 +154,22 @@ class Localisation:
 
 class Author:
 
-    def __init__(self, id_zh, create_date, update_date):
+    def __init__(self, id_zh, create_date, update_date, id_organisme):
         self.id_zh = id_zh
         self.create_date = create_date
         self.update_date = update_date
         self.create_author = self.__get_author()
         self.edit_author = self.__get_author(type='coauthors')
+        self.id_organisme = id_organisme
 
     def __str__(self):
         return {
             "auteur": self.create_author,
             "auteur_modif": self.edit_author,
             "date": datetime.strptime(self.create_date, '%Y-%m-%d %H:%M:%S').date().strftime("%d/%m/%Y"),
-            "date_modif": datetime.strptime(self.update_date, '%Y-%m-%d %H:%M:%S.%f').date().strftime("%d/%m/%Y")
+            "date_modif": datetime.strptime(self.update_date, '%Y-%m-%d %H:%M:%S.%f').date().strftime("%d/%m/%Y"),
+            # "organism": DB.session.query(Organisme).filter(Organisme.id_organisme == self.id_organisme).one().nom_organisme
+            "organism": self.__temporary_get_organism(self.id_organisme)
         }
 
     def __get_author(self, type='authors'):
@@ -178,6 +177,16 @@ class Author:
         prenom = getattr(zh, type).prenom_role
         nom = getattr(zh, type).nom_role
         return prenom + ' ' + nom.upper()
+
+    def __temporary_get_organism(self, id_organism):
+        # waiting for update of pypnusershub with Organisme class
+        query = \
+            """
+                SELECT nom_organisme
+                FROM utilisateurs.bib_organismes
+                WHERE id_organisme = {id_organisme}
+            """.format(id_organisme=id_organism)
+        return DB.session.execute(text(query)).fetchone().nom_organisme
 
 
 class Municipalities:
@@ -351,9 +360,9 @@ class Taxa:
 
     def __str__(self):
         return {
-            "nb_flore": Utils.get_int(self.nb_flora_sp),
-            "nb_vertebre": Utils.get_int(self.nb_vertebrate_sp),
-            "nb_invertebre": Utils.get_int(self.nb_invertebrate_sp)
+            "nb_flore": self.nb_flora_sp,
+            "nb_vertebre": self.nb_vertebrate_sp,
+            "nb_invertebre": self.nb_invertebrate_sp
         }
 
 
@@ -370,7 +379,7 @@ class HabHeritage:
             "biotope": DB.session.query(Habref).filter(Habref.lb_code == self.id_corine_bio).filter(Habref.cd_typo == 22).one().lb_hab_fr,
             "etat": Utils.get_mnemo(self.id_preservation_state),
             "cahier": DB.session.query(Habref).filter(Habref.cd_hab == self.id_cahier_hab).one().lb_hab_fr,
-            "recouvrement": int(self.hab_cover)
+            "recouvrement": self.hab_cover
         }
 
 
@@ -394,7 +403,7 @@ class Habs:
                     hab['id_corine_bio'],
                     hab['id_cahier_hab'],
                     hab['id_preservation_state'],
-                    int(hab["hab_cover"])
+                    hab["hab_cover"]
                 ) for hab in habs
             ]
         else:
@@ -403,8 +412,8 @@ class Habs:
     def __str__(self):
         return {
             "cartographie": Utils.get_bool(self.is_carto_hab),
-            "nombre": Utils.get_int(self.nb_hab),
-            "recouvrement": Utils.get_int(int(self.total_hab_cover)),
+            "nombre": self.nb_hab,
+            "recouvrement": self.total_hab_cover,
             "corine": [hab.__str__() for hab in self.hab_heritage]
         }
 
@@ -527,12 +536,18 @@ class Activity:
 class Status:
 
     def __init__(self):
+        self.id_zh: int
         self.ownerships: list(Ownership)
         self.managements: list(Management)
         self.instruments: list(Instrument)
+        self.other_ref_geo: list(dict)
         self.is_other_inventory: bool
         self.protections: list(int)
         self.urban_docs: list(UrbanDoc)
+
+    @property
+    def id_zh(self):
+        return self.__id_zh
 
     @property
     def ownerships(self):
@@ -547,6 +562,10 @@ class Status:
         return self.__instruments
 
     @property
+    def other_ref_geo(self):
+        return self.__other_ref_geo
+
+    @property
     def is_other_inventory(self):
         return self.__is_other_inventory
 
@@ -557,6 +576,10 @@ class Status:
     @property
     def urban_docs(self):
         return self.__urban_docs
+
+    @id_zh.setter
+    def id_zh(self, value):
+        self.__id_zh = value
 
     @ownerships.setter
     def ownerships(self, value):
@@ -594,6 +617,23 @@ class Status:
             ) for instrument in instruments
         ]
 
+    @other_ref_geo.setter
+    def other_ref_geo(self, ref_geo):
+        id_types = CorZhArea.get_id_types_ref_geo(self.id_zh, ref_geo)
+        refs = []
+        for ref in CorZhArea.get_ref_geo_info(self.id_zh, id_types):
+            for i in ref:
+                type_code = DB.session.query(BibAreasTypes).filter(
+                    BibAreasTypes.id_type == i.LAreas.id_type).one().type_code
+                refs.append({
+                    "area_name": i.LAreas.area_name,
+                    "area_code": i.LAreas.area_code,
+                    "url": i.LAreas.source,
+                    "type_code": type_code,
+                    "zh_type_name": [ref['zh_name'] for ref in ref_geo if ref['type_code_ref_geo'] == type_code][0]
+                })
+        self.__other_ref_geo = refs
+
     @is_other_inventory.setter
     def is_other_inventory(self, value):
         self.__is_other_inventory = value
@@ -627,7 +667,8 @@ class Status:
             "regime": [ownership.__str__() for ownership in self.ownerships],
             "structure": [management.__str__() for management in self.managements],
             "instruments": [instrument.__str__() for instrument in self.instruments],
-            "autre_invetaire": Utils.get_bool(self.is_other_inventory),
+            "autre_inventaire": self.__other_ref_geo,
+            "autre_etude": Utils.get_bool(self.is_other_inventory),
             "statuts": self.__str_protections(),
             "zonage": [urban_doc.__str__() for urban_doc in self.urban_docs]
         }
@@ -674,7 +715,7 @@ class Plan:
         return {
             "plan": Utils.get_mnemo(self.id_nature),
             "date": Utils.get_string(str(self.plan_date)),
-            "duree": Utils.get_int(self.duration)
+            "duree": self.duration
         }
 
 
@@ -687,7 +728,7 @@ class Instrument:
     def __str__(self):
         return {
             "instrument": Utils.get_mnemo(self.id_instrument),
-            "date": datetime.strptime(self.instrument_date, '%Y-%m-%d').date().strftime("%d/%m/%Y")
+            "date": self.instrument_date
         }
 
 
@@ -823,12 +864,12 @@ class EvalInterest:
     def __str__(self):
         return {
             "interet": [interest.__str__() for interest in self.interet_patrim],
-            "faunistique": Utils.get_int(self.nb_fauna_sp),
-            "floristique": Utils.get_int(self.nb_flora_sp),
-            "nb_hab": Utils.get_int(self.nb_hab),
-            "total_hab_cover": Utils.get_int(self.total_hab_cover),
+            "faunistique": self.nb_fauna_sp,
+            "floristique": self.nb_flora_sp,
+            "nb_hab": self.nb_hab,
+            "total_hab_cover": self.total_hab_cover,
             "valeur": [val.__str__() for val in self.val_soc_eco],
-            "Commentaire": Utils.get_int(self.remark_eval_functions)
+            "Commentaire": self.remark_eval_functions
         }
 
 
@@ -848,10 +889,10 @@ class EvalThread:
 
     def __str__(self):
         return {
-            "menaces": Utils.get_int(self.id_thread),
-            "hydrologique": Utils.get_int(self.id_diag_hydro),
-            "biologique": Utils.get_int(self.id_diag_bio),
-            "Commentaire": Utils.get_int(self.remark_eval_thread),
+            "menaces": Utils.get_mnemo(self.id_thread),
+            "hydrologique": Utils.get_mnemo(self.id_diag_hydro),
+            "biologique": Utils.get_mnemo(self.id_diag_bio),
+            "Commentaire": self.remark_eval_thread,
         }
 
 
@@ -899,7 +940,7 @@ class Action:
 
     def __str__(self):
         return {
-            "proposition": Utils.get_mnemo(self.id_action),
+            "proposition": DB.session.query(BibActions).filter(BibActions.id_action == self.id_action).one().name,
             "niveau": Utils.get_mnemo(self.id_priority_level),
             "remarque": Utils.get_string(self.remark)
         }
@@ -907,9 +948,10 @@ class Action:
 
 class Card(ZH):
 
-    def __init__(self, id_zh, type):
+    def __init__(self, id_zh, type, ref_geo_config):
         self.id_zh = id_zh
         self.type = type
+        self.ref_geo_config = ref_geo_config
         self.properties = self.get_properties()
         self.eval = self.get_eval()
         self.info = Info()
@@ -962,13 +1004,15 @@ class Card(ZH):
             self.id_zh,
             self.properties['geo_info']['regions'],
             self.properties['geo_info']['departments']
+            # self.ref_geo_config
         )
 
     def __set_author(self):
         self.info.authors = Author(
             self.id_zh,
             self.properties['create_date'],
-            self.properties['update_date']
+            self.properties['update_date'],
+            self.properties['authors']['id_organisme']
         )
 
     def __set_references(self):
@@ -1076,9 +1120,11 @@ class Card(ZH):
         self.description.use.remark_activity = self.properties['global_remark_activity']
 
     def __set_statuses(self):
+        self.status.id_zh = self.id_zh
         self.status.ownerships = self.properties['ownerships']
         self.status.managements = self.properties['managements']
         self.status.instruments = self.properties['instruments']
+        self.status.other_ref_geo = self.ref_geo_config
         self.status.is_other_inventory = self.properties['is_other_inventory']
         self.status.protections = self.properties['protections']
         self.status.urban_docs = self.properties['urban_docs']

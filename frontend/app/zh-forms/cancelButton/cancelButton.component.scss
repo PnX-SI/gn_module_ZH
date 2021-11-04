@@ -13,3 +13,12 @@
   font-size: 18px;
   padding: 10px 24px 16px;
 }
+
+.warning-icon {
+  position: relative;
+  top: 5px
+}
+
+.warning {
+  color: var(--danger);
+}

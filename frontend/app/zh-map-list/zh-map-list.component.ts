@@ -102,9 +102,6 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
         this._mapService.currentExtend.zoom
       );
     }
-    this._mapService.removeLayerFeatureGroups([
-      this._mapService.fileLayerFeatureGroup,
-    ]);
   }
 
   @HostListener("window:resize", ["$event"])

@@ -6,6 +6,7 @@ import { Subscription, Observable } from "rxjs";
 import { debounceTime, distinctUntilChanged, map } from "rxjs/operators";
 import { ToastrService } from "ngx-toastr";
 import { TabsService } from "../../../services/tabs.service";
+import { ModalService } from "../../../services/modal.service";
 
 @Component({
   selector: "zh-form-tab3",
@@ -24,8 +25,8 @@ export class ZhFormTab3Component implements OnInit {
   public currentZh: any;
   corinBioMetaData: any;
   corinTableCol = [
-    { name: "CB_code", label: "Code corine Biotope" },
-    { name: "CB_label", label: "Libellé corine biotope" },
+    { name: "CB_code", label: "Code Corine biotopes" },
+    { name: "CB_label", label: "Libellé Corine biotopes" },
     { name: "CB_humidity", label: "Humidité" },
   ];
   activityTableCol = [
@@ -51,13 +52,13 @@ export class ZhFormTab3Component implements OnInit {
   activitiesInput: any = [];
   submitted: boolean;
   formImpactSubmitted: boolean;
-  $_humanActivitySub: Subscription;
 
   constructor(
     private fb: FormBuilder,
     private _dataService: ZhDataService,
     private _tabService: TabsService,
     public ngbModal: NgbModal,
+    private _modalService: ModalService,
     private _toastr: ToastrService
   ) {}
 
@@ -69,6 +70,7 @@ export class ZhFormTab3Component implements OnInit {
       searchPlaceholderText: "Rechercher",
       enableCheckAll: false,
       allowSearchFilter: true,
+      maxHeight: 300,
     };
 
     this.settings = {
@@ -127,47 +129,47 @@ export class ZhFormTab3Component implements OnInit {
               v.CB_code
             )
           );
-          this.currentZh.properties.activities.forEach((activity) => {
-            let impacts = [];
-            activity.ids_impact.forEach((impact) => {
-              impacts.push(
-                this.formMetaData["IMPACTS"].find((item) => {
-                  return item.id_cor_impact_types == impact;
-                })
-              );
-            });
-            let impactNames = impacts.map((item) => {
-              return item["mnemonique"];
-            });
-
-            this.listActivity.push({
-              frontId: activity.id_human_activity,
-              human_activity: {
-                id_nomenclature: activity.id_human_activity,
-                mnemonique: this.formMetaData["ACTIV_HUM"].find((item) => {
-                  return item.id_nomenclature == activity.id_human_activity;
-                }).mnemonique,
-              },
-              localisation: {
-                id_nomenclature: activity.id_localisation,
-                mnemonique: this.formMetaData["LOCALISATION"].find((item) => {
-                  return item.id_nomenclature == activity.id_localisation;
-                }).mnemonique,
-              },
-              remark_activity: activity.remark_activity,
-              impacts: {
-                impacts: impacts,
-                mnemonique: impactNames.join("\r\n"),
-              },
-            });
-
-            this.activitiesInput.map((item) => {
-              if (item.id_nomenclature == activity.id_human_activity) {
-                item.disabled = true;
-              }
-            });
-          });
         }
+        this.currentZh.properties.activities.forEach((activity) => {
+          let impacts = [];
+          activity.ids_impact.forEach((impact) => {
+            impacts.push(
+              this.formMetaData["IMPACTS"].find((item) => {
+                return item.id_cor_impact_types == impact;
+              })
+            );
+          });
+          let impactNames = impacts.map((item) => {
+            return item["mnemonique"];
+          });
+
+          this.listActivity.push({
+            frontId: activity.id_human_activity,
+            human_activity: {
+              id_nomenclature: activity.id_human_activity,
+              mnemonique: this.formMetaData["ACTIV_HUM"].find((item) => {
+                return item.id_nomenclature == activity.id_human_activity;
+              }).mnemonique,
+            },
+            localisation: {
+              id_nomenclature: activity.id_localisation,
+              mnemonique: this.formMetaData["LOCALISATION"].find((item) => {
+                return item.id_nomenclature == activity.id_localisation;
+              }).mnemonique,
+            },
+            remark_activity: activity.remark_activity,
+            impacts: {
+              impacts: impacts,
+              mnemonique: impactNames.join("\r\n"),
+            },
+          });
+          this.sortHumanActivities();
+          this.activitiesInput.map((item) => {
+            if (item.id_nomenclature == activity.id_human_activity) {
+              item.disabled = true;
+            }
+          });
+        });
         this.form.patchValue({
           id_sdage: this.currentZh.properties.id_sdage,
           id_sage: this.currentZh.properties.id_sage,
@@ -258,15 +260,17 @@ export class ZhFormTab3Component implements OnInit {
   }
 
   onAddActivity(event, modal) {
+    this.resetActivityForm();
+
     this.patchActivity = false;
     this.modalButtonLabel = "Ajouter";
-    this.modalTitle = "Ajout d'une activié humaine";
+    this.modalTitle = "Ajout d'une activité humaine";
     event.stopPropagation();
-    this.ngbModal.open(modal, {
-      centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
-    });
+    this._modalService.open(
+      modal,
+      this.listActivity.map((item) => item.human_activity),
+      this.activitiesInput
+    );
   }
 
   onPostActivity() {
@@ -303,10 +307,10 @@ export class ZhFormTab3Component implements OnInit {
         }
       });
       this.ngbModal.dismissAll();
-      this.activityForm.reset();
-      this.selectedItems = [];
+      this.resetActivityForm();
       this.canChangeTab.emit(false);
       this.formImpactSubmitted = false;
+      this.sortHumanActivities();
     }
   }
 
@@ -328,20 +332,12 @@ export class ZhFormTab3Component implements OnInit {
       remark_activity: activity.remark_activity,
       frontId: activity.frontId,
     });
-    this.$_humanActivitySub = this.activityForm
-      .get("human_activity")
-      .valueChanges.subscribe(() => {
-        this.activitiesInput.map((item) => {
-          if (item.id_nomenclature == activity.human_activity.id_nomenclature) {
-            item.disabled = false;
-          }
-        });
-      });
-    this.ngbModal.open(modal, {
-      centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
-    });
+    this._modalService.open(
+      modal,
+      this.listActivity.map((item) => item.human_activity),
+      this.activitiesInput,
+      activity.human_activity
+    );
   }
 
   onPatchActivity() {
@@ -365,9 +361,7 @@ export class ZhFormTab3Component implements OnInit {
         }
       });
       this.ngbModal.dismissAll();
-      this.activityForm.reset();
-      this.selectedItems = [];
-      this.$_humanActivitySub.unsubscribe();
+      this.resetActivityForm();
       this.canChangeTab.emit(false);
       this.formImpactSubmitted = false;
     }
@@ -433,6 +427,23 @@ export class ZhFormTab3Component implements OnInit {
         }
       );
     }
+  }
+
+  resetActivityForm() {
+    this.activityForm.reset();
+    this.selectedItems = [];
+  }
+
+  sortHumanActivities() {
+    this.listActivity.sort((a, b) =>
+      a.human_activity.mnemonique.slice(0, 2) >
+      b.human_activity.mnemonique.slice(0, 2)
+        ? 1
+        : b.human_activity.mnemonique.slice(0, 2) >
+          a.human_activity.mnemonique.slice(0, 2)
+        ? -1
+        : 0
+    );
   }
 
   ngOnDestroy() {

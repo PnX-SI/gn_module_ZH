@@ -40,6 +40,6 @@ const routes: Routes = [
   ],
   entryComponents: [DeleteModalComponent],
   imports: [GN2CommonModule, CommonModule, RouterModule.forChild(routes)],
-  exports: [LabelComponent],
+  exports: [LabelComponent, TableComponent],
 })
 export class ZhDetailsModule {}
