@@ -58,7 +58,6 @@ const routes: Routes = [
     AngularMultiSelectModule,
     NgMultiSelectDropDownModule.forRoot(),
     NgbModule,
-    ZhDetailsModule,
     ZhSearchModule,
   ],
   providers: [
