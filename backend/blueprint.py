@@ -69,7 +69,7 @@ from .nomenclatures import (
 
 from .forms import *
 
-from .geometry import set_geom
+from .geometry import is_dep, set_geom
 
 from .upload import upload
 
@@ -433,6 +433,9 @@ def get_tab_data(id_tab, info_role):
             if 'id_zh' not in form_data.keys():
                 # set geometry from coordinates
                 geom = set_geom(form_data['geom']['geometry'])
+                if not is_dep(geom):
+                    raise ZHApiError(
+                        message='ZH_not_France', details='polygon does not intersect metropolitan france territory', status_code=400)
                 # create_zh
                 zh = create_zh(form_data, info_role, zh_date,
                                geom['polygon'], active_geo_refs)
@@ -441,6 +444,9 @@ def get_tab_data(id_tab, info_role):
                 # edit geometry
                 geom = set_geom(
                     form_data['geom']['geometry'], form_data['id_zh'])
+                if not is_dep(geom):
+                    raise ZHApiError(
+                        message='ZH_not_France', details='polygon does not intersect metropolitan france territory', status_code=400)
                 # edit zh
                 zh = update_zh_tab0(form_data, geom['polygon'],
                                     info_role, zh_date, active_geo_refs)
@@ -566,14 +572,18 @@ def get_tab_data(id_tab, info_role):
             }, 200
 
     except Exception as e:
-        print(e)
         DB.session.rollback()
-        print(e)
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
-            return 'Empty mandatory field ?', 400
+            raise ZHApiError(
+                message='likely_empty_mandatory_field', details=str(e), status_code=400)
         if e.__class__.__name__ == 'IntegrityError':
-            return 'ZH_main_name_already_exists', 400
-        raise ZHApiError(message=str(e), details=str(e))
+            raise ZHApiError(
+                message='ZH_main_name_already_exists', details=str(e), status_code=400)
+        if e.__class__.__name__ == 'ZHApiError':
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details), status_code=400)
+        raise ZHApiError(
+            message="error_during_post", details=str(e))
     finally:
         DB.session.close()
 

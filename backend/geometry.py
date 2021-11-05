@@ -1,17 +1,15 @@
 from flask import abort
+from sqlalchemy.sql import select, func, and_, cast
+import pdb
 
 from geonature.utils.env import DB
-
-from sqlalchemy import func
-
+from geonature.core.ref_geo.models import BibAreasTypes, LAreas
 from geoalchemy2.shape import to_shape
+from geoalchemy2.types import Geography, Geometry
 
-from .model.zh_schema import TZH
 
+from .model.zh_schema import TZH, CorZhArea
 from .api_error import ZHApiError
-
-
-import pdb
 
 
 def set_geom(geometry, id_zh=None):
@@ -35,3 +33,18 @@ def set_geom(geometry, id_zh=None):
         'polygon': polygon,
         'is_intersected': is_intersected
     }
+
+
+def is_dep(geom):
+    id_typ_dep = DB.session.query(BibAreasTypes).filter(
+        BibAreasTypes.type_code == 'DEP').one().id_type
+    q_dep = DB.session.query(LAreas).filter(
+        LAreas.id_type == id_typ_dep).all()
+    for dep in q_dep:
+        geom1 = DB.session.query(func.ST_GeogFromWKB(
+            func.ST_AsEWKB(geom['polygon']))).scalar()
+        geom2 = DB.session.query(func.ST_GeogFromWKB(
+            func.ST_Transform(dep.geom, 4326))).scalar()
+        if DB.session.query(func.ST_Intersects(geom1, geom2)).scalar():
+            return True
+    return False
