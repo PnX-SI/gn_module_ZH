@@ -122,6 +122,8 @@ def post_cor_zh_area(polygon, id_zh, id_type):
             municipality_area = DB.session.query(
                 func.ST_Area(municipality_geom)).scalar()
             cover = math.ceil((intersect_area * 100)/municipality_area)
+            if cover > 100:
+                cover = 100
         else:
             cover = None
         DB.session.add(
