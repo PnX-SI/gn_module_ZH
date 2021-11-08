@@ -1,7 +1,7 @@
 <div class="d-flex flex-row">
   <div class="card">
     <div class="card-header title">
-      <h2>Recherche multi-critères</h2>
+      <h4>Recherche multi-critères</h4>
     </div>
     <div class="card-body">
       <zh-search-sdage [data]="forms?.SDAGE"></zh-search-sdage>
@@ -32,23 +32,27 @@
         label="Zones hydrographiques" 
         [inputData]="hydrographicZones">
       </zh-search-dependant>
+      <hr/>
+      <mat-slide-toggle 
+        [checked]="advancedSearchToggled"
+        (change)="advancedSearchToggled=!advancedSearchToggled">
+        Recherche avancée</mat-slide-toggle>
+      
+      <button
+        mat-raised-button
+        color="primary"
+        class="btn-action hard-shadow button-success uppercase ml-3"
+        (click)="onSearch()"
+      >
+        Recherche
+        <mat-icon>search</mat-icon>
+      </button>
     </div>
   </div>
   <div *ngIf="advancedSearchToggled" class="card">
-    <zh-avanced-search [forms]=forms></zh-avanced-search>
+    <zh-advanced-search 
+      [forms]=forms
+      (changed)="onAdvancedFormChanged($event)"
+      ></zh-advanced-search>
   </div>
 </div>
-<mat-slide-toggle 
-  [checked]="advancedSearchToggled"
-  (change)="advancedSearchToggled=!advancedSearchToggled">
-  Recherche avancée</mat-slide-toggle>
-
-<button
-  mat-raised-button
-  color="primary"
-  class="btn-action hard-shadow button-success uppercase ml-3"
-  (click)="advancedSearchToggled=!advancedSearchToggled"
->
-  Recherche
-  <mat-icon>search</mat-icon>
-</button>
