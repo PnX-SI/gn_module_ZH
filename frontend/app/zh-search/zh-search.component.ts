@@ -8,6 +8,8 @@ import { Component, OnInit, Input } from "@angular/core";
 export class ZhSearchComponent implements OnInit {
   @Input() forms: any;
 
+  public selectedDepartment: any;
+
   constructor() {}
 
   ngOnInit() {}
