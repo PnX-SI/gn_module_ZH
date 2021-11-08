@@ -11,9 +11,10 @@
       class="form-control"
       [formControl]="codeForm.controls.code"
     />
-    <small 
-      class="error-msg" 
-      *ngIf="codeForm.controls.code.errors?.pattern">
-      Le format du code de la zone humide semble incorrect (exemple : 13GE10001)
-    </small>
   </div>
+</div>
+<small 
+  class="error-msg" 
+  *ngIf="codeForm.controls.code.errors?.pattern">
+  Le format du code de la zone humide semble incorrect (exemple : 13GE10001)
+</small>
