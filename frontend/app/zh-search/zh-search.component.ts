@@ -8,11 +8,11 @@ import { ZhDataService } from "../services/zh-data.service";
 })
 export class ZhSearchComponent implements OnInit {
   @Input() forms: any;
-
+  public advancedSearchToggled: boolean = false;
   public bassins: [];
+  public hydrographicZones: [];
   public departements: [];
   public communes: [];
-  public selectedDepartment: any;
 
   constructor(private _dataService: ZhDataService) {}
 
@@ -47,5 +47,11 @@ export class ZhSearchComponent implements OnInit {
     }
   }
 
-  onBassinSelected(event) {}
+  onBassinSelected(event) {
+    if (event) {
+      this.hydrographicZones = [];
+    } else {
+      this.hydrographicZones = undefined;
+    }
+  }
 }

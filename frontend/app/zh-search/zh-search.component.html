@@ -1,43 +1,54 @@
-<div class="card">
-  <div class="card-header title">
-    <h2>Recherche multi-critères</h2>
+<div class="d-flex flex-row">
+  <div class="card">
+    <div class="card-header title">
+      <h2>Recherche multi-critères</h2>
+    </div>
+    <div class="card-body">
+      <zh-search-sdage [data]="forms?.SDAGE"></zh-search-sdage>
+      <hr/>
+      <zh-search-code></zh-search-code>
+      <hr/>
+      <zh-search-ensemble [data]="forms?.BIB_SITE_SPACE"></zh-search-ensemble>
+      <hr/>
+      <zh-search-area></zh-search-area>
+      <hr/>
+      <zh-search-input 
+        label="Département" 
+        [displayCode]="true"
+        [data]="departements"
+        (onSelected)="onDepartmentSelected($event)">
+      </zh-search-input>
+      <zh-search-dependant 
+        label="Communes" 
+        [inputData]="communes">
+      </zh-search-dependant>
+      <hr/>
+      <zh-search-input 
+        label="Bassin versant"
+        [data]="bassins"
+        (onSelected)="onBassinSelected($event)">
+      </zh-search-input>
+      <zh-search-dependant 
+        label="Zones hydrographiques" 
+        [inputData]="hydrographicZones">
+      </zh-search-dependant>
+    </div>
   </div>
-  
-  <div class="card-body">
-    <zh-search-sdage [data]="forms?.SDAGE"></zh-search-sdage>
-    <hr/>
-    <zh-search-code></zh-search-code>
-    <hr/>
-    <zh-search-ensemble [data]="forms?.BIB_SITE_SPACE"></zh-search-ensemble>
-    <hr/>
-    <zh-search-area></zh-search-area>
-    <hr/>
-    <zh-search-input 
-      label="Département" 
-      [displayCode]="true"
-      [data]="departements"
-      (onSelected)="onDepartmentSelected($event)">
-    </zh-search-input>
-    <zh-search-dependant 
-      label="Communes" 
-      [inputData]="communes">
-    </zh-search-dependant>
-    <hr/>
-    <zh-search-input 
-      label="Bassin versant"
-      [data]="bassins"
-      (onSelected)="onBassinSelected($event)">
-    </zh-search-input>
+  <div *ngIf="advancedSearchToggled" class="card">
+    <zh-avanced-search [forms]=forms></zh-avanced-search>
+  </div>
+</div>
+<mat-slide-toggle 
+  [checked]="advancedSearchToggled"
+  (change)="advancedSearchToggled=!advancedSearchToggled">
+  Recherche avancée</mat-slide-toggle>
 
-  </div>
-<div class="card-body">
 <button
   mat-raised-button
   color="primary"
   class="btn-action hard-shadow button-success uppercase ml-3"
+  (click)="advancedSearchToggled=!advancedSearchToggled"
 >
-  Recherche avancée
-  <mat-icon>add_circle_outline</mat-icon>
+  Recherche
+  <mat-icon>search</mat-icon>
 </button>
-</div>
-</div>
