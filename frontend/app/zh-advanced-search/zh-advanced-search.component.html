@@ -1,0 +1,42 @@
+<div class="card">
+  <div class="card-header title">
+    <h4>Recherche avancée</h4>
+  </div>
+  <div class="card-body">
+    <zh-advanced-search-fonctions 
+    title="Fonctions hydrologiques"
+    [form]="advancedForm.get('hydro')"
+    [data]="forms.FONCTIONS_HYDRO"
+    [connaissances]="forms.FONCTIONS_CONNAISSANCE"
+    [qualifications]="forms.FONCTIONS_QUALIF">
+  </zh-advanced-search-fonctions>
+  <zh-advanced-search-fonctions 
+    title="Fonctions biologiques"
+    [form]="advancedForm.get('bio')"
+    [data]="forms.FONCTIONS_BIO"
+    [connaissances]="forms.FONCTIONS_CONNAISSANCE"
+    [qualifications]="forms.FONCTIONS_QUALIF">
+  </zh-advanced-search-fonctions>
+  <zh-advanced-search-fonctions 
+  title="Valeurs socio-économiques"
+  [form]="advancedForm.get('socio')"
+  fonctionLabel="Valeur"
+  [data]="forms.VAL_SOC_ECO"
+  [connaissances]="forms.FONCTIONS_CONNAISSANCE"
+  [qualifications]="forms.FONCTIONS_QUALIF">
+  </zh-advanced-search-fonctions>
+  <zh-advanced-search-fonctions 
+  title="Intérêt patrimonial"
+  [form]="advancedForm.get('interet')"
+  fonctionLabel="Intérêt"
+  [data]="forms.INTERET_PATRIM"
+  [connaissances]="forms.FONCTIONS_CONNAISSANCE"
+  [qualifications]="forms.FONCTIONS_QUALIF">
+  </zh-advanced-search-fonctions>
+  <zh-advanced-search-statuts
+  [form]="advancedForm.get('statuts')"
+  [statuts]="forms.STATUT_PROPRIETE"
+  [plans]="forms.PLAN_GESTION"
+  ></zh-advanced-search-statuts>
+  </div>
+</div>
