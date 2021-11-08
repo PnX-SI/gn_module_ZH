@@ -1,24 +1,29 @@
 import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { FormGroup, FormBuilder } from "@angular/forms";
 
+type inputDataType = {
+  name: string;
+  code: string;
+};
+
 @Component({
-  selector: "zh-search-commune",
-  templateUrl: "./zh-search-commune.component.html",
-  styleUrls: ["./zh-search-commune.component.scss"],
+  selector: "zh-search-dependant",
+  templateUrl: "./zh-search-dependant.component.html",
+  styleUrls: ["./zh-search-dependant.component.scss"],
 })
-export class ZhSearchCommuneComponent implements OnInit {
-  @Input() set department(value: string) {
-    this._department = value;
-    this.setCommunes(value);
+export class ZhSearchDependantComponent implements OnInit {
+  @Input() label: string = "";
+  @Input() set inputData(value: inputDataType[]) {
+    this._inputData = value;
+    this.setData(value);
   }
   @Output() onSelected = new EventEmitter<object>();
-  public _department: any = null;
-  public communes: any[];
-  public communesForm: FormGroup;
-  public communesDropdownSettings = {
+  public _inputData: inputDataType[] = null;
+  public dataForm: FormGroup;
+  public dropdownSettings = {
     enableSearchFilter: true,
     addNewItemOnFilter: true,
-    text: "Sélectionner une commune",
+    text: "",
     labelKey: "name",
     primaryKey: "code",
     enableFilterSelectAll: false,
@@ -28,18 +33,15 @@ export class ZhSearchCommuneComponent implements OnInit {
   constructor(private _fb: FormBuilder) {}
 
   ngOnInit() {
-    this.communesForm = this._fb.group({
-      commune: [""],
+    this.dataForm = this._fb.group({
+      data: [""],
     });
   }
 
-  setCommunes(value) {
-    if (this._department != undefined) {
+  setData(value) {
+    if (this._inputData != undefined) {
       this.enable();
-      this.communes = [
-        { code: "83143", name: "Le Val" },
-        { code: "13007", name: "Marseille" },
-      ];
+      this._inputData = value;
     } else {
       this.disable();
     }
@@ -47,10 +49,10 @@ export class ZhSearchCommuneComponent implements OnInit {
 
   //Awkward but taken from the doc : https://cuppalabs.github.io/angular2-multiselect-dropdown/#/disablemode
   disable() {
-    this.communesDropdownSettings = {
+    this.dropdownSettings = {
       enableSearchFilter: true,
       addNewItemOnFilter: true,
-      text: "Sélectionner une commune",
+      text: "",
       labelKey: "name",
       primaryKey: "code",
       enableFilterSelectAll: false,
@@ -58,10 +60,10 @@ export class ZhSearchCommuneComponent implements OnInit {
     };
   }
   enable() {
-    this.communesDropdownSettings = {
+    this.dropdownSettings = {
       enableSearchFilter: true,
       addNewItemOnFilter: true,
-      text: "Sélectionner une commune",
+      text: "",
       labelKey: "name",
       primaryKey: "code",
       enableFilterSelectAll: false,

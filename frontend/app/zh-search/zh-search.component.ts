@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from "@angular/core";
+import { ZhDataService } from "../services/zh-data.service";
 
 @Component({
   selector: "zh-search",
@@ -8,9 +9,43 @@ import { Component, OnInit, Input } from "@angular/core";
 export class ZhSearchComponent implements OnInit {
   @Input() forms: any;
 
+  public bassins: [];
+  public departements: [];
+  public communes: [];
   public selectedDepartment: any;
 
-  constructor() {}
+  constructor(private _dataService: ZhDataService) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this._dataService
+      .getDepartments()
+      .toPromise()
+      .then((resp: any) => {
+        this.departements = resp;
+      })
+      .catch((error) => console.log(error));
+
+    this._dataService
+      .getBassins()
+      .toPromise()
+      .then((resp: any) => {
+        this.bassins = resp;
+      })
+      .catch((error) => console.log(error));
+  }
+
+  onDepartmentSelected(event) {
+    if (event) {
+      const department = event[0].code;
+      this._dataService
+        .getCommuneFromDepartment(department)
+        .toPromise()
+        .then((resp: any) => (this.communes = resp));
+    } else {
+      // reset it for the select to be disabled
+      this.communes = undefined;
+    }
+  }
+
+  onBassinSelected(event) {}
 }

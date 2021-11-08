@@ -12,9 +12,23 @@
     <hr/>
     <zh-search-area></zh-search-area>
     <hr/>
-    <zh-search-departement (onSelected)="selectedDepartment=$event"></zh-search-departement>
-    <zh-search-commune [department]="selectedDepartment"></zh-search-commune>
+    <zh-search-input 
+      label="Département" 
+      [displayCode]="true"
+      [data]="departements"
+      (onSelected)="onDepartmentSelected($event)">
+    </zh-search-input>
+    <zh-search-dependant 
+      label="Communes" 
+      [inputData]="communes">
+    </zh-search-dependant>
     <hr/>
+    <zh-search-input 
+      label="Bassin versant"
+      [data]="bassins"
+      (onSelected)="onBassinSelected($event)">
+    </zh-search-input>
+
   </div>
 <div class="card-body">
 <button

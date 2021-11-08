@@ -1,0 +1,14 @@
+<div class="form-row">
+  <div class="form-group col-md-5">
+    <zh-label [label]="label">
+    </zh-label>
+  </div>
+  <div class="form-group col-md-7">
+    <angular2-multiselect
+      [settings]="dropdownSettings"
+      [data]="_inputData"
+      [formControl]="dataForm.controls.data"
+    >
+    </angular2-multiselect>
+  </div>
+</div>
