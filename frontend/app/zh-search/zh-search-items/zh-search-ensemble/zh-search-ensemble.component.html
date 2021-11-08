@@ -1,0 +1,13 @@
+<div class="form-row">
+  <zh-label label="Grand ensemble">
+  </zh-label>
+  <select class="form-control">
+    <option value=""></option>
+    <option
+      *ngFor="let item of data"
+      [ngValue]="item"
+    >
+      {{ item.name }}
+    </option>
+  </select>
+</div>

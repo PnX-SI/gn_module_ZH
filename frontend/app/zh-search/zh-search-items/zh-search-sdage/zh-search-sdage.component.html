@@ -1,0 +1,13 @@
+<div class="form-row">
+  <zh-label label="Type SDAGE de la zone humide">
+  </zh-label>
+  <select class="form-control">
+    <option value=""></option>
+    <option
+      *ngFor="let item of data"
+      [ngValue]="item"
+    >
+      {{ item.mnemonique }}
+    </option>
+  </select>
+</div>

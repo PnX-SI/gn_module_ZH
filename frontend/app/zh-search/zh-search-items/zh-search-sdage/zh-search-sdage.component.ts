@@ -6,7 +6,7 @@ import { Component, OnInit, Input } from "@angular/core";
   styleUrls: ["./zh-search-sdage.component.scss"],
 })
 export class ZhSearchSDAGEComponent implements OnInit {
-  @Input() sdage: any;
+  @Input() data: any;
   @Input() values: any;
 
   constructor() {}

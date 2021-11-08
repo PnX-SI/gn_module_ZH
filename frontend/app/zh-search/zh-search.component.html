@@ -4,34 +4,15 @@
   </div>
   
   <div class="card-body">
-<zh-label label="Parc naturel régional">
-  <select></select>
-</zh-label>
-<zh-label label="Bassin versant">
-  <select></select>
-</zh-label>
-<zh-search-sdage [sdage]="forms.SDAGE"></zh-search-sdage>
-<zh-label label="Nom ou code de la zone humide">
-  <select></select>
-</zh-label>
-<zh-label label="Commune">
-  <select></select>
-</zh-label>
-<zh-label label="Grand ensemble">
-  <select></select>
-</zh-label>
-<zh-label label="Grand ensemble">
-  <select></select>
-</zh-label>
-<zh-label label="Superficie ZH (ha)">
-  <select></select>
-  <select></select>
-</zh-label>
-<zh-label label="Superficie ZH (ha)">
-  <select></select>
-  <select></select>
-</zh-label>
-</div>
+    <zh-search-sdage [data]="forms?.SDAGE"></zh-search-sdage>
+    <hr/>
+    <zh-search-code></zh-search-code>
+    <hr/>
+    <zh-search-ensemble [data]="forms?.BIB_SITE_SPACE"></zh-search-ensemble>
+    <hr/>
+    <zh-search-area></zh-search-area>
+    <hr/>
+  </div>
 <div class="card-body">
 <button
   mat-raised-button
