@@ -12,6 +12,9 @@
     <hr/>
     <zh-search-area></zh-search-area>
     <hr/>
+    <zh-search-departement (onSelected)="selectedDepartment=$event"></zh-search-departement>
+    <zh-search-commune [department]="selectedDepartment"></zh-search-commune>
+    <hr/>
   </div>
 <div class="card-body">
 <button
