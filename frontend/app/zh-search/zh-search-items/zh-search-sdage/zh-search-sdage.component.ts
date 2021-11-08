@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from "@angular/core";
+import { FormGroup } from "@angular/forms";
 
 @Component({
   selector: "zh-search-sdage",
@@ -7,9 +8,21 @@ import { Component, OnInit, Input } from "@angular/core";
 })
 export class ZhSearchSDAGEComponent implements OnInit {
   @Input() data: any;
-  @Input() values: any;
+  @Input() form: FormGroup;
+
+  public dropdownSettings;
 
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.dropdownSettings = {
+      enableCheckAll: false,
+      text: "Sélectionner",
+      labelKey: "mnemonique",
+      primaryKey: "id_nomenclature",
+      searchPlaceholderText: "Rechercher",
+      enableSearchFilter: true,
+      autoPosition: true,
+    };
+  }
 }

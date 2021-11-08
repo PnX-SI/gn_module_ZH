@@ -16,7 +16,7 @@
           name="ha"
           type="number"
           class="form-control"
-          [formControl]="areaForm.controls.ha"
+          [formControl]="form.controls.ha"
         />
       <div class="input-group-append">
         <span>Ha</span>
@@ -24,7 +24,7 @@
     </div>
     <small 
       class="error-msg" 
-      *ngIf="areaForm.controls.ha.errors?.pattern">
+      *ngIf="form.controls.ha.errors?.pattern">
       La superficie doit être supérieure à 0
     </small>
   </div>

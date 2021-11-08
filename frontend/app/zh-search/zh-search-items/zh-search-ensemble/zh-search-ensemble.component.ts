@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from "@angular/core";
+import { FormGroup } from "@angular/forms";
 
 @Component({
   selector: "zh-search-ensemble",
@@ -7,8 +8,19 @@ import { Component, OnInit, Input } from "@angular/core";
 })
 export class ZhSearchEnsembleComponent implements OnInit {
   @Input() data: any;
-
+  @Input() form: FormGroup;
+  public dropdownSettings;
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.dropdownSettings = {
+      enableCheckAll: false,
+      text: "Sélectionner",
+      labelKey: "name",
+      primaryKey: "id_site_space",
+      searchPlaceholderText: "Rechercher",
+      enableSearchFilter: true,
+      autoPosition: true,
+    };
+  }
 }

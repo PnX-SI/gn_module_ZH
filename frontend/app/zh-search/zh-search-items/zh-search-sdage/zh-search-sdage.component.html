@@ -3,13 +3,12 @@
     <zh-label label="Type SDAGE de la zone humide">
     </zh-label>
   </div>
-  <select class="form-control col-md-6">
-    <option value=""></option>
-    <option
-      *ngFor="let item of data"
-      [ngValue]="item"
+  <div class="form-group col-md-6">
+    <angular2-multiselect
+    [data]="data"
+    [formControl]="form.controls.sdage"
+    [settings]="dropdownSettings"
     >
-      {{ item.mnemonique }}
-    </option>
-  </select>
+    </angular2-multiselect>
+  </div>
 </div>

@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import { FormGroup } from "@angular/forms";
 
 @Component({
   selector: "zh-search-code",
@@ -7,19 +7,11 @@ import { FormGroup, FormBuilder, Validators } from "@angular/forms";
   styleUrls: ["./zh-search-code.component.scss"],
 })
 export class ZhSearchCodeComponent implements OnInit {
-  public codeForm: FormGroup;
+  @Input() form: FormGroup;
 
-  constructor(private _fb: FormBuilder) {}
+  constructor() {}
 
   ngOnInit() {
-    this.codeForm = this._fb.group({
-      code: [
-        "",
-        {
-          validators: [Validators.pattern("^[0-9]{2}[A-Z]{2}[0-9]{5}")],
-          updateOn: "change",
-        },
-      ],
-    });
+    console.log(this.form);
   }
 }

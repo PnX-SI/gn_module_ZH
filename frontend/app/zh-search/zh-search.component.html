@@ -4,13 +4,23 @@
       <h4>Recherche multi-critères</h4>
     </div>
     <div class="card-body">
-      <zh-search-sdage [data]="forms?.SDAGE"></zh-search-sdage>
+      <zh-search-sdage 
+        [data]="forms?.SDAGE" 
+        [form]="searchForm.get('sdage')">
+      </zh-search-sdage>
       <hr/>
-      <zh-search-code></zh-search-code>
+      <zh-search-code 
+        [form]="searchForm.get('code')">
+      </zh-search-code>
       <hr/>
-      <zh-search-ensemble [data]="forms?.BIB_SITE_SPACE"></zh-search-ensemble>
+      <zh-search-ensemble 
+        [data]="forms?.BIB_SITE_SPACE" 
+        [form]="searchForm.get('ensemble')">
+      </zh-search-ensemble>
       <hr/>
-      <zh-search-area></zh-search-area>
+      <zh-search-area 
+        [form]="searchForm.get('area')">
+      </zh-search-area>
       <hr/>
       <zh-search-input 
         label="Département" 

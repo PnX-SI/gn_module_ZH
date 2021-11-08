@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import { FormGroup } from "@angular/forms";
 
 type Symbol = {
   value: string;
@@ -12,21 +12,12 @@ type Symbol = {
   styleUrls: ["./zh-search-area.component.scss"],
 })
 export class ZhSearchAreaComponent implements OnInit {
-  public areaForm: FormGroup;
+  @Input() form: FormGroup;
   public symbols: Symbol[];
 
-  constructor(private _fb: FormBuilder) {}
+  constructor() {}
 
   ngOnInit() {
-    this.areaForm = this._fb.group({
-      ha: [
-        "",
-        {
-          validators: [Validators.min(0)],
-          updateOn: "change",
-        },
-      ],
-    });
     this.symbols = [
       {
         value: "≥",
