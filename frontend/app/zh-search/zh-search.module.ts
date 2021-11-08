@@ -13,7 +13,7 @@ import { ZhSearchEnsembleComponent } from "./zh-search-items/zh-search-ensemble/
 import { ZhSearchAreaComponent } from "./zh-search-items/zh-search-superficie/zh-search-area.component";
 import { ZhSearchDependantComponent } from "./zh-search-items/components/zh-search-dependant/zh-search-dependant.component";
 import { ZhSearchInputComponent } from "./zh-search-items/components/zh-search-input/zh-search-input.component";
-import { ZhAdvancedSearchModule } from "../zh-advanced-search/zh-avanced-search.module";
+import { ZhAdvancedSearchModule } from "../zh-advanced-search/zh-advanced-search.module";
 
 const routes: Routes = [{ path: "/search", component: ZhSearchComponent }];
 
@@ -33,7 +33,6 @@ const routes: Routes = [{ path: "/search", component: ZhSearchComponent }];
     CommonModule,
     RouterModule.forChild(routes),
     ZhDetailsModule,
-    AngularMultiSelectModule,
     ZhAdvancedSearchModule,
   ],
   exports: [
