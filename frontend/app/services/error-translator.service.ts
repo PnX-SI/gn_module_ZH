@@ -14,7 +14,7 @@ export class ErrorTranslatorService {
 
   private errors = [
     {
-      api: "400 Bad Request: polygon_contained_in_zh", // error returned by backend
+      api: "polygon_contained_in_zh", // error returned by backend
       front: "La geometrie est contenue entièrement dans une autre zone humide", //error to show to the user
       id: 1,
     },
