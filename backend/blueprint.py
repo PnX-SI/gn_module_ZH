@@ -71,7 +71,10 @@ from .forms import *
 
 from .geometry import set_geom
 
-from .upload import upload
+from .upload import (
+    upload,
+    check_file_name
+)
 
 from .utils import (
     get_file_path,
@@ -637,22 +640,14 @@ def get_tab_data(id_tab, info_role):
             return {"id_zh": form_data['id_zh']}, 200
 
         if id_tab == 8:
-            # to do :
-            #   add main_picture attribute in pr_zh.t_zh when implemented in frontend (radio ?)
-            try:
-                file_name = secure_filename(request.files["file"].filename)
-                temp = file_name.split(".")
-                extension = temp[len(temp) - 1]
-            except Exception as e:
-                file_name = "Filename_error"
-                extension = "Extension_error"
-                raise
-
             ALLOWED_EXTENSIONS = blueprint.config['allowed_extensions']
             MAX_PDF_SIZE = blueprint.config['max_pdf_size']
             MAX_JPG_SIZE = blueprint.config['max_jpg_size']
             FILE_PATH = blueprint.config['file_path']
             MODULE_NAME = blueprint.config['MODULE_CODE'].lower()
+
+            check_file_name(request.files["file"])
+
             uploaded_resp = upload(
                 request,
                 ALLOWED_EXTENSIONS,

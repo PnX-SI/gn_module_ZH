@@ -67,3 +67,14 @@ def upload(request, extensions, pdf_size, jpg_size, upload_path, module_name):
         exc_type, value, tb = sys.exc_info()
         raise ZHApiError(
             message="update_tzh_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+
+
+def check_file_name(file):
+    try:
+        file_name = secure_filename(file.filename)
+        temp = file_name.split(".")
+        extension = temp[len(temp) - 1]
+    except Exception as e:
+        file_name = "Filename_error"
+        extension = "Extension_error"
+        raise
