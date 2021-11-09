@@ -7,7 +7,7 @@ import { FormBuilder, FormGroup } from "@angular/forms";
   styleUrls: ["./zh-advanced-search.component.scss"],
 })
 export class ZhAdvancedSearchComponent implements OnInit {
-  @Input() forms: any;
+  @Input() data: any;
   @Output() changed = new EventEmitter<FormGroup>();
 
   public advancedForm: FormGroup;

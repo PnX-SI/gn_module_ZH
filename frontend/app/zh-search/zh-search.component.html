@@ -5,7 +5,7 @@
     </div>
     <div class="card-body">
       <zh-search-sdage 
-        [data]="forms?.SDAGE" 
+        [data]="data?.SDAGE" 
         [form]="searchForm.get('sdage')">
       </zh-search-sdage>
       <hr/>
@@ -14,7 +14,7 @@
       </zh-search-code>
       <hr/>
       <zh-search-ensemble 
-        [data]="forms?.BIB_SITE_SPACE" 
+        [data]="data?.BIB_SITE_SPACE" 
         [form]="searchForm.get('ensemble')">
       </zh-search-ensemble>
       <hr/>
@@ -28,7 +28,7 @@
         [data]="departements"
         (onSelected)="onDepartmentSelected($event)">
       </zh-search-input>
-      <zh-search-dependant 
+      <zh-search-dependant
         label="Communes" 
         [inputData]="communes">
       </zh-search-dependant>
@@ -61,7 +61,7 @@
   </div>
   <div *ngIf="advancedSearchToggled" class="card">
     <zh-advanced-search 
-      [forms]=forms
+      [data]="data"
       (changed)="onAdvancedFormChanged($event)"
       ></zh-advanced-search>
   </div>
