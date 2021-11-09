@@ -19,6 +19,7 @@
     </div>
     <div class="col-3 changeButtons">
       <button
+        *ngIf="_cruvedStore.cruved?.ZONES_HUMIDES?.cruved.C !== '0'"
         type="button"
         ngbAutofocus
         mat-raised-button
@@ -29,15 +30,21 @@
         Modifier
       </button>
       <button
+        *ngIf="_cruvedStore.cruved?.ZONES_HUMIDES?.cruved.D !== '0'"
         type="button"
         ngbAutofocus
         mat-raised-button
         color="warn"
         class="uppercase ml-3"
-        (click)="onOpen()"
+        (click)="onOpen(content)"
       >
         Supprimer
       </button>
     </div>
   </div>
 </div>
+<ng-template #content let-c="close" let-d="dismiss">
+  <zh-delete-modal (onCancel)="d()" (onDelete)=c()>
+    <p>Etes-vous sûr de vouloir supprimer cette zone humide ? Cette action est irréversible</p>
+  </zh-delete-modal>
+</ng-template>

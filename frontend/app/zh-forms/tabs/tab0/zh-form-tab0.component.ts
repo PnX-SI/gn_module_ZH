@@ -18,6 +18,8 @@ import { ZhDataService } from "../../../services/zh-data.service";
 import { TabsService } from "../../../services/tabs.service";
 import { ErrorTranslatorService } from "../../../services/error-translator.service";
 
+const GEOM_CONTAINED_ID = 1;
+
 @Component({
   selector: "zh-form-tab0",
   templateUrl: "./zh-form-tab0.component.html",
@@ -234,7 +236,20 @@ export class ZhFormTab0Component implements OnInit {
           (error) => {
             this.posted = false;
             var msg: string = "Impossible de créer la zone humide : ";
-            msg += this._error.getFrontError(error.error.message);
+            const frontMsg: string = this._error.getFrontError(
+              error.error.message
+            );
+            // Not really good, but must filter error id to remove the
+            // geometry or not
+            if (
+              this._error.getErrorId(error.error.message) == GEOM_CONTAINED_ID
+            ) {
+              this._mapService.removeAllLayers(
+                this._mapService.map,
+                this._mapService.leafletDrawFeatureGroup
+              );
+            }
+            msg += frontMsg;
             this._toastr.error(msg, "", {
               positionClass: "toast-top-right",
             });
