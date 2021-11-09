@@ -18,20 +18,16 @@ export class ZhAdvancedSearchFonctionsComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
-    let settings = {
+    this.dropdownSettings = {
       enableCheckAll: false,
       text: "Sélectionner",
       labelKey: "mnemonique",
       primaryKey: "id_nomenclature",
       searchPlaceholderText: "Rechercher",
       enableSearchFilter: true,
+      position: "bottom",
       autoPosition: false,
-      groupBy: null,
     };
-    if (this.data.every((obj) => "category" in obj)) {
-      settings.groupBy = "category";
-    }
-    this.dropdownSettings = settings;
     this.dropdownSettingsNoCategory = {
       enableCheckAll: false,
       text: "Sélectionner",
