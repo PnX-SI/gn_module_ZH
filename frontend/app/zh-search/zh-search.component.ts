@@ -9,7 +9,7 @@ import { ZhDataService } from "../services/zh-data.service";
   styleUrls: ["./zh-search.component.scss"],
 })
 export class ZhSearchComponent implements OnInit {
-  @Input() forms: any;
+  @Input() data: any;
   public advancedSearchToggled: boolean = false;
   public bassins: [];
   public hydrographicZones: [];
@@ -65,7 +65,6 @@ export class ZhSearchComponent implements OnInit {
 
   onAdvancedFormChanged(event) {
     this.advancedForm = event;
-    console.log(this.advancedForm);
   }
 
   initForm() {

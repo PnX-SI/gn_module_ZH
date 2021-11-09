@@ -11,7 +11,5 @@ export class ZhSearchCodeComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit() {
-    console.log(this.form);
-  }
+  ngOnInit() {}
 }
