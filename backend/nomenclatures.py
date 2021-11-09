@@ -17,7 +17,8 @@ from pypnnomenclature.models import (
 
 from pypn_habref_api.models import (
     Habref,
-    CorespHab
+    CorespHab,
+    TypoRef
 )
 
 from geonature.utils.env import DB
@@ -51,12 +52,16 @@ def get_corine_biotope():
 
 
 def get_ch(lb_code):
+    CH_typo = DB.session.query(TypoRef).filter(
+        TypoRef.cd_table == 'TYPO_CH').one().cd_typo
+    CB_typo = DB.session.query(TypoRef).filter(
+        TypoRef.cd_table == 'TYPO_CORINE_BIOTOPES').one().cd_typo
     # get cd_hab_sortie list from lb_code of selected Corine Biotope
     cd_hab_sortie = DB.session.query(Habref).filter(
-        and_(Habref.lb_code == lb_code, Habref.cd_typo == 22)).one().cd_hab
+        and_(Habref.lb_code == lb_code, Habref.cd_typo == CB_typo)).one().cd_hab
     # get all cd_hab_entre corresponding to cd_hab_sortie
     q_cd_hab_entre = DB.session.query(CorespHab).filter(
-        CorespHab.cd_hab_sortie == cd_hab_sortie).all()
+        and_(CorespHab.cd_hab_sortie == cd_hab_sortie, CorespHab.cd_typo_entre == CH_typo)).all()
     # get list of cd_hab_entre/lb_code/lb_hab_fr for each cahier habitat
     ch = []
     for q in q_cd_hab_entre:
