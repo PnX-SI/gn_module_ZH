@@ -61,7 +61,10 @@ export class ZhSearchComponent implements OnInit {
     }
   }
 
-  onSearch() {}
+  onSearch() {
+    console.log(this.searchForm.value);
+    console.log(this.advancedForm.value);
+  }
 
   onAdvancedFormChanged(event) {
     this.advancedForm = event;
@@ -69,12 +72,12 @@ export class ZhSearchComponent implements OnInit {
 
   initForm() {
     this.searchForm = this._fb.group({
-      bassin: [null],
-      departement: [null],
-      commune: [null],
-      sdage: this._fb.group({ sdage: [null] }),
+      bassin: this._fb.group({ data: null }),
+      departement: this._fb.group({ data: null }),
+      communes: this._fb.group({ data: null }),
+      sdage: this._fb.group({ data: [null] }),
       code: this._fb.group({
-        code: [
+        data: [
           null,
           {
             validators: [Validators.pattern("^[0-9]{2}[A-Z]{2}[0-9]{5}")],
@@ -82,16 +85,42 @@ export class ZhSearchComponent implements OnInit {
           },
         ],
       }),
-      hydro: [null],
-      ensemble: this._fb.group({ ensemble: [null] }),
+      zones: this._fb.group({ data: null }),
+      ensemble: this._fb.group({ data: [null] }),
       area: this._fb.group({
-        ha: [
+        data: [
           "",
           {
             validators: [Validators.min(0)],
             updateOn: "change",
           },
         ],
+      }),
+    });
+    this.advancedForm = this._fb.group({
+      hydro: this._fb.group({
+        functions: [""],
+        qualifications: [""],
+        connaissances: [""],
+      }),
+      bio: this._fb.group({
+        functions: [""],
+        qualifications: [""],
+        connaissances: [""],
+      }),
+      socio: this._fb.group({
+        functions: [""],
+        qualifications: [""],
+        connaissances: [""],
+      }),
+      interet: this._fb.group({
+        functions: [""],
+        qualifications: [""],
+        connaissances: [""],
+      }),
+      statuts: this._fb.group({
+        statuts: [""],
+        plans: [""],
       }),
     });
   }

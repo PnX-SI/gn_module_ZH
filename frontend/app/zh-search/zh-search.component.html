@@ -24,22 +24,26 @@
       <hr/>
       <zh-search-input 
         label="Département" 
+        [form]="searchForm.get('departement')"
         [displayCode]="true"
         [data]="departements"
         (onSelected)="onDepartmentSelected($event)">
       </zh-search-input>
       <zh-search-dependant
         label="Communes" 
-        [inputData]="communes">
+        [inputData]="communes"
+        [form]="searchForm.get('communes')">
       </zh-search-dependant>
       <hr/>
       <zh-search-input 
         label="Bassin versant"
+        [form]="searchForm.get('bassin')"
         [data]="bassins"
         (onSelected)="onBassinSelected($event)">
       </zh-search-input>
       <zh-search-dependant 
         label="Zones hydrographiques" 
+        [form]="searchForm.get('zones')"
         [inputData]="hydrographicZones">
       </zh-search-dependant>
       <hr/>
@@ -62,7 +66,7 @@
   <div *ngIf="advancedSearchToggled" class="card">
     <zh-advanced-search 
       [data]="data"
-      (changed)="onAdvancedFormChanged($event)"
+      [form]="advancedForm"
       ></zh-advanced-search>
   </div>
 </div>

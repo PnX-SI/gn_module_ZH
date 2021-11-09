@@ -13,6 +13,7 @@ type inputDataType = {
 })
 export class ZhSearchDependantComponent implements OnInit {
   @Input() label: string = "";
+  @Input() form: FormGroup;
   @Input() set inputData(value: inputDataType[]) {
     this._inputData = value;
     this.setData(value);
@@ -30,13 +31,9 @@ export class ZhSearchDependantComponent implements OnInit {
     disabled: true,
   };
 
-  constructor(private _fb: FormBuilder) {}
+  constructor() {}
 
-  ngOnInit() {
-    this.dataForm = this._fb.group({
-      data: [""],
-    });
-  }
+  ngOnInit() {}
 
   setData(value) {
     if (this._inputData != undefined) {

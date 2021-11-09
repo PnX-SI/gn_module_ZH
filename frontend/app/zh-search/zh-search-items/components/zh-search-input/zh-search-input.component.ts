@@ -10,6 +10,7 @@ export class ZhSearchInputComponent implements OnInit {
   @Input() data: any[];
   @Input() label: string = "";
   @Input() displayCode: boolean = false;
+  @Input() form: FormGroup;
   @Output() onSelected = new EventEmitter<object>();
 
   public dropdownSettings = {
@@ -21,20 +22,16 @@ export class ZhSearchInputComponent implements OnInit {
     primaryKey: "code",
     enableFilterSelectAll: false,
   };
-  public dataForm: FormGroup;
 
-  constructor(private _fb: FormBuilder) {}
+  constructor() {}
 
   ngOnInit() {
-    this.dataForm = this._fb.group({
-      data: [""],
-    });
-    this.dataForm.get("data").valueChanges.subscribe((x) => {
+    this.form.get("data").valueChanges.subscribe((x) => {
       this.onSelected.emit(x);
     });
   }
 
   onDeselect() {
-    this.dataForm.patchValue({ data: undefined });
+    this.form.patchValue({ data: undefined });
   }
 }
