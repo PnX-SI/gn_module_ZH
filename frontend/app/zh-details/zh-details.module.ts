@@ -1,6 +1,8 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Routes, RouterModule } from "@angular/router";
+import { MatRadioModule } from "@angular/material/radio";
+
 import { GN2CommonModule } from "@geonature_common/GN2Common.module";
 import { ZhDetailsComponent } from "./zh-details.component";
 import { DescriptionComponent } from "./description/description.component";
@@ -16,6 +18,7 @@ import { TableComponent } from "../commonComponents/table/table.component";
 import { LabelComponent } from "../commonComponents/label/label.component";
 import { HeaderComponent } from "./header/header.component";
 import { DeleteModalComponent } from "../commonComponents/delete-modal/delete-modal.component";
+import { ImageTableComponent } from "../commonComponents/imageTable/image-table.component";
 
 // my module routing
 const routes: Routes = [
@@ -36,10 +39,16 @@ const routes: Routes = [
     TableComponent,
     LabelComponent,
     HeaderComponent,
+    ImageTableComponent,
     DeleteModalComponent,
   ],
   entryComponents: [DeleteModalComponent],
-  imports: [GN2CommonModule, CommonModule, RouterModule.forChild(routes)],
-  exports: [TableComponent],
+  imports: [
+    GN2CommonModule,
+    CommonModule,
+    RouterModule.forChild(routes),
+    MatRadioModule,
+  ],
+  exports: [CollapseComponent, TableComponent, ImageTableComponent],
 })
 export class ZhDetailsModule {}

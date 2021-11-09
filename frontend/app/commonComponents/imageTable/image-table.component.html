@@ -1,0 +1,80 @@
+<table class="table mb-4">
+  <thead class="thead-inverse table-header">
+    <tr>
+      <th class="photo-principale">Photo principale</th>
+      <th class="image">Photo</th>
+      <!-- size can be provided in the columns object -->
+      <th *ngFor="let col of tableCols"  [style.width]="col.size" >{{ col.label }}</th>
+      <th *ngIf="editable || deletable"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <ng-container *ngIf="data && data.length > 0">
+      <tr *ngFor="let item of data">
+        <td>
+          <div class="radio">
+            <!-- <input type="radio"
+               name="radio"
+               id="radio-{{item.id_media}}"
+               [(ngModel)]="value"
+               [value]="item.main_pict_id"
+               /> -->
+               <mat-radio-button [checked]="item.mainPictureId == item.id_media" (change)="onRadioChangedItem(item)"></mat-radio-button>
+            <!-- <input type="radio" id='regular' name="optradio" [(ngModel)]="mainPhoto" (change)="onRadioChangedItem($event, item.id)"> -->
+          </div>
+        </td>
+        <td>
+          <img [src]="item.image"/>
+        </td>
+        <td *ngFor="let col of tableCols">
+            {{ item[col.name] !== "null" ? item[col.name] : "" }}
+        </td>
+        <td 
+          class="tab-buttons" 
+          *ngIf="editable || deletable || downloadable">
+          <ng-container *ngIf="editable">
+            <button
+              mat-icon-button
+              class="mr-2"
+              placement="top"
+              ngbTooltip="Editer"
+              (click)="onEditItem(item)"
+            >
+              <mat-icon class="edit-icon">edit</mat-icon>
+            </button>
+          </ng-container>
+          <ng-container *ngIf="deletable">
+            <button
+              mat-icon-button
+              class="mr-2"
+              placement="top"
+              ngbTooltip="Supprimer"
+              (click)="onDeleteItem(content, item)"
+            >
+              <mat-icon class="delete-icon">close</mat-icon>
+            </button>
+          </ng-container>
+          <ng-container *ngIf="downloadable">
+            <button
+              mat-icon-button
+              class="mr-2"
+              placement="top"
+              ngbTooltip="Télécharger"
+              (click)="onDownloadItem(item)"
+            >
+              <mat-icon class="download-icon">download</mat-icon>
+            </button>
+          </ng-container>
+        </td>
+      </tr>
+    </ng-container>
+    <tr *ngIf="!data || data.length == 0">
+      <td colspan="100%">non renseigné</td>
+    </tr>
+  </tbody>
+</table>
+<ng-template #content let-c="close" let-d="dismiss">
+  <zh-delete-modal (onCancel)="d()" (onDelete)=c()>
+    <p>Etes-vous sûr de vouloir supprimer cette image ?</p>
+  </zh-delete-modal>
+</ng-template>

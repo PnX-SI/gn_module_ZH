@@ -94,6 +94,32 @@ export class ZhDataService {
     );
   }
 
+  getZhFiles(zhId: number) {
+    return this._api.get(
+      `${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/files`
+    );
+  }
+
+  deleteFile(mediaId: number) {
+    return this._api.delete(
+      `${AppConfig.API_ENDPOINT}/zones_humides/files/${mediaId}`
+    );
+  }
+
+  downloadFile(mediaId: number) {
+    return this._api.get(
+      `${AppConfig.API_ENDPOINT}/zones_humides/files/${mediaId}`,
+      { responseType: "blob" }
+    );
+  }
+
+  postMainPicture(zhId: number, mediaId: number) {
+    return this._api.patch(
+      `${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/main_pict/${mediaId}`,
+      {}
+    );
+  }
+
   getTaxa(zhId: number) {
     return this._api.get(
       `${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/taxa`
