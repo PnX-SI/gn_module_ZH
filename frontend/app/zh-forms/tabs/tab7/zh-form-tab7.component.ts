@@ -129,7 +129,6 @@ export class ZhFormTab7Component implements OnInit {
           this.bioFctData = [];
           this.patrimData = [];
           this.socEcoData = [];
-          this.actionTable = [];
           if (evalZh.fonctions_bio && evalZh.fonctions_bio.length > 0) {
             evalZh.fonctions_bio.forEach((fctBio: any) => {
               let namefctBio = this.formMetaData["FONCTIONS_BIO"].find(
@@ -237,6 +236,7 @@ export class ZhFormTab7Component implements OnInit {
           this.currentZh.properties.actions &&
           this.currentZh.properties.actions.length > 0
         ) {
+          this.actionTable = [];
           this.currentZh.properties.actions.forEach((action: any) => {
             this.actionTable.push({
               action: this.actionInput.find(
