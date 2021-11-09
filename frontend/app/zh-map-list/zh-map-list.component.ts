@@ -31,7 +31,7 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
   public rowPerPage: number;
   public cardContentHeight: number;
   public moduleSub: Subscription;
-  private metaData: any;
+  private metaData: any = [];
 
   constructor(
     public mapListService: MapListService,
