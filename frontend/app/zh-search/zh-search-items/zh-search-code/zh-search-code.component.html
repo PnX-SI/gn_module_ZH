@@ -9,12 +9,12 @@
       name="code"
       type="text"
       class="form-control"
-      [formControl]="form.controls.data"
+      [formControl]="form"
     />
   </div>
 </div>
 <small 
   class="error-msg" 
-  *ngIf="form.controls.data.errors?.pattern">
+  *ngIf="form.errors?.pattern">
   Le format du code de la zone humide semble incorrect (exemple : 13GE10001)
 </small>

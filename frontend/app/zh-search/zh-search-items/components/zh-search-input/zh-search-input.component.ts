@@ -26,7 +26,7 @@ export class ZhSearchInputComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
-    this.form.get("data").valueChanges.subscribe((x) => {
+    this.form.valueChanges.subscribe((x) => {
       this.onSelected.emit(x);
     });
   }

@@ -62,8 +62,23 @@ export class ZhSearchComponent implements OnInit {
   }
 
   onSearch() {
-    console.log(this.searchForm.value);
-    console.log(this.advancedForm.value);
+    if (!this.searchForm.invalid) {
+      const searchObj = Object.assign(
+        {},
+        this.searchForm.value,
+        this.advancedForm.value
+      );
+      const filtered = this.filterFormGroup(searchObj);
+      console.log(filtered);
+
+      this._dataService
+        .search(filtered)
+        .toPromise()
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((error) => console.log(error));
+    }
   }
 
   onAdvancedFormChanged(event) {
@@ -72,56 +87,72 @@ export class ZhSearchComponent implements OnInit {
 
   initForm() {
     this.searchForm = this._fb.group({
-      bassin: this._fb.group({ data: null }),
-      departement: this._fb.group({ data: null }),
-      communes: this._fb.group({ data: null }),
-      sdage: this._fb.group({ data: [null] }),
-      code: this._fb.group({
-        data: [
-          null,
-          {
-            validators: [Validators.pattern("^[0-9]{2}[A-Z]{2}[0-9]{5}")],
-            updateOn: "change",
-          },
-        ],
-      }),
-      zones: this._fb.group({ data: null }),
-      ensemble: this._fb.group({ data: [null] }),
-      area: this._fb.group({
-        data: [
-          "",
-          {
-            validators: [Validators.min(0)],
-            updateOn: "change",
-          },
-        ],
-      }),
+      bassin: [null],
+      departement: [null],
+      communes: [null],
+      sdage: [null],
+      code: [
+        null,
+        {
+          validators: [Validators.pattern("^[0-9]{2}[A-Z]{2}[0-9]{5}")],
+          updateOn: "change",
+        },
+      ],
+      zones: [null],
+      ensemble: [null],
+      area: [
+        null,
+        {
+          validators: [Validators.min(0)],
+          updateOn: "change",
+        },
+      ],
     });
     this.advancedForm = this._fb.group({
       hydro: this._fb.group({
-        functions: [""],
-        qualifications: [""],
-        connaissances: [""],
+        functions: [null],
+        qualifications: [null],
+        connaissances: [null],
       }),
       bio: this._fb.group({
-        functions: [""],
-        qualifications: [""],
-        connaissances: [""],
+        functions: [null],
+        qualifications: [null],
+        connaissances: [null],
       }),
       socio: this._fb.group({
-        functions: [""],
-        qualifications: [""],
-        connaissances: [""],
+        functions: [null],
+        qualifications: [null],
+        connaissances: [null],
       }),
       interet: this._fb.group({
-        functions: [""],
-        qualifications: [""],
-        connaissances: [""],
+        functions: [null],
+        qualifications: [null],
+        connaissances: [null],
       }),
       statuts: this._fb.group({
-        statuts: [""],
-        plans: [""],
+        statuts: [null],
+        plans: [null],
       }),
     });
+  }
+
+  filterFormGroup(values) {
+    const filtered = {};
+    // Since everything is a form group:
+    Object.keys(values).forEach((key) => {
+      let value = values[key];
+      if (value) {
+        if (value instanceof Array) {
+          value = value.filter((item) => item != null);
+        } else if (value instanceof Object) {
+          value = this.filterFormGroup(value);
+        }
+        if (Object.keys(value).length !== 0) {
+          filtered[key] = value;
+        }
+      }
+    });
+
+    return filtered;
   }
 }

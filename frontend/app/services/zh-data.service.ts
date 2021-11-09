@@ -115,4 +115,11 @@ export class ZhDataService {
   getBassins() {
     return this._api.get(`${AppConfig.API_ENDPOINT}/zones_humides/bassins`);
   }
+
+  search(payload: Object) {
+    return this._api.post(
+      `${AppConfig.API_ENDPOINT}/zones_humides/search`,
+      payload
+    );
+  }
 }
