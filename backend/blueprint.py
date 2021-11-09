@@ -69,7 +69,7 @@ from .nomenclatures import (
 
 from .forms import *
 
-from .geometry import is_dep, set_geom
+from .geometry import set_geom
 
 from .upload import upload
 
@@ -551,9 +551,6 @@ def get_tab_data(id_tab, info_role):
             if 'id_zh' not in form_data.keys():
                 # set geometry from coordinates
                 geom = set_geom(form_data['geom']['geometry'])
-                if not is_dep(geom):
-                    raise ZHApiError(
-                        message='ZH_not_France', details='polygon does not intersect metropolitan france territory', status_code=400)
                 # create_zh
                 zh = create_zh(form_data, info_role, zh_date,
                                geom['polygon'], active_geo_refs)
@@ -562,9 +559,6 @@ def get_tab_data(id_tab, info_role):
                 # edit geometry
                 geom = set_geom(
                     form_data['geom']['geometry'], form_data['id_zh'])
-                if not is_dep(geom):
-                    raise ZHApiError(
-                        message='ZH_not_France', details='polygon does not intersect metropolitan france territory', status_code=400)
                 # edit zh
                 zh = update_zh_tab0(form_data, geom['polygon'],
                                     info_role, zh_date, active_geo_refs)

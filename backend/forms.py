@@ -68,7 +68,6 @@ def create_zh(form_data, info_role, zh_date, polygon, ref_geo_referentiels):
         # temporary code
         code = str(uuid.uuid4())[0:12]
 
-        form_data['id_org'] = 'tests'
         # create zh : fill pr_zh.t_zh
         new_zh = TZH(
             main_name=form_data['main_name'],
