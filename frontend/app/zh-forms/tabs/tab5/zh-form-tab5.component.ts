@@ -653,12 +653,13 @@ export class ZhFormTab5Component implements OnInit {
           const files = res.file_names.map((file) =>
             file.replace(/^.*[\\\/]/, "")
           );
-          const msg = `Les fichiers suivants ont été générés ${files.join(
-            ", "
+          const msg = `Les fichiers suivants ont été générés </br> ${files.join(
+            "</br>"
           )}`;
           this._toastr.success(msg, "", {
             disableTimeOut: true, // to be sure the user sees the toast
             closeButton: true,
+            enableHtml: true,
           });
         }
       })
