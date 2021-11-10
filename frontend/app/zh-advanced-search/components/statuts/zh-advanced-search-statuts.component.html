@@ -13,6 +13,7 @@
           [data]="statuts"
           [formControl]="form.controls.statuts"
           [settings]="dropdownSettings"
+          (onDeSelectAll)="onDeSelectAllStatuts()"
         >
         </angular2-multiselect>
       </div>
@@ -27,6 +28,7 @@
           [data]="plans"
           [formControl]="form.controls.plans"
           [settings]="dropdownSettings"
+          (onDeSelectAll)="onDeSelectAllPlans()"
         >
         </angular2-multiselect>
       </div>

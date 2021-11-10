@@ -31,4 +31,14 @@ export class ZhAdvancedSearchEvaluationsComponent implements OnInit {
       menaces: [""],
     });
   }
+
+  onDeSelectAllHydro() {
+    this.form.get("hydros").reset();
+  }
+  onDeSelectAllBio() {
+    this.form.get("bios").reset();
+  }
+  onDeSelectAllMenaces() {
+    this.form.get("menaces").reset();
+  }
 }

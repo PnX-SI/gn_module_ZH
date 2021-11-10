@@ -36,4 +36,16 @@ export class ZhAdvancedSearchFonctionsComponent implements OnInit {
       autoPosition: false,
     };
   }
+
+  onDeSelectAllFcts() {
+    console.log("coucou");
+
+    this.form.get("functions").reset();
+  }
+  onDeSelectAllQual() {
+    this.form.get("qualifications").reset();
+  }
+  onDeSelectAllConn() {
+    this.form.get("connaissances").reset();
+  }
 }

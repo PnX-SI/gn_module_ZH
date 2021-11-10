@@ -13,6 +13,7 @@
           [data]="data"
           [formControl]="form.controls.functions"
           [settings]="dropdownSettings"
+          (onDeSelectAll)="onDeSelectAllFcts()"
         >
         </angular2-multiselect>
       </div>
@@ -27,6 +28,7 @@
           [data]="qualifications"
           [formControl]="form.controls.qualifications"
           [settings]="dropdownSettingsNoCategory"
+          (onDeSelectAll)="onDeSelectAllQual()"
         >
         </angular2-multiselect>
       </div>
@@ -41,6 +43,7 @@
         [data]="connaissances"
         [formControl]="form.controls.connaissances"
         [settings]="dropdownSettingsNoCategory"
+        (onDeSelectAll)="onDeSelectAllConn()"
       >
       </angular2-multiselect>
       </div>

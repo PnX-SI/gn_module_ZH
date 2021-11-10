@@ -24,4 +24,11 @@ export class ZhAdvancedSearchStatutsComponent implements OnInit {
       autoPosition: true,
     };
   }
+
+  onDeSelectAllStatuts() {
+    this.form.get("statuts").reset();
+  }
+  onDeSelectAllPlans() {
+    this.form.get("plans").reset();
+  }
 }
