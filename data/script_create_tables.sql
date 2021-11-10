@@ -734,7 +734,7 @@ CREATE OR REPLACE VIEW pr_zh.vertebrates AS
 	LEFT JOIN taxonomie.taxref taxref ON synthese_zh.cd_nom = taxref.cd_nom
 	LEFT JOIN taxonomie.taxref_protection_especes tpe ON taxref.cd_nom = tpe.cd_nom
 	LEFT JOIN taxonomie.taxref_protection_articles tpa ON tpa.cd_protection = tpe.cd_protection
-	LEFT JOIN taxonomie.taxref_liste_rouge_fr tlr ON tlr.cd_nom = taxref.cd_nom
+	LEFT JOIN (SELECT * FROM taxonomie.taxref_liste_rouge_fr WHERE categorie_lr_mondiale IN ('CR', 'VU', 'EN')) tlr ON tlr.cd_nom = taxref.cd_nom
 	WHERE synthese_zh.id_zh IS NOT NULL
 	AND (synthese_zh.date_max::timestamp > (NOW()::timestamp - interval '20 years'))
 	AND taxref.phylum = 'Chordata'
@@ -778,7 +778,7 @@ CREATE OR REPLACE VIEW pr_zh.invertebrates AS
 	LEFT JOIN taxonomie.taxref taxref ON synthese_zh.cd_nom = taxref.cd_nom
 	LEFT JOIN taxonomie.taxref_protection_especes tpe ON taxref.cd_nom = tpe.cd_nom
 	LEFT JOIN taxonomie.taxref_protection_articles tpa ON tpa.cd_protection = tpe.cd_protection
-	LEFT JOIN taxonomie.taxref_liste_rouge_fr tlr ON tlr.cd_nom = taxref.cd_nom
+	LEFT JOIN (SELECT * FROM taxonomie.taxref_liste_rouge_fr WHERE categorie_lr_mondiale IN ('CR', 'VU', 'EN')) tlr ON tlr.cd_nom = taxref.cd_nom
 	WHERE synthese_zh.id_zh IS NOT NULL
 	AND (synthese_zh.date_max::timestamp > (NOW()::timestamp - interval '20 years'))
 	AND taxref.phylum != 'Chordata'
@@ -824,7 +824,7 @@ CREATE OR REPLACE VIEW pr_zh.flora AS
 	LEFT JOIN taxonomie.taxref taxref ON synthese_zh.cd_nom = taxref.cd_nom
 	LEFT JOIN taxonomie.taxref_protection_especes tpe ON taxref.cd_nom = tpe.cd_nom
 	LEFT JOIN taxonomie.taxref_protection_articles tpa ON tpa.cd_protection = tpe.cd_protection
-	LEFT JOIN taxonomie.taxref_liste_rouge_fr tlr ON tlr.cd_nom = taxref.cd_nom
+	LEFT JOIN (SELECT * FROM taxonomie.taxref_liste_rouge_fr WHERE categorie_lr_mondiale IN ('CR', 'VU', 'EN')) tlr ON tlr.cd_nom = taxref.cd_nom
 	WHERE synthese_zh.id_zh IS NOT NULL
 	AND (synthese_zh.date_max::timestamp > (NOW()::timestamp - interval '20 years'))
 	AND taxref.regne = 'Plantae'
