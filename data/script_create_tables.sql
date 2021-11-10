@@ -722,6 +722,7 @@ CREATE OR REPLACE VIEW pr_zh.vertebrates AS
 		taxref.classe AS "group",
 		taxref.nom_complet AS scientific_name,
 		taxref.nom_vern AS vernac_name,
+		tlr.liste_rouge_source,
 		tpa.intitule AS reglementation,
 		tpa.article AS article,
 		synthese_zh.date_max AS last_date,
@@ -732,10 +733,11 @@ CREATE OR REPLACE VIEW pr_zh.vertebrates AS
 	LEFT JOIN taxonomie.taxref taxref ON synthese_zh.cd_nom = taxref.cd_nom
 	LEFT JOIN taxonomie.taxref_protection_especes tpe ON taxref.cd_nom = tpe.cd_nom
 	LEFT JOIN taxonomie.taxref_protection_articles tpa ON tpa.cd_protection = tpe.cd_protection
+	LEFT JOIN taxonomie.taxref_liste_rouge_fr tlr ON tlr.cd_nom = taxref.cd_nom
 	WHERE synthese_zh.id_zh IS NOT NULL
 	AND (synthese_zh.date_max::timestamp > (NOW()::timestamp - interval '20 years'))
 	AND taxref.phylum = 'Chordata'
-	GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, tpe.cd_protection, tpa.intitule, tpa.article, taxref.cd_nom, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;
+	GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, tpe.cd_protection, tpa.intitule, tpa.article, taxref.cd_nom, tlr.liste_rouge_source, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;
 
 CREATE OR REPLACE VIEW pr_zh.invertebrates AS
 	WITH synthese_zh AS (
@@ -763,6 +765,7 @@ CREATE OR REPLACE VIEW pr_zh.invertebrates AS
 		taxref.classe AS "group",
 		taxref.nom_complet AS scientific_name,
 		taxref.nom_vern AS vernac_name,
+		tlr.liste_rouge_source,
 		tpa.intitule AS reglementation,
 		tpa.article AS article,
 		synthese_zh.date_max AS last_date,
@@ -773,11 +776,12 @@ CREATE OR REPLACE VIEW pr_zh.invertebrates AS
 	LEFT JOIN taxonomie.taxref taxref ON synthese_zh.cd_nom = taxref.cd_nom
 	LEFT JOIN taxonomie.taxref_protection_especes tpe ON taxref.cd_nom = tpe.cd_nom
 	LEFT JOIN taxonomie.taxref_protection_articles tpa ON tpa.cd_protection = tpe.cd_protection
+	LEFT JOIN taxonomie.taxref_liste_rouge_fr tlr ON tlr.cd_nom = taxref.cd_nom
 	WHERE synthese_zh.id_zh IS NOT NULL
 	AND (synthese_zh.date_max::timestamp > (NOW()::timestamp - interval '20 years'))
 	AND taxref.phylum != 'Chordata'
 	AND taxref.regne = 'Animalia'
-	GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, tpe.cd_protection, tpa.intitule, tpa.article, taxref.cd_nom, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;
+	GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, tpe.cd_protection, tpa.intitule, tpa.article, taxref.cd_nom, tlr.liste_rouge_source, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;
 
 
 CREATE OR REPLACE VIEW pr_zh.flora AS
@@ -806,6 +810,7 @@ CREATE OR REPLACE VIEW pr_zh.flora AS
 		taxref.classe AS "group",
 		taxref.nom_complet AS scientific_name,
 		taxref.nom_vern AS vernac_name,
+		tlr.liste_rouge_source,
 		tpa.intitule AS reglementation,
 		tpa.article AS article,
 		synthese_zh.date_max AS last_date,
@@ -816,7 +821,8 @@ CREATE OR REPLACE VIEW pr_zh.flora AS
 	LEFT JOIN taxonomie.taxref taxref ON synthese_zh.cd_nom = taxref.cd_nom
 	LEFT JOIN taxonomie.taxref_protection_especes tpe ON taxref.cd_nom = tpe.cd_nom
 	LEFT JOIN taxonomie.taxref_protection_articles tpa ON tpa.cd_protection = tpe.cd_protection
+	LEFT JOIN taxonomie.taxref_liste_rouge_fr tlr ON tlr.cd_nom = taxref.cd_nom
 	WHERE synthese_zh.id_zh IS NOT NULL
 	AND (synthese_zh.date_max::timestamp > (NOW()::timestamp - interval '20 years'))
 	AND taxref.regne = 'Plantae'
-	GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, tpe.cd_protection, tpa.intitule, tpa.article, taxref.cd_nom, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;
+	GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, tpe.cd_protection, tpa.intitule, tpa.article, taxref.cd_nom, tlr.liste_rouge_source, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;
