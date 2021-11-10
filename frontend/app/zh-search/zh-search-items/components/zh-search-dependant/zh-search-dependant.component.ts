@@ -40,8 +40,13 @@ export class ZhSearchDependantComponent implements OnInit {
       this.enable();
       this._inputData = value;
     } else {
+      this.form.reset();
       this.disable();
     }
+  }
+
+  onDeselectAll() {
+    this.form.reset();
   }
 
   //Awkward but taken from the doc : https://cuppalabs.github.io/angular2-multiselect-dropdown/#/disablemode

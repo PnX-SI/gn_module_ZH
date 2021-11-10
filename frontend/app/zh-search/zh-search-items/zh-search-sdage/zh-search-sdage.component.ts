@@ -25,4 +25,8 @@ export class ZhSearchSDAGEComponent implements OnInit {
       autoPosition: true,
     };
   }
+
+  onDeSelectAll() {
+    this.form.reset();
+  }
 }

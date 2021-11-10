@@ -23,4 +23,8 @@ export class ZhSearchEnsembleComponent implements OnInit {
       autoPosition: true,
     };
   }
+
+  onDeSelectAll() {
+    this.form.reset();
+  }
 }
