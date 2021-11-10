@@ -11,6 +11,58 @@ from geonature.utils.env import ROOT_DIR
 
 from .utils import get_file_path
 from .api_error import ZHApiError
+from .forms import post_file_info, patch_file_info
+
+
+def upload_process(request, extensions, pdf_size, jpg_size, upload_path, module_name, id_media=None):
+
+    check_file_name(request.files["file"])
+
+    if id_media:
+        try:
+            os.remove(get_file_path(id_media))
+        except:
+            pass
+
+    upload_file = upload(
+        request,
+        extensions,
+        pdf_size,
+        jpg_size,
+        upload_path,
+        module_name
+    )
+
+    # checks if error in user file or user http request:
+    if "error" in upload_file:
+        raise ZHApiError(
+            message=upload_file["error"], details=upload_file["error"], status_code=400)
+
+    if id_media:
+        patch_file_info(
+            request.form.to_dict()['id_zh'],
+            id_media,
+            request.form.to_dict()['title'],
+            request.form.to_dict()['author'],
+            request.form.to_dict()['summary'],
+            upload_file['media_path'],
+            upload_file['extension'])
+    else:
+        # save in db
+        id_media = post_file_info(
+            request.form.to_dict()['id_zh'],
+            request.form.to_dict()['title'],
+            request.form.to_dict()['author'],
+            request.form.to_dict()['summary'],
+            upload_file['media_path'],
+            upload_file['extension'])
+
+    return {
+        "media_path": upload_file["media_path"],
+        "secured_file_name": upload_file['file_name'],
+        "original_file_name": request.files["file"].filename,
+        "id_media": id_media
+    }
 
 
 def upload(request, extensions, pdf_size, jpg_size, upload_path, module_name):

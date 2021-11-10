@@ -71,10 +71,7 @@ from .forms import *
 
 from .geometry import set_geom
 
-from .upload import (
-    upload,
-    check_file_name
-)
+from .upload import upload_process
 
 from .utils import (
     get_file_path,
@@ -428,6 +425,7 @@ def patch_reference(info_role):
     """edit reference
     """
     try:
+        pdb.set_trace()
         form_data = request.json
         DB.session.query(TReferences).filter(TReferences.id_reference == form_data['id_reference']).update({
             TReferences.authors: form_data["authors"],
@@ -640,63 +638,94 @@ def get_tab_data(id_tab, info_role):
             return {"id_zh": form_data['id_zh']}, 200
 
         if id_tab == 8:
-            ALLOWED_EXTENSIONS = blueprint.config['allowed_extensions']
-            MAX_PDF_SIZE = blueprint.config['max_pdf_size']
-            MAX_JPG_SIZE = blueprint.config['max_jpg_size']
-            FILE_PATH = blueprint.config['file_path']
-            MODULE_NAME = blueprint.config['MODULE_CODE'].lower()
+            try:
+                ALLOWED_EXTENSIONS = blueprint.config['allowed_extensions']
+                MAX_PDF_SIZE = blueprint.config['max_pdf_size']
+                MAX_JPG_SIZE = blueprint.config['max_jpg_size']
+                FILE_PATH = blueprint.config['file_path']
+                MODULE_NAME = blueprint.config['MODULE_CODE'].lower()
 
-            check_file_name(request.files["file"])
+                upload_resp = upload_process(
+                    request,
+                    ALLOWED_EXTENSIONS,
+                    MAX_PDF_SIZE,
+                    MAX_JPG_SIZE,
+                    FILE_PATH,
+                    MODULE_NAME
+                )
 
-            uploaded_resp = upload(
-                request,
-                ALLOWED_EXTENSIONS,
-                MAX_PDF_SIZE,
-                MAX_JPG_SIZE,
-                FILE_PATH,
-                MODULE_NAME
-            )
+                DB.session.commit()
 
-            # checks if error in user file or user http request:
-            if "error" in uploaded_resp:
-                return {"id_zh": request.form.to_dict['id_zh'], "errors": uploaded_resp["error"]}, 400
+                return {
+                    "media_path": upload_resp["media_path"],
+                    "secured_file_name": upload_resp['secured_file_name'],
+                    "original_file_name": upload_resp['original_file_name'],
+                    "id_media": upload_resp['id_media']
+                }, 200
+            except Exception as e:
+                exc_type, value, tb = sys.exc_info()
+                raise ZHApiError(
+                    message="upload_file_post_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
-            # save in db
-            id_media = post_file_info(
-                request.form.to_dict()['id_zh'],
-                request.form.to_dict()['title'],
-                request.form.to_dict()['author'],
-                request.form.to_dict()['summary'],
-                uploaded_resp['media_path'],
-                uploaded_resp['extension'])
-            DB.session.commit()
-
-            return {
-                "media_path": uploaded_resp["media_path"],
-                "secured_file_name": uploaded_resp['file_name'],
-                "original_file_name": request.files["file"].filename,
-                "id_media": id_media
-            }, 200
-
+    except KeyError or TypeError as e:
+        raise ZHApiError(
+            message='likely_empty_mandatory_field_error', details=str(e), status_code=400)
+    except exc.IntegrityError as e:
+        raise ZHApiError(
+            message='ZH_main_name_already_exists', details=str(e), status_code=400)
+    except exc.DataError as e:
+        raise ZHApiError(
+            message="post_tab_form_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+    except ZHApiError as e:
+        raise ZHApiError(
+            message=str(e.message), details=str(e.details))
     except Exception as e:
-        DB.session.rollback()
-        if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
-            raise ZHApiError(
-                message='likely_empty_mandatory_field_error', details=str(e), status_code=400)
-        if e.__class__.__name__ == 'IntegrityError':
-            raise ZHApiError(
-                message='ZH_main_name_already_exists', details=str(e), status_code=400)
-        if e.__class__.__name__ == 'DataError':
-            raise ZHApiError(
-                message="post_tab_form_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
-        if e.__class__.__name__ == 'ZHApiError':
-            raise ZHApiError(
-                message=str(e.message), details=str(e.details))
         exc_type, value, tb = sys.exc_info()
         raise ZHApiError(
             message="post_tab_form_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
     finally:
+        DB.session.rollback()
         DB.session.close()
+
+
+@ blueprint.route("files/<int:id_media>", methods=["PATCH"])
+@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
+@ json_resp
+def patch_file(id_media, info_role):
+    """edit file upload from tab8
+    """
+    try:
+        ALLOWED_EXTENSIONS = blueprint.config['allowed_extensions']
+        MAX_PDF_SIZE = blueprint.config['max_pdf_size']
+        MAX_JPG_SIZE = blueprint.config['max_jpg_size']
+        FILE_PATH = blueprint.config['file_path']
+        MODULE_NAME = blueprint.config['MODULE_CODE'].lower()
+
+        upload_resp = upload_process(
+            request,
+            ALLOWED_EXTENSIONS,
+            MAX_PDF_SIZE,
+            MAX_JPG_SIZE,
+            FILE_PATH,
+            MODULE_NAME,
+            id_media=id_media
+        )
+
+        DB.session.commit()
+
+        return {
+            "media_path": upload_resp["media_path"],
+            "secured_file_name": upload_resp['secured_file_name'],
+            "original_file_name": upload_resp['original_file_name'],
+            "id_media": upload_resp['id_media']
+        }, 200
+    except ZHApiError as e:
+        raise ZHApiError(
+            message=str(e.message), details=str(e.details))
+    except Exception as e:
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="upload_file_patch_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 @ blueprint.route("/<int:id_zh>", methods=["DELETE"])
