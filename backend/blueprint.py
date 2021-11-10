@@ -802,7 +802,8 @@ def write_csv(id_zh, info_role):
             if query:
                 rows = [
                     {
-                        "Groupe d'étude": row.group,
+                        "Groupe d'étude - classe": row.group_class,
+                        "Groupe d'étude - ordre": row.group_order,
                         "Nom Scientifique": row.scientific_name,
                         "Nom vernaculaire": row.vernac_name,
                         "Réglementation": row.reglementation,
