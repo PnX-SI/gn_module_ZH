@@ -83,6 +83,10 @@ from .api_error import ZHApiError
 
 import pdb
 
+
+# Convert m² to ha
+M_HA = 10000
+
 blueprint = Blueprint("pr_zh", __name__)
 
 
@@ -728,3 +732,157 @@ def returnUserCruved(info_role):
         module_code=blueprint.config['MODULE_CODE']
     )
     return user_cruved
+
+
+# test routes MV
+@blueprint.route("/departments", methods=['GET'])
+@json_resp
+def departments():
+    query = DB.session.query(LAreas).with_entities(LAreas.area_name, LAreas.area_code, LAreas.id_type, BibAreasTypes.type_code).join(BibAreasTypes, LAreas.id_type == BibAreasTypes.id_type)
+    query = query.filter(BibAreasTypes.type_code == 'DEP')
+    query = query.order_by(LAreas.area_code)
+    resp = query.all()
+    return [{"code": r.area_code, "name": r.area_name} for r in resp]
+
+
+@blueprint.route("/communes", methods=['POST'])
+@json_resp
+def get_area_from_department() -> dict:
+    code = request.json.get('code')
+    if code: 
+        query = DB.session.query(LiMunicipalities).with_entities(LiMunicipalities.id_area, LAreas.area_name, LAreas.area_code)\
+            .join(LAreas, LiMunicipalities.id_area == LAreas.id_area)\
+            .filter(LiMunicipalities.insee_com.like('{}%'.format(code)))
+        query = query.order_by(LAreas.area_code)
+        resp = query.all()
+        return [{"code": r.area_code, "name": r.area_name} for r in resp]
+    
+    return []
+
+
+@blueprint.route("/bassins", methods=['GET'])
+@json_resp
+def bassins():
+    query = DB.session.query(TRiverBasin).with_entities(
+        TRiverBasin.id_rb,
+        TRiverBasin.name)
+    resp = query.all()
+    return [{"code": r.id_rb, "name": r.name} for r in resp]
+
+
+@blueprint.route("/search", methods=['POST'])
+@json_resp
+def search():
+    query = DB.session.query(TZH).with_entities(TZH.main_name, TZH.id_zh)
+
+    json = request.json
+    
+    sdage = json.get('sdage')
+    if sdage is not None:
+        query = filter_sdage(query, sdage)
+    
+    code = json.get('code')
+    if code is not None:
+        query = filter_code(query, code)
+
+    ensemble = json.get('ensemble')
+    if ensemble is not None:
+        query = filter_ensemble(query, ensemble)
+
+    area = json.get('area')
+    if area is not None:
+        query = filter_area(query, area)
+
+    departement = json.get('departement')
+    communes = json.get('communes')
+
+    if departement and communes is None:
+        query = filter_area(query, departement, type_code='DEP')
+    if communes is not None:
+        query = filter_area(query, communes, type_code='COM')
+
+    # TODO: Bassin versant and Zones hydrographiques
+
+    # --- Advanced search
+    hydro = json.get('hydro')
+    if hydro is not None:
+        query = filter_fct(query, hydro)
+    
+    resp = query.all()
+    return [{"name": r.main_name} for r in resp]
+
+
+def filter_sdage(query, json: dict):
+    ids = [obj.get('id_nomenclature') for obj in json]
+    return query.filter(TZH.id_sdage.in_(ids))
+
+
+def filter_code(query, json: dict):
+    return query.filter(TZH.code == json)
+
+
+def filter_ensemble(query, json: dict):
+    ids = [obj.get('id_nomenclature') for obj in json]
+    return query.filter(TZH.id_site_space.in_(ids))
+
+
+def filter_area(query, json: dict):
+    ha = json.get('ha', None)
+    symbol = json.get('symbol', None)
+    if symbol is None or ha is None:
+        return query
+    
+    if symbol == '=':
+        query = query.filter(func.ST_Area(TZH.geom)/M_HA == ha)
+    elif symbol == "≥":
+        query = query.filter(func.ST_Area(TZH.geom)/M_HA >= ha)
+    elif symbol == "≤":
+        query = query.filter(func.ST_Area(TZH.geom)/M_HA <= ha)
+
+    return query
+
+
+def filter_area(query, json: dict, type_code: str):
+    codes = [dep.get('code', None) for dep in json]
+    if any(code is None for code in codes):
+        return query
+    
+    # Filter on departments
+    subquery = DB.session.query(LAreas).with_entities(LAreas.area_name, LAreas.geom, LAreas.id_type, BibAreasTypes.type_code).join(BibAreasTypes, LAreas.id_type == BibAreasTypes.id_type).filter(BibAreasTypes.type_code == type_code).filter(LAreas.area_code.in_(codes)).subquery()
+    
+    # Filter on geom.
+    # Need to use (c) on subquery to get the column
+    query = query.filter(func.ST_Transform(func.ST_SetSRID(
+            TZH.geom, 4326), 2154).ST_Intersects(subquery.c.geom))
+    
+    return query
+
+
+def filter_fct(query, json: dict):
+    ids_fct = [f.get('id_nomenclature') for f in json.get('functions', [])]
+    ids_qual = [f.get('id_nomenclature') for f in json.get('qualifications', [])]
+    ids_conn = [f.get('id_nomenclature') for f in json.get('connaissances', [])]
+
+    subquery = DB.session.query(TFunctions.id_zh).with_entities(
+            TFunctions.id_zh,
+            TFunctions.id_function, 
+            TFunctions.id_qualification, 
+            TFunctions.id_knowledge,
+            TZH.id_zh.label('id')).join(TFunctions, 
+                                        TFunctions.id_zh == TZH.id_zh)
+
+    if ids_fct and all(id_ is not None for id_ in ids_fct):
+        subquery = subquery.filter(TFunctions.id_function.in_(ids_fct))
+        print('1', ids_fct)
+    
+    if ids_qual and all(id_ is not None for id_ in ids_qual):
+        subquery = subquery.filter(TFunctions.id_qualification.in_(ids_qual))
+        print('2', ids_qual)
+    
+    if ids_conn and all(id_ is not None for id_ in ids_conn):
+        subquery = subquery.filter(TFunctions.id_knowledge.in_(ids_conn))
+        print('3', ids_conn)
+    
+    query = query.filter(TZH.id_zh == subquery.subquery().c.id_zh)
+    print(query)
+    return query
