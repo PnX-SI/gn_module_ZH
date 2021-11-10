@@ -32,6 +32,6 @@ export class ZhSearchInputComponent implements OnInit {
   }
 
   onDeselect() {
-    this.form.patchValue({ data: undefined });
+    this.form.patchValue(undefined);
   }
 }
