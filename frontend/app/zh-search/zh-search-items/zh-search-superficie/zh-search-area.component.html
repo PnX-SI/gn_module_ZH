@@ -7,8 +7,10 @@
   <div class="form-group col-md-6">
     <div class="input-group mb-3">
       <div class="input-group-prepend">
-        <select class="form-control">
-          <option *ngFor="let symbol of symbols">{{ symbol.value }}</option>
+        <select 
+          class="form-control"
+          [formControl]="form.controls.symbol">
+          <option *ngFor="let symbol of symbols" [ngValue]="symbol.value">{{ symbol.value }}</option>
         </select>
       </div>
       <input
@@ -16,7 +18,7 @@
           name="ha"
           type="number"
           class="form-control"
-          [formControl]="form"
+          [formControl]="form.controls.ha"
         />
       <div class="input-group-append">
         <span>Ha</span>
@@ -24,7 +26,7 @@
     </div>
     <small 
       class="error-msg" 
-      *ngIf="form.errors?.pattern">
+      *ngIf="form.controls.ha.errors?.pattern">
       La superficie doit être supérieure à 0
     </small>
   </div>

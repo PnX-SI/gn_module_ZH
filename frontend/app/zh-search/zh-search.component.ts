@@ -41,7 +41,7 @@ export class ZhSearchComponent implements OnInit {
   }
 
   onDepartmentSelected(event) {
-    if (event) {
+    if (event && event.length > 0) {
       const department = event[0].code;
       this._dataService
         .getCommuneFromDepartment(department)
@@ -57,6 +57,7 @@ export class ZhSearchComponent implements OnInit {
     if (event) {
       this.hydrographicZones = [];
     } else {
+      this.searchForm.get("zones").reset();
       this.hydrographicZones = undefined;
     }
   }
@@ -69,7 +70,7 @@ export class ZhSearchComponent implements OnInit {
         this.advancedForm.value
       );
       const filtered = this.filterFormGroup(searchObj);
-      console.log(filtered);
+      console.log("filtered", filtered);
 
       this._dataService
         .search(filtered)
@@ -100,13 +101,15 @@ export class ZhSearchComponent implements OnInit {
       ],
       zones: [null],
       ensemble: [null],
-      area: [
-        null,
-        {
-          validators: [Validators.min(0)],
-          updateOn: "change",
-        },
-      ],
+      area: this._fb.group({
+        ha: [
+          null,
+          {
+            validators: [Validators.min(0)],
+          },
+        ],
+        symbol: [null],
+      }),
     });
     this.advancedForm = this._fb.group({
       hydro: this._fb.group({
@@ -144,10 +147,13 @@ export class ZhSearchComponent implements OnInit {
       if (value) {
         if (value instanceof Array) {
           value = value.filter((item) => item != null);
+          filtered[key] = value;
         } else if (value instanceof Object) {
           value = this.filterFormGroup(value);
-        }
-        if (Object.keys(value).length !== 0) {
+          if (Object.keys(value).length !== 0) {
+            filtered[key] = value;
+          }
+        } else {
           filtered[key] = value;
         }
       }
