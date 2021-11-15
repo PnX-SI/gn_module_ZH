@@ -806,8 +806,25 @@ def search():
     # --- Advanced search
     hydro = json.get('hydro')
     if hydro is not None:
-        query = filter_fct(query, hydro)
+        query = filter_fct(query, hydro, 'FONCTIONS_HYDRO')
     
+    bio = json.get('bio')
+    if bio is not None:
+        query = filter_fct(query, bio, 'FONCTIONS_BIO')
+    
+    socio = json.get('socio')
+    if socio is not None:
+        query = filter_fct(query, socio, 'VAL_SOC_ECO')
+    
+    interet = json.get('interet')
+    if interet is not None:
+        query = filter_fct(query, interet, 'INTERET_PATRIM')
+
+    statuts = json.get('statuts')
+    if statuts is not None:
+        query = filter_statuts(query, statuts)
+        query = filter_plans(query, statuts)
+
     resp = query.all()
     return [{"name": r.main_name} for r in resp]
 
@@ -858,7 +875,16 @@ def filter_area(query, json: dict, type_code: str):
     return query
 
 
-def filter_fct(query, json: dict):
+def filter_fct(query, json: dict, type_: str):
+    known_types = ['FONCTIONS_HYDRO', 
+                   'FONCTIONS_BIO', 
+                   'INTERET_PATRIM', 
+                   'VAL_SOC_ECO',
+                   'FONCTIONS_QUALIF', 
+                   'FONCTIONS_CONNAISSANCE']
+    if type_ not in known_types:
+        raise ZHApiError(message='Filter type not appropriate', code=500)
+
     ids_fct = [f.get('id_nomenclature') for f in json.get('functions', [])]
     ids_qual = [f.get('id_nomenclature') for f in json.get('qualifications', [])]
     ids_conn = [f.get('id_nomenclature') for f in json.get('connaissances', [])]
@@ -868,21 +894,49 @@ def filter_fct(query, json: dict):
             TFunctions.id_function, 
             TFunctions.id_qualification, 
             TFunctions.id_knowledge,
+            TNomenclatures.id_type,
+            TNomenclatures.id_nomenclature,
             TZH.id_zh.label('id')).join(TFunctions, 
-                                        TFunctions.id_zh == TZH.id_zh)
+                                        TFunctions.id_zh == TZH.id_zh).join(TNomenclatures, TNomenclatures.id_nomenclature == TFunctions.id_function).filter_by(id_type=select(
+                [func.ref_nomenclatures.get_id_nomenclature_type(type_)]))
 
     if ids_fct and all(id_ is not None for id_ in ids_fct):
         subquery = subquery.filter(TFunctions.id_function.in_(ids_fct))
-        print('1', ids_fct)
     
     if ids_qual and all(id_ is not None for id_ in ids_qual):
         subquery = subquery.filter(TFunctions.id_qualification.in_(ids_qual))
-        print('2', ids_qual)
     
     if ids_conn and all(id_ is not None for id_ in ids_conn):
         subquery = subquery.filter(TFunctions.id_knowledge.in_(ids_conn))
-        print('3', ids_conn)
     
-    query = query.filter(TZH.id_zh == subquery.subquery().c.id_zh)
-    print(query)
+    query = query.filter(TZH.id_zh == subquery.subquery().c.id_zh).distinct()
+    
+    return query
+
+
+def filter_statuts(query, json: dict):
+    ids_statuts = [f.get('id_nomenclature') for f in json.get('statuts', [])]
+
+    if ids_statuts and ids_statuts:
+        subquery = DB.session.query(TOwnership.id_zh).with_entities(
+            TOwnership.id_zh,
+            TOwnership.id_status
+        ).filter(TOwnership.id_status.in_(ids_statuts))
+        query = query.filter(TZH.id_zh == subquery.subquery().c.id_zh).distinct()
+    
+    return query
+
+def filter_plans(query, json: dict):
+    
+    ids_plans = [f.get('id_nomenclature') for f in json.get('plans', [])]
+
+    if ids_plans and all(id_ is not None for id_ in ids_plans):
+        subquery = DB.session.query(TManagementStructures.id_zh).with_entities(
+        TManagementPlans.id_nature,
+        TManagementPlans.id_structure,
+        TManagementStructures.id_structure,
+        TManagementStructures.id_zh).join(TManagementStructures, TManagementPlans.id_structure == TManagementStructures.id_structure).filter(TManagementPlans.id_nature.in_(ids_plans))
+
+        query = query.filter(TZH.id_zh == subquery.subquery().c.id_zh).distinct()
+    
     return query
