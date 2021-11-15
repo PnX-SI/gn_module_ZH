@@ -7,13 +7,13 @@ import { FormBuilder, FormGroup } from "@angular/forms";
   styleUrls: ["./zh-advanced-search-evaluations.component.scss"],
 })
 export class ZhAdvancedSearchEvaluationsComponent implements OnInit {
+  @Input() form: FormGroup;
   @Input() hydros: [];
-  @Input() bio: [];
+  @Input() bios: [];
   @Input() menaces: [];
 
-  public form: FormGroup;
   public dropdownSettings: {};
-  constructor(private _fb: FormBuilder) {}
+  constructor() {}
 
   ngOnInit() {
     this.dropdownSettings = {
@@ -25,11 +25,6 @@ export class ZhAdvancedSearchEvaluationsComponent implements OnInit {
       enableSearchFilter: true,
       autoPosition: true,
     };
-    this.form = this._fb.group({
-      hydros: [""],
-      bios: [""],
-      menaces: [""],
-    });
   }
 
   onDeSelectAllHydro() {

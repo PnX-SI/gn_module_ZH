@@ -782,7 +782,6 @@ def bassins():
     return [{"code": r.id_rb, "name": r.name} for r in resp]
 
 
-
 def main_search(query, json):    
     sdage = json.get('sdage')
     if sdage is not None:
@@ -831,6 +830,10 @@ def main_search(query, json):
     if statuts is not None:
         query = filter_statuts(query, statuts)
         query = filter_plans(query, statuts)
+
+    evaluations = json.get('evaluations')
+    if evaluations is not None:
+        query = filter_evaluations(query, evaluations)
 
     return query
 
@@ -932,6 +935,7 @@ def filter_statuts(query, json: dict):
     
     return query
 
+
 def filter_plans(query, json: dict):
     
     ids_plans = [f.get('id_nomenclature') for f in json.get('plans', [])]
@@ -945,4 +949,21 @@ def filter_plans(query, json: dict):
 
         query = query.filter(TZH.id_zh == subquery.subquery().c.id_zh).distinct()
     
+    return query
+
+
+def filter_evaluations(query, json: dict):
+    ids_hydros = [f.get('id_nomenclature') for f in json.get('hydros', [])]
+    ids_bios = [f.get('id_nomenclature') for f in json.get('bios', [])]
+    ids_menaces = [f.get('id_nomenclature') for f in json.get('menaces', [])]
+
+    if ids_hydros and all(id_ is not None for id_ in ids_hydros):
+        query = query.filter(TZH.id_diag_hydro.in_(ids_hydros))
+    
+    if ids_bios and all(id_ is not None for id_ in ids_bios):
+        query = query.filter(TZH.id_diag_bio.in_(ids_bios))
+    
+    if ids_menaces and all(id_ is not None for id_ in ids_menaces):
+        query = query.filter(TZH.id_thread.in_(ids_menaces))
+
     return query

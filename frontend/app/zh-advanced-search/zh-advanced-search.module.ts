@@ -7,6 +7,7 @@ import { ZhAdvancedSearchFonctionsComponent } from "./components/fonctions/zh-ad
 import { AngularMultiSelectModule } from "angular2-multiselect-dropdown";
 import { ZhDetailsModule } from "../zh-details/zh-details.module";
 import { ZhAdvancedSearchStatutsComponent } from "./components/statuts/zh-advanced-search-statuts.component";
+import { ZhAdvancedSearchEvaluationsComponent } from "./components/evaluations/zh-advanced-search-evaluations.component";
 
 const routes: Routes = [
   { path: "/advanced_search", component: ZhAdvancedSearchComponent },
@@ -17,6 +18,7 @@ const routes: Routes = [
     ZhAdvancedSearchComponent,
     ZhAdvancedSearchFonctionsComponent,
     ZhAdvancedSearchStatutsComponent,
+    ZhAdvancedSearchEvaluationsComponent,
   ],
   entryComponents: [],
   imports: [

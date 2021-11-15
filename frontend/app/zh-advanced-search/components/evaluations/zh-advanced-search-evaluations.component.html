@@ -29,7 +29,7 @@
         <angular2-multiselect
           [data]="bios"
           [formControl]="form.controls.bios"
-          [settings]="dropdownSettingsNoCategory"
+          [settings]="dropdownSettings"
           (onDeSelectAll)="onDeSelectAllBio()"
         >
         </angular2-multiselect>
@@ -44,7 +44,7 @@
         <angular2-multiselect
           [data]="menaces"
           [formControl]="form.controls.menaces"
-          [settings]="dropdownSettingsNoCategory"
+          [settings]="dropdownSettings"
           (onDeSelectAll)="onDeSelectAllMenaces()"
         >
         </angular2-multiselect>

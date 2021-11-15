@@ -139,6 +139,11 @@ export class ZhSearchComponent implements OnInit {
         statuts: [null],
         plans: [null],
       }),
+      evaluations: this._fb.group({
+        hydros: [null],
+        bios: [null],
+        menaces: [null],
+      }),
     });
   }
 
