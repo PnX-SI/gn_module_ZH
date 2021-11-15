@@ -1,7 +1,7 @@
 <div class="container-fluid">
   <mat-drawer-container [hasBackdrop]="false" [autosize]="true">
     <mat-drawer #drawer mode="push">
-      <zh-search [data]="metaData" (onClose)="drawer.close()"></zh-search>
+      <zh-search [data]="metaData" (onClose)="drawer.close()" (onSearch)="filterZh($event)"></zh-search>
     </mat-drawer>
     <mat-drawer-content>
     <div class="map-list-container">
