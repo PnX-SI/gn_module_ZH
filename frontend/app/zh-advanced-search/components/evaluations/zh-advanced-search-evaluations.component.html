@@ -10,7 +10,7 @@
         <zh-label label="Fonctionnalité hydrologique">
         </zh-label>
       </div>
-      <div class="form-group col-6">
+      <div class="form-group col-6 customselect">
         <angular2-multiselect
           [data]="hydros"
           [formControl]="form.controls.hydros"
@@ -25,7 +25,7 @@
         <zh-label label="Fonctionnalité biologique (Habitats / faune / flore)">
         </zh-label>
       </div>
-      <div class="form-group col-6">
+      <div class="form-group col-6 customselect">
         <angular2-multiselect
           [data]="bios"
           [formControl]="form.controls.bios"
@@ -40,7 +40,7 @@
         <zh-label label="Menaces potentielles ou avérées">
         </zh-label>
       </div>
-      <div class="form-group col-6">
+      <div class="form-group col-6 customselect">
         <angular2-multiselect
           [data]="menaces"
           [formControl]="form.controls.menaces"
