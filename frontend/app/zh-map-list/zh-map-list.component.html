@@ -1,11 +1,11 @@
 <div class="container-fluid">
-  <mat-drawer-container class="example-container">
+  <mat-drawer-container [hasBackdrop]="false" [autosize]="true">
     <mat-drawer #drawer mode="push">
-      <zh-search [data]="metaData"></zh-search>
+      <zh-search [data]="metaData" (onClose)="drawer.close()"></zh-search>
     </mat-drawer>
     <mat-drawer-content>
     <div class="map-list-container">
-      <div class="float-btns">
+      <div [hidden]="drawer.opened" class="float-btns">
         <ng-container *ngIf="userCruved?.C != '0'">
           <button
             mat-raised-button
@@ -29,6 +29,7 @@
       </div>
       <div class="row">
         <div
+          [hidden]="drawer.opened"
           class="col-xs-12 col-sm-12 col-md-6 col-lg-6 padding-sm-occ"
           [ngStyle]="{ 'min-height.px': cardContentHeight }"
         >
