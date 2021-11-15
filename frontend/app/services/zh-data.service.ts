@@ -116,10 +116,10 @@ export class ZhDataService {
     return this._api.get(`${AppConfig.API_ENDPOINT}/zones_humides/bassins`);
   }
 
-  search(payload: Object) {
-    return this._api.post(
-      `${AppConfig.API_ENDPOINT}/zones_humides/search`,
-      payload
-    );
+  // Search is a function that filter or not all the ZH
+  search(payload: Object, options?) {
+    return this._api.post(`${AppConfig.API_ENDPOINT}/zones_humides`, payload, {
+      params: options,
+    });
   }
 }
