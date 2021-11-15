@@ -112,8 +112,16 @@ export class ZhDataService {
     );
   }
 
-  getBassins() {
+  getBasins() {
     return this._api.get(`${AppConfig.API_ENDPOINT}/zones_humides/bassins`);
+  }
+
+  getHydroZoneFromBasin(code: number) {
+    const payload = { code: code };
+    return this._api.post(
+      `${AppConfig.API_ENDPOINT}/zones_humides/zones_hydro`,
+      payload
+    );
   }
 
   // Search is a function that filter or not all the ZH

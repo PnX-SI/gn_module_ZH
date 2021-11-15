@@ -781,6 +781,22 @@ def bassins():
     resp = query.all()
     return [{"code": r.id_rb, "name": r.name} for r in resp]
 
+@blueprint.route("/zones_hydro", methods=['POST'])
+@json_resp
+def get_hydro_zones_from_bassin() -> dict:
+    code = request.json.get('code')
+    if code:
+        query = DB.session.query(THydroArea).with_entities(
+            THydroArea.id_hydro,
+            THydroArea.name,
+            TRiverBasin.id_rb
+        ).filter(TRiverBasin.id_rb == code).join(TRiverBasin, TRiverBasin.geom.ST_Intersects(THydroArea.geom))
+
+        resp = query.all()
+        return [{"code": r.id_hydro, "name": r.name} for r in resp]
+
+    return []
+
 
 def main_search(query, json):    
     sdage = json.get('sdage')
@@ -808,6 +824,13 @@ def main_search(query, json):
         query = filter_area(query, communes, type_code='COM')
 
     # TODO: Bassin versant and Zones hydrographiques
+    basin = json.get('basin')
+    zones = json.get('zones')
+
+    if basin is not None and zones is None:
+        query = filter_basin(query, basin)
+    if zones is not None:
+        query = filter_hydro(query, zones)
 
     # --- Advanced search
     hydro = json.get('hydro')
@@ -869,7 +892,7 @@ def filter_area_size(query, json: dict):
 
 
 def filter_area(query, json: dict, type_code: str):
-    codes = [dep.get('code', None) for dep in json]
+    codes = [area.get('code', None) for area in json]
     if any(code is None for code in codes):
         return query
     
@@ -883,6 +906,35 @@ def filter_area(query, json: dict, type_code: str):
     
     return query
 
+
+def filter_hydro(query, json):
+    codes = [area.get('code', None) for area in json]
+    
+    if codes and all(code is not None for code in codes):
+        subquery = DB.session.query(THydroArea).with_entities(
+            THydroArea.id_hydro,
+            THydroArea.geom
+        ).filter(THydroArea.id_hydro.in_(codes)).subquery()
+        
+        # SET_SRID does not return a valid geom...
+        query = query.filter(func.ST_Transform(func.ST_SetSRID(
+            TZH.geom, 4326), 4326).ST_Intersects(subquery.c.geom))
+
+    return query
+
+def filter_basin(query, json):
+    codes = [area.get('code', None) for area in json]
+
+    if codes is not None:
+        subquery = DB.session.query(TRiverBasin).with_entities(
+            TRiverBasin.id_rb,
+            TRiverBasin.geom,
+        ).filter(TRiverBasin.id_rb.in_(codes)).subquery()
+        # SET_SRID does not return a valid geom...
+        query = query.filter(func.ST_Transform(func.ST_SetSRID(
+            TZH.geom, 4326), 4326).ST_Intersects(subquery.c.geom))
+    
+    return query
 
 def filter_fct(query, json: dict, type_: str):
     known_types = ['FONCTIONS_HYDRO', 

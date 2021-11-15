@@ -13,7 +13,7 @@ export class ZhSearchComponent implements OnInit {
   @Output() onClose = new EventEmitter<object>();
   @Output() onSearch = new EventEmitter<object>();
   public advancedSearchToggled: boolean = false;
-  public bassins: [];
+  public basins: [];
   public hydrographicZones: [];
   public departements: [];
   public communes: [];
@@ -32,10 +32,10 @@ export class ZhSearchComponent implements OnInit {
       .catch((error) => console.log(error));
 
     this._dataService
-      .getBassins()
+      .getBasins()
       .toPromise()
       .then((resp: any) => {
-        this.bassins = resp;
+        this.basins = resp;
       })
       .catch((error) => console.log(error));
 
@@ -55,9 +55,13 @@ export class ZhSearchComponent implements OnInit {
     }
   }
 
-  onBassinSelected(event) {
-    if (event) {
-      this.hydrographicZones = [];
+  onBasinSelected(event) {
+    if (event && event.length > 0) {
+      const basin = event[0].code;
+      this._dataService
+        .getHydroZoneFromBasin(basin)
+        .toPromise()
+        .then((resp: any) => (this.hydrographicZones = resp));
     } else {
       this.searchForm.get("zones").reset();
       this.hydrographicZones = undefined;
@@ -91,7 +95,7 @@ export class ZhSearchComponent implements OnInit {
 
   initForm() {
     this.searchForm = this._fb.group({
-      bassin: [null],
+      basin: [null],
       departement: [null],
       communes: [null],
       sdage: [null],
