@@ -32,6 +32,7 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit {
     // examples: enable circle =>  leafletDrawOption.draw.circle = true;
     leafletDrawOption.draw.marker = false;
     leafletDrawOption.draw.polyline = false;
+    leafletDrawOption.edit.remove = true;
     this.leafletDrawOptions = leafletDrawOption;
     // set the input for the marker component
     // set the coord only when load data and when its edition mode (id_releve)

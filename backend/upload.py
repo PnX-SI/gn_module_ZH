@@ -1,4 +1,5 @@
 import pdb
+import sys
 
 from werkzeug.utils import secure_filename
 
@@ -9,12 +10,11 @@ import os
 from geonature.utils.env import ROOT_DIR
 
 from .utils import get_file_path
+from .api_error import ZHApiError
 
 
 def upload(request, extensions, pdf_size, jpg_size, upload_path, module_name):
     try:
-        # to do : set file name : file_name_1, _2, ... for main_picture
-
         # get form data
         metadata = request.form.to_dict()
 
@@ -63,5 +63,7 @@ def upload(request, extensions, pdf_size, jpg_size, upload_path, module_name):
             "media_path": str(media_path),
             "extension": extension,
         }
-    except Exception:
-        raise
+    except Exception as e:
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="update_tzh_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))

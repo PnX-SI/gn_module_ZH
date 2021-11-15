@@ -1,9 +1,9 @@
 import { Component, Input } from "@angular/core";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { DeleteModalComponent } from "../../commonComponents/delete-modal/delete-modal.component";
 import { ZhDataService } from "../../services/zh-data.service";
 import { CommonService } from "@geonature_common/service/common.service";
 import { Router } from "@angular/router";
+import { CruvedStoreService } from "@geonature_common/service/cruved-store.service";
 
 @Component({
   selector: "zh-details-header",
@@ -14,20 +14,18 @@ export class HeaderComponent {
   @Input() zhId: number;
 
   constructor(
+    public _cruvedStore: CruvedStoreService,
     private ngModal: NgbModal,
     private router: Router,
     private _zhService: ZhDataService,
     private _commonService: CommonService
   ) {}
 
-  onOpen() {
-    const deleteModal = this.ngModal.open(DeleteModalComponent, {
+  onOpen(modal) {
+    const deleteModal = this.ngModal.open(modal, {
       centered: true,
     });
 
-    deleteModal.componentInstance.title = "World";
-    deleteModal.componentInstance.message =
-      "Etes-vous sûr de vouloir supprimer cette Zone Humide ? Cette action est irréversible";
     deleteModal.result.then(
       () => {
         this.deleteZh(this.zhId);

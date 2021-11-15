@@ -42,22 +42,22 @@ export class ZhFormTab5Component implements OnInit {
 
   public hydroFctTableCol = [
     { name: "function", label: "Fonctions hydrologiques / biogéochimiques" },
+    { name: "justification", label: "Justifications" },
     { name: "qualification", label: "Qualifications" },
     { name: "knowledge", label: "Connaissance" },
-    { name: "justification", label: "Justifications" },
   ];
   public bioFctTableCol = [
     { name: "function", label: "Fonctions biologiques / écologiques" },
+    { name: "justification", label: "Justifications" },
     { name: "qualification", label: "Qualifications" },
     { name: "knowledge", label: "Connaissance" },
-    { name: "justification", label: "Justifications" },
   ];
 
   public interetsTableCol = [
     { name: "function", label: "Intérêts patrimoniaux" },
+    { name: "justification", label: "Justifications" },
     { name: "qualification", label: "Qualifications" },
     { name: "knowledge", label: "Connaissance" },
-    { name: "justification", label: "Justifications" },
   ];
 
   public corineTableCol = [
@@ -69,9 +69,9 @@ export class ZhFormTab5Component implements OnInit {
 
   public socioEcoTableCol = [
     { name: "function", label: "Valeurs socio-économiques" },
+    { name: "justification", label: "Justifications" },
     { name: "qualification", label: "Qualifications" },
     { name: "knowledge", label: "Connaissance" },
-    { name: "justification", label: "Justifications" },
   ];
 
   private tempID: any;
@@ -653,12 +653,13 @@ export class ZhFormTab5Component implements OnInit {
           const files = res.file_names.map((file) =>
             file.replace(/^.*[\\\/]/, "")
           );
-          const msg = `Les fichiers suivants ont été générés ${files.join(
-            ", "
+          const msg = `Les fichiers suivants ont été générés </br> ${files.join(
+            "</br>"
           )}`;
           this._toastr.success(msg, "", {
             disableTimeOut: true, // to be sure the user sees the toast
             closeButton: true,
+            enableHtml: true,
           });
         }
       })

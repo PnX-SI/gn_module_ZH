@@ -129,47 +129,47 @@ export class ZhFormTab3Component implements OnInit {
               v.CB_code
             )
           );
-          this.currentZh.properties.activities.forEach((activity) => {
-            let impacts = [];
-            activity.ids_impact.forEach((impact) => {
-              impacts.push(
-                this.formMetaData["IMPACTS"].find((item) => {
-                  return item.id_cor_impact_types == impact;
-                })
-              );
-            });
-            let impactNames = impacts.map((item) => {
-              return item["mnemonique"];
-            });
-
-            this.listActivity.push({
-              frontId: activity.id_human_activity,
-              human_activity: {
-                id_nomenclature: activity.id_human_activity,
-                mnemonique: this.formMetaData["ACTIV_HUM"].find((item) => {
-                  return item.id_nomenclature == activity.id_human_activity;
-                }).mnemonique,
-              },
-              localisation: {
-                id_nomenclature: activity.id_localisation,
-                mnemonique: this.formMetaData["LOCALISATION"].find((item) => {
-                  return item.id_nomenclature == activity.id_localisation;
-                }).mnemonique,
-              },
-              remark_activity: activity.remark_activity,
-              impacts: {
-                impacts: impacts,
-                mnemonique: impactNames.join("\r\n"),
-              },
-            });
-            this.sortHumanActivities();
-            this.activitiesInput.map((item) => {
-              if (item.id_nomenclature == activity.id_human_activity) {
-                item.disabled = true;
-              }
-            });
-          });
         }
+        this.currentZh.properties.activities.forEach((activity) => {
+          let impacts = [];
+          activity.ids_impact.forEach((impact) => {
+            impacts.push(
+              this.formMetaData["IMPACTS"].find((item) => {
+                return item.id_cor_impact_types == impact;
+              })
+            );
+          });
+          let impactNames = impacts.map((item) => {
+            return item["mnemonique"];
+          });
+
+          this.listActivity.push({
+            frontId: activity.id_human_activity,
+            human_activity: {
+              id_nomenclature: activity.id_human_activity,
+              mnemonique: this.formMetaData["ACTIV_HUM"].find((item) => {
+                return item.id_nomenclature == activity.id_human_activity;
+              }).mnemonique,
+            },
+            localisation: {
+              id_nomenclature: activity.id_localisation,
+              mnemonique: this.formMetaData["LOCALISATION"].find((item) => {
+                return item.id_nomenclature == activity.id_localisation;
+              }).mnemonique,
+            },
+            remark_activity: activity.remark_activity,
+            impacts: {
+              impacts: impacts,
+              mnemonique: impactNames.join("\r\n"),
+            },
+          });
+          this.sortHumanActivities();
+          this.activitiesInput.map((item) => {
+            if (item.id_nomenclature == activity.id_human_activity) {
+              item.disabled = true;
+            }
+          });
+        });
         this.form.patchValue({
           id_sdage: this.currentZh.properties.id_sdage,
           id_sage: this.currentZh.properties.id_sage,
