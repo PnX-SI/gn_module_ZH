@@ -791,7 +791,7 @@ def search():
 
     area = json.get('area')
     if area is not None:
-        query = filter_area(query, area)
+        query = filter_area_size(query, area)
 
     departement = json.get('departement')
     communes = json.get('communes')
@@ -843,7 +843,7 @@ def filter_ensemble(query, json: dict):
     return query.filter(TZH.id_site_space.in_(ids))
 
 
-def filter_area(query, json: dict):
+def filter_area_size(query, json: dict):
     ha = json.get('ha', None)
     symbol = json.get('symbol', None)
     if symbol is None or ha is None:
