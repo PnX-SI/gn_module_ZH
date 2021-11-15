@@ -11,6 +11,7 @@ import { ZhDataService } from "../services/zh-data.service";
 export class ZhSearchComponent implements OnInit {
   @Input() data: any;
   @Output() onClose = new EventEmitter<object>();
+  @Output() onSearch = new EventEmitter<object>();
   public advancedSearchToggled: boolean = false;
   public bassins: [];
   public hydrographicZones: [];
@@ -63,7 +64,7 @@ export class ZhSearchComponent implements OnInit {
     }
   }
 
-  onSearch() {
+  search() {
     if (!this.searchForm.invalid) {
       const searchObj = Object.assign(
         {},
@@ -73,19 +74,15 @@ export class ZhSearchComponent implements OnInit {
       const filtered = this.filterFormGroup(searchObj);
       console.log("filtered", filtered);
 
-      this._dataService
-        .search(filtered)
-        .toPromise()
-        .then((res) => {
-          console.log(res);
-        })
-        .catch((error) => console.log(error));
+      this.onSearch.emit(filtered);
     }
   }
 
   onReset() {
     this.searchForm.reset();
     this.advancedForm.reset();
+    // Emit empty object to search all ZH
+    this.onSearch.emit(new Object());
   }
 
   onAdvancedFormChanged(event) {
