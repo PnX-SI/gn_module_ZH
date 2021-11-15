@@ -107,6 +107,10 @@ max_pdf_size = 1.5  # Mo
 
 max_jpg_size = 0.5  # Mo
 
+filename_validated = True
+
+fileformat_validated = True
+
 file_path = "static"
 
 module_dir_name = 'gn_module_zones_humides'

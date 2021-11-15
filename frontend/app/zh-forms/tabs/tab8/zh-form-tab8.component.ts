@@ -4,6 +4,7 @@ import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 
 import { ToastrService } from "ngx-toastr";
 
+import { AppConfig } from "@geonature_config/app.config";
 import { ZhDataService } from "../../../services/zh-data.service";
 import { fileSizeValidator } from "../../../validators/fileSizeValidator";
 import { fileNameValidator } from "../../../validators/fileNameValidator";
@@ -71,19 +72,31 @@ export class ZhFormTab8Component implements OnInit {
   // initialize forms
   initForms() {
     this.fileForm = this.fb.group({
-      file: [
-        null,
-        Validators.compose([
-          Validators.required,
-          fileFormatValidator(this.fileTypeAccepted),
-          fileSizeValidator(500, 1500),
-          fileNameValidator(this.zh.properties.code),
-        ]),
-      ],
+      file: [null, Validators.compose(this.getValidators())],
       title: [null, Validators.required],
       author: [null, Validators.required],
       summary: null,
     });
+  }
+
+  getValidators() {
+    let validators = [Validators.required];
+    if (AppConfig.fileformat_validated) {
+      validators.push(fileFormatValidator(this.fileTypeAccepted));
+    }
+    if (AppConfig.filename_validated) {
+      validators.push(fileNameValidator(this.zh.properties.code));
+    }
+
+    if (AppConfig.max_jpg_size) {
+      validators.push(fileSizeValidator(AppConfig.max_jpg_size * 1000));
+    }
+
+    if (AppConfig.max_jpg_size && AppConfig.max_pdf_size) {
+      validators.push(fileSizeValidator(AppConfig.max_jpg_size * 1000));
+    }
+
+    return validators;
   }
 
   initExtensions() {
