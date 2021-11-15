@@ -91,7 +91,7 @@ blueprint = Blueprint("pr_zh", __name__)
 
 
 # Route pour afficher liste des zones humides
-@blueprint.route("", methods=["GET"])
+@blueprint.route("", methods=["GET", "POST"])
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
 def get_zh(info_role):
@@ -102,15 +102,27 @@ def get_zh(info_role):
     limit = int(parameters.get("limit", 100))
     page = int(parameters.get("offset", 0))
 
+    payload = request.json or None
+
+    if payload is not None:
+        q = main_search(q, payload)
+
+    return get_all_zh(info_role=info_role, 
+                      query=q, 
+                      limit=limit, 
+                      page=page)
+
+
+def get_all_zh(info_role, query, limit, page):
     # Pour obtenir le nombre de résultat de la requete sans le LIMIT
-    nb_results_without_limit = q.count()
+    nb_results_without_limit = query.count()
 
     user = info_role
     user_cruved = get_or_fetch_user_cruved(
         session=session, id_role=info_role.id_role, module_code="ZONES_HUMIDES"
     )
 
-    data = q.limit(limit).offset(page * limit).all()
+    data = query.limit(limit).offset(page * limit).all()
 
     # check if municipalities and dep in ref_geo
     id_type_com = DB.session.query(BibAreasTypes).filter(
@@ -770,13 +782,8 @@ def bassins():
     return [{"code": r.id_rb, "name": r.name} for r in resp]
 
 
-@blueprint.route("/search", methods=['POST'])
-@json_resp
-def search():
-    query = DB.session.query(TZH).with_entities(TZH.main_name, TZH.id_zh)
 
-    json = request.json
-    
+def main_search(query, json):    
     sdage = json.get('sdage')
     if sdage is not None:
         query = filter_sdage(query, sdage)
@@ -825,8 +832,7 @@ def search():
         query = filter_statuts(query, statuts)
         query = filter_plans(query, statuts)
 
-    resp = query.all()
-    return [{"name": r.main_name} for r in resp]
+    return query
 
 
 def filter_sdage(query, json: dict):
