@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 
 import { ZhDataService } from "../services/zh-data.service";
@@ -10,6 +10,7 @@ import { ZhDataService } from "../services/zh-data.service";
 })
 export class ZhSearchComponent implements OnInit {
   @Input() data: any;
+  @Output() onClose = new EventEmitter<object>();
   public advancedSearchToggled: boolean = false;
   public bassins: [];
   public hydrographicZones: [];
@@ -80,6 +81,11 @@ export class ZhSearchComponent implements OnInit {
         })
         .catch((error) => console.log(error));
     }
+  }
+
+  onReset() {
+    this.searchForm.reset();
+    this.advancedForm.reset();
   }
 
   onAdvancedFormChanged(event) {
@@ -160,5 +166,9 @@ export class ZhSearchComponent implements OnInit {
     });
 
     return filtered;
+  }
+
+  onCloseClicked() {
+    this.onClose.emit();
   }
 }

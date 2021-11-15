@@ -1,7 +1,12 @@
 <div class="d-flex flex-row">
   <div class="card">
     <div class="card-header title">
-      <h4>Recherche multi-critères</h4>
+      <div class="d-flex justify-content-between">
+        <h4>Recherche multi-critères</h4>
+        <button mat-icon-button (click)="onCloseClicked()">
+          <mat-icon class="cancel-icon">cancel</mat-icon>
+        </button>
+      </div>
     </div>
     <div class="card-body">
       <zh-search-sdage 
@@ -47,20 +52,35 @@
         [inputData]="hydrographicZones">
       </zh-search-dependant>
       <hr/>
-      <mat-slide-toggle 
-        [checked]="advancedSearchToggled"
-        (change)="advancedSearchToggled=!advancedSearchToggled">
-        Recherche avancée</mat-slide-toggle>
       
-      <button
+      <div class="row">
+        <div class="col-12">
+          <mat-slide-toggle 
+          [checked]="advancedSearchToggled"
+          (change)="advancedSearchToggled=!advancedSearchToggled">
+          Recherche avancée</mat-slide-toggle>
+        </div>
+      </div>
+      <div class="d-flex justify-content-start searchButtons">
+        <button
+          mat-raised-button
+          color="primary"
+          class="btn-action hard-shadow button-success uppercase"
+          (click)="onSearch()"
+        >
+          Recherche
+          <mat-icon>search</mat-icon>
+        </button> 
+        <button
         mat-raised-button
-        color="primary"
-        class="btn-action hard-shadow button-success uppercase ml-3"
-        (click)="onSearch()"
-      >
-        Recherche
-        <mat-icon>search</mat-icon>
-      </button>
+        color="warning"
+        class="btn-action hard-shadow button-warning uppercase ml-3"
+        (click)="onReset()"
+        >
+          Réinitialiser
+        <mat-icon>cleaning_services</mat-icon>
+        </button>
+      </div>
     </div>
   </div>
   <div *ngIf="advancedSearchToggled" class="card">
