@@ -82,7 +82,6 @@ export class ZhFormTab8Component implements OnInit {
 
   getValidators() {
     let validators = [Validators.required];
-    console.log(this.config.fileformat_validated);
     if (this.config.fileformat_validated) {
       validators.push(fileFormatValidator(this.fileTypeAccepted));
     }
@@ -90,14 +89,13 @@ export class ZhFormTab8Component implements OnInit {
       validators.push(fileNameValidator(this.zh.properties.code));
     }
 
-    if (this.config.max_jpg_size) {
-      validators.push(fileSizeValidator(this.config.max_jpg_size * 1000));
-    }
+    validators.push(
+      fileSizeValidator(
+        this.config.max_jpg_size * 1000,
+        this.config.max_pdf_size * 1000
+      )
+    );
 
-    if (this.config.max_jpg_size && this.config.max_pdf_size) {
-      validators.push(fileSizeValidator(this.config.max_jpg_size * 1000));
-    }
-    console.log(validators);
     return validators;
   }
 
