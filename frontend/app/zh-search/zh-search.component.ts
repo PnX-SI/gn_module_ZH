@@ -99,13 +99,7 @@ export class ZhSearchComponent implements OnInit {
       departement: [null],
       communes: [null],
       sdage: [null],
-      code: [
-        null,
-        {
-          validators: [Validators.pattern("^[0-9]{2}[A-Z]{2}[0-9]{5}")],
-          updateOn: "change",
-        },
-      ],
+      nameorcode: [null],
       zones: [null],
       ensemble: [null],
       area: this._fb.group({

@@ -217,7 +217,7 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     this._zhService
       .search(filtered, { limit: this.rowPerPage })
       .toPromise()
-      .then((res) => {
+      .then((res: any) => {
         ms.page.totalElements = res.total;
         ms.page.itemPerPage = this.rowPerPage;
         ms.page.pageNumber = res.page;

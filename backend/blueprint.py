@@ -803,9 +803,9 @@ def main_search(query, json):
     if sdage is not None:
         query = filter_sdage(query, sdage)
     
-    code = json.get('code')
-    if code is not None:
-        query = filter_code(query, code)
+    nameorcode = json.get('nameorcode')
+    if nameorcode is not None:
+        query = filter_nameorcode(query, nameorcode)
 
     ensemble = json.get('ensemble')
     if ensemble is not None:
@@ -866,8 +866,9 @@ def filter_sdage(query, json: dict):
     return query.filter(TZH.id_sdage.in_(ids))
 
 
-def filter_code(query, json: dict):
-    return query.filter(TZH.code == json)
+def filter_nameorcode(query, json: dict):
+    # Checks if the code OR the name is already taken
+    return query.filter((TZH.code == json) | (TZH.main_name == json))
 
 
 def filter_ensemble(query, json: dict):
