@@ -10,15 +10,15 @@
     <ng-container *ngIf="data && data.length > 0">
       <tr *ngFor="let item of data">
         <td *ngFor="let col of tableCols">
-          <ng-container *ngIf="col.subname; else elseBlockSub">
-            <ul *ngIf="isArray(item[col.name][col.subname]); else elseBlockSubArr">
-              <li class="item" *ngFor="let item of item[col.name][col.subname]">
-                {{ item }}
+          <ng-container *ngIf="col.subcell; else elseBlockSub">
+            <ul *ngIf="isArray(item[col.name][col.subcell.key]); else elseBlockSubArr">
+              <li class="item" *ngFor="let item of item[col.name][col.subcell.key]">
+                {{ item[col.subcell.name] }}
               </li>
             </ul>
           </ng-container>
           <ng-template #elseBlockSubArr>
-            {{ item[col.name][col.subname] }}
+            {{ item[col.name][col.subcell.name] }}
           </ng-template>
           <ng-template #elseBlockSub>
             <ul *ngIf="isArray(item[col.name]); else elseBlockSub">
