@@ -664,7 +664,7 @@ def get_tab_data(id_tab, info_role):
 
             # checks if error in user file or user http request:
             if "error" in uploaded_resp:
-                return {"id_zh": request.form.to_dict['id_zh'], "errors": uploaded_resp["error"]}, 400
+                return {"id_zh": request.form.to_dict()['id_zh'], "errors": uploaded_resp["error"]}, 400
 
             # save in db
             id_media = post_file_info(
