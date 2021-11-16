@@ -113,6 +113,14 @@
         *ngIf="listActivity && listActivity.length > 0"
         class="table-responsive"
       >
+      <zh-table
+          [tableCols]="activityTableCol"
+          [data]="listActivity"
+          [deletable]="true"
+          [editable]="true"
+          (onEdit)="onEditActivity(activityModal, $event)"
+          (onDelete)="onDeleteActivity($event)"
+      ></zh-table>
         <table class="table">
           <thead class="thead-inverse table-header">
             <tr>

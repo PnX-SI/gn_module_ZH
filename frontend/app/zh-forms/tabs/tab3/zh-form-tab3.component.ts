@@ -30,11 +30,16 @@ export class ZhFormTab3Component implements OnInit {
     { name: "CB_humidity", label: "Humidité" },
   ];
   activityTableCol = [
-    { name: "human_activity", label: "Activités humaines" },
-    { name: "localisation", label: "Localisation" },
+    {
+      name: "human_activity",
+      label: "Activités humaines",
+      subname: "mnemonique",
+    },
+    { name: "localisation", label: "Localisation", subname: "mnemonique" },
     {
       name: "impacts",
       label: "Impacts (facteurs influençant l'évolution de la zone)",
+      subname: "mnemonique",
     },
     { name: "remark_activity", label: "Remarques" },
   ];
@@ -163,6 +168,7 @@ export class ZhFormTab3Component implements OnInit {
               mnemonique: impactNames.join("\r\n"),
             },
           });
+          console.log(this.listActivity);
           this.sortHumanActivities();
           this.activitiesInput.map((item) => {
             if (item.id_nomenclature == activity.id_human_activity) {
