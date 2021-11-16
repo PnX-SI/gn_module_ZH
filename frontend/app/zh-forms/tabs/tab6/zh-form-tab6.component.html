@@ -19,42 +19,14 @@
           *ngIf="statusTable && statusTable.length > 0"
           class="table-responsive"
         >
-          <table class="table">
-            <thead class="thead-inverse table-header">
-              <tr>
-                <th *ngFor="let col of statusTableCol">{{ col.label }}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of statusTable">
-                <td *ngFor="let col of statusTableCol">
-                  {{ item[col.name]?.mnemonique || item[col.name] }}
-                </td>
-                <td>
-                  <div>
-                    <button
-                      mat-icon-button
-                      class="mr-2"
-                      placement="top"
-                      ngbTooltip="Editer"
-                      (click)="onEditStatus(statusModal, item)"
-                    >
-                      <mat-icon class="edit-icon">edit</mat-icon>
-                    </button>
-                    <button
-                      mat-icon-button
-                      placement="top"
-                      ngbTooltip="Supprimer"
-                      (click)="onDeleteStatus(item)"
-                    >
-                      <mat-icon class="delete-icon">close</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <zh-table
+          [tableCols]="statusTableCol"
+          [data]="statusTable"
+          [deletable]="true"
+          [editable]="true"
+          (onDelete)="onDeleteStatus($event)"
+          (onEdit)="onEditStatus(statusModal, $event)"
+        ></zh-table>
         </div>
       </div>
     </fieldset>
@@ -205,42 +177,14 @@
           *ngIf="instrumentTable && instrumentTable.length > 0"
           class="table-responsive"
         >
-          <table class="table">
-            <thead class="thead-inverse table-header">
-              <tr>
-                <th *ngFor="let col of instrumentTableCol">{{ col.label }}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of instrumentTable">
-                <td *ngFor="let col of instrumentTableCol">
-                  {{ item[col.name]?.mnemonique || item[col.name] }}
-                </td>
-                <td>
-                  <div>
-                    <button
-                      mat-icon-button
-                      class="mr-2"
-                      placement="top"
-                      ngbTooltip="Editer"
-                      (click)="onEditInstrument(instrumentModal, item)"
-                    >
-                      <mat-icon class="edit-icon">edit</mat-icon>
-                    </button>
-                    <button
-                      mat-icon-button
-                      placement="top"
-                      ngbTooltip="Supprimer"
-                      (click)="onDeleteInstrument(item)"
-                    >
-                      <mat-icon class="delete-icon">close</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <zh-table
+            [tableCols]="instrumentTableCol"
+            [data]="instrumentTable"
+            [deletable]="true"
+            [editable]="true"
+            (onDelete)="onDeleteInstrument($event)"
+            (onEdit)="onEditInstrument(instrumentModal, $event)"
+          ></zh-table>
         </div>
       </div>
     </fieldset>
@@ -296,46 +240,14 @@
           *ngIf="urbanDocTable && urbanDocTable.length > 0"
           class="table-responsive"
         >
-          <table class="table">
-            <thead class="thead-inverse table-header">
-              <tr>
-                <th *ngFor="let col of urbanDocTableCol">{{ col.label }}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of urbanDocTable">
-                <td class="backToLigne" *ngFor="let col of urbanDocTableCol">
-                  {{
-                    item[col.name]?.mnemonique ||
-                      item[col.name]?.municipality_name ||
-                      item[col.name]
-                  }}
-                </td>
-                <td>
-                  <div>
-                    <button
-                      mat-icon-button
-                      class="mr-2"
-                      placement="top"
-                      ngbTooltip="Editer"
-                      (click)="onEditUrbanDoc(urbanDocModal, item)"
-                    >
-                      <mat-icon class="edit-icon">edit</mat-icon>
-                    </button>
-                    <button
-                      mat-icon-button
-                      placement="top"
-                      ngbTooltip="Supprimer"
-                      (click)="onDeleteUrbanDoc(item)"
-                    >
-                      <mat-icon class="delete-icon">close</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <zh-table
+            [tableCols]="urbanDocTableCol"
+            [data]="urbanDocTable"
+            [deletable]="true"
+            [editable]="true"
+            (onDelete)="onDeleteUrbanDoc($event)"
+            (onEdit)="onEditUrbanDoc(urbanDocModal, $event)"
+          ></zh-table>
         </div>
       </div>
     </fieldset>

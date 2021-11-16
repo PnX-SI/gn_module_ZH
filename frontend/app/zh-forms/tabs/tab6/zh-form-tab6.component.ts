@@ -54,19 +54,31 @@ export class ZhFormTab6Component implements OnInit {
   public selectedItems = [];
 
   public statusTableCol = [
-    { name: "status", label: "Statut" },
+    { name: "status", label: "Statut", subcell: { name: "mnemonique" } },
     { name: "remark", label: "Remarques" },
   ];
 
   public instrumentTableCol = [
-    { name: "instrument", label: "Instruments contractuels et financiers" },
+    {
+      name: "instrument",
+      label: "Instruments contractuels et financiers",
+      subcell: { name: "mnemonique" },
+    },
     { name: "instrument_date", label: "Date de mise en oeuvre" },
   ];
 
   public urbanDocTableCol = [
-    { name: "area", label: "Commune" },
-    { name: "urbanType", label: "Type de document communal" },
-    { name: "typeClassement", label: "Type de classement" },
+    { name: "area", label: "Commune", subcell: { name: "municipality_name" } },
+    {
+      name: "urbanType",
+      label: "Type de document communal",
+      subcell: { name: "mnemonique" },
+    },
+    {
+      name: "typeClassement",
+      label: "Type de classement",
+      subcell: { name: "mnemonique" },
+    },
     { name: "remark", label: "Remarques" },
   ];
   public planTableCol = [
