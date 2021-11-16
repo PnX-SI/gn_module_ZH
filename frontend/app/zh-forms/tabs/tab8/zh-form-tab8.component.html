@@ -82,7 +82,7 @@
                 fileForm.controls.file.errors?.fileSizeValidator
               "
               class="error-msg"
-              >Le fichier excède le poids maximum autorisé (500ko pour les photos, 1500ko pour les pdf)<br></small>
+              >Le fichier excède le poids maximum autorisé ({{ config.max_jpg_size }}Mo pour les photos, {{ config.max_pdf_size }}Mo pour les pdf)<br></small>
           <small
             *ngIf="
               fileForm.controls.file.errors?.fileNameValidator
