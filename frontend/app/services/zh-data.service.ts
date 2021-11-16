@@ -113,6 +113,13 @@ export class ZhDataService {
     );
   }
 
+  patchFile(mediaId: number, form: FormData) {
+    return this._api.patch(
+      `${AppConfig.API_ENDPOINT}/zones_humides/files/${mediaId}`,
+      form
+    );
+  }
+
   postMainPicture(zhId: number, mediaId: number) {
     return this._api.patch(
       `${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/main_pict/${mediaId}`,

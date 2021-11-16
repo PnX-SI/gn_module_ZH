@@ -29,6 +29,7 @@ export class ZhFormTab8Component implements OnInit {
   public fileForm: FormGroup;
   public files: ZhFile[];
   public fileToUpload: File | null = null;
+  public fileIdToPatch: number | null = null;
   public loadingUpload: boolean = false;
 
   public modalTitle: string;
@@ -167,6 +168,7 @@ export class ZhFormTab8Component implements OnInit {
       event.author,
       event.description_fr
     );
+    this.fileIdToPatch = event.id_media;
     this.patchModal = true;
     this.onOpenModal(modal);
   }
@@ -268,14 +270,21 @@ export class ZhFormTab8Component implements OnInit {
     });
   }
 
-  postFile() {
-    this.loadingUpload = true;
+  fillUploadForm(patchFile: boolean = true): FormData {
     const uploadForm = new FormData();
     uploadForm.append("id_zh", this.zh.id);
     uploadForm.append("title", this.fileForm.value.title);
     uploadForm.append("author", this.fileForm.value.author);
     uploadForm.append("summary", this.fileForm.value.summary);
-    uploadForm.append("file", this.fileToUpload, this.fileToUpload.name);
+    if (patchFile) {
+      uploadForm.append("file", this.fileToUpload, this.fileToUpload.name);
+    }
+    return uploadForm;
+  }
+
+  postFile() {
+    this.loadingUpload = true;
+    const uploadForm = this.fillUploadForm(true);
     this._dataService
       .postDataForm(uploadForm, 8)
       .toPromise()
@@ -285,7 +294,7 @@ export class ZhFormTab8Component implements OnInit {
       })
       .catch((error) => {
         this.displayError(
-          `Une erreur est survenue, impossible d'uploader un fichier : <${error.message}>`
+          `Une erreur est survenue, impossible de téléverser un fichier : <${error.message}>`
         );
       })
       .finally(() => {
@@ -295,8 +304,26 @@ export class ZhFormTab8Component implements OnInit {
   }
 
   patchFile() {
-    // Check if file is empty: not changed
-    console.log("Not implemented yet");
+    this.loadingUpload = true;
+    const uploadForm: FormData = this.fillUploadForm(
+      this.fileToUpload.size !== 0
+    );
+    this._dataService
+      .patchFile(this.fileIdToPatch, uploadForm)
+      .toPromise()
+      .then(() => {
+        this.activeModal.close();
+        this.displayInfo("Fichier téléversé avec succès !");
+      })
+      .catch((error) => {
+        this.displayError(
+          `Une erreur est survenue, impossible de mettre à jour un fichier : <${error.message}>`
+        );
+      })
+      .finally(() => {
+        this.loadingUpload = false;
+        this.getFiles();
+      });
   }
 
   resetForm() {
