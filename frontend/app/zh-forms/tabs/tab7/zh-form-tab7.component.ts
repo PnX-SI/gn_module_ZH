@@ -57,8 +57,16 @@ export class ZhFormTab7Component implements OnInit {
   ];
 
   public actionTableCol = [
-    { name: "action", label: "Propositions d’actions" },
-    { name: "priority", label: "Niveau de priorité" },
+    {
+      name: "action",
+      label: "Propositions d’actions",
+      subcell: { name: "name" },
+    },
+    {
+      name: "priority",
+      label: "Niveau de priorité",
+      subcell: { name: "mnemonique" },
+    },
     { name: "remark", label: "Remarques" },
   ];
 
