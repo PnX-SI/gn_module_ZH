@@ -100,7 +100,7 @@
                       mat-icon-button
                       placement="top"
                       ngbTooltip="Supprimer"
-                      (click)="onDeleteStructure(item)"
+                      (click)="onDeleteStrutureModal(content, item)"
                     >
                       <mat-icon class="delete-icon">close</mat-icon>
                     </button>
@@ -141,7 +141,7 @@
                                 mat-icon-button
                                 placement="top"
                                 ngbTooltip="Supprimer"
-                                (click)="onDeletePlan(plan, item)"
+                                (click)="onDeletePlanModal(content, plan, item)"
                               >
                                 <mat-icon class="delete-icon">close</mat-icon>
                               </button>
@@ -619,4 +619,9 @@
       {{ addModalBtnLabel }}
     </button>
   </div>
+</ng-template>
+<ng-template #content let-c="close" let-d="dismiss">
+  <zh-delete-modal (onCancel)="d()" (onDelete)=c()>
+    <p>Etes-vous sûr de vouloir supprimer cette ligne ?</p>
+  </zh-delete-modal>
 </ng-template>

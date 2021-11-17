@@ -716,6 +716,22 @@ export class ZhFormTab6Component implements OnInit {
     }
   }
 
+  onDeleteStrutureModal(modal, structure) {
+    this.ngbModal
+      .open(modal, {
+        centered: true,
+        size: "lg",
+        windowClass: "bib-modal",
+      })
+      .result.then(
+        () => {
+          //When suppr is clicked
+          this.onDeleteStructure(structure);
+        },
+        () => {}
+      );
+  }
+
   //delete Structure from the StructureS array
   onDeleteStructure(structure: any) {
     structure.plans = [];
@@ -788,6 +804,22 @@ export class ZhFormTab6Component implements OnInit {
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
     }
+  }
+
+  onDeletePlanModal(modal, plan, structure) {
+    this.ngbModal
+      .open(modal, {
+        centered: true,
+        size: "lg",
+        windowClass: "bib-modal",
+      })
+      .result.then(
+        () => {
+          //When suppr is clicked
+          this.onDeletePlan(plan, structure);
+        },
+        () => {}
+      );
   }
 
   //delete plan from the plan array
