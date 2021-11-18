@@ -118,7 +118,7 @@ export class ZhFormTab8Component implements OnInit {
   handleImages() {
     let files = this.getFilesByExtensions(this._filesService.EXT_IMAGES);
     files.map((item) => {
-      this.downloadFile(item.id_media).then((res) => {
+      this._filesService.downloadFile(item.id_media).then((res) => {
         const reader = new FileReader();
         reader.readAsDataURL(res);
         reader.onloadend = () => {
@@ -145,13 +145,19 @@ export class ZhFormTab8Component implements OnInit {
   // Enables to filter files from their extension
   // so that they can be separated in the html
   getFilesByExtensions(extensions: string[]): ZhFile[] {
-    return this._filesService.filterByExtension(this.files, extensions);
+    return this._filesService.filterByExtension(
+      this._filesService.files,
+      extensions
+    );
   }
 
   // Function to gather all the files that do not
   // respect the extensions provided
   getOtherFiles(extensions: string[]): ZhFile[] {
-    return this._filesService.unfilterByExtension(this.files, extensions);
+    return this._filesService.unfilterByExtension(
+      this._filesService.files,
+      extensions
+    );
   }
 
   onAddFile(event: any, modal: any) {
@@ -184,44 +190,27 @@ export class ZhFormTab8Component implements OnInit {
     });
   }
 
-  getFiles() {
-    this._dataService
-      .getZhFiles(this.zh.id)
+  async getFiles() {
+    await this._filesService
+      .loadFiles(this.zh.id)
       .toPromise()
-      .then((res: ZhFiles) => {
-        this.files = res.media_data;
-        this.files.map((item) => (item.mainPictureId = res.main_pict_id));
-        this.initExtensions();
-      })
-      .catch((error) => {
-        this.displayError(
-          `Une erreur est survenue, impossible de récupérer les fichiers : <${error.message}>`
-        );
-      });
+      .then(() => this.initExtensions());
   }
 
   onDeleteFile(event) {
-    this._dataService
+    this._filesService
       .deleteFile(event.id_media)
       .toPromise()
-      .then(() => {
-        this.displayInfo("Fichier supprimé avec succès");
-      })
-      .catch((error) => {
-        this.displayError(
-          `Une erreur est survenue, impossible de supprimer ce fichier. Erreur : <${error.message}>`
-        );
-      })
-      .finally(() => {
-        this.getFiles();
-      });
+      .finally(() => this.getFiles());
   }
 
   onDownloadFile(event) {
-    this.downloadFile(event.id_media)
+    this._filesService
+      .downloadFile(event.id_media)
       .then((res) => {
         this._filesService.saveFile(res, event.media_path);
       })
+      // TODO: to remove !
       .catch((error) => {
         this.displayError(
           `Une erreur est survenue ! Impossible de télécharger ce fichier. Erreur : <${error.message}>`
@@ -229,26 +218,11 @@ export class ZhFormTab8Component implements OnInit {
       });
   }
 
-  downloadFile(id: number) {
-    return this._dataService.downloadFile(id).toPromise();
-  }
-
   onChangeMainPhoto(event) {
-    console.log(event);
-    this._dataService
-      .postMainPicture(this.zh.id, event.id_media)
+    this._filesService
+      .changeMainPhoto(this.zh.id, event.id_media)
       .toPromise()
-      .then(() => {
-        this.displayInfo("Photo principale changée avec succès");
-      })
-      .catch((error) => {
-        this.displayError(
-          `Une erreur est survenue ! Impossible de changer la photo principale. Erreur : <${error.message}>`
-        );
-      })
-      .finally(() => {
-        this.getFiles();
-      });
+      .finally(() => this.getFiles());
   }
 
   onOpenModal(modal) {
@@ -285,18 +259,10 @@ export class ZhFormTab8Component implements OnInit {
   postFile() {
     this.loadingUpload = true;
     const uploadForm = this.fillUploadForm(true);
-    this._dataService
-      .postDataForm(uploadForm, 8)
+    this._filesService
+      .postFile(uploadForm)
       .toPromise()
-      .then(() => {
-        this.activeModal.close();
-        this.displayInfo("Fichier téléversé avec succès !");
-      })
-      .catch((error) => {
-        this.displayError(
-          `Une erreur est survenue, impossible de téléverser un fichier : <${error.message}>`
-        );
-      })
+      .then(() => this.activeModal.close())
       .finally(() => {
         this.loadingUpload = false;
         this.getFiles();
@@ -308,21 +274,16 @@ export class ZhFormTab8Component implements OnInit {
     const uploadForm: FormData = this.fillUploadForm(
       this.fileToUpload.size !== 0
     );
-    this._dataService
+    this._filesService
       .patchFile(this.fileIdToPatch, uploadForm)
       .toPromise()
       .then(() => {
         this.activeModal.close();
-        this.displayInfo("Fichier téléversé avec succès !");
+        this.getFiles();
       })
-      .catch((error) => {
-        this.displayError(
-          `Une erreur est survenue, impossible de mettre à jour un fichier : <${error.message}>`
-        );
-      })
+      .catch((err) => console.log(err))
       .finally(() => {
         this.loadingUpload = false;
-        this.getFiles();
       });
   }
 
@@ -331,9 +292,6 @@ export class ZhFormTab8Component implements OnInit {
     this.fileToUpload = null;
   }
 
-  displayInfo(message: string) {
-    this._toastr.success(message);
-  }
   displayError(error: string) {
     this._toastr.error(error);
   }
