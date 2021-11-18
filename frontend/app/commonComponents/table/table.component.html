@@ -3,7 +3,7 @@
     <tr>
       <!-- size can be provided in the columns object -->
       <th *ngFor="let col of tableCols"  [style.width]="col.size" >{{ col.label }}</th>
-      <th *ngIf="editable || deletable"></th>
+      <th *ngIf="editable || deletable || downloadable"></th>
     </tr>
   </thead>
   <tbody>
