@@ -103,8 +103,21 @@ export class FilesService {
     );
   }
 
-  downloadFile(id: number) {
+  downloadFilePromise(id: number) {
     return this._dataService.downloadFile(id).toPromise();
+  }
+
+  downloadFile(file: ZhFile) {
+    this.downloadFilePromise(file.id_media)
+      .then((res) => {
+        this.saveFile(res, file.media_path);
+      })
+      // TODO: to remove !
+      .catch((error) => {
+        this.displayError(
+          `Une erreur est survenue ! Impossible de télécharger ce fichier. Erreur : <${error.message}>`
+        );
+      });
   }
 
   postFile(uploadForm) {

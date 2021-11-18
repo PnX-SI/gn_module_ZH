@@ -117,7 +117,7 @@ export class ZhFormTab8Component implements OnInit {
   handleImages() {
     let files = this.getFilesByExtensions(this._filesService.EXT_IMAGES);
     files.map((item) => {
-      this._filesService.downloadFile(item.id_media).then((res) => {
+      this._filesService.downloadFilePromise(item.id_media).then((res) => {
         const reader = new FileReader();
         reader.readAsDataURL(res);
         reader.onloadend = () => {
@@ -195,20 +195,6 @@ export class ZhFormTab8Component implements OnInit {
       .deleteFile(event.id_media)
       .toPromise()
       .finally(() => this.getFiles());
-  }
-
-  onDownloadFile(event) {
-    this._filesService
-      .downloadFile(event.id_media)
-      .then((res) => {
-        this._filesService.saveFile(res, event.media_path);
-      })
-      // TODO: to remove !
-      .catch((error) => {
-        this.displayError(
-          `Une erreur est survenue ! Impossible de télécharger ce fichier. Erreur : <${error.message}>`
-        );
-      });
   }
 
   onChangeMainPhoto(event) {
