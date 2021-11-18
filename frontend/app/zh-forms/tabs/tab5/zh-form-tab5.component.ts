@@ -787,14 +787,7 @@ export class ZhFormTab5Component implements OnInit {
   onPostCorineBio() {
     this.modalFormSubmitted = true;
     if (this.corineBioForm.valid) {
-      let formValues = this.corineBioForm.value;
-      // check if the corineBio to add is already added
-      let itemExist = this.corineBioTable.some(
-        (item: any) => item.corinBio.CB_code == formValues.corinBio.CB_code
-      );
-      if (!itemExist) {
-        this.corineBioTable.push(formValues);
-      }
+      this.corineBioTable.push(this.corineBioForm.value);
       this.ngbModal.dismissAll();
       this.corineBioForm.reset();
       this.corineBioForm.get("cahierHab").disable();
