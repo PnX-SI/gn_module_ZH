@@ -10,7 +10,7 @@ import { fileSizeValidator } from "../../../validators/fileSizeValidator";
 import { fileNameValidator } from "../../../validators/fileNameValidator";
 import { fileFormatValidator } from "../../../validators/fileFormatValidator";
 
-import { ZhFile, ZhFiles } from "./zh-form-tab8.models";
+import { ZhFile } from "./zh-form-tab8.models";
 import { FilesService } from "../../../services/files.service";
 import { TabsService } from "../../../services/tabs.service";
 
@@ -27,7 +27,6 @@ export class ZhFormTab8Component implements OnInit {
   public config = ModuleConfig;
   public formTab8: FormGroup;
   public fileForm: FormGroup;
-  public files: ZhFile[];
   public fileToUpload: File | null = null;
   public fileIdToPatch: number | null = null;
   public loadingUpload: boolean = false;
