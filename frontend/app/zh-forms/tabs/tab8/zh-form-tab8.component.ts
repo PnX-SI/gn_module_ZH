@@ -144,19 +144,13 @@ export class ZhFormTab8Component implements OnInit {
   // Enables to filter files from their extension
   // so that they can be separated in the html
   getFilesByExtensions(extensions: string[]): ZhFile[] {
-    return this._filesService.filterByExtension(
-      this._filesService.files,
-      extensions
-    );
+    return this._filesService.filterByExtension(extensions);
   }
 
   // Function to gather all the files that do not
   // respect the extensions provided
   getOtherFiles(extensions: string[]): ZhFile[] {
-    return this._filesService.unfilterByExtension(
-      this._filesService.files,
-      extensions
-    );
+    return this._filesService.unfilterByExtension(extensions);
   }
 
   onAddFile(event: any, modal: any) {

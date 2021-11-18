@@ -1,17 +1,17 @@
 import { Injectable } from "@angular/core";
-import { throwError } from "rxjs";
+import { throwError, of, Observable } from "rxjs";
 import { map, catchError } from "rxjs/operators";
 import { saveAs } from "file-saver";
 import { ToastrService } from "ngx-toastr";
 
 import { ZhDataService } from "./zh-data.service";
-import { ZhFile, ZhFiles } from "./zh-form-tab8.models";
+import { ZhFile, ZhFiles } from "../zh-forms/tabs/tab8/zh-form-tab8.models";
 
 @Injectable({
   providedIn: "root",
 })
 export class FilesService {
-  public files: ZhFile[];
+  public files: ZhFile[] = [];
   public EXT_CSV = ["csv"];
   public EXT_PDF = ["pdf"];
   public EXT_IMAGES = [
@@ -35,16 +35,16 @@ export class FilesService {
 
   // Enables to filter files from their extension
   // so that they can be separated in the html
-  filterByExtension(files: ZhFile[], extensions: string[]): ZhFile[] {
-    return files.filter((file) =>
+  filterByExtension(extensions: string[]): ZhFile[] {
+    return this.files.filter((file) =>
       extensions.includes(file.media_path.split(".").slice(-1)[0])
     );
   }
 
   // Function to gather all the files that do not
   // respect the extensions provided
-  unfilterByExtension(files: ZhFile[], extensions: string[]): ZhFile[] {
-    return files.filter(
+  unfilterByExtension(extensions: string[]): ZhFile[] {
+    return this.files.filter(
       (file) => !extensions.includes(file.media_path.split(".").slice(-1)[0])
     );
   }
@@ -68,7 +68,7 @@ export class FilesService {
       }),
       catchError((error) => {
         console.log(
-          `Une erreur est survenue, impossible de récupérer les fichiers : <${error.message}>`
+          `Une erreur est survenue, impossible de récupérer les fichiers : <${error}>`
         );
         return throwError(error);
       })
@@ -84,6 +84,7 @@ export class FilesService {
         this.displayError(
           `Une erreur est survenue, impossible de supprimer ce fichier. Erreur : <${error.message}>`
         );
+        return throwError(error);
       })
     );
   }
@@ -97,6 +98,7 @@ export class FilesService {
         this.displayError(
           `Une erreur est survenue ! Impossible de changer la photo principale. Erreur : <${error.message}>`
         );
+        return throwError(error);
       })
     );
   }
