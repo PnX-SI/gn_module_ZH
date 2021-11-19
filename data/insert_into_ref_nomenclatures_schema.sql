@@ -42,7 +42,15 @@ INSERT INTO ref_nomenclatures.bib_nomenclatures_types(mnemonique,label_default,d
     ('TYP_DOC_COMM','Type de document communal','Type de document communal','Type de document communal','Type de document communal','ZONES_HUMIDES','Non validé'),
     ('TYP_CLASS_COMM','Type de classement','Type de classement (document communal)','Type de classement','Type de classement (document communal)','ZONES_HUMIDES','Non validé')
     ON CONFLICT (mnemonique) DO NOTHING;;
-    
+
+
+-- add hierarchy type in ref_nomenclatures.bib_nomenclatures_types
+
+INSERT INTO ref_nomenclatures.bib_nomenclatures_types(mnemonique, label_default, definition_default, label_fr, source, statut)  VALUES
+('HIERARCHY', 'Hiérarchie', 'Hierarchie des zones humides', 'Hiérarchie', 'ZONES_HUMIDES', 'Non validé')
+ON CONFLICT (id_type, cd_nomenclature) DO NOTHING
+;
+
     
 -- fillref_nomenclatures.t_nomenclatures
 
@@ -490,6 +498,8 @@ INSERT INTO ref_nomenclatures.t_nomenclatures(id_type,cd_nomenclature,mnemonique
     ((select ref_nomenclatures.get_id_nomenclature_type('TYPE_MEDIA')),'csv','Tableur','Tableur','Tableur','ZONES_HUMIDES','non validé')
 ON CONFLICT (id_type, cd_nomenclature) DO NOTHING;
 ;
+
+
 
     
 COMMIT;

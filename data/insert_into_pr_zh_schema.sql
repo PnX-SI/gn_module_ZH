@@ -837,5 +837,63 @@ INSERT INTO pr_zh.cor_sdage_sage VALUES
 ((SELECT ref_nomenclatures.get_id_nomenclature('SDAGE','13')),(SELECT ref_nomenclatures.get_id_nomenclature('SAGE','7')))
 ;
 
+-- insert into hierarchy tables
+
+INSERT INTO pr_zh.bib_hier_panes VALUES
+(1, 'valeur patrimoniale'),
+(2, 'priorité d''invervention');
+ 
+ 
+INSERT INTO pr_zh.bib_hier_categories VALUES
+(1, 'type de zone humide'),
+(2, 'interêt patrimonial'),
+(3, 'fonctions écologiques'),
+(4, 'fonctions hydrologiques'),
+(5, 'valeurs socio-économiques'),
+(6, 'statut et gestion'),
+(7, 'état fonctionnel'),
+(8, 'menaces');
+
+
+INSERT INTO pr_zh.bib_hier_subcategories VALUES
+(1, 'habitats patrimoniaux humides'),
+(2, 'flore patrimoniale'),
+(3, 'faune patrimoniale - vertébrés'),
+(4, 'faune patrimoniale - invertébrés'),
+(5, 'protection du milieu physique'),
+(6, 'épuration'),
+(7, 'soutient naturel d''étiage'),
+(8, 'loisirs et pédagogie'),
+(9, 'production'),
+(10, 'statut'),
+(11, 'gestion conservatoire'),
+(12, 'hydrolgique'),
+(13, 'biologique');
+
+
+INSERT INTO pr_zh.bib_note_types VALUES
+(1, 'uniq'),
+(2, 'high_knowledge'),
+(3, 'low_knowledge');
+
+
+INSERT INTO pr_zh.t_rules VALUES
+(1, 1, 1, NULL),
+(2, 1, 2, 1),
+(3, 1, 2, 2),
+(4, 1, 2, 3),
+(5, 1, 2, 4),
+(6, 1, 3, NULL),
+(7, 1, 4, 5),
+(8, 1, 4, 6),
+(9, 1, 4, 7),
+(10, 1, 5, 8),
+(11, 1, 5, 9),
+(12, 2, 6, 10),
+(13, 2, 6, 11),
+(14, 2, 7, 12),
+(15, 2, 7, 13),
+(16, 2, 8, NULL);
+
 
 COMMIT;
