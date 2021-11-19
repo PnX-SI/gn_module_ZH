@@ -73,6 +73,8 @@ from .geometry import set_geom
 
 from .upload import upload
 
+from .hierarchy import *
+
 from .utils import (
     get_file_path,
     delete_file,
@@ -861,3 +863,25 @@ def returnUserCruved(info_role):
         module_code=blueprint.config['MODULE_CODE']
     )
     return user_cruved
+
+
+@blueprint.route("/<int:id_zh>/hierarchy", methods=["GET"])
+@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@json_resp
+def get_hierarchy(id_zh, info_role):
+    """Get zh note
+    """
+    try:
+        hierarchy = Hierarchy(id_zh).__str__()
+        # pdb.set_trace()
+        return hierarchy
+    except ZHApiError as e:
+        raise ZHApiError(
+            message=str(e.message), details=str(e.details), status_code=e.status_code)
+    except Exception as e:
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="get_hierarchy_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+    finally:
+        DB.session.rollback()
+        DB.session.close()
