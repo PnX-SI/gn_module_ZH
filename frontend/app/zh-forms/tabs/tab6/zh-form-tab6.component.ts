@@ -160,7 +160,7 @@ export class ZhFormTab6Component implements OnInit {
 
     this.instrumentForm = this.fb.group({
       instrument: [null, Validators.required],
-      instrument_date: [null, Validators.required],
+      instrument_date: [null],
     });
 
     this.urbanDocForm = this.fb.group({
