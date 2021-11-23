@@ -827,6 +827,7 @@ CREATE SCHEMA IF NOT EXISTS pr_zh;
 
 CREATE  TABLE pr_zh.bib_hier_categories ( 
 	cat_id               integer  NOT NULL ,
+	abbreviation		 varchar(4)  NOT NULL,
 	label                varchar(50)  NOT NULL ,
 	CONSTRAINT pk_bib_hier_categories_cat_id PRIMARY KEY ( cat_id )
  );

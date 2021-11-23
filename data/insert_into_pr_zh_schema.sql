@@ -845,14 +845,14 @@ INSERT INTO pr_zh.bib_hier_panes VALUES
  
  
 INSERT INTO pr_zh.bib_hier_categories VALUES
-(1, 'type de zone humide'),
-(2, 'interêt patrimonial'),
-(3, 'fonctions écologiques'),
-(4, 'fonctions hydrologiques'),
-(5, 'valeurs socio-économiques'),
-(6, 'statut et gestion'),
-(7, 'état fonctionnel'),
-(8, 'menaces');
+(1, 'cat1', 'type de zone humide'),
+(2, 'cat2', 'interêt patrimonial'),
+(3, 'cat3', 'fonctions écologiques'),
+(4, 'cat4', 'fonctions hydrologiques'),
+(5, 'cat5', 'valeurs socio-économiques'),
+(6, 'cat6', 'statut et gestion'),
+(7, 'cat7', 'état fonctionnel'),
+(8, 'cat8', 'menaces');
 
 
 INSERT INTO pr_zh.bib_hier_subcategories VALUES

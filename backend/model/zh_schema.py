@@ -1214,6 +1214,10 @@ class BibHierCategories(DB.Model):
     cat_id = DB.Column(
         DB.Integer,
         primary_key=True)
+    abbreviation = DB.Column(
+        DB.Unicode(length=4),
+        nullable=False
+    )
     label = DB.Column(
         DB.Unicode,
         nullable=False
