@@ -132,10 +132,7 @@ class Cat:
         return rule_ids
 
     def __get_name(self):
-        # todo : return full name from abb
-        return self.abb
-        # self.__name = DB.session.query(TRules, BibHierCategories).join(
-        #    TRules).filter(TRules.rule_id == value).one().BibHierCategories.label
+        return getattr(DB.session.query(BibHierCategories).filter(BibHierCategories.abbreviation == self.abb).one(), 'label')
 
     @staticmethod
     def get_note(value):
