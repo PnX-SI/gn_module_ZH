@@ -856,6 +856,7 @@ CREATE  TABLE pr_zh.bib_note_types (
 
 CREATE  TABLE pr_zh.t_rules ( 
 	rule_id              integer  NOT NULL ,
+	abbreviation		 varchar(15)  NOT NULL,
 	pane_id              integer  NOT NULL ,
 	cat_id               integer  NOT NULL ,
 	subcat_id            integer   ,

@@ -1254,6 +1254,10 @@ class TRules(DB.Model):
     rule_id = DB.Column(
         DB.Integer,
         primary_key=True)
+    abbreviation = DB.Column(
+        DB.Unicode(length=15),
+        nullable=False
+    )
     pane_id = DB.Column(
         DB.Integer,
         ForeignKey(BibHierPanes.pane_id)

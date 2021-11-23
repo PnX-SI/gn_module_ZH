@@ -21,15 +21,19 @@ import pdb
 
 class Item:
 
-    def __init__(self, rule_id, rb_id, id_qualif, knowledge, cor_rule_id):
-        self.rule_id = rule_id
+    def __init__(self, id_zh, rb_id, abb):
+        self.id_zh = id_zh
+        self.rule_id = self.__get_rule_id(abb)
         self.rb_id = rb_id
         self.active = self.__is_rb_rule()
-        self.cor_rule_id = cor_rule_id
-        self.id_qualif = self.__set_qualif(id_qualif)
-        self.knowledge = knowledge
+        self.cor_rule_id = self.__get_cor_rule_id()
+        self.id_qualif = self.__check_qualif(self.__get_qualif())
+        self.knowledge = self.__get_knowledge()
         self.note = self.__get_note()
         self.denominator = self.__get_denominator()
+
+    def __get_rule_id(self, abb):
+        return getattr(DB.session.query(TRules).filter(TRules.abbreviation == abb).one(), 'rule_id')
 
     def __is_rb_rule(self):
         q_rule = DB.session.query(CorRbRules).filter(
@@ -38,7 +42,79 @@ class Item:
             return True
         return False
 
-    def __set_qualif(self, id_qualif):
+    def __get_cor_rule_id(self):
+        return getattr(DB.session.query(CorRbRules).filter(and_(CorRbRules.rb_id == self.rb_id, CorRbRules.rule_id == self.rule_id)).one(), 'cor_rule_id')
+
+    def __get_qualif(self):
+        if self.rule_id == 1:
+            return getattr(TZH.get_tzh_by_id(self.id_zh), 'id_sdage')
+        nb = None
+        if self.rule_id == 2:
+            nb = DB.session.query(TZH).filter(
+                TZH.id_zh == self.id_zh).one().nb_hab
+        if self.rule_id == 3:
+            nb = DB.session.query(TZH).filter(
+                TZH.id_zh == self.id_zh).one().nb_flora_sp
+        if self.rule_id == 4:
+            nb = DB.session.query(TZH).filter(
+                TZH.id_zh == self.id_zh).one().nb_vertebrate_sp
+        if self.rule_id == 5:
+            nb = DB.session.query(TZH).filter(
+                TZH.id_zh == self.id_zh).one().nb_invertebrate_sp
+        if self.rule_id == 6:
+            # get nomenclature id of bio functions 61 and 62
+            bio_type_id = getattr(DB.session.query(BibNomenclaturesTypes).filter(
+                BibNomenclaturesTypes.mnemonique == 'FONCTIONS_BIO').one(), 'id_type')
+            cd_nomenclature_list = ['61', '62']
+            q_bio = DB.session.query(TFunctions, TNomenclatures).join(TNomenclatures, TNomenclatures.id_nomenclature == TFunctions.id_function).filter(
+                TFunctions.id_zh == self.id_zh).filter(and_(TNomenclatures.id_type == bio_type_id, TNomenclatures.cd_nomenclature.in_(cd_nomenclature_list))).all()
+            if not q_bio:
+                raise ZHApiError(
+                    message='no_eco_function', details='eco function evaluation not possible for this zh', status_code=400)
+            hier_type_id = getattr(DB.session.query(BibNomenclaturesTypes).filter(
+                BibNomenclaturesTypes.mnemonique == 'HIERARCHY').one(), 'id_type')
+            if len(q_bio) == 1:
+                # if 61 or 62 : continum ('reseau')
+                return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type == hier_type_id, TNomenclatures.cd_nomenclature == 'res')).one(), 'id_nomenclature')
+            elif len(q_bio) == 2:
+                # if 61 and 62 : isolated
+                return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type == hier_type_id, TNomenclatures.cd_nomenclature == 'iso')).one(), 'id_nomenclature')
+        if not nb:
+            nb = 0
+        try:
+            qualif = DB.session.query(CorRbRules, TItems, CorItemValue).join(TItems, TItems.cor_rule_id == CorRbRules.cor_rule_id).join(CorItemValue, TItems.attribute_id == CorItemValue.attribute_id).filter(
+                and_(CorRbRules.rb_id == self.rb_id, CorRbRules.rule_id == self.rule_id)).filter(and_(CorItemValue.val_min.__le__(nb), CorItemValue.val_max.__ge__(nb))).first()
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="__get_id_qualif_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        return qualif.TItems.attribute_id
+
+    def __get_knowledge(self):
+        if self.rule_id == 2:
+            is_carto = DB.session.query(TZH).filter(
+                TZH.id_zh == self.id_zh).one().is_carto_hab
+            if is_carto:
+                return 2
+            return 3
+        elif self.rule_id in [3, 4, 5]:
+            is_other_inventory = DB.session.query(TZH).filter(
+                TZH.id_zh == self.id_zh).one().is_other_inventory
+            is_id_nature_plan_2 = self.__get_id_plan()
+            if is_other_inventory or is_id_nature_plan_2:
+                return 2
+            return 3
+        else:
+            return 1
+
+    def __get_id_plan(self):
+        q_plans = DB.session.query(TManagementStructures, TManagementPlans).join(TManagementPlans, TManagementStructures.id_structure ==
+                                                                                 TManagementPlans.id_structure).filter(and_(TManagementStructures.id_zh == self.id_zh, TManagementPlans.id_nature == 2)).all()
+        if q_plans:
+            return True
+        return False
+
+    def __check_qualif(self, id_qualif):
         # todo: in db, add unique constraint on rb_id,rule_id in cor_rb_rules table
         if self.active:
             attribute_id_list = [getattr(item, 'attribute_id') for item in DB.session.query(
@@ -69,13 +145,12 @@ class Item:
 
     def __get_rule_name(self):
         try:
-            DB.session.query(TRules, BibHierSubcategories).join(TRules).filter(
+            return DB.session.query(TRules, BibHierSubcategories).join(TRules).filter(
                 TRules.rule_id == self.rule_id).one().BibHierSubcategories.label
         except NoResultFound:
             pass
-        name = DB.session.query(TRules, BibHierCategories).join(TRules).filter(
+        return DB.session.query(TRules, BibHierCategories).join(TRules).filter(
             TRules.rule_id == self.rule_id).one().BibHierCategories.label
-        return name
 
     def __str__(self):
         return {
@@ -90,79 +165,76 @@ class Item:
 
 class Cat:
 
-    def __init__(self, rb_id, abb_cat):
+    def __init__(self, id_zh, rb_id, abb_cat, cat_class):
+        self.id_zh: int = id_zh
         self.rb_id: int = rb_id
         self.abb: str = abb_cat
-        self.rule_ids: list[int] = self.__get_rules()
-        self.items: list[Item]
+        self.items: cat_class = cat_class(self.id_zh, self.rb_id)
         self.denominator: int
         self.note: int
         # self.active = Hierarchy.set_active(cat_id, type='cat')
 
     @property
-    def items(self):
-        return self.__items
-
-    @property
     def denominator(self):
         return self.__denominator
-
-    @items.setter
-    def items(self, value):
-        item_list = []
-        for item in value:
-            cor_rule_id = Cat.get_cor_rule_id(self.rb_id, item['rule_id'])
-            item_list.append(
-                Item(
-                    rule_id=item['rule_id'],
-                    rb_id=self.rb_id,
-                    id_qualif=item['qualif_id'],
-                    knowledge=item['id_knowledge'],
-                    cor_rule_id=cor_rule_id
-                ))
-        self.__items = item_list
 
     @denominator.setter
     def denominator(self, value):
         self.__denominator = Hierarchy.get_denom(self.rb_id, value)
-
-    def __get_rules(self):
-        rule_ids = [getattr(item.TRules, 'rule_id') for item in DB.session.query(
-            TRules, BibHierCategories).join(TRules).filter(BibHierCategories.abbreviation == self.abb).all()]
-        return rule_ids
 
     def __get_name(self):
         return getattr(DB.session.query(BibHierCategories).filter(BibHierCategories.abbreviation == self.abb).one(), 'label')
 
     @staticmethod
     def get_note(value):
-        return sum([getattr(item, 'note') for item in value])
-
-    @staticmethod
-    def get_cor_rule_id(rb_id, rule_id):
-        return getattr(DB.session.query(CorRbRules).filter(and_(CorRbRules.rb_id == rb_id, CorRbRules.rule_id == rule_id)).one(), 'cor_rule_id')
+        return sum([item['note sous-rubrique'] for item in value])
 
     def __str__(self):
         return {
-            "items": [item.__str__() for item in self.items],
+            "items": [item for item in self.items.__str__()],
             "note rubrique": self.note,
             "denominateur rubrique": self.denominator,
             "nom rubrique": self.__get_name()
         }
 
 
+class Sdage:
+
+    def __init__(self, id_zh, rb_id):
+        self.sdage = Item(id_zh, rb_id, 'sdage')
+
+    def __str__(self):
+        items = []
+        items.append(self.sdage.__str__())
+        return items
+
+
 class Heritage:
 
-    def __init__(self):
-        hab: Item
-        flora: Item
-        vertebrates: Item
-        invertebrates: Integer
+    def __init__(self, id_zh, rb_id):
+        self.hab = Item(id_zh, rb_id, 'hab')
+        self.flora = Item(id_zh, rb_id, 'flore')
+        self.vertebrates = Item(id_zh, rb_id, 'vertebrates')
+        self.invertebrates = Item(id_zh, rb_id, 'invertebrates')
+
+    def __str__(self):
+        items = []
+        items.append(self.hab.__str__())
+        items.append(self.flora.__str__())
+        items.append(self.vertebrates.__str__())
+        items.append(self.invertebrates.__str__())
+        return items
 
 
-class EcoCat:
-    eco_cat: Item
-    note: Integer
+class EcoFunction:
+
+    def __init__(self, id_zh, rb_id):
+        self.eco = Item(id_zh, rb_id, 'eco')
+
+    def __str__(self):
+        items = []
+        items.append(self.eco.__str__())
+        return items
 
 
 class HydroCat:
@@ -202,140 +274,20 @@ class Volet1:
     def __init__(self, id_zh, rb_id):
         self.id_zh = id_zh
         self.rb_id = rb_id
-        self.cat1_sdage = self.__set_sdage()
-        self.cat2_heritage = self.__set_heritage()
-        self.cat3_eco = self.__set_eco()
+        self.cat1_sdage = self.__set_cat('cat1', Sdage, 'rub_sdage')
+        self.cat2_heritage = self.__set_cat(
+            'cat2', Heritage, 'rub_interet_pat')
+        self.cat3_eco = self.__set_cat('cat2', EcoFunction, 'rub_eco')
         # self.hydro_cat: HydroCat
         # self.soc_cat: SocioCat
         # self.note = self.__get_note()
         # self.denom = self.__get_denom()
 
-    def __set_sdage(self):
-        cat1 = Cat(self.rb_id, 'cat1')
-        items = []
-        for id in cat1.rule_ids:
-            items = [
-                {
-                    "rule_id": id,
-                    "qualif_id": self.__get_qualif(id),
-                    "id_knowledge": self.__get_knowledge(id)
-                }
-            ]
-        cat1.items = items
-        #cat1.items = Sdage
-        cat1.denominator = 'rub_sdage'
-        cat1.note = cat1.get_note(cat1.items)
-        cat1.name = 'cat1'  # todo : get full name from abb
-        return cat1
-
-    def __set_heritage(self):
-        cat2 = Cat(self.rb_id, 'cat2')
-        items = []
-        for id in cat2.rule_ids:
-            items.append(
-                {
-                    "rule_id": id,
-                    "qualif_id": self.__get_qualif(id),
-                    "id_knowledge": self.__get_knowledge(id)
-                }
-            )
-        cat2.items = items
-        cat2.denominator = 'rub_interet_pat'
-        cat2.note = cat2.get_note(cat2.items)
-        cat2.name = 'cat2'
-        return cat2
-
-    def __set_eco(self):
-        cat3 = Cat(self.rb_id, 'cat3')
-        items = []
-        for id in cat3.rule_ids:
-            items = [
-                {
-                    "rule_id": id,
-                    "qualif_id": self.__get_qualif(id),
-                    "id_knowledge": self.__get_knowledge(id)
-                }
-            ]
-        cat3.items = items
-        #cat1.items = Sdage
-        cat3.denominator = 'rub_eco'
-        cat3.note = cat3.get_note(cat3.items)
-        cat3.name = 'cat3'  # todo : get full name from abb
-        return cat3
-
-    def __get_qualif(self, rule_id):
-        if rule_id == 1:
-            return getattr(TZH.get_tzh_by_id(self.id_zh), 'id_sdage')
-        nb = None
-        if rule_id == 2:
-            nb = DB.session.query(TZH).filter(
-                TZH.id_zh == self.id_zh).one().nb_hab
-        if rule_id == 3:
-            nb = DB.session.query(TZH).filter(
-                TZH.id_zh == self.id_zh).one().nb_flora_sp
-        if rule_id == 4:
-            nb = DB.session.query(TZH).filter(
-                TZH.id_zh == self.id_zh).one().nb_vertebrate_sp
-        if rule_id == 5:
-            nb = DB.session.query(TZH).filter(
-                TZH.id_zh == self.id_zh).one().nb_invertebrate_sp
-        if rule_id == 6:
-            # get nomenclature id of bio functions 61 and 62
-            bio_type_id = getattr(DB.session.query(BibNomenclaturesTypes).filter(
-                BibNomenclaturesTypes.mnemonique == 'FONCTIONS_BIO').one(), 'id_type')
-            cd_nomenclature_list = ['61', '62']
-            q_bio = DB.session.query(TFunctions, TNomenclatures).join(TNomenclatures, TNomenclatures.id_nomenclature == TFunctions.id_function).filter(
-                TFunctions.id_zh == self.id_zh).filter(and_(TNomenclatures.id_type == bio_type_id, TNomenclatures.cd_nomenclature.in_(cd_nomenclature_list))).all()
-            if not q_bio:
-                raise ZHApiError(
-                    message='no_eco_function', details='eco function evaluation not possible for this zh', status_code=400)
-            hier_type_id = getattr(DB.session.query(BibNomenclaturesTypes).filter(
-                BibNomenclaturesTypes.mnemonique == 'HIERARCHY').one(), 'id_type')
-            if len(q_bio) == 1:
-                # if 61 or 62 : continum ('reseau')
-                return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type == hier_type_id, TNomenclatures.cd_nomenclature == 'res')).one(), 'id_nomenclature')
-            elif len(q_bio) == 2:
-                # if 61 and 62 : isolated
-                return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type == hier_type_id, TNomenclatures.cd_nomenclature == 'iso')).one(), 'id_nomenclature')
-        if not nb:
-            nb = 0
-        try:
-            qualif = DB.session.query(CorRbRules, TItems, CorItemValue).join(TItems, TItems.cor_rule_id == CorRbRules.cor_rule_id).join(CorItemValue, TItems.attribute_id == CorItemValue.attribute_id).filter(
-                and_(CorRbRules.rb_id == self.rb_id, CorRbRules.rule_id == rule_id)).filter(and_(CorItemValue.val_min.__le__(nb), CorItemValue.val_max.__ge__(nb))).first()
-        except Exception as e:
-            exc_type, value, tb = sys.exc_info()
-            raise ZHApiError(
-                message="__get_id_qualif_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
-        return qualif.TItems.attribute_id
-
-    # def __get_rule_ids(self, cat_id):
-    #    # todo: get list of subcat_ids from cat_id
-    #    subcat_ids = []
-    #    return subcat_ids
-
-    def __get_knowledge(self, rule_id):
-        if rule_id == 2:
-            is_carto = DB.session.query(TZH).filter(
-                TZH.id_zh == self.id_zh).one().is_carto_hab
-            if is_carto:
-                return 2
-            return 3
-        elif rule_id in [3, 4, 5]:
-            is_other_inventory = DB.session.query(TZH).filter(
-                TZH.id_zh == self.id_zh).one().is_other_inventory
-            is_id_nature_plan_2 = self.__get_id_plan()
-            if is_other_inventory or is_id_nature_plan_2:
-                return 2
-            return 3
-        else:
-            return 1
-
-    def __get_id_plan(self):
-        q_plans = DB.session.query(TManagementStructures, TManagementPlans).join(TManagementPlans, TManagementStructures.id_structure ==
-                                                                                 TManagementPlans.id_structure).filter(and_(TManagementStructures.id_zh == self.id_zh, TManagementPlans.id_nature == 2)).all()
-        if q_plans:
-            return True
-        return False
+    def __set_cat(self, cat_abb, cat_class, view_abb):
+        cat = Cat(self.id_zh, self.rb_id, cat_abb, cat_class)
+        cat.denominator = view_abb
+        cat.note = cat.get_note(cat.items.__str__())
+        return cat
 
     def __str__(self):
         return {

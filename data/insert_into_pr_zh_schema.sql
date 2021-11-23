@@ -878,22 +878,22 @@ INSERT INTO pr_zh.bib_note_types VALUES
 
 
 INSERT INTO pr_zh.t_rules VALUES
-(1, 1, 1, NULL),
-(2, 1, 2, 1),
-(3, 1, 2, 2),
-(4, 1, 2, 3),
-(5, 1, 2, 4),
-(6, 1, 3, NULL),
-(7, 1, 4, 5),
-(8, 1, 4, 6),
-(9, 1, 4, 7),
-(10, 1, 5, 8),
-(11, 1, 5, 9),
-(12, 2, 6, 10),
-(13, 2, 6, 11),
-(14, 2, 7, 12),
-(15, 2, 7, 13),
-(16, 2, 8, NULL);
+(1, 'sdage', 1, 1, NULL),
+(2, 'hab', 1, 2, 1),
+(3, 'flore', 1, 2, 2),
+(4, 'vertebrates', 1, 2, 3),
+(5, 'invertebrates', 1, 2, 4),
+(6, 'eco', 1, 3, NULL),
+(7, 'protection', 1, 4, 5),
+(8, 'epuration', 1, 4, 6),
+(9, 'support', 1, 4, 7),
+(10, 'pedagogy', 1, 5, 8),
+(11, 'production', 1, 5, 9),
+(12, 'status', 2, 6, 10),
+(13, 'management', 2, 6, 11),
+(14, 'hydro', 2, 7, 12),
+(15, 'bio', 2, 7, 13),
+(16, 'thread', 2, 8, NULL);
 
 
 COMMIT;
