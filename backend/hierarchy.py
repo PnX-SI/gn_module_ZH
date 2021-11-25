@@ -21,91 +21,323 @@ import pdb
 
 class Item:
 
-    def __init__(self, id_zh, rb_id, abb):
+    def __init__(self, id_zh, rb_id, abb, cd_nomenclature=None):
         self.id_zh = id_zh
+        self.abb = abb
         self.rule_id = self.__get_rule_id(abb)
         self.rb_id = rb_id
         self.active = self.__is_rb_rule()
         self.cor_rule_id = self.__get_cor_rule_id()
+        self.cd_nomenclatures = self.__get_cd_nomenclature()
         self.id_qualif = self.__check_qualif(self.__get_qualif())
         self.knowledge = self.__get_knowledge()
         self.note = self.__get_note()
         self.denominator = self.__get_denominator()
 
     def __get_rule_id(self, abb):
-        return getattr(DB.session.query(TRules).filter(TRules.abbreviation == abb).one(), 'rule_id')
-
-    def __is_rb_rule(self):
-        q_rule = DB.session.query(CorRbRules).filter(
-            and_(CorRbRules.rb_id == self.rb_id, CorRbRules.rule_id == self.rule_id)).first()
-        if q_rule:
-            return True
-        return False
-
-    def __get_cor_rule_id(self):
-        return getattr(DB.session.query(CorRbRules).filter(and_(CorRbRules.rb_id == self.rb_id, CorRbRules.rule_id == self.rule_id)).one(), 'cor_rule_id')
-
-    def __get_qualif(self):
-        if self.rule_id == 1:
-            return getattr(TZH.get_tzh_by_id(self.id_zh), 'id_sdage')
-        nb = None
-        if self.rule_id == 2:
-            nb = DB.session.query(TZH).filter(
-                TZH.id_zh == self.id_zh).one().nb_hab
-        if self.rule_id == 3:
-            nb = DB.session.query(TZH).filter(
-                TZH.id_zh == self.id_zh).one().nb_flora_sp
-        if self.rule_id == 4:
-            nb = DB.session.query(TZH).filter(
-                TZH.id_zh == self.id_zh).one().nb_vertebrate_sp
-        if self.rule_id == 5:
-            nb = DB.session.query(TZH).filter(
-                TZH.id_zh == self.id_zh).one().nb_invertebrate_sp
-        if self.rule_id == 6:
-            # get nomenclature id of bio functions 61 and 62
-            bio_type_id = getattr(DB.session.query(BibNomenclaturesTypes).filter(
-                BibNomenclaturesTypes.mnemonique == 'FONCTIONS_BIO').one(), 'id_type')
-            cd_nomenclature_list = ['61', '62']
-            q_bio = DB.session.query(TFunctions, TNomenclatures).join(TNomenclatures, TNomenclatures.id_nomenclature == TFunctions.id_function).filter(
-                TFunctions.id_zh == self.id_zh).filter(and_(TNomenclatures.id_type == bio_type_id, TNomenclatures.cd_nomenclature.in_(cd_nomenclature_list))).all()
-            if not q_bio:
-                raise ZHApiError(
-                    message='no_eco_function', details='eco function evaluation not possible for this zh', status_code=400)
-            hier_type_id = getattr(DB.session.query(BibNomenclaturesTypes).filter(
-                BibNomenclaturesTypes.mnemonique == 'HIERARCHY').one(), 'id_type')
-            if len(q_bio) == 1:
-                # if 61 or 62 : continum ('reseau')
-                return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type == hier_type_id, TNomenclatures.cd_nomenclature == 'res')).one(), 'id_nomenclature')
-            elif len(q_bio) == 2:
-                # if 61 and 62 : isolated
-                return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type == hier_type_id, TNomenclatures.cd_nomenclature == 'iso')).one(), 'id_nomenclature')
-        if not nb:
-            nb = 0
         try:
-            qualif = DB.session.query(CorRbRules, TItems, CorItemValue).join(TItems, TItems.cor_rule_id == CorRbRules.cor_rule_id).join(CorItemValue, TItems.attribute_id == CorItemValue.attribute_id).filter(
-                and_(CorRbRules.rb_id == self.rb_id, CorRbRules.rule_id == self.rule_id)).filter(and_(CorItemValue.val_min.__le__(nb), CorItemValue.val_max.__ge__(nb))).first()
+            return getattr(DB.session.query(TRules).filter(TRules.abbreviation == abb).one(), 'rule_id')
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
-                message="__get_id_qualif_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
-        return qualif.TItems.attribute_id
+                message="Item class: __get_rule_id", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
+            DB.session.close()
+
+    def __is_rb_rule(self):
+        try:
+            q_rule = DB.session.query(CorRbRules).filter(
+                and_(CorRbRules.rb_id == self.rb_id, CorRbRules.rule_id == self.rule_id)).first()
+            if q_rule:
+                return True
+            return False
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __is_rb_rule", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
+            DB.session.close()
+
+    def __get_cor_rule_id(self):
+        try:
+            return getattr(DB.session.query(CorRbRules).filter(and_(CorRbRules.rb_id == self.rb_id, CorRbRules.rule_id == self.rule_id)).one(), 'cor_rule_id')
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __get_cor_rule_id", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
+            DB.session.close()
+
+    def __get_cd_nomenclature(self):
+        if self.abb == 'protection':
+            return ['41', '42', '51']
+        if self.abb == 'epuration':
+            return ['44']
+        if self.abb == 'support':
+            return ['43']
+        if self.abb == 'eco':
+            return ['61', '62']
+
+    def __get_qualif_sdage(self):
+        try:
+            return self.__get_qualif_val()
+        except ZHApiError as e:
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details), status_code=e.status_code)
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __get_qualif_sdage", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
+            DB.session.close()
+
+    def __get_qualif_val(self):
+        try:
+            if self.abb == 'sdage':
+                return self.__get_tzh_val('id_sdage')
+            if self.abb == 'hab':
+                return self.__get_tzh_val('nb_hab')
+            if self.abb == 'flore':
+                return self.__get_tzh_val('nb_flora_sp')
+            if self.abb == 'vertebrates':
+                return self.__get_tzh_val('nb_vertebrate_sp')
+            if self.abb == 'invertebrates':
+                return self.__get_tzh_val('nb_invertebrate_sp')
+        except ZHApiError as e:
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details), status_code=e.status_code)
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __get_qualif_val", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
+            DB.session.close()
+
+    def __get_qualif_heritage(self):
+        try:
+            nb = self.__get_qualif_val()
+            if not nb:
+                nb = 0
+            try:
+                qualif = DB.session.query(CorRbRules, TItems, CorItemValue).join(TItems, TItems.cor_rule_id == CorRbRules.cor_rule_id).join(CorItemValue, TItems.attribute_id == CorItemValue.attribute_id).filter(
+                    and_(CorRbRules.rb_id == self.rb_id, CorRbRules.rule_id == self.rule_id)).filter(and_(CorItemValue.val_min.__le__(nb), CorItemValue.val_max.__ge__(nb))).first()
+            except Exception as e:
+                exc_type, value, tb = sys.exc_info()
+                raise ZHApiError(
+                    message="__get_id_qualif_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+            return qualif.TItems.attribute_id
+        except ZHApiError as e:
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details), status_code=e.status_code)
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __get_qualif_heritage", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
+            DB.session.close()
+
+    def __get_qualif_eco(self):
+        try:
+            # get selected functions
+            q_functions = self.__get_selected_functions(
+                'FONCTIONS_BIO', self.cd_nomenclatures)
+
+            # get id_type of 'hierarchy' in TNomenclatures
+            hier_type_id = self.__get_hier_nomenc_id()
+
+            if len(q_functions) >= 1:
+                # if 61 and/or 62 : get nomenc id of continum ('res')
+                return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type == hier_type_id, TNomenclatures.cd_nomenclature == 'res')).one(), 'id_nomenclature')
+            else:
+                return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type == hier_type_id, TNomenclatures.cd_nomenclature == 'iso')).one(), 'id_nomenclature')
+        except ZHApiError as e:
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details), status_code=e.status_code)
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __get_qualif_eco", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
+            DB.session.close()
+
+    def __get_selected_functions(self, nomenc_type_mnemo, cd_ids):
+        try:
+            # get nomenclature id
+            type_id = getattr(DB.session.query(BibNomenclaturesTypes).filter(
+                BibNomenclaturesTypes.mnemonique == nomenc_type_mnemo).one(), 'id_type')
+
+            # get selected functions
+            q_ = DB.session.query(TFunctions, TNomenclatures).join(TNomenclatures, TNomenclatures.id_nomenclature == TFunctions.id_function).filter(
+                TFunctions.id_zh == self.id_zh).filter(and_(TNomenclatures.id_type == type_id, TNomenclatures.cd_nomenclature.in_(cd_ids))).all()
+
+            # raise 400 error if empty
+            # if not q_:
+            #    message = 'no_' + self.abb
+            #    raise ZHApiError(
+            #        message=message, details=self.abb + ' function evaluation not possible for this zh', status_code=400)
+            return q_
+        except ZHApiError as e:
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details), status_code=e.status_code)
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __get_selected_functions", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
+            DB.session.close()
+
+    def __get_hier_nomenc_id(self):
+        try:
+            # get id_type of 'hierarchy' in TNomenclatures
+            return getattr(DB.session.query(BibNomenclaturesTypes).filter(
+                BibNomenclaturesTypes.mnemonique == 'HIERARCHY').one(), 'id_type')
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __get_hier_nomenc_id", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
+            DB.session.close()
+
+    def __get_count(self, id_list, function_id):
+        count = 0
+        for id in id_list:
+            if id == function_id:
+                count += 1
+        return count
+
+    def __set_combination(self, qualif_list, selected_ids):
+        res_list = []
+        for function in qualif_list:
+            if function['mnemo'] == 'Non évaluée':
+                res_list.insert(0, self.__get_count(
+                    selected_ids, function['id']))
+            if function['mnemo'] == 'Nulle à faible':
+                res_list.insert(1, self.__get_count(
+                    selected_ids, function['id']))
+            if function['mnemo'] == 'Moyenne':
+                res_list.insert(2, self.__get_count(
+                    selected_ids, function['id']))
+            if function['mnemo'] == 'Forte':
+                res_list.insert(3, self.__get_count(
+                    selected_ids, function['id']))
+        res_strings = [str(res) for res in res_list]
+        return "".join(res_strings)
+
+    def __get_combination(self):
+        if self.abb in ['protection', 'epuration', 'support']:
+            # get selected functions ids
+            q_functions = self.__get_selected_functions(
+                'FONCTIONS_HYDRO', self.cd_nomenclatures)
+            selected_ids = [getattr(function.TFunctions, 'id_qualification')
+                            for function in q_functions]
+
+            # get function qualifications in TNomenclatures
+            functions_qualif = [
+                {
+                    "mnemo": nomenc.TNomenclatures.mnemonique,
+                    "id": nomenc.TNomenclatures.id_nomenclature
+                } for nomenc in DB.session.query(BibNomenclaturesTypes, TNomenclatures).join(BibNomenclaturesTypes).filter(BibNomenclaturesTypes.mnemonique == 'FONCTIONS_QUALIF').all()
+            ]
+
+            # get qualif combination of selected functions
+            combination = self.__set_combination(
+                functions_qualif, selected_ids)
+
+            return combination
+
+    def __get_qualif_protection(self):
+        try:
+            combination = self.__get_combination()
+            # set id_qualif
+            id_qualif = getattr(DB.session.query(TCorQualif).filter(
+                TCorQualif.combination == combination).one(), 'id_qualification')
+            return id_qualif
+        except ZHApiError as e:
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details), status_code=e.status_code)
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __get_qualif_protection", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
+            DB.session.close()
+
+    def __get_tzh_val(self, field):
+        return getattr(DB.session.query(TZH).filter(TZH.id_zh == self.id_zh).one(), field)
+
+    def __get_qualif(self):
+        try:
+            if self.abb == 'sdage':
+                return self.__get_qualif_sdage()
+            if self.abb in ['hab', 'flore', 'vertebrates', 'invertebrates']:
+                return self.__get_qualif_heritage()
+            if self.abb == 'eco':
+                return self.__get_qualif_eco()
+            if self.abb in ['protection', 'epuration', 'support']:
+                return self.__get_qualif_protection()
+        except ZHApiError as e:
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details), status_code=e.status_code)
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __get_qualif", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
+            DB.session.close()
 
     def __get_knowledge(self):
-        if self.rule_id == 2:
+        if self.abb == 'hab':
             is_carto = DB.session.query(TZH).filter(
                 TZH.id_zh == self.id_zh).one().is_carto_hab
             if is_carto:
-                return 2
-            return 3
-        elif self.rule_id in [3, 4, 5]:
+                return 3
+            return 2
+        elif self.abb in ['flore', 'vertebrates', 'invertebrates']:
             is_other_inventory = DB.session.query(TZH).filter(
                 TZH.id_zh == self.id_zh).one().is_other_inventory
             is_id_nature_plan_2 = self.__get_id_plan()
             if is_other_inventory or is_id_nature_plan_2:
-                return 2
-            return 3
+                return 3
+            return 2
+        elif self.abb == 'protection':
+            return self.__set_protection_knowledge()
+        elif self.abb in ['epuration', 'support']:
+            try:
+                # return id_knowledge if abb function selected
+                return getattr(DB.session.query(TFunctions, BibNoteTypes).join(TFunctions, TFunctions.id_knowledge == BibNoteTypes.id_knowledge).filter(and_(TFunctions.id_zh == self.id_zh, TFunctions.id_qualification == self.id_qualif)).one().BibNoteTypes, 'note_id')
+            except:
+                pass
+            # if no function selected, return lacunaire ou nulle
+            return 2
+
         else:
             return 1
+
+    def __set_protection_knowledge(self):
+        selected_functions = self.__get_selected_functions(
+            'FONCTIONS_HYDRO', self.cd_nomenclatures)
+        if len(selected_functions) in [0, 1]:
+            # if 0 or 1 functions selected: low_knowlege
+            return 2
+        else:
+            # if more than 1 functions selected :
+            #   if 2 or more functions qualified as 'good knowledge': 'good knowledge'
+            #   else: 'low knowledge'
+
+            # get good knowldege id in TNomenclatures
+            id_type = getattr(DB.session.query(BibNomenclaturesTypes).filter(
+                BibNomenclaturesTypes.mnemonique == 'FONCTIONS_CONNAISSANCE').one(), 'id_type')
+            high_know_id = DB.session.query(TNomenclatures).filter(and_(
+                TNomenclatures.cd_nomenclature == '1', TNomenclatures.id_type == id_type)).one().id_nomenclature
+
+            # count good knowledge ids in user selected functions
+            selected_functions_ids = [
+                getattr(function.TFunctions, 'id_knowledge') for function in selected_functions]
+            count = self.__get_count(selected_functions_ids, high_know_id)
+            if count >= 2:
+                return 3
+            else:
+                return 2
 
     def __get_id_plan(self):
         q_plans = DB.session.query(TManagementStructures, TManagementPlans).join(TManagementPlans, TManagementStructures.id_structure ==
@@ -121,24 +353,30 @@ class Item:
                 TItems).filter(TItems.cor_rule_id == self.cor_rule_id).all()]
             if id_qualif not in attribute_id_list:
                 raise ZHApiError(
-                    message='wrong_qualif', details='zh qualif provided is not part of the qualif list defined in the river basin hierarchy rules', status_code=400)
+                    message='wrong_qualif', details='zh qualif ({}) provided for {} rule is not part of the qualif list defined in the river basin hierarchy rules'.format(str(id_qualif), self.abb), status_code=400)
             return id_qualif
 
     def __get_note(self):
-        if self.active:
-            type = self.__get_note_type()
-            if type == 'single':
-                return getattr(DB.session.query(TItems).filter(and_(TItems.attribute_id == self.id_qualif, TItems.cor_rule_id == self.cor_rule_id)).one(), 'note')
-            else:
+        try:
+            if self.active:
                 return getattr(DB.session.query(TItems).filter(and_(TItems.attribute_id == self.id_qualif, TItems.cor_rule_id == self.cor_rule_id, TItems.note_type_id == self.knowledge)).one(), 'note')
+        except ZHApiError as e:
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details), status_code=e.status_code)
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __get_note", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
+            DB.session.close()
 
-    def __get_note_type(self):
-        note_type_list = [getattr(item, 'note_type_id') for item in DB.session.query(
-            TItems).filter(TItems.cor_rule_id == self.cor_rule_id).all()]
-        if note_type_list[0] == 1:
-            return 'single'
-        else:
-            return 'double'
+    # def __get_note_type(self):
+    #    note_type_id = getattr(DB.session.query(TItems).distinct(TItems.note_type_id).filter(
+    #        TItems.cor_rule_id == self.cor_rule_id).one(), 'note_type_id')
+    #    if note_type_id:
+    #        return 'single'
+    #    else:
+    #        return 'double'
 
     def __get_denominator(self):
         return max(getattr(val, 'note') for val in DB.session.query(TItems).filter(TItems.cor_rule_id == self.cor_rule_id).all())
@@ -152,11 +390,17 @@ class Item:
         return DB.session.query(TRules, BibHierCategories).join(TRules).filter(
             TRules.rule_id == self.rule_id).one().BibHierCategories.label
 
+    def __get_knowledge_mnemo(self):
+        if self.knowledge == 1:
+            return 'pas de connaissance pour cette sous-rubrique'
+        else:
+            return getattr(DB.session.query(TNomenclatures, BibNoteTypes).join(BibNoteTypes, TNomenclatures.id_nomenclature == BibNoteTypes.id_knowledge).filter(BibNoteTypes.note_id == self.knowledge).one().TNomenclatures, 'mnemonique')
+
     def __str__(self):
         return {
             "active": self.active,
             "qualification": getattr(DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == self.id_qualif).one(), 'label_default'),
-            # "connaissance": self.knowledge,
+            "connaissance": self.__get_knowledge_mnemo(),
             "nom sous-rubrique": self.__get_rule_name(),
             "note sous-rubrique": self.note,
             "denominateur sous-rubrique": self.denominator
@@ -237,13 +481,19 @@ class EcoFunction:
         return items
 
 
-class HydroCat:
+class HydroFunction:
 
-    def __init__(self):
-        protection: Item
-        epuration: Item
-        soutien: Item
-        note: Integer
+    def __init__(self, id_zh, rb_id):
+        self.protection = Item(id_zh, rb_id, 'protection')
+        self.epuration = Item(id_zh, rb_id, 'epuration')
+        self.soutien = Item(id_zh, rb_id, 'support')
+
+    def __str__(self):
+        items = []
+        items.append(self.protection.__str__())
+        items.append(self.epuration.__str__())
+        items.append(self.soutien.__str__())
+        return items
 
 
 class SocioCat:
@@ -277,8 +527,8 @@ class Volet1:
         self.cat1_sdage = self.__set_cat('cat1', Sdage, 'rub_sdage')
         self.cat2_heritage = self.__set_cat(
             'cat2', Heritage, 'rub_interet_pat')
-        self.cat3_eco = self.__set_cat('cat2', EcoFunction, 'rub_eco')
-        # self.hydro_cat: HydroCat
+        self.cat3_eco = self.__set_cat('cat3', EcoFunction, 'rub_eco')
+        self.cat4_hydro = self.__set_cat('cat4', HydroFunction, 'rub_hydro')
         # self.soc_cat: SocioCat
         # self.note = self.__get_note()
         # self.denom = self.__get_denom()
@@ -293,7 +543,8 @@ class Volet1:
         return {
             "cat1_sdage": self.cat1_sdage.__str__(),
             "cat2_heritage": self.cat2_heritage.__str__(),
-            "cat3_eco": self.cat3_eco.__str__()
+            "cat3_eco": self.cat3_eco.__str__(),
+            "cat4_hydro": self.cat4_hydro.__str__()
         }
 
 

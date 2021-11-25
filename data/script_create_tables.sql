@@ -850,7 +850,7 @@ CREATE  TABLE pr_zh.bib_hier_subcategories (
 
 CREATE  TABLE pr_zh.bib_note_types ( 
 	note_id              integer  NOT NULL ,
-	label                varchar(20)  NOT NULL ,
+	id_knowledge         integer,
 	CONSTRAINT pk_bib_note_types_note_id PRIMARY KEY ( note_id )
  );
 
@@ -888,6 +888,12 @@ CREATE  TABLE pr_zh.cor_item_value (
 	CONSTRAINT pk_cor_item_value_id_val PRIMARY KEY ( attribute_id )
  );
 
+CREATE  TABLE pr_zh.t_cor_qualif ( 
+	combination          varchar(4)  NOT NULL ,
+	id_qualification        integer  NOT NULL,
+CONSTRAINT pk_t_cor_qualif_combination PRIMARY KEY ( combination )
+);
+
 ALTER TABLE pr_zh.cor_rb_rules ADD CONSTRAINT fk_cor_rb_items_t_items FOREIGN KEY ( rule_id ) REFERENCES pr_zh.t_rules( rule_id )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.t_items ADD CONSTRAINT fk_t_items_rule FOREIGN KEY ( cor_rule_id ) REFERENCES pr_zh.cor_rb_rules( cor_rule_id )  ON UPDATE CASCADE;
@@ -903,6 +909,9 @@ ALTER TABLE pr_zh.t_rules ADD CONSTRAINT fk_t_items_cat FOREIGN KEY ( cat_id ) R
 ALTER TABLE pr_zh.t_rules ADD CONSTRAINT fk_t_items_subcat FOREIGN KEY ( subcat_id ) REFERENCES pr_zh.bib_hier_subcategories( subcat_id )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_item_value ADD CONSTRAINT fk_cor_item_value_t_items FOREIGN KEY ( attribute_id ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.t_cor_qualif ADD CONSTRAINT fk_t_cor_qualif_id_qualification FOREIGN KEY ( id_qualification ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
+
 
 CREATE OR REPLACE VIEW pr_zh.all_rb_rules AS (
 SELECT 

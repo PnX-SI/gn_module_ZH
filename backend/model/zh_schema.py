@@ -1242,9 +1242,9 @@ class BibNoteTypes(DB.Model):
     note_id = DB.Column(
         DB.Integer,
         primary_key=True)
-    label = DB.Column(
-        DB.Unicode,
-        nullable=False
+    id_knowledge = DB.Column(
+        DB.Integer,
+        nullable=True
     )
 
 
@@ -1343,3 +1343,15 @@ class RbNotesSummary(DB.Model):
     rub_statut = DB.Column(DB.Integer)
     rub_etat_fonct = DB.Column(DB.Integer)
     rub_menaces = DB.Column(DB.Integer)
+
+
+class TCorQualif(DB.Model):
+    __tablename__ = "t_cor_qualif"
+    __table_args__ = {"schema": "pr_zh"}
+    combination = DB.Column(
+        DB.Unicode(length=4),
+        primary_key=True)
+    id_qualification = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature)
+    )
