@@ -169,16 +169,9 @@ class Item:
             # get nomenclature id
             type_id = getattr(DB.session.query(BibNomenclaturesTypes).filter(
                 BibNomenclaturesTypes.mnemonique == nomenc_type_mnemo).one(), 'id_type')
-
             # get selected functions
             q_ = DB.session.query(TFunctions, TNomenclatures).join(TNomenclatures, TNomenclatures.id_nomenclature == TFunctions.id_function).filter(
                 TFunctions.id_zh == self.id_zh).filter(and_(TNomenclatures.id_type == type_id, TNomenclatures.cd_nomenclature.in_(cd_ids))).all()
-
-            # raise 400 error if empty
-            # if not q_:
-            #    message = 'no_' + self.abb
-            #    raise ZHApiError(
-            #        message=message, details=self.abb + ' function evaluation not possible for this zh', status_code=400)
             return q_
         except ZHApiError as e:
             raise ZHApiError(
@@ -248,7 +241,7 @@ class Item:
 
         return combination
 
-    def __get_qualif_protection(self):
+    def __get_qualif_cat4_cat5(self):
         try:
             if self.abb in ['protection', 'epuration', 'support', 'pedagogy', 'production']:
                 combination = self.__get_combination('FONCTIONS_HYDRO')
@@ -264,7 +257,7 @@ class Item:
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
-                message="Item class: __get_qualif_protection", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+                message="Item class: __get_qualif_cat4_cat5", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
         finally:
             DB.session.close()
 
@@ -280,7 +273,7 @@ class Item:
             if self.abb == 'eco':
                 return self.__get_qualif_eco()
             if self.abb in ['protection', 'epuration', 'support', 'pedagogy', 'production']:
-                return self.__get_qualif_protection()
+                return self.__get_qualif_cat4_cat5()
         except ZHApiError as e:
             raise ZHApiError(
                 message=str(e.message), details=str(e.details), status_code=e.status_code)
@@ -375,14 +368,6 @@ class Item:
         finally:
             DB.session.close()
 
-    # def __get_note_type(self):
-    #    note_type_id = getattr(DB.session.query(TItems).distinct(TItems.note_type_id).filter(
-    #        TItems.cor_rule_id == self.cor_rule_id).one(), 'note_type_id')
-    #    if note_type_id:
-    #        return 'single'
-    #    else:
-    #        return 'double'
-
     def __get_denominator(self):
         return max(getattr(val, 'note') for val in DB.session.query(TItems).filter(TItems.cor_rule_id == self.cor_rule_id).all())
 
@@ -407,7 +392,7 @@ class Item:
             "qualification": getattr(DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == self.id_qualif).one(), 'label_default'),
             "connaissance": self.__get_knowledge_mnemo(),
             "nom sous-rubrique": self.__get_rule_name(),
-            "note sous-rubrique": self.note,
+            "note sous-rubrique": round(self.note),
             "denominateur sous-rubrique": self.denominator
         }
 
@@ -542,8 +527,8 @@ class Volet1:
         self.cat3_eco = self.__set_cat('cat3', EcoFunction, 'rub_eco')
         self.cat4_hydro = self.__set_cat('cat4', HydroFunction, 'rub_hydro')
         self.cat5_soc = self.__set_cat('cat5',  SocioCat, 'rub_socio')
-        # self.note = self.__get_note()
-        # self.denom = self.__get_denom()
+        self.note = self.__get_note()
+        self.denom = Hierarchy.get_denom(rb_id, 'volet_1')
 
     def __set_cat(self, cat_abb, cat_class, view_abb):
         cat = Cat(self.id_zh, self.rb_id, cat_abb, cat_class)
@@ -551,13 +536,20 @@ class Volet1:
         cat.note = cat.get_note(cat.items.__str__())
         return cat
 
+    def __get_note(self):
+        note = self.cat1_sdage.note + self.cat2_heritage.note + \
+            self.cat3_eco.note + self.cat4_hydro.note + self.cat5_soc.note
+        return note
+
     def __str__(self):
         return {
             "cat1_sdage": self.cat1_sdage.__str__(),
             "cat2_heritage": self.cat2_heritage.__str__(),
             "cat3_eco": self.cat3_eco.__str__(),
             "cat4_hydro": self.cat4_hydro.__str__(),
-            "cat5_soc_eco": self.cat5_soc.__str__()
+            "cat5_soc_eco": self.cat5_soc.__str__(),
+            "note rubrique": self.note,
+            "denominateur rubrique": self.denom
         }
 
 
