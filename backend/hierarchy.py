@@ -77,6 +77,10 @@ class Item:
             return ['43']
         if self.abb == 'eco':
             return ['61', '62']
+        if self.abb == 'pedagogy':
+            return ['4', '5', '6', '7', '8']
+        if self.abb == 'production':
+            return ['1', '2', '3']
 
     def __get_qualif_sdage(self):
         try:
@@ -223,31 +227,33 @@ class Item:
         res_strings = [str(res) for res in res_list]
         return "".join(res_strings)
 
-    def __get_combination(self):
-        if self.abb in ['protection', 'epuration', 'support']:
-            # get selected functions ids
-            q_functions = self.__get_selected_functions(
-                'FONCTIONS_HYDRO', self.cd_nomenclatures)
-            selected_ids = [getattr(function.TFunctions, 'id_qualification')
-                            for function in q_functions]
+    def __get_combination(self, mnemo_type):
+        # get selected functions ids
+        q_functions = self.__get_selected_functions(
+            mnemo_type, self.cd_nomenclatures)
+        selected_ids = [getattr(function.TFunctions, 'id_qualification')
+                        for function in q_functions]
 
-            # get function qualifications in TNomenclatures
-            functions_qualif = [
-                {
-                    "mnemo": nomenc.TNomenclatures.mnemonique,
-                    "id": nomenc.TNomenclatures.id_nomenclature
-                } for nomenc in DB.session.query(BibNomenclaturesTypes, TNomenclatures).join(BibNomenclaturesTypes).filter(BibNomenclaturesTypes.mnemonique == 'FONCTIONS_QUALIF').all()
-            ]
+        # get function qualifications in TNomenclatures
+        functions_qualif = [
+            {
+                "mnemo": nomenc.TNomenclatures.mnemonique,
+                "id": nomenc.TNomenclatures.id_nomenclature
+            } for nomenc in DB.session.query(BibNomenclaturesTypes, TNomenclatures).join(BibNomenclaturesTypes).filter(BibNomenclaturesTypes.mnemonique == 'FONCTIONS_QUALIF').all()
+        ]
 
-            # get qualif combination of selected functions
-            combination = self.__set_combination(
-                functions_qualif, selected_ids)
+        # get qualif combination of selected functions
+        combination = self.__set_combination(
+            functions_qualif, selected_ids)
 
-            return combination
+        return combination
 
     def __get_qualif_protection(self):
         try:
-            combination = self.__get_combination()
+            if self.abb in ['protection', 'epuration', 'support', 'pedagogy', 'production']:
+                combination = self.__get_combination('FONCTIONS_HYDRO')
+            if self.abb in ['pedagogy', 'production']:
+                combination = self.__get_combination('VAL_SOC_ECO')
             # set id_qualif
             id_qualif = getattr(DB.session.query(TCorQualif).filter(
                 TCorQualif.combination == combination).one(), 'id_qualification')
@@ -273,7 +279,7 @@ class Item:
                 return self.__get_qualif_heritage()
             if self.abb == 'eco':
                 return self.__get_qualif_eco()
-            if self.abb in ['protection', 'epuration', 'support']:
+            if self.abb in ['protection', 'epuration', 'support', 'pedagogy', 'production']:
                 return self.__get_qualif_protection()
         except ZHApiError as e:
             raise ZHApiError(
@@ -309,7 +315,6 @@ class Item:
                 pass
             # if no function selected, return lacunaire ou nulle
             return 2
-
         else:
             return 1
 
@@ -497,9 +502,16 @@ class HydroFunction:
 
 
 class SocioCat:
-    loisirs: Item
-    production: Item
-    note: Integer
+
+    def __init__(self, id_zh, rb_id):
+        self.pedagogy = Item(id_zh, rb_id, 'pedagogy')
+        self.production = Item(id_zh, rb_id, 'production')
+
+    def __str__(self):
+        items = []
+        items.append(self.pedagogy.__str__())
+        items.append(self.production.__str__())
+        return items
 
 
 class StatusCat:
@@ -529,7 +541,7 @@ class Volet1:
             'cat2', Heritage, 'rub_interet_pat')
         self.cat3_eco = self.__set_cat('cat3', EcoFunction, 'rub_eco')
         self.cat4_hydro = self.__set_cat('cat4', HydroFunction, 'rub_hydro')
-        # self.soc_cat: SocioCat
+        self.cat5_soc = self.__set_cat('cat5',  SocioCat, 'rub_socio')
         # self.note = self.__get_note()
         # self.denom = self.__get_denom()
 
@@ -544,7 +556,8 @@ class Volet1:
             "cat1_sdage": self.cat1_sdage.__str__(),
             "cat2_heritage": self.cat2_heritage.__str__(),
             "cat3_eco": self.cat3_eco.__str__(),
-            "cat4_hydro": self.cat4_hydro.__str__()
+            "cat4_hydro": self.cat4_hydro.__str__(),
+            "cat5_soc_eco": self.cat5_soc.__str__()
         }
 
 
