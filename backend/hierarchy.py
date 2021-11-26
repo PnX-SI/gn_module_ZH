@@ -111,6 +111,27 @@ class Item:
         finally:
             DB.session.close()
 
+    def __get_qualif_cat7(self):
+        try:
+            id_nomenc = self.__get_qualif_val()
+            if getattr(DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == id_nomenc).one(), 'cd_nomenclature') == '0':
+                return getattr(DB.session.query(BibNomenclaturesTypes, TNomenclatures).join(TNomenclatures, TNomenclatures.id_type == BibNomenclaturesTypes.id_type).filter(and_(BibNomenclaturesTypes.mnemonique == 'HIERARCHY', TNomenclatures.cd_nomenclature == 'NE')).one().TNomenclatures, 'id_nomenclature')
+            if getattr(DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == id_nomenc).one(), 'cd_nomenclature') == '1':
+                return getattr(DB.session.query(BibNomenclaturesTypes, TNomenclatures).join(TNomenclatures, TNomenclatures.id_type == BibNomenclaturesTypes.id_type).filter(and_(BibNomenclaturesTypes.mnemonique == 'HIERARCHY', TNomenclatures.cd_nomenclature == 'mauvais')).one().TNomenclatures, 'id_nomenclature')
+            if getattr(DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == id_nomenc).one(), 'cd_nomenclature') == '2':
+                return getattr(DB.session.query(BibNomenclaturesTypes, TNomenclatures).join(TNomenclatures, TNomenclatures.id_type == BibNomenclaturesTypes.id_type).filter(and_(BibNomenclaturesTypes.mnemonique == 'HIERARCHY', TNomenclatures.cd_nomenclature == 'moyen')).one().TNomenclatures, 'id_nomenclature')
+            if getattr(DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == id_nomenc).one(), 'cd_nomenclature') == '3':
+                return getattr(DB.session.query(BibNomenclaturesTypes, TNomenclatures).join(TNomenclatures, TNomenclatures.id_type == BibNomenclaturesTypes.id_type).filter(and_(BibNomenclaturesTypes.mnemonique == 'HIERARCHY', TNomenclatures.cd_nomenclature == 'bon')).one().TNomenclatures, 'id_nomenclature')
+        except ZHApiError as e:
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details), status_code=e.status_code)
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __get_qualif_val", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
+            DB.session.close()
+
     def __get_qualif_val(self):
         try:
             if self.abb == 'sdage':
@@ -123,6 +144,10 @@ class Item:
                 return self.__get_tzh_val('nb_vertebrate_sp')
             if self.abb == 'invertebrates':
                 return self.__get_tzh_val('nb_invertebrate_sp')
+            if self.abb == 'hydro':
+                return self.__get_tzh_val('id_diag_hydro')
+            if self.abb == 'bio':
+                return self.__get_tzh_val('id_diag_bio')
         except ZHApiError as e:
             raise ZHApiError(
                 message=str(e.message), details=str(e.details), status_code=e.status_code)
@@ -327,7 +352,7 @@ class Item:
     def __get_qualif(self):
         try:
             if self.abb == 'sdage':
-                return self.__get_qualif_sdage()
+                return self.__get_qualif_val()
             if self.abb in ['hab', 'flore', 'vertebrates', 'invertebrates']:
                 return self.__get_qualif_heritage()
             if self.abb == 'eco':
@@ -338,6 +363,8 @@ class Item:
                 return self.__get_qualif_status()
             if self.abb == 'management':
                 return self.__get_qualif_management()
+            if self.abb in ['hydro', 'bio']:
+                return self.__get_qualif_cat7()
         except ZHApiError as e:
             raise ZHApiError(
                 message=str(e.message), details=str(e.details), status_code=e.status_code)
@@ -597,7 +624,7 @@ class Status:
         return items
 
 
-class FctStateCat:
+class FctState:
 
     def __init__(self, id_zh, rb_id):
         self.hydro = Item(id_zh, rb_id, 'hydro')
@@ -664,7 +691,7 @@ class Volet2:
         self.id_zh = id_zh
         self.rb_id = rb_id
         self.cat6 = self.__set_cat('cat6', Status, 'rub_statut')
-        #self.cat7 = self.__set_cat('cat7', Sdage, 'rub_etat_fonct')
+        self.cat7 = self.__set_cat('cat7', FctState, 'rub_etat_fonct')
         #self.cat8 = self.__set_cat('cat8', Sdage, 'rub_menaces')
         #self.note = self.__get_note()
         self.denom = Hierarchy.get_denom(rb_id, 'volet_1')
@@ -681,8 +708,8 @@ class Volet2:
 
     def __str__(self):
         return {
-            "cat6_status": self.cat6.__str__()
-            # "cat7_fct_state": self.cat7.__str__(),
+            "cat6_status": self.cat6.__str__(),
+            "cat7_fct_state": self.cat7.__str__()
             # "cat8_thread": self.cat8.__str__(),
             # "note rubrique": self.note,
             # "denominateur rubrique": self.denom

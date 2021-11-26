@@ -919,19 +919,18 @@ CREATE OR REPLACE VIEW pr_zh.all_rb_rules AS (
 SELECT 
 	rb.name,
 	rb_rules.cor_rule_id,
-
 	rb_rules.rule_id,
 	(SELECT label FROM pr_zh.bib_hier_panes WHERE pane_id = rules.pane_id) AS VOLET,
 	(SELECT label FROM pr_zh.bib_hier_categories WHERE cat_id = rules.cat_id) AS RUBRIQUE,
 	(SELECT label FROM pr_zh.bib_hier_subcategories WHERE subcat_id = rules.subcat_id) AS SOUSRUBRIQUE,
+	(SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE id_nomenclature = items.attribute_id) AS id_attribut,
 	(SELECT label_default FROM ref_nomenclatures.t_nomenclatures WHERE id_nomenclature = items.attribute_id) AS attribut,
 	items.note AS note,
-	(SELECT label FROM pr_zh.bib_note_types WHERE note_id = items.note_type_id) AS note_type
+	(SELECT mnemonique FROM ref_nomenclatures.t_nomenclatures WHERE id_nomenclature = (SELECT id_knowledge FROM pr_zh.bib_note_types WHERE note_id = items.note_type_id)) AS note_type
 FROM pr_zh.t_river_basin rb
 RIGHT JOIN pr_zh.cor_rb_rules rb_rules ON rb.id_rb = rb_rules.rb_id
 LEFT JOIN pr_zh.t_rules rules ON rules.rule_id = rb_rules.rule_id
 LEFT JOIN pr_zh.t_items items ON items.cor_rule_id = rb_rules.cor_rule_id
-
 );
 
 
