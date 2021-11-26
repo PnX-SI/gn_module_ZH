@@ -1244,6 +1244,7 @@ class BibNoteTypes(DB.Model):
         primary_key=True)
     id_knowledge = DB.Column(
         DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
         nullable=True
     )
 

@@ -912,6 +912,8 @@ ALTER TABLE pr_zh.cor_item_value ADD CONSTRAINT fk_cor_item_value_t_items FOREIG
 
 ALTER TABLE pr_zh.t_cor_qualif ADD CONSTRAINT fk_t_cor_qualif_id_qualification FOREIGN KEY ( id_qualification ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
+ALTER TABLE pr_zh.bib_note_types ADD CONSTRAINT fk_bib_note_types FOREIGN KEY ( id_knowledge ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
+
 
 CREATE OR REPLACE VIEW pr_zh.all_rb_rules AS (
 SELECT 

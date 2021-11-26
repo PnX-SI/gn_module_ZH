@@ -1,6 +1,8 @@
 #from abc import get_cache_token
 import sys
 
+import numpy as np
+
 import sqlalchemy
 from sqlalchemy import and_, distinct
 from sqlalchemy.orm.exc import NoResultFound
@@ -68,6 +70,9 @@ class Item:
         finally:
             DB.session.close()
 
+    def __get_cd_nomencs(self, mnemo_type):
+        return [getattr(q_.TNomenclatures, 'cd_nomenclature') for q_ in DB.session.query(BibNomenclaturesTypes, TNomenclatures).join(TNomenclatures).filter(BibNomenclaturesTypes.mnemonique == 'STATUT_PROTECTION').all()]
+
     def __get_cd_nomenclature(self):
         if self.abb == 'protection':
             return ['41', '42', '51']
@@ -81,6 +86,17 @@ class Item:
             return ['4', '5', '6', '7', '8']
         if self.abb == 'production':
             return ['1', '2', '3']
+        if self.abb == 'status':
+            total = self.__get_cd_nomencs('STATUT_PROTECTION')
+            nothing = ['0', '1']
+            high = ['11', '13', '15', '16', '17', '31', '32', '33',
+                    '34', '35', '36', '37', '38', '39', '40', '41', '100']
+            low = sorted(np.setdiff1d(total, nothing+high))
+            return {
+                "nothing": nothing,
+                "low": low,
+                "high": high
+            }
 
     def __get_qualif_sdage(self):
         try:
@@ -140,6 +156,37 @@ class Item:
         finally:
             DB.session.close()
 
+    def __get_qualif_status(self):
+        try:
+            hier_id_type = self.__get_hier_nomenc_id()
+
+            # get selected status cds
+            q_status = self.__get_selected_status()
+
+            # if nothing selected
+            if not q_status:
+                return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type ==
+                                                                            hier_id_type, TNomenclatures.cd_nomenclature == '0')).one(), 'id_nomenclature')
+
+            # get id_qualif
+            for cd in q_status:
+                if cd in self.cd_nomenclatures['high']:
+                    return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type == hier_id_type, TNomenclatures.cd_nomenclature == 'fort')).one(), 'id_nomenclature')
+                elif cd in self.cd_nomenclatures['nothing']:
+                    return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type == hier_id_type, TNomenclatures.cd_nomenclature == '0')).one(), 'id_nomenclature')
+                else:
+                    return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type == hier_id_type, TNomenclatures.cd_nomenclature == 'faible')).one(), 'id_nomenclature')
+
+        except ZHApiError as e:
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details), status_code=e.status_code)
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __get_qualif_status", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
+            DB.session.close()
+
     def __get_qualif_eco(self):
         try:
             # get selected functions
@@ -161,6 +208,19 @@ class Item:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
                 message="Item class: __get_qualif_eco", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
+            DB.session.close()
+
+    def __get_selected_status(self):
+        try:
+            return [getattr(q_.TNomenclatures, 'cd_nomenclature') for q_ in DB.session.query(CorZhProtection, CorProtectionLevelType, TNomenclatures).join(CorProtectionLevelType, CorZhProtection.id_protection == CorProtectionLevelType.id_protection).join(TNomenclatures, TNomenclatures.id_nomenclature == CorProtectionLevelType.id_protection_status).all()]
+        except ZHApiError as e:
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details), status_code=e.status_code)
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __get_selected_functions", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
         finally:
             DB.session.close()
 
@@ -274,6 +334,8 @@ class Item:
                 return self.__get_qualif_eco()
             if self.abb in ['protection', 'epuration', 'support', 'pedagogy', 'production']:
                 return self.__get_qualif_cat4_cat5()
+            if self.abb == 'status':
+                return self.__get_qualif_status()
         except ZHApiError as e:
             raise ZHApiError(
                 message=str(e.message), details=str(e.details), status_code=e.status_code)
@@ -486,7 +548,7 @@ class HydroFunction:
         return items
 
 
-class SocioCat:
+class SocEco:
 
     def __init__(self, id_zh, rb_id):
         self.pedagogy = Item(id_zh, rb_id, 'pedagogy')
@@ -499,21 +561,41 @@ class SocioCat:
         return items
 
 
-class StatusCat:
-    status: Item
-    management: Item
-    note: Integer
+class Status:
+
+    def __init__(self, id_zh, rb_id):
+        self.status = Item(id_zh, rb_id, 'status')
+        #self.management = Item(id_zh, rb_id, 'management')
+
+    def __str__(self):
+        items = []
+        items.append(self.status.__str__())
+        # items.append(self.management.__str__())
+        return items
 
 
 class FctStateCat:
-    hydro: Item
-    bio: Item
-    note: Integer
+
+    def __init__(self, id_zh, rb_id):
+        self.hydro = Item(id_zh, rb_id, 'hydro')
+        self.bio = Item(id_zh, rb_id, 'bio')
+
+    def __str__(self):
+        items = []
+        items.append(self.hydro.__str__())
+        items.append(self.bio.__str__())
+        return items
 
 
 class ThreadCat:
-    thread: Item
-    note: Integer
+
+    def __init__(self, id_zh, rb_id):
+        self.thread = Item(id_zh, rb_id, 'thread')
+
+    def __str__(self):
+        items = []
+        items.append(self.thread.__str__())
+        return items
 
 
 class Volet1:
@@ -521,12 +603,12 @@ class Volet1:
     def __init__(self, id_zh, rb_id):
         self.id_zh = id_zh
         self.rb_id = rb_id
-        self.cat1_sdage = self.__set_cat('cat1', Sdage, 'rub_sdage')
-        self.cat2_heritage = self.__set_cat(
+        self.cat1 = self.__set_cat('cat1', Sdage, 'rub_sdage')
+        self.cat2 = self.__set_cat(
             'cat2', Heritage, 'rub_interet_pat')
-        self.cat3_eco = self.__set_cat('cat3', EcoFunction, 'rub_eco')
-        self.cat4_hydro = self.__set_cat('cat4', HydroFunction, 'rub_hydro')
-        self.cat5_soc = self.__set_cat('cat5',  SocioCat, 'rub_socio')
+        self.cat3 = self.__set_cat('cat3', EcoFunction, 'rub_eco')
+        self.cat4 = self.__set_cat('cat4', HydroFunction, 'rub_hydro')
+        self.cat5 = self.__set_cat('cat5',  SocEco, 'rub_socio')
         self.note = self.__get_note()
         self.denom = Hierarchy.get_denom(rb_id, 'volet_1')
 
@@ -537,19 +619,50 @@ class Volet1:
         return cat
 
     def __get_note(self):
-        note = self.cat1_sdage.note + self.cat2_heritage.note + \
-            self.cat3_eco.note + self.cat4_hydro.note + self.cat5_soc.note
+        note = self.cat1.note + self.cat2.note + \
+            self.cat3.note + self.cat4.note + self.cat5.note
         return note
 
     def __str__(self):
         return {
-            "cat1_sdage": self.cat1_sdage.__str__(),
-            "cat2_heritage": self.cat2_heritage.__str__(),
-            "cat3_eco": self.cat3_eco.__str__(),
-            "cat4_hydro": self.cat4_hydro.__str__(),
-            "cat5_soc_eco": self.cat5_soc.__str__(),
+            "cat1_sdage": self.cat1.__str__(),
+            "cat2_heritage": self.cat2.__str__(),
+            "cat3_eco": self.cat3.__str__(),
+            "cat4_hydro": self.cat4.__str__(),
+            "cat5_soc_eco": self.cat5.__str__(),
             "note rubrique": self.note,
             "denominateur rubrique": self.denom
+        }
+
+
+class Volet2:
+
+    def __init__(self, id_zh, rb_id):
+        self.id_zh = id_zh
+        self.rb_id = rb_id
+        self.cat6 = self.__set_cat('cat6', Status, 'rub_statut')
+        #self.cat7 = self.__set_cat('cat7', Sdage, 'rub_etat_fonct')
+        #self.cat8 = self.__set_cat('cat8', Sdage, 'rub_menaces')
+        #self.note = self.__get_note()
+        self.denom = Hierarchy.get_denom(rb_id, 'volet_1')
+
+    def __set_cat(self, cat_abb, cat_class, view_abb):
+        cat = Cat(self.id_zh, self.rb_id, cat_abb, cat_class)
+        cat.denominator = view_abb
+        cat.note = cat.get_note(cat.items.__str__())
+        return cat
+
+    def __get_note(self):
+        note = self.cat6.note + self.cat7.note + self.cat8.note
+        return note
+
+    def __str__(self):
+        return {
+            "cat6_status": self.cat6.__str__()
+            # "cat7_fct_state": self.cat7.__str__(),
+            # "cat8_thread": self.cat8.__str__(),
+            # "note rubrique": self.note,
+            # "denominateur rubrique": self.denom
         }
 
 
@@ -569,7 +682,7 @@ class Hierarchy(ZH):
         self.id_zh = id_zh
         self.rb_id = self.__get_rb()
         self.volet1 = Volet1(self.id_zh, self.rb_id)
-        # self.volet2: Volet2(self.id_zh, self.rb_id)
+        self.volet2 = Volet2(self.id_zh, self.rb_id)
         # self.global_note: Integer
         # self.final_note: Integer
 
@@ -603,8 +716,8 @@ class Hierarchy(ZH):
     def __str__(self):
         return {
             "river_basin": DB.session.query(TRiverBasin).filter(TRiverBasin.id_rb == self.rb_id).one().name,
-            "volet1": self.volet1.__str__()
-            # "volet2": self.volet2.__str__(),
+            "volet1": self.volet1.__str__(),
+            "volet2": self.volet2.__str__()
             # "note totale": self.global_note,
             # "note globale": self.final_note
         }

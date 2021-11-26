@@ -895,6 +895,7 @@ INSERT INTO pr_zh.t_rules VALUES
 (15, 'bio', 2, 7, 13),
 (16, 'thread', 2, 8, NULL);
 
+
 INSERT INTO pr_zh.t_cor_qualif VALUES
 ('5000', (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'FONCTIONS_QUALIF') AND cd_nomenclature = '0')),
 ('0500', (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'FONCTIONS_QUALIF') AND cd_nomenclature = '1')),
