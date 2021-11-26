@@ -148,6 +148,8 @@ class Item:
                 return self.__get_tzh_val('id_diag_hydro')
             if self.abb == 'bio':
                 return self.__get_tzh_val('id_diag_bio')
+            if self.abb == 'thread':
+                return self.__get_tzh_val('id_thread')
         except ZHApiError as e:
             raise ZHApiError(
                 message=str(e.message), details=str(e.details), status_code=e.status_code)
@@ -365,6 +367,8 @@ class Item:
                 return self.__get_qualif_management()
             if self.abb in ['hydro', 'bio']:
                 return self.__get_qualif_cat7()
+            if self.abb == 'thread':
+                return self.__get_qualif_val()
         except ZHApiError as e:
             raise ZHApiError(
                 message=str(e.message), details=str(e.details), status_code=e.status_code)
@@ -637,7 +641,7 @@ class FctState:
         return items
 
 
-class ThreadCat:
+class Thread:
 
     def __init__(self, id_zh, rb_id):
         self.thread = Item(id_zh, rb_id, 'thread')
@@ -692,9 +696,9 @@ class Volet2:
         self.rb_id = rb_id
         self.cat6 = self.__set_cat('cat6', Status, 'rub_statut')
         self.cat7 = self.__set_cat('cat7', FctState, 'rub_etat_fonct')
-        #self.cat8 = self.__set_cat('cat8', Sdage, 'rub_menaces')
-        #self.note = self.__get_note()
-        self.denom = Hierarchy.get_denom(rb_id, 'volet_1')
+        self.cat8 = self.__set_cat('cat8', Thread, 'rub_menaces')
+        self.note = self.__get_note()
+        self.denom = Hierarchy.get_denom(rb_id, 'volet_2')
 
     def __set_cat(self, cat_abb, cat_class, view_abb):
         cat = Cat(self.id_zh, self.rb_id, cat_abb, cat_class)
@@ -709,10 +713,10 @@ class Volet2:
     def __str__(self):
         return {
             "cat6_status": self.cat6.__str__(),
-            "cat7_fct_state": self.cat7.__str__()
-            # "cat8_thread": self.cat8.__str__(),
-            # "note rubrique": self.note,
-            # "denominateur rubrique": self.denom
+            "cat7_fct_state": self.cat7.__str__(),
+            "cat8_thread": self.cat8.__str__(),
+            "note rubrique": self.note,
+            "denominateur rubrique": self.denom
         }
 
 
