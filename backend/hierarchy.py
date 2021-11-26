@@ -336,6 +336,8 @@ class Item:
                 return self.__get_qualif_cat4_cat5()
             if self.abb == 'status':
                 return self.__get_qualif_status()
+            if self.abb == 'management':
+                return self.__get_qualif_management()
         except ZHApiError as e:
             raise ZHApiError(
                 message=str(e.message), details=str(e.details), status_code=e.status_code)
@@ -343,6 +345,27 @@ class Item:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
                 message="Item class: __get_qualif", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
+            DB.session.close()
+
+    def __get_qualif_management(self):
+        try:
+            cd_id_nature_naturaliste = getattr(DB.session.query(BibNomenclaturesTypes, TNomenclatures).join(TNomenclatures, TNomenclatures.id_type == BibNomenclaturesTypes.id_type).filter(
+                and_(BibNomenclaturesTypes.mnemonique == 'PLAN_GESTION', TNomenclatures.cd_nomenclature == '5')).one().TNomenclatures, 'id_nomenclature')
+            selected_id_nature = [getattr(q_.TManagementPlans, 'id_nature') for q_ in DB.session.query(TManagementPlans, TManagementStructures).join(
+                TManagementStructures, TManagementPlans.id_structure == TManagementStructures.id_structure).filter(TManagementStructures.id_zh == self.id_zh).all()]
+            if cd_id_nature_naturaliste in selected_id_nature:
+                # if id_nature == 'naturaliste' in selected plans : return
+                return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type == self.__get_hier_nomenc_id(), TNomenclatures.cd_nomenclature == 'OUI')).one(), 'id_nomenclature')
+            else:
+                return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type == self.__get_hier_nomenc_id(), TNomenclatures.cd_nomenclature == 'NON')).one(), 'id_nomenclature')
+        except ZHApiError as e:
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details), status_code=e.status_code)
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __get_qualif_management", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
         finally:
             DB.session.close()
 
@@ -565,12 +588,12 @@ class Status:
 
     def __init__(self, id_zh, rb_id):
         self.status = Item(id_zh, rb_id, 'status')
-        #self.management = Item(id_zh, rb_id, 'management')
+        self.management = Item(id_zh, rb_id, 'management')
 
     def __str__(self):
         items = []
         items.append(self.status.__str__())
-        # items.append(self.management.__str__())
+        items.append(self.management.__str__())
         return items
 
 
