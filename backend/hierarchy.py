@@ -62,7 +62,8 @@ class Item:
 
     def __get_cor_rule_id(self):
         try:
-            return getattr(DB.session.query(CorRbRules).filter(and_(CorRbRules.rb_id == self.rb_id, CorRbRules.rule_id == self.rule_id)).one(), 'cor_rule_id')
+            if self.active:
+                return getattr(DB.session.query(CorRbRules).filter(and_(CorRbRules.rb_id == self.rb_id, CorRbRules.rule_id == self.rule_id)).one(), 'cor_rule_id')
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
@@ -247,7 +248,7 @@ class Item:
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
-                message="Item class: __get_selected_functions", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+                message="Item class: __get_selected_status", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
         finally:
             DB.session.close()
 
@@ -349,26 +350,34 @@ class Item:
             DB.session.close()
 
     def __get_tzh_val(self, field):
-        return getattr(DB.session.query(TZH).filter(TZH.id_zh == self.id_zh).one(), field)
+        try:
+            return getattr(DB.session.query(TZH).filter(TZH.id_zh == self.id_zh).one(), field)
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __get_tzh_val", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
+            DB.session.close()
 
     def __get_qualif(self):
         try:
-            if self.abb == 'sdage':
-                return self.__get_qualif_val()
-            if self.abb in ['hab', 'flore', 'vertebrates', 'invertebrates']:
-                return self.__get_qualif_heritage()
-            if self.abb == 'eco':
-                return self.__get_qualif_eco()
-            if self.abb in ['protection', 'epuration', 'support', 'pedagogy', 'production']:
-                return self.__get_qualif_cat4_cat5()
-            if self.abb == 'status':
-                return self.__get_qualif_status()
-            if self.abb == 'management':
-                return self.__get_qualif_management()
-            if self.abb in ['hydro', 'bio']:
-                return self.__get_qualif_cat7()
-            if self.abb == 'thread':
-                return self.__get_qualif_val()
+            if self.active:
+                if self.abb == 'sdage':
+                    return self.__get_qualif_val()
+                if self.abb in ['hab', 'flore', 'vertebrates', 'invertebrates']:
+                    return self.__get_qualif_heritage()
+                if self.abb == 'eco':
+                    return self.__get_qualif_eco()
+                if self.abb in ['protection', 'epuration', 'support', 'pedagogy', 'production']:
+                    return self.__get_qualif_cat4_cat5()
+                if self.abb == 'status':
+                    return self.__get_qualif_status()
+                if self.abb == 'management':
+                    return self.__get_qualif_management()
+                if self.abb in ['hydro', 'bio']:
+                    return self.__get_qualif_cat7()
+                if self.abb == 'thread':
+                    return self.__get_qualif_val()
         except ZHApiError as e:
             raise ZHApiError(
                 message=str(e.message), details=str(e.details), status_code=e.status_code)
@@ -401,57 +410,78 @@ class Item:
             DB.session.close()
 
     def __get_knowledge(self):
-        if self.abb == 'hab':
-            is_carto = DB.session.query(TZH).filter(
-                TZH.id_zh == self.id_zh).one().is_carto_hab
-            if is_carto:
-                return 3
-            return 2
-        elif self.abb in ['flore', 'vertebrates', 'invertebrates']:
-            is_other_inventory = DB.session.query(TZH).filter(
-                TZH.id_zh == self.id_zh).one().is_other_inventory
-            is_id_nature_plan_2 = self.__get_id_plan()
-            if is_other_inventory or is_id_nature_plan_2:
-                return 3
-            return 2
-        elif self.abb == 'protection':
-            return self.__set_protection_knowledge()
-        elif self.abb in ['epuration', 'support']:
-            try:
-                # return id_knowledge if abb function selected
-                return getattr(DB.session.query(TFunctions, BibNoteTypes).join(TFunctions, TFunctions.id_knowledge == BibNoteTypes.id_knowledge).filter(and_(TFunctions.id_zh == self.id_zh, TFunctions.id_qualification == self.id_qualif)).one().BibNoteTypes, 'note_id')
-            except:
-                pass
-            # if no function selected, return lacunaire ou nulle
-            return 2
-        else:
-            return 1
+        try:
+            if self.active:
+                if self.abb == 'hab':
+                    is_carto = DB.session.query(TZH).filter(
+                        TZH.id_zh == self.id_zh).one().is_carto_hab
+                    if is_carto:
+                        return 3
+                    return 2
+                elif self.abb in ['flore', 'vertebrates', 'invertebrates']:
+                    is_other_inventory = DB.session.query(TZH).filter(
+                        TZH.id_zh == self.id_zh).one().is_other_inventory
+                    is_id_nature_plan_2 = self.__get_id_plan()
+                    if is_other_inventory or is_id_nature_plan_2:
+                        return 3
+                    return 2
+                elif self.abb == 'protection':
+                    return self.__set_protection_knowledge()
+                elif self.abb in ['epuration', 'support']:
+                    try:
+                        # return id_knowledge if abb function selected
+                        return getattr(DB.session.query(TFunctions, BibNoteTypes).join(TFunctions, TFunctions.id_knowledge == BibNoteTypes.id_knowledge).filter(and_(TFunctions.id_zh == self.id_zh, TFunctions.id_qualification == self.id_qualif)).one().BibNoteTypes, 'note_id')
+                    except:
+                        pass
+                    # if no function selected, return lacunaire ou nulle
+                    return 2
+                else:
+                    return 1
+        except ZHApiError as e:
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details), status_code=e.status_code)
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __get_knowledge", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
+            DB.session.close()
 
     def __set_protection_knowledge(self):
-        selected_functions = self.__get_selected_functions(
-            'FONCTIONS_HYDRO', self.cd_nomenclatures)
-        if len(selected_functions) in [0, 1]:
-            # if 0 or 1 functions selected: low_knowlege
-            return 2
-        else:
-            # if more than 1 functions selected :
-            #   if 2 or more functions qualified as 'good knowledge': 'good knowledge'
-            #   else: 'low knowledge'
-
-            # get good knowldege id in TNomenclatures
-            id_type = getattr(DB.session.query(BibNomenclaturesTypes).filter(
-                BibNomenclaturesTypes.mnemonique == 'FONCTIONS_CONNAISSANCE').one(), 'id_type')
-            high_know_id = DB.session.query(TNomenclatures).filter(and_(
-                TNomenclatures.cd_nomenclature == '1', TNomenclatures.id_type == id_type)).one().id_nomenclature
-
-            # count good knowledge ids in user selected functions
-            selected_functions_ids = [
-                getattr(function.TFunctions, 'id_knowledge') for function in selected_functions]
-            count = self.__get_count(selected_functions_ids, high_know_id)
-            if count >= 2:
-                return 3
-            else:
+        try:
+            selected_functions = self.__get_selected_functions(
+                'FONCTIONS_HYDRO', self.cd_nomenclatures)
+            if len(selected_functions) in [0, 1]:
+                # if 0 or 1 functions selected: low_knowlege
                 return 2
+            else:
+                # if more than 1 functions selected :
+                #   if 2 or more functions qualified as 'good knowledge': 'good knowledge'
+                #   else: 'low knowledge'
+
+                # get good knowldege id in TNomenclatures
+                id_type = getattr(DB.session.query(BibNomenclaturesTypes).filter(
+                    BibNomenclaturesTypes.mnemonique == 'FONCTIONS_CONNAISSANCE').one(), 'id_type')
+                high_know_id = DB.session.query(TNomenclatures).filter(and_(
+                    TNomenclatures.cd_nomenclature == '1', TNomenclatures.id_type == id_type)).one().id_nomenclature
+
+                # count good knowledge ids in user selected functions
+                selected_functions_ids = [
+                    getattr(function.TFunctions, 'id_knowledge') for function in selected_functions]
+                count = self.__get_count(selected_functions_ids, high_know_id)
+                if count >= 2:
+                    return 3
+                else:
+                    return 2
+        except ZHApiError as e:
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details), status_code=e.status_code)
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __set_protection_knowledge", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
+            DB.session.close()
 
     def __get_id_plan(self):
         q_plans = DB.session.query(TManagementStructures, TManagementPlans).join(TManagementPlans, TManagementStructures.id_structure ==
@@ -461,19 +491,29 @@ class Item:
         return False
 
     def __check_qualif(self, id_qualif):
-        # todo: in db, add unique constraint on rb_id,rule_id in cor_rb_rules table
-        if self.active:
-            attribute_id_list = [getattr(item, 'attribute_id') for item in DB.session.query(
-                TItems).filter(TItems.cor_rule_id == self.cor_rule_id).all()]
-            if id_qualif not in attribute_id_list:
-                raise ZHApiError(
-                    message='wrong_qualif', details='zh qualif ({}) provided for {} rule is not part of the qualif list defined in the river basin hierarchy rules'.format(str(id_qualif), self.abb), status_code=400)
-            return id_qualif
+        try:
+            # todo: in db, add unique constraint on rb_id,rule_id in cor_rb_rules table
+            if self.active:
+                attribute_id_list = [getattr(item, 'attribute_id') for item in DB.session.query(
+                    TItems).filter(TItems.cor_rule_id == self.cor_rule_id).all()]
+                if id_qualif not in attribute_id_list:
+                    raise ZHApiError(
+                        message='wrong_qualif', details='zh qualif ({}) provided for {} rule is not part of the qualif list defined in the river basin hierarchy rules'.format(str(id_qualif), self.abb), status_code=400)
+                return id_qualif
+        except ZHApiError as e:
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details), status_code=e.status_code)
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __check_qualif", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
+            DB.session.close()
 
     def __get_note(self):
         try:
             if self.active:
-                return getattr(DB.session.query(TItems).filter(and_(TItems.attribute_id == self.id_qualif, TItems.cor_rule_id == self.cor_rule_id, TItems.note_type_id == self.knowledge)).one(), 'note')
+                return round(getattr(DB.session.query(TItems).filter(and_(TItems.attribute_id == self.id_qualif, TItems.cor_rule_id == self.cor_rule_id, TItems.note_type_id == self.knowledge)).one(), 'note'))
         except ZHApiError as e:
             raise ZHApiError(
                 message=str(e.message), details=str(e.details), status_code=e.status_code)
@@ -481,11 +521,15 @@ class Item:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
                 message="Item class: __get_note", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
-        finally:
-            DB.session.close()
 
     def __get_denominator(self):
-        return max(getattr(val, 'note') for val in DB.session.query(TItems).filter(TItems.cor_rule_id == self.cor_rule_id).all())
+        try:
+            if self.active:
+                return max(getattr(val, 'note') for val in DB.session.query(TItems).filter(TItems.cor_rule_id == self.cor_rule_id).all())
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __get_denominator", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
     def __get_rule_name(self):
         try:
@@ -497,18 +541,35 @@ class Item:
             TRules.rule_id == self.rule_id).one().BibHierCategories.label
 
     def __get_knowledge_mnemo(self):
-        if self.knowledge == 1:
-            return 'pas de connaissance pour cette sous-rubrique'
-        else:
-            return getattr(DB.session.query(TNomenclatures, BibNoteTypes).join(BibNoteTypes, TNomenclatures.id_nomenclature == BibNoteTypes.id_knowledge).filter(BibNoteTypes.note_id == self.knowledge).one().TNomenclatures, 'mnemonique')
+        try:
+            if self.active:
+                if self.knowledge == 1:
+                    return 'pas de connaissance pour cette sous-rubrique'
+                else:
+                    return getattr(DB.session.query(TNomenclatures, BibNoteTypes).join(BibNoteTypes, TNomenclatures.id_nomenclature == BibNoteTypes.id_knowledge).filter(BibNoteTypes.note_id == self.knowledge).one().TNomenclatures, 'mnemonique')
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __get_knowledge_mnemo", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+
+    def __get_qualif_mnemo(self):
+        try:
+            if self.active:
+                return getattr(DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == self.id_qualif).one(), 'label_default')
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __get_qualif_mnemo", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
     def __str__(self):
+        # if self.abb == 'hab':
+        # pdb.set_trace()
         return {
             "active": self.active,
-            "qualification": getattr(DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == self.id_qualif).one(), 'label_default'),
+            "qualification": self.__get_qualif_mnemo(),
             "connaissance": self.__get_knowledge_mnemo(),
             "nom sous-rubrique": self.__get_rule_name(),
-            "note sous-rubrique": round(self.note),
+            "note sous-rubrique": self.note,
             "denominateur sous-rubrique": self.denominator
         }
 
@@ -522,7 +583,7 @@ class Cat:
         self.items: cat_class = cat_class(self.id_zh, self.rb_id)
         self.denominator: int
         self.note: int
-        # self.active = Hierarchy.set_active(cat_id, type='cat')
+        #self.active = Hierarchy.set_active(cat_id, type='cat')
 
     @property
     def denominator(self):
@@ -537,7 +598,16 @@ class Cat:
 
     @staticmethod
     def get_note(value):
-        return sum([item['note sous-rubrique'] for item in value])
+        try:
+            try:
+                return sum(filter(None, [item['note sous-rubrique'] for item in value]))
+            except TypeError:
+                pass
+            return None
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Cat class: get_note", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
     def __str__(self):
         return {
@@ -673,8 +743,8 @@ class Volet1:
         return cat
 
     def __get_note(self):
-        note = self.cat1.note + self.cat2.note + \
-            self.cat3.note + self.cat4.note + self.cat5.note
+        note = sum(filter(None, [self.cat1.note, self.cat2.note,
+                   self.cat3.note, self.cat4.note, self.cat5.note]))
         return note
 
     def __str__(self):
@@ -707,7 +777,8 @@ class Volet2:
         return cat
 
     def __get_note(self):
-        note = self.cat6.note + self.cat7.note + self.cat8.note
+        note = sum(
+            filter(None, [self.cat6.note, self.cat7.note, self.cat8.note]))
         return note
 
     def __str__(self):
@@ -720,16 +791,6 @@ class Volet2:
         }
 
 
-"""
-class Volet2:
-    status_cat: SdageCat
-    fct_state_cat: FctStateCat
-    thread: ThreadCat
-    note: Integer
-    denom: Integer
-"""
-
-
 class Hierarchy(ZH):
 
     def __init__(self, id_zh):
@@ -737,8 +798,9 @@ class Hierarchy(ZH):
         self.rb_id = self.__get_rb()
         self.volet1 = Volet1(self.id_zh, self.rb_id)
         self.volet2 = Volet2(self.id_zh, self.rb_id)
-        # self.global_note: Integer
-        # self.final_note: Integer
+        self.denom = self.volet1.denom + self.volet2.denom
+        self.global_note = self.volet1.note + self.volet2.note
+        self.final_note = (self.global_note / self.denom) * 100
 
     def __get_rb(self):
         try:
@@ -771,7 +833,8 @@ class Hierarchy(ZH):
         return {
             "river_basin": DB.session.query(TRiverBasin).filter(TRiverBasin.id_rb == self.rb_id).one().name,
             "volet1": self.volet1.__str__(),
-            "volet2": self.volet2.__str__()
-            # "note totale": self.global_note,
-            # "note globale": self.final_note
+            "volet2": self.volet2.__str__(),
+            "note globale": self.global_note,
+            "denominateur": self.denom,
+            "note finale": self.final_note
         }
