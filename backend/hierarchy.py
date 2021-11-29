@@ -1,4 +1,4 @@
-#from abc import get_cache_token
+# from abc import get_cache_token
 import sys
 
 import numpy as np
@@ -583,7 +583,7 @@ class Cat:
         self.items: cat_class = cat_class(self.id_zh, self.rb_id)
         self.denominator: int
         self.note: int
-        #self.active = Hierarchy.set_active(cat_id, type='cat')
+        # self.active = Hierarchy.set_active(cat_id, type='cat')
 
     @property
     def denominator(self):
@@ -599,11 +599,7 @@ class Cat:
     @staticmethod
     def get_note(value):
         try:
-            try:
-                return sum(filter(None, [item['note sous-rubrique'] for item in value]))
-            except TypeError:
-                pass
-            return None
+            return sum(filter(None, [item['note sous-rubrique'] for item in value]))
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
@@ -722,30 +718,32 @@ class Thread:
         return items
 
 
-class Volet1:
+class Volet:
 
-    def __init__(self, id_zh, rb_id):
+    def __init__(self, id_zh, rb_id, view_abb):
         self.id_zh = id_zh
         self.rb_id = rb_id
-        self.cat1 = self.__set_cat('cat1', Sdage, 'rub_sdage')
-        self.cat2 = self.__set_cat(
-            'cat2', Heritage, 'rub_interet_pat')
-        self.cat3 = self.__set_cat('cat3', EcoFunction, 'rub_eco')
-        self.cat4 = self.__set_cat('cat4', HydroFunction, 'rub_hydro')
-        self.cat5 = self.__set_cat('cat5',  SocEco, 'rub_socio')
-        self.note = self.__get_note()
-        self.denom = Hierarchy.get_denom(rb_id, 'volet_1')
+        self.note = 0
+        self.denom = Hierarchy.get_denom(self.rb_id, view_abb)
 
-    def __set_cat(self, cat_abb, cat_class, view_abb):
+    def set_cat(self, cat_abb, cat_class, view_abb):
         cat = Cat(self.id_zh, self.rb_id, cat_abb, cat_class)
         cat.denominator = view_abb
         cat.note = cat.get_note(cat.items.__str__())
+        self.note += cat.note
         return cat
 
-    def __get_note(self):
-        note = sum(filter(None, [self.cat1.note, self.cat2.note,
-                   self.cat3.note, self.cat4.note, self.cat5.note]))
-        return note
+
+class Volet1(Volet):
+
+    def __init__(self, id_zh, rb_id):
+        self.volet = Volet(id_zh, rb_id, 'volet_1')
+        self.cat1 = self.volet.set_cat('cat1', Sdage, 'rub_sdage')
+        self.cat2 = self.volet.set_cat(
+            'cat2', Heritage, 'rub_interet_pat')
+        self.cat3 = self.volet.set_cat('cat3', EcoFunction, 'rub_eco')
+        self.cat4 = self.volet.set_cat('cat4', HydroFunction, 'rub_hydro')
+        self.cat5 = self.volet.set_cat('cat5',  SocEco, 'rub_socio')
 
     def __str__(self):
         return {
@@ -754,40 +752,26 @@ class Volet1:
             "cat3_eco": self.cat3.__str__(),
             "cat4_hydro": self.cat4.__str__(),
             "cat5_soc_eco": self.cat5.__str__(),
-            "note rubrique": self.note,
-            "denominateur rubrique": self.denom
+            "note rubrique": self.volet.note,
+            "denominateur rubrique": self.volet.denom
         }
 
 
-class Volet2:
+class Volet2(Volet):
 
     def __init__(self, id_zh, rb_id):
-        self.id_zh = id_zh
-        self.rb_id = rb_id
-        self.cat6 = self.__set_cat('cat6', Status, 'rub_statut')
-        self.cat7 = self.__set_cat('cat7', FctState, 'rub_etat_fonct')
-        self.cat8 = self.__set_cat('cat8', Thread, 'rub_menaces')
-        self.note = self.__get_note()
-        self.denom = Hierarchy.get_denom(rb_id, 'volet_2')
-
-    def __set_cat(self, cat_abb, cat_class, view_abb):
-        cat = Cat(self.id_zh, self.rb_id, cat_abb, cat_class)
-        cat.denominator = view_abb
-        cat.note = cat.get_note(cat.items.__str__())
-        return cat
-
-    def __get_note(self):
-        note = sum(
-            filter(None, [self.cat6.note, self.cat7.note, self.cat8.note]))
-        return note
+        self.volet = Volet(id_zh, rb_id, 'volet_2')
+        self.cat6 = self.volet.set_cat('cat6', Status, 'rub_statut')
+        self.cat7 = self.volet.set_cat('cat7', FctState, 'rub_etat_fonct')
+        self.cat8 = self.volet.set_cat('cat8', Thread, 'rub_menaces')
 
     def __str__(self):
         return {
             "cat6_status": self.cat6.__str__(),
             "cat7_fct_state": self.cat7.__str__(),
             "cat8_thread": self.cat8.__str__(),
-            "note rubrique": self.note,
-            "denominateur rubrique": self.denom
+            "note rubrique": self.volet.note,
+            "denominateur rubrique": self.volet.denom
         }
 
 
@@ -798,9 +782,21 @@ class Hierarchy(ZH):
         self.rb_id = self.__get_rb()
         self.volet1 = Volet1(self.id_zh, self.rb_id)
         self.volet2 = Volet2(self.id_zh, self.rb_id)
-        self.denom = self.volet1.denom + self.volet2.denom
-        self.global_note = self.volet1.note + self.volet2.note
-        self.final_note = (self.global_note / self.denom) * 100
+        self.total_denom = self.__get_total_denom()
+        self.global_note = self.__get_global_note()
+        self.final_note = self.__get_final_note()
+
+    def __get_total_denom(self):
+        return sum(filter(None, [self.volet1.volet.denom, self.volet2.volet.denom]))
+
+    def __get_global_note(self):
+        return sum(filter(None, [self.volet1.volet.note, self.volet2.volet.note]))
+
+    def __get_final_note(self):
+        if self.total_denom != 0:
+            return round(((self.global_note / self.total_denom) * 100), 2) if self.global_note != 0 else 0
+        else:
+            return None
 
     def __get_rb(self):
         try:
@@ -835,6 +831,6 @@ class Hierarchy(ZH):
             "volet1": self.volet1.__str__(),
             "volet2": self.volet2.__str__(),
             "note globale": self.global_note,
-            "denominateur": self.denom,
+            "denominateur": self.total_denom,
             "note finale": self.final_note
         }
