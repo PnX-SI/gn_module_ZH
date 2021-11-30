@@ -132,14 +132,12 @@ export class ZhFormTab0Component implements OnInit {
         // Must put a set timeout here otherwise
         // this._mapService is undefined...
         setTimeout(() => {
-          // Transform into a featureCollection to feed the
-          // leafletDrawFeatureGroup
-          this.geometry = this.multipolygonToFeatureCollection(
-            this._currentZh.geometry
-          );
-          // Clears the layers before adding the geometry to
-          // prevent having the same superimposed layers...
-          this._mapService.leafletDrawFeatureGroup.clearLayers();
+          this.geometry = {
+            geometry: this._currentZh.geometry,
+            properties: { idZh: this._currentZh.properties.id_zh },
+            type: "Feature",
+          };
+
           const layer = L.geoJSON(this.geometry, {
             onEachFeature: (feature, layer) => {
               this._mapService.leafletDrawFeatureGroup.addLayer(layer);
@@ -195,11 +193,7 @@ export class ZhFormTab0Component implements OnInit {
       sdage: formValues.sdage,
       geom: null,
     };
-    // Get the geometry as a featureCollection from the
-    // featureGroup layer
-    this.geometry = this.featureCollectionToMultipolygon(
-      this._mapService.leafletDrawFeatureGroup.toGeoJSON()
-    );
+
     if (this.geometry) {
       formToPost.geom = this.geometry;
       if (this.form.valid) {
@@ -283,10 +277,7 @@ export class ZhFormTab0Component implements OnInit {
   }
 
   onNewGeom(event: any) {
-    // Get the geometry from the featureGroup directly
-    // Here we will have a featureCollection
-    this.geometry = this._mapService.leafletDrawFeatureGroup.toGeoJSON();
-
+    this.geometry = event.layer.toGeoJSON();
     this.canChangeTab.emit(false);
     this._mapService.map.eachLayer((layer: any) => {
       if (
@@ -328,55 +319,5 @@ export class ZhFormTab0Component implements OnInit {
   ngOnDestroy() {
     this.$_geojsonSub.unsubscribe();
     this.$_currentZhSub.unsubscribe();
-  }
-
-  featureCollectionToMultipolygon(featureCollection) {
-    // Transforms a featureCollection from leafletDrawFeatureGroup
-    // to a single multipolygon because PostGis cannot interpret a
-    // featureGroup
-    const features = featureCollection.features;
-    let coordinates = [];
-    features.forEach((element) =>
-      coordinates.push(element.geometry.coordinates)
-    );
-    return {
-      type: "Feature",
-      geometry: {
-        type: "MultiPolygon",
-        coordinates: coordinates,
-      },
-      properties: null,
-    };
-  }
-
-  getPolygonFeature(coordinates) {
-    return {
-      type: "Feature",
-      properties: {},
-      geometry: {
-        type: "Polygon",
-        coordinates: coordinates,
-      },
-    };
-  }
-
-  multipolygonToFeatureCollection(geometry) {
-    // transforms a multipolygon to a feature collection
-    // to be able to send it to leafletDrawFeatureGroup
-    // to be able to edit each feature
-    let features = [];
-    // We can have a multipolygon and a polygon here.
-    // It can be checked with their coordinates
-    if (geometry.coordinates.length > 1) {
-      geometry.coordinates.forEach((coord) =>
-        features.push(this.getPolygonFeature(coord))
-      );
-    } else {
-      features.push(this.getPolygonFeature(geometry.coordinates));
-    }
-    return {
-      type: "FeatureCollection",
-      features: features,
-    };
   }
 }
