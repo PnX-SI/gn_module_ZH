@@ -513,7 +513,7 @@ class Item:
     def __get_note(self):
         try:
             if self.active:
-                return round(getattr(DB.session.query(TItems).filter(and_(TItems.attribute_id == self.id_qualif, TItems.cor_rule_id == self.cor_rule_id, TItems.note_type_id == self.knowledge)).one(), 'note'))
+                return round(getattr(DB.session.query(TItems).filter(and_(TItems.attribute_id == self.id_qualif, TItems.cor_rule_id == self.cor_rule_id, TItems.note_type_id == self.knowledge)).one(), 'note'), 2)
         except ZHApiError as e:
             raise ZHApiError(
                 message=str(e.message), details=str(e.details), status_code=e.status_code)
@@ -567,8 +567,7 @@ class Item:
             "qualification": self.__get_qualif_mnemo(),
             "knowledge": self.__get_knowledge_mnemo(),
             "name": self.__get_rule_name(),
-            "note": self.note,
-            "denominator": self.denominator
+            "note": Hierarchy.get_str_note(self.note, self.denominator) if self.active else 'Non paramétré'
         }
 
 
@@ -596,17 +595,26 @@ class Cat:
     @staticmethod
     def get_note(value):
         try:
-            return sum(filter(None, [item['note'] for item in value]))
+            return round(sum(filter(None, [float(item['note'].split('/')[0]) for item in value if item['active']])))
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
                 message="Cat class: get_note", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
+    def __get_str_note(self):
+        try:
+            if (self.note is None) or (self.denominator is None):
+                return None
+            return str(self.note) + '/' + str(self.denominator)
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __get_qualif_mnemo", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+
     def __str__(self):
         return {
             "items": [item for item in self.items.__str__()],
-            "note": self.note,
-            "denominator": self.denominator,
+            "note": Hierarchy.get_str_note(self.note, self.denominator),
             "name": self.__get_name()
         }
 
@@ -730,6 +738,9 @@ class Volet:
         self.note += cat.note
         return cat
 
+    def __str__(self):
+        return Hierarchy.get_str_note(self.note, self.denom)
+
 
 class Volet1(Volet):
 
@@ -749,8 +760,7 @@ class Volet1(Volet):
             "cat3_eco": self.cat3.__str__(),
             "cat4_hydro": self.cat4.__str__(),
             "cat5_soc_eco": self.cat5.__str__(),
-            "note": self.volet.note,
-            "denominator": self.volet.denom
+            "note": self.volet.__str__()
         }
 
 
@@ -767,8 +777,7 @@ class Volet2(Volet):
             "cat6_status": self.cat6.__str__(),
             "cat7_fct_state": self.cat7.__str__(),
             "cat8_thread": self.cat8.__str__(),
-            "note": self.volet.note,
-            "denominator": self.volet.denom
+            "note": self.volet.__str__()
         }
 
 
@@ -811,7 +820,7 @@ class Hierarchy(ZH):
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
-                message="get_rb_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+                message="Hierarchy class: get_rb_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
         finally:
             DB.session.rollback()
             DB.session.close()
@@ -822,12 +831,22 @@ class Hierarchy(ZH):
             TRiverBasin.id_rb == rb_id).one().name
         return getattr(DB.session.query(RbNotesSummary).filter(RbNotesSummary.bassin_versant == rb_name).one(), col_name)
 
+    @staticmethod
+    def get_str_note(note, denominator):
+        try:
+            if (note is None) or (denominator is None):
+                return None
+            return str(note) + '/' + str(denominator)
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Hierarchy class: get_str_note", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+
     def __str__(self):
         return {
             "river_basin_name": DB.session.query(TRiverBasin).filter(TRiverBasin.id_rb == self.rb_id).one().name,
             "volet1": self.volet1.__str__(),
             "volet2": self.volet2.__str__(),
-            "global_note": self.global_note,
-            "denominator": self.total_denom,
-            "final_note": self.final_note
+            "global_note": Hierarchy.get_str_note(self.global_note, self.total_denom),
+            "final_note": Hierarchy.get_str_note(self.final_note, 100)
         }
