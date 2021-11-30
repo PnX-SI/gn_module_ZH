@@ -1,23 +1,17 @@
-import { Component, EventEmitter, OnInit, Input, Output } from "@angular/core";
-import { ToastrService } from "ngx-toastr";
-import { Subscription } from "rxjs";
-
-import { ZhDataService } from "../../../services/zh-data.service";
-import { TabsService } from "../../../services/tabs.service";
-import { HierarchyModel } from "../../../zh-details/models/hierarchy.model";
-import { ItemModel } from "../../../zh-details/models/hierarchy.model";
-import { TableColumn } from "../../../commonComponents/table/table-interface";
-
+import { Component, Input } from "@angular/core";
+import { HierarchyModel } from "../models/hierarchy.model";
+import { ItemModel } from "../models/hierarchy.model";
+import { TableColumn } from "../../commonComponents/table/table-interface";
+import { ZhFormTab9Component } from "../../zh-forms/tabs/tab9/zh-form-tab9.component"
 
 @Component({
-  selector: "zh-form-tab9",
-  templateUrl: "./zh-form-tab9.component.html",
-  styleUrls: ["./zh-form-tab9.component.scss"]
+  selector: "zh-details-hierarchy",
+  templateUrl: "./hierarchy.component.html",
+  styleUrls: ["./hierarchy.component.scss"],
 })
-export class ZhFormTab9Component implements OnInit {
-  
-  private $_currentZhSub: Subscription;
+export class HierarchyComponent {
 
+  @Input() data: HierarchyModel;
   public hierTableCols: TableColumn[] = [
     { name: "name", label: "RUBRIQUES" },
     { name: "qualification", label: "QUALIFICATIONS" },
@@ -31,39 +25,15 @@ export class ZhFormTab9Component implements OnInit {
   public hierZh: HierarchyModel;
   public items: ItemModel[];
 
-  constructor(
-    private _dataService: ZhDataService,
-    private _toastr: ToastrService,
-    private _tabService: TabsService
-  ) {}
-
   ngOnInit() {
-    this.getCurrentZh();
+    this.setItems();
   }
 
-  // get current zone humides
-  getCurrentZh() {
-    this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
-      if (zh) {
-        this.currentZh = zh;
-        this._dataService.getHierZh(zh.id).subscribe(
-          (data: HierarchyModel) => {
-            console.log(data)
-            this.hierZh = data;
-
-            this.items = this.setItems()
-
-          },
-          (error) => {
-            console.log(error.error)
-          }
-        );
-      }
-    });
-  }
 
   // set list of hierarchy items
   setItems() {
+
+    this.hierZh = this.data;
 
     this.items = [{"name": "", "active":true, "qualification":"", "knowledge": "", "note": ""}]
 
@@ -160,6 +130,5 @@ export class ZhFormTab9Component implements OnInit {
 
     return this.items
   }
-
 
 }

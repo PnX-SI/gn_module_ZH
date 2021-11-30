@@ -16,6 +16,7 @@ import { TableComponent } from "../commonComponents/table/table.component";
 import { LabelComponent } from "../commonComponents/label/label.component";
 import { HeaderComponent } from "./header/header.component";
 import { DeleteModalComponent } from "../commonComponents/delete-modal/delete-modal.component";
+import { HierarchyComponent } from "./hierarchy/hierarchy.component";
 
 // my module routing
 const routes: Routes = [
@@ -32,6 +33,7 @@ const routes: Routes = [
     FonctionsComponent,
     RenseignementsComponent,
     StatutsComponent,
+    HierarchyComponent,
     CollapseComponent,
     TableComponent,
     LabelComponent,

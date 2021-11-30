@@ -4,7 +4,7 @@ import { BehaviorSubject, pipe } from "rxjs";
 import { map } from "rxjs/operators";
 import { AppConfig } from "@geonature_config/app.config";
 import { DetailsModel } from "../zh-details/models/zh-details.model";
-import { HierarchyModel } from "../zh-forms/tabs/tab9/zh-tab9.model";
+import { HierarchyModel } from "../zh-details/models/hierarchy.model";
 
 @Injectable({
   providedIn: "root",

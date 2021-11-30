@@ -9,6 +9,7 @@ from geonature.core.ref_geo.models import LAreas
 from .zh_schema import *
 from .zh import ZH
 from ..nomenclatures import get_corine_biotope
+from ..hierarchy import Hierarchy
 
 import pdb
 
@@ -961,6 +962,7 @@ class Card(ZH):
         self.description = Description()
         self.status = Status()
         self.evaluation = Evaluation()
+        self.hierarchy = Hierarchy(id_zh)
 
     def get_properties(self):
         return ZH(self.id_zh).__repr__()['properties']
@@ -977,6 +979,7 @@ class Card(ZH):
             "fonctions": self.__set_zh_functions(),
             "statuts": self.__set_statuses(),
             "evaluation": self.__set_evaluation(),
+            "hierarchy": self.hierarchy.__str__(),
             "geometry": self.__set_geometry()
         }
 
