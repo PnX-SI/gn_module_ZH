@@ -544,7 +544,7 @@ class Item:
         try:
             if self.active:
                 if self.knowledge == 1:
-                    return 'pas de connaissance pour cette sous-rubrique'
+                    return None
                 else:
                     return getattr(DB.session.query(TNomenclatures, BibNoteTypes).join(BibNoteTypes, TNomenclatures.id_nomenclature == BibNoteTypes.id_knowledge).filter(BibNoteTypes.note_id == self.knowledge).one().TNomenclatures, 'mnemonique')
         except Exception as e:
@@ -562,15 +562,13 @@ class Item:
                 message="Item class: __get_qualif_mnemo", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
     def __str__(self):
-        # if self.abb == 'hab':
-        # pdb.set_trace()
         return {
             "active": self.active,
             "qualification": self.__get_qualif_mnemo(),
-            "connaissance": self.__get_knowledge_mnemo(),
-            "nom sous-rubrique": self.__get_rule_name(),
-            "note sous-rubrique": self.note,
-            "denominateur sous-rubrique": self.denominator
+            "knowledge": self.__get_knowledge_mnemo(),
+            "name": self.__get_rule_name(),
+            "note": self.note,
+            "denominator": self.denominator
         }
 
 
@@ -583,7 +581,6 @@ class Cat:
         self.items: cat_class = cat_class(self.id_zh, self.rb_id)
         self.denominator: int
         self.note: int
-        # self.active = Hierarchy.set_active(cat_id, type='cat')
 
     @property
     def denominator(self):
@@ -599,7 +596,7 @@ class Cat:
     @staticmethod
     def get_note(value):
         try:
-            return sum(filter(None, [item['note sous-rubrique'] for item in value]))
+            return sum(filter(None, [item['note'] for item in value]))
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
@@ -608,9 +605,9 @@ class Cat:
     def __str__(self):
         return {
             "items": [item for item in self.items.__str__()],
-            "note rubrique": self.note,
-            "denominateur rubrique": self.denominator,
-            "nom rubrique": self.__get_name()
+            "note": self.note,
+            "denominator": self.denominator,
+            "name": self.__get_name()
         }
 
 
@@ -752,8 +749,8 @@ class Volet1(Volet):
             "cat3_eco": self.cat3.__str__(),
             "cat4_hydro": self.cat4.__str__(),
             "cat5_soc_eco": self.cat5.__str__(),
-            "note rubrique": self.volet.note,
-            "denominateur rubrique": self.volet.denom
+            "note": self.volet.note,
+            "denominator": self.volet.denom
         }
 
 
@@ -770,8 +767,8 @@ class Volet2(Volet):
             "cat6_status": self.cat6.__str__(),
             "cat7_fct_state": self.cat7.__str__(),
             "cat8_thread": self.cat8.__str__(),
-            "note rubrique": self.volet.note,
-            "denominateur rubrique": self.volet.denom
+            "note": self.volet.note,
+            "denominator": self.volet.denom
         }
 
 
@@ -827,10 +824,10 @@ class Hierarchy(ZH):
 
     def __str__(self):
         return {
-            "river_basin": DB.session.query(TRiverBasin).filter(TRiverBasin.id_rb == self.rb_id).one().name,
+            "river_basin_name": DB.session.query(TRiverBasin).filter(TRiverBasin.id_rb == self.rb_id).one().name,
             "volet1": self.volet1.__str__(),
             "volet2": self.volet2.__str__(),
-            "note globale": self.global_note,
-            "denominateur": self.total_denom,
-            "note finale": self.final_note
+            "global_note": self.global_note,
+            "denominator": self.total_denom,
+            "final_note": self.final_note
         }
