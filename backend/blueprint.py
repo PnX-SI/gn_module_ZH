@@ -46,6 +46,8 @@ from geonature.core.gn_commons.models import TMedias
 # import des fonctions utiles depuis le sous-module d'authentification
 from geonature.core.gn_permissions import decorators as permissions
 from geonature.core.gn_permissions.tools import get_or_fetch_user_cruved
+# Filemanager
+import geonature.utils.filemanager as fm
 
 from .model.zh_schema import (
     TZH,
@@ -87,7 +89,7 @@ from .api_error import ZHApiError
 
 import pdb
 
-blueprint = Blueprint("pr_zh", __name__)
+blueprint = Blueprint("pr_zh", __name__, template_folder='templates')
 
 
 # Route pour afficher liste des zones humides
@@ -171,6 +173,7 @@ def get_zh_by_id(id_zh, info_role):
     """Get zh form data by id
     """
     try:
+        print(info_role)
         return ZH(id_zh).__repr__()
     except Exception as e:
         exc_type, value, tb = sys.exc_info()
@@ -861,3 +864,24 @@ def returnUserCruved(info_role):
         module_code=blueprint.config['MODULE_CODE']
     )
     return user_cruved
+
+@blueprint.route("/export_pdf/<int:id_zh>", methods=["GET"])
+@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
+def download(id_zh: int):
+    """
+    Downloads the report in pdf format
+    """
+    filename = "rapport.pdf"
+    dataset = ZH(id_zh).__repr__()
+    # dataset['map'] = request.form.get('map')
+    # dataset['chart'] = request.form.get('chart')
+
+    # url_list = [current_app.config['URL_APPLICATION'],
+    #             '#',
+    #             current_app.config['IMPORT'].get('MODULE_URL', "").replace('/',''),
+    #             'report',
+    #             str(dataset.get('id_import', 0))]
+    # dataset['url'] = '/'.join(url_list)
+    pdf_file = fm.generate_pdf("fiche_template_pdf.html", dataset, filename)
+    pdf_file_posix = Path(pdf_file)
+    return send_file(pdf_file_posix, as_attachment=True)
