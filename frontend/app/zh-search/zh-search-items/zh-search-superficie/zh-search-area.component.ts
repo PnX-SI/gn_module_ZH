@@ -20,6 +20,10 @@ export class ZhSearchAreaComponent implements OnInit {
   ngOnInit() {
     this.symbols = [
       {
+        value: "",
+        text: "Aucun filtre",
+      },
+      {
         value: "≥",
         text: "Supérieur à",
       },
