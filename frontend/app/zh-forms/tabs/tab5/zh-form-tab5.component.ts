@@ -798,9 +798,9 @@ export class ZhFormTab5Component implements OnInit {
 
   //delete corineBio from the corineBio array
   onDeleteCorineBio(corineBio: any) {
-    this.corineBioTable = this.corineBioTable.filter((item: any) => {
-      return item.corinBio.CB_code != corineBio.corinBio.CB_code;
-    });
+    this.corineBioTable = this.corineBioTable.filter(
+      (item: any) => item != corineBio
+    );
     this.canChangeTab.emit(false);
   }
 
@@ -882,7 +882,15 @@ export class ZhFormTab5Component implements OnInit {
     this._dataService
       .getHabitatByCorine(corineBio.CB_code)
       .subscribe((habitats: any) => {
-        this.cahierHabInput = habitats;
+        console.log(habitats);
+        console.log(this.corineBioTable);
+        this.cahierHabInput = habitats.map((item) => {
+          item.disabled = this.corineBioTable
+            .map((cor) => cor.cahierHab)
+            .some((e) => e.cd_hab === item.cd_hab);
+          return item;
+        });
+        console.log(this.cahierHabInput);
         this.corineBioForm.get("cahierHab").enable();
       });
   }
