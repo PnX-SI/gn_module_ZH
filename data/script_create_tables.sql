@@ -867,6 +867,7 @@ CREATE  TABLE pr_zh.cor_rb_rules (
 	cor_rule_id          integer  NOT NULL ,
 	rb_id                integer  NOT NULL ,
 	rule_id              integer  NOT NULL ,
+	UNIQUE (rb_id, rule_id),
 	CONSTRAINT pk_cor_rb_items_id_cor PRIMARY KEY ( cor_rule_id )
  );
 

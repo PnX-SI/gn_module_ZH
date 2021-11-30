@@ -99,19 +99,6 @@ class Item:
                 "high": high
             }
 
-    def __get_qualif_sdage(self):
-        try:
-            return self.__get_qualif_val()
-        except ZHApiError as e:
-            raise ZHApiError(
-                message=str(e.message), details=str(e.details), status_code=e.status_code)
-        except Exception as e:
-            exc_type, value, tb = sys.exc_info()
-            raise ZHApiError(
-                message="Item class: __get_qualif_sdage", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
-        finally:
-            DB.session.close()
-
     def __get_qualif_cat7(self):
         try:
             id_nomenc = self.__get_qualif_val()
@@ -567,7 +554,7 @@ class Item:
             "qualification": self.__get_qualif_mnemo(),
             "knowledge": self.__get_knowledge_mnemo(),
             "name": self.__get_rule_name(),
-            "note": Hierarchy.get_str_note(self.note, self.denominator) if self.active else 'Non paramétré'
+            "note": Hierarchy.get_str_note(self.note, self.denominator) if self.active else 'Non paramétrée'
         }
 
 
@@ -600,16 +587,6 @@ class Cat:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
                 message="Cat class: get_note", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
-
-    def __get_str_note(self):
-        try:
-            if (self.note is None) or (self.denominator is None):
-                return None
-            return str(self.note) + '/' + str(self.denominator)
-        except Exception as e:
-            exc_type, value, tb = sys.exc_info()
-            raise ZHApiError(
-                message="Item class: __get_qualif_mnemo", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
     def __str__(self):
         return {
@@ -811,7 +788,7 @@ class Hierarchy(ZH):
                 raise ZHApiError(message='no_river_basin',
                                  details="zh is not part of any river basin", status_code=400)
             elif len(q_rb) > 1:
-                # to do : if several rb intersect the zh polygon, calculate rb areas to determine which one is the main one
+                # todo : if several rb intersect the zh polygon, calculate rb areas to determine which one is the main one
                 # temp fix:
                 raise ZHApiError(message='several_river_basin',
                                  details="zh is part of several river basins")
