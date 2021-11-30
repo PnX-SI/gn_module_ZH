@@ -333,6 +333,7 @@ export class ZhFormTab5Component implements OnInit {
             cahierHab: selectedCahierHab,
             habCover: corineBio.hab_cover,
           });
+          this.sortCorineBio();
         });
     });
   }
@@ -788,6 +789,7 @@ export class ZhFormTab5Component implements OnInit {
     this.modalFormSubmitted = true;
     if (this.corineBioForm.valid) {
       this.corineBioTable.push(this.corineBioForm.value);
+      this.sortCorineBio();
       this.ngbModal.dismissAll();
       this.corineBioForm.reset();
       this.corineBioForm.get("cahierHab").disable();
@@ -850,6 +852,7 @@ export class ZhFormTab5Component implements OnInit {
       this.corineBioTable = this.corineBioTable.map((item: any) =>
         item.corinBio.CB_code != this.tempID ? item : formValues
       );
+      this.sortCorineBio();
       this.tempID = null;
       this.ngbModal.dismissAll();
       this.corineBioForm.reset();
@@ -882,15 +885,12 @@ export class ZhFormTab5Component implements OnInit {
     this._dataService
       .getHabitatByCorine(corineBio.CB_code)
       .subscribe((habitats: any) => {
-        console.log(habitats);
-        console.log(this.corineBioTable);
         this.cahierHabInput = habitats.map((item) => {
           item.disabled = this.corineBioTable
             .map((cor) => cor.cahierHab)
             .some((e) => e.cd_hab === item.cd_hab);
           return item;
         });
-        console.log(this.cahierHabInput);
         this.corineBioForm.get("cahierHab").enable();
       });
   }
@@ -1004,6 +1004,16 @@ export class ZhFormTab5Component implements OnInit {
       a.function.mnemonique.slice(0, 2) > b.function.mnemonique.slice(0, 2)
         ? 1
         : b.function.mnemonique.slice(0, 2) > a.function.mnemonique.slice(0, 2)
+        ? -1
+        : 0
+    );
+  }
+
+  sortCorineBio() {
+    this.corineBioTable.sort((a, b) =>
+      a.corinBio.CB_label > b.corinBio.CB_label
+        ? 1
+        : b.corinBio.CB_label > a.corinBio.CB_label
         ? -1
         : 0
     );
