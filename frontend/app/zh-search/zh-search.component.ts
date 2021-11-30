@@ -150,7 +150,7 @@ export class ZhSearchComponent implements OnInit {
     // Since everything is a form group:
     Object.keys(values).forEach((key) => {
       let value = values[key];
-      if (value) {
+      if (value != null && value != []) {
         if (value instanceof Array) {
           value = value.filter((item) => item != null);
           filtered[key] = value;
