@@ -54,6 +54,10 @@ export class HierarchyService {
 
   // set list of hierarchy items
   setItems(data) {
+    if (data == null) {
+      return [];
+    }
+
     this.items = [
       { name: "", active: true, qualification: "", knowledge: "", note: "" },
     ];

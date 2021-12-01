@@ -10,6 +10,7 @@ from .zh_schema import *
 from .zh import ZH
 from ..nomenclatures import get_corine_biotope
 from ..hierarchy import Hierarchy
+from ..api_error import ZHApiError
 
 import pdb
 
@@ -962,8 +963,11 @@ class Card(ZH):
         self.description = Description()
         self.status = Status()
         self.evaluation = Evaluation()
-        self.hierarchy = Hierarchy(id_zh)
-
+        try:
+            self.hierarchy = Hierarchy(id_zh)
+        except ZHApiError:
+            self.hierarchy = None
+    
     def get_properties(self):
         return ZH(self.id_zh).__repr__()['properties']
 
@@ -979,7 +983,7 @@ class Card(ZH):
             "fonctions": self.__set_zh_functions(),
             "statuts": self.__set_statuses(),
             "evaluation": self.__set_evaluation(),
-            "hierarchy": self.hierarchy.__str__(),
+            "hierarchy": self.__set_hierarchy(),
             "geometry": self.__set_geometry()
         }
 
@@ -1132,6 +1136,9 @@ class Card(ZH):
         self.status.protections = self.properties['protections']
         self.status.urban_docs = self.properties['urban_docs']
         return self.status.__str__()
+    
+    def __set_hierarchy(self):
+        return self.hierarchy.__str__() if self.hierarchy is not None else None
 
     def __set_evaluation(self):
         self.__set_main_functions()
