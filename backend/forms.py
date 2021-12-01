@@ -1,6 +1,9 @@
 import uuid
 
 import math
+import sys
+import traceback
+from psycopg2 import OperationalError, errorcodes, errors
 
 import datetime
 
@@ -11,6 +14,7 @@ from sqlalchemy import (
     and_
 )
 
+import sqlalchemy.exc as exc
 from sqlalchemy.sql.expression import delete
 
 from geonature.utils.env import DB
@@ -31,15 +35,25 @@ from pypnnomenclature.models import (
 
 from .api_error import ZHApiError
 
+import psycopg2
+
 import pdb
 
 
 def update_tzh(data):
-    zh = DB.session.query(TZH).filter_by(id_zh=data['id_zh']).first()
-    for key, val in data.items():
-        if hasattr(TZH, key) and key != 'id_zh':
-            setattr(zh, key, val)
-            DB.session.flush()
+    try:
+        zh = DB.session.query(TZH).filter_by(id_zh=data['id_zh']).first()
+        for key, val in data.items():
+            if hasattr(TZH, key) and key != 'id_zh':
+                setattr(zh, key, val)
+                DB.session.flush()
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="update_tzh_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="update_tzh_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 # tab 0
@@ -47,168 +61,242 @@ def update_tzh(data):
 
 def create_zh(form_data, info_role, zh_date, polygon, ref_geo_referentiels):
 
-    uuid_id_lim_list = uuid.uuid4()
-    post_cor_lim_list(uuid_id_lim_list, form_data['critere_delim'])
+    try:
+        uuid_id_lim_list = uuid.uuid4()
+        post_cor_lim_list(uuid_id_lim_list, form_data['critere_delim'])
 
-    # temporary code
-    code = str(uuid.uuid4())[0:12]
+        # temporary code
+        code = str(uuid.uuid4())[0:12]
 
-    # create zh : fill pr_zh.t_zh
-    new_zh = TZH(
-        main_name=form_data['main_name'],
-        code=code,
-        id_org=form_data['id_org'],
-        create_author=info_role.id_role,
-        update_author=info_role.id_role,
-        create_date=zh_date,
-        update_date=zh_date,
-        id_lim_list=uuid_id_lim_list,
-        id_sdage=form_data['sdage'],
-        geom=polygon
-    )
-    DB.session.add(new_zh)
-    DB.session.flush()
+        # create zh : fill pr_zh.t_zh
+        new_zh = TZH(
+            main_name=form_data['main_name'],
+            code=code,
+            id_org=form_data['id_org'],
+            create_author=info_role.id_role,
+            update_author=info_role.id_role,
+            create_date=zh_date,
+            update_date=zh_date,
+            id_lim_list=uuid_id_lim_list,
+            id_sdage=form_data['sdage'],
+            geom=polygon
+        )
+        DB.session.add(new_zh)
+        DB.session.flush()
 
-    # fill cor_zh_area for municipalities
-    post_cor_zh_area(polygon, new_zh.id_zh, DB.session.query(
-        BibAreasTypes).filter(BibAreasTypes.type_code == 'COM').one().id_type)
-    # fill cor_zh_area for departements
-    post_cor_zh_area(polygon, new_zh.id_zh, DB.session.query(
-        BibAreasTypes).filter(BibAreasTypes.type_code == 'DEP').one().id_type)
-    # fill cor_zh_area for other geo referentials
-    for ref in ref_geo_referentiels:
+        # fill cor_zh_area for municipalities
         post_cor_zh_area(polygon, new_zh.id_zh, DB.session.query(
-            BibAreasTypes).filter(BibAreasTypes.type_code == ref['type_code_ref_geo']).one().id_type)
+            BibAreasTypes).filter(BibAreasTypes.type_code == 'COM').one().id_type)
+        # fill cor_zh_area for departements
+        post_cor_zh_area(polygon, new_zh.id_zh, DB.session.query(
+            BibAreasTypes).filter(BibAreasTypes.type_code == 'DEP').one().id_type)
+        # fill cor_zh_area for other geo referentials
+        for ref in ref_geo_referentiels:
+            post_cor_zh_area(polygon, new_zh.id_zh, DB.session.query(
+                BibAreasTypes).filter(BibAreasTypes.type_code == ref['type_code_ref_geo']).one().id_type)
 
-    # fill cor_zh_rb
-    post_cor_zh_rb(form_data['geom']['geometry'], new_zh.id_zh)
-    # fill cor_zh_hydro
-    post_cor_zh_hydro(form_data['geom']['geometry'], new_zh.id_zh)
-    # fill cor_zh_fct_area
-    post_cor_zh_fct_area(form_data['geom']['geometry'], new_zh.id_zh)
+        # fill cor_zh_rb
+        post_cor_zh_rb(form_data['geom']['geometry'], new_zh.id_zh)
+        # fill cor_zh_hydro
+        post_cor_zh_hydro(form_data['geom']['geometry'], new_zh.id_zh)
+        # fill cor_zh_fct_area
+        post_cor_zh_fct_area(form_data['geom']['geometry'], new_zh.id_zh)
 
-    # create zh code
-    code = Code(new_zh.id_zh, new_zh.id_org, new_zh.geom)
-    new_zh.code = code.__repr__()
+        # create zh code
+        code = Code(new_zh.id_zh, new_zh.id_org, new_zh.geom)
+        new_zh.code = code.__repr__()
 
-    DB.session.flush()
-    return new_zh.id_zh
+        DB.session.flush()
+        return new_zh.id_zh
+    except Exception as e:
+        # e.orig.diag.source_line
+        # e.orig.diag.statement_position
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="create_zh_post_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="create_zh_post_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def post_cor_lim_list(uuid_lim, criteria):
-    # fill pr_zh.cor_lim_list
-    for lim in criteria:
-        DB.session.add(CorLimList(
-            id_lim_list=uuid_lim, id_lim=lim))
-        DB.session.flush()
+    try:
+        # fill pr_zh.cor_lim_list
+        for lim in criteria:
+            DB.session.add(CorLimList(
+                id_lim_list=uuid_lim, id_lim=lim))
+            DB.session.flush()
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_cor_lim_list_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_cor_lim_list_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def post_cor_zh_area(polygon, id_zh, id_type):
-    query = \
-        """
-            SELECT (ref_geo.fct_get_area_intersection(
-            ST_SetSRID('{geom}'::geometry,4326), {type})).id_area
-        """.format(geom=str(polygon), type=id_type)
-    q_list = DB.session.execute(text(query)).fetchall()
-    for element in q_list:
-        # if 'Communes', % of zh in the municipality must be calculated
-        if id_type == CorZhArea.get_id_type('Communes'):
-            municipality_geom = DB.session.query(LAreas).filter(
-                LAreas.id_area == element[0]).one().geom
-            polygon_2154 = DB.session.query(func.ST_Transform(
-                func.ST_SetSRID(func.ST_AsText(polygon), 4326), 2154)).one()[0]
-            intersect_area = DB.session.query(func.ST_Area(
-                func.ST_Intersection(municipality_geom, polygon_2154))).scalar()
-            municipality_area = DB.session.query(
-                func.ST_Area(municipality_geom)).scalar()
-            cover = math.ceil((intersect_area * 100)/municipality_area)
-        else:
-            cover = None
-        DB.session.add(
-            CorZhArea(
-                id_area=element[0],
-                id_zh=id_zh,
-                cover=cover
+    try:
+        query = \
+            """
+                SELECT (ref_geo.fct_get_area_intersection(
+                ST_SetSRID('{geom}'::geometry,4326), {type})).id_area
+            """.format(geom=str(polygon), type=id_type)
+        q_list = DB.session.execute(text(query)).fetchall()
+        for element in q_list:
+            # if 'Communes', % of zh in the municipality must be calculated
+            if id_type == CorZhArea.get_id_type('Communes'):
+                municipality_geom = DB.session.query(LAreas).filter(
+                    LAreas.id_area == element[0]).one().geom
+                polygon_2154 = DB.session.query(func.ST_Transform(
+                    func.ST_SetSRID(func.ST_AsText(polygon), 4326), 2154)).one()[0]
+                intersect_area = DB.session.query(func.ST_Area(
+                    func.ST_Intersection(municipality_geom, polygon_2154))).scalar()
+                municipality_area = DB.session.query(
+                    func.ST_Area(municipality_geom)).scalar()
+                cover = math.ceil((intersect_area * 100)/municipality_area)
+                if cover > 100:
+                    cover = 100
+            else:
+                cover = None
+            DB.session.add(
+                CorZhArea(
+                    id_area=element[0],
+                    id_zh=id_zh,
+                    cover=cover
+                )
             )
-        )
-        DB.session.flush()
+            DB.session.flush()
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_cor_zh_area_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary))
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_cor_zh_area_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def post_cor_zh_rb(geom, id_zh):
-    rbs = TZH.get_zh_area_intersected(
-        'river_basin', func.ST_GeomFromGeoJSON(str(geom)))
-    for rb in rbs:
-        DB.session.add(CorZhRb(id_zh=id_zh, id_rb=rb.id_rb))
-        DB.session.flush()
+    try:
+        rbs = TZH.get_zh_area_intersected(
+            'river_basin', func.ST_GeomFromGeoJSON(str(geom)))
+        for rb in rbs:
+            DB.session.add(CorZhRb(id_zh=id_zh, id_rb=rb.id_rb))
+            DB.session.flush()
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_cor_zh_rb_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary))
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_cor_zh_rb_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def post_cor_zh_hydro(geom, id_zh):
-    has = TZH.get_zh_area_intersected(
-        'hydro_area', func.ST_GeomFromGeoJSON(str(geom)))
-    for ha in has:
-        DB.session.add(CorZhHydro(
-            id_zh=id_zh, id_hydro=ha.id_hydro))
-        DB.session.flush()
+    try:
+        has = TZH.get_zh_area_intersected(
+            'hydro_area', func.ST_GeomFromGeoJSON(str(geom)))
+        for ha in has:
+            DB.session.add(CorZhHydro(
+                id_zh=id_zh, id_hydro=ha.id_hydro))
+            DB.session.flush()
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_cor_zh_hydro_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary))
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_cor_zh_hydro_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def post_cor_zh_fct_area(geom, id_zh):
-    fas = TZH.get_zh_area_intersected(
-        'fct_area', func.ST_GeomFromGeoJSON(str(geom)))
-    for fa in fas:
-        DB.session.add(CorZhFctArea(
-            id_zh=id_zh, id_fct_area=fa.id_fct_area))
-        DB.session.flush()
+    try:
+        fas = TZH.get_zh_area_intersected(
+            'fct_area', func.ST_GeomFromGeoJSON(str(geom)))
+        for fa in fas:
+            DB.session.add(CorZhFctArea(
+                id_zh=id_zh, id_fct_area=fa.id_fct_area))
+            DB.session.flush()
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_cor_zh_fct_area_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary))
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_cor_zh_fct_area_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def update_zh_tab0(form_data, polygon, info_role, zh_date, geo_refs):
-    is_geom_new = check_polygon(polygon, form_data['id_zh'])
+    try:
+        is_geom_new = check_polygon(polygon, form_data['id_zh'])
 
-    # update pr_zh.cor_lim_list
-    id_lim_list = DB.session.query(TZH.id_lim_list).filter(
-        TZH.id_zh == form_data['id_zh']).one()[0]
-    DB.session.query(CorLimList).filter(
-        CorLimList.id_lim_list == id_lim_list).delete()
-    post_cor_lim_list(id_lim_list, form_data['critere_delim'])
+        # update pr_zh.cor_lim_list
+        id_lim_list = DB.session.query(TZH.id_lim_list).filter(
+            TZH.id_zh == form_data['id_zh']).one()[0]
+        DB.session.query(CorLimList).filter(
+            CorLimList.id_lim_list == id_lim_list).delete()
+        post_cor_lim_list(id_lim_list, form_data['critere_delim'])
 
-    # update zh : fill pr_zh.t_zh
-    DB.session.query(TZH).filter(TZH.id_zh == form_data['id_zh']).update({
-        TZH.main_name: form_data['main_name'],
-        TZH.id_org: form_data['id_org'],
-        TZH.update_author: info_role.id_role,
-        TZH.update_date: zh_date,
-        TZH.id_sdage: form_data['sdage'],
-        TZH.geom: polygon
-    })
-    DB.session.flush()
+        # update zh : fill pr_zh.t_zh
+        DB.session.query(TZH).filter(TZH.id_zh == form_data['id_zh']).update({
+            TZH.main_name: form_data['main_name'],
+            TZH.id_org: form_data['id_org'],
+            TZH.update_author: info_role.id_role,
+            TZH.update_date: zh_date,
+            TZH.id_sdage: form_data['sdage'],
+            TZH.geom: polygon
+        })
+        DB.session.flush()
 
-    if is_geom_new:
-        update_cor_zh_area(polygon, form_data['id_zh'], geo_refs)
-        update_cor_zh_rb(form_data['geom']['geometry'], form_data['id_zh'])
-        update_cor_zh_hydro(form_data['geom']['geometry'], form_data['id_zh'])
-        update_cor_zh_fct_area(
-            form_data['geom']['geometry'], form_data['id_zh'])
+        if is_geom_new:
+            update_cor_zh_area(polygon, form_data['id_zh'], geo_refs)
+            update_cor_zh_rb(form_data['geom']['geometry'], form_data['id_zh'])
+            update_cor_zh_hydro(
+                form_data['geom']['geometry'], form_data['id_zh'])
+            update_cor_zh_fct_area(
+                form_data['geom']['geometry'], form_data['id_zh'])
 
-    DB.session.flush()
-    return form_data['id_zh']
+        DB.session.flush()
+        return form_data['id_zh']
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="update_tab0_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="update_tab0_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def check_polygon(polygon, id_zh):
-    if polygon != str(DB.session.query(TZH.geom).filter(TZH.id_zh == id_zh).one()[0]).upper():
-        return True
-    return False
+    try:
+        if polygon != str(DB.session.query(TZH.geom).filter(TZH.id_zh == id_zh).one()[0]).upper():
+            return True
+        return False
+    except Exception as e:
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="check_polygon_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def update_cor_zh_area(polygon, id_zh, geo_refs):
-    DB.session.query(CorZhArea).filter(
-        CorZhArea.id_zh == id_zh).delete()
-    post_cor_zh_area(polygon, id_zh, DB.session.query(BibAreasTypes).filter(
-        BibAreasTypes.type_code == 'COM').one().id_type)
-    post_cor_zh_area(polygon, id_zh, DB.session.query(BibAreasTypes).filter(
-        BibAreasTypes.type_code == 'DEP').one().id_type)
-    # fill cor_zh_area for other geo referentials
-    for ref in geo_refs:
-        post_cor_zh_area(polygon, id_zh, DB.session.query(
-            BibAreasTypes).filter(BibAreasTypes.type_code == ref['type_code_ref_geo']).one().id_type)
+    try:
+        DB.session.query(CorZhArea).filter(
+            CorZhArea.id_zh == id_zh).delete()
+        post_cor_zh_area(polygon, id_zh, DB.session.query(BibAreasTypes).filter(
+            BibAreasTypes.type_code == 'COM').one().id_type)
+        post_cor_zh_area(polygon, id_zh, DB.session.query(BibAreasTypes).filter(
+            BibAreasTypes.type_code == 'DEP').one().id_type)
+        # fill cor_zh_area for other geo referentials
+        for ref in geo_refs:
+            post_cor_zh_area(polygon, id_zh, DB.session.query(
+                BibAreasTypes).filter(BibAreasTypes.type_code == ref['type_code_ref_geo']).one().id_type)
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="update_cor_zh_area_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="update_cor_zh_area_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def update_cor_zh_rb(geom, id_zh):
@@ -233,11 +321,19 @@ def update_cor_zh_fct_area(geom, id_zh):
 
 
 def update_refs(form_data):
-    DB.session.query(CorZhRef).filter(
-        CorZhRef.id_zh == form_data['id_zh']).delete()
-    for ref in form_data['id_references']:
-        DB.session.add(CorZhRef(id_zh=form_data['id_zh'], id_ref=ref))
-        DB.session.flush()
+    try:
+        DB.session.query(CorZhRef).filter(
+            CorZhRef.id_zh == form_data['id_zh']).delete()
+        for ref in form_data['id_references']:
+            DB.session.add(CorZhRef(id_zh=form_data['id_zh'], id_ref=ref))
+            DB.session.flush()
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="update_refs_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="update_refs_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 # tab 3
@@ -263,17 +359,33 @@ def post_activities(id_zh, activities):
 
 
 def update_activities(id_zh, activities):
-    # delete cascade t_activity and cor_impact_list with id_zh
-    DB.session.query(TActivity).filter(
-        TActivity.id_zh == id_zh).delete()
-    # post new activities
-    post_activities(id_zh, activities)
+    try:
+        # delete cascade t_activity and cor_impact_list with id_zh
+        DB.session.query(TActivity).filter(
+            TActivity.id_zh == id_zh).delete()
+        # post new activities
+        post_activities(id_zh, activities)
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_update_activities_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_update_activities_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def update_corine_biotopes(id_zh, corine_biotopes):
-    DB.session.query(CorZhCb).filter(
-        CorZhCb.id_zh == id_zh).delete()
-    post_corine_biotopes(id_zh, corine_biotopes)
+    try:
+        DB.session.query(CorZhCb).filter(
+            CorZhCb.id_zh == id_zh).delete()
+        post_corine_biotopes(id_zh, corine_biotopes)
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_update_corine_biotopes_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_update_corine_biotopes_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def post_corine_biotopes(id_zh, corine_biotopes):
@@ -284,9 +396,17 @@ def post_corine_biotopes(id_zh, corine_biotopes):
 
 
 def update_corine_landcover(id_zh, ids_cover):
-    DB.session.query(CorZhCorineCover).filter(
-        CorZhCorineCover.id_zh == id_zh).delete()
-    post_corine_landcover(id_zh, ids_cover)
+    try:
+        DB.session.query(CorZhCorineCover).filter(
+            CorZhCorineCover.id_zh == id_zh).delete()
+        post_corine_landcover(id_zh, ids_cover)
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_update_corine_landcover_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_update_corine_landcover_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def post_corine_landcover(id_zh, ids_cover):
@@ -300,11 +420,19 @@ def post_corine_landcover(id_zh, ids_cover):
 
 
 def update_delim(id_zh, criteria):
-    uuid_lim_list = DB.session.query(TZH.id_lim_list).filter(
-        TZH.id_zh == id_zh).one().id_lim_list
-    DB.session.query(CorLimList).filter(
-        CorLimList.id_lim_list == uuid_lim_list).delete()
-    post_delim(uuid_lim_list, criteria)
+    try:
+        uuid_lim_list = DB.session.query(TZH.id_lim_list).filter(
+            TZH.id_zh == id_zh).one().id_lim_list
+        DB.session.query(CorLimList).filter(
+            CorLimList.id_lim_list == uuid_lim_list).delete()
+        post_delim(uuid_lim_list, criteria)
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_update_delim_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_update_delim_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def post_delim(uuid_lim, criteria):
@@ -315,9 +443,17 @@ def post_delim(uuid_lim, criteria):
 
 
 def update_fct_delim(id_zh, criteria):
-    DB.session.query(CorZhLimFs).filter(
-        CorZhLimFs.id_zh == id_zh).delete()
-    post_fct_delim(id_zh, criteria)
+    try:
+        DB.session.query(CorZhLimFs).filter(
+            CorZhLimFs.id_zh == id_zh).delete()
+        post_fct_delim(id_zh, criteria)
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_update_fct_delim_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_update_fct_delim_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def post_fct_delim(id_zh, criteria):
@@ -330,9 +466,17 @@ def post_fct_delim(id_zh, criteria):
 
 
 def update_outflow(id_zh, outflows):
-    DB.session.query(TOutflow).filter(
-        TOutflow.id_zh == id_zh).delete()
-    post_outflow(id_zh, outflows)
+    try:
+        DB.session.query(TOutflow).filter(
+            TOutflow.id_zh == id_zh).delete()
+        post_outflow(id_zh, outflows)
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_update_outflow_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_update_outflow_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def post_outflow(id_zh, outflows):
@@ -349,9 +493,17 @@ def post_outflow(id_zh, outflows):
 
 
 def update_inflow(id_zh, inflows):
-    DB.session.query(TInflow).filter(
-        TInflow.id_zh == id_zh).delete()
-    post_inflow(id_zh, inflows)
+    try:
+        DB.session.query(TInflow).filter(
+            TInflow.id_zh == id_zh).delete()
+        post_inflow(id_zh, inflows)
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_update_inflow_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_update_inflow_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def post_inflow(id_zh, inflows):
@@ -384,20 +536,36 @@ def post_functions(id_zh, functions):
 
 
 def update_functions(id_zh, functions, function_type):
-    id_function_list = [
-        nomenclature.id_nomenclature for nomenclature in Nomenclatures.get_nomenclature_info(function_type)
-    ]
-    DB.session.query(TFunctions).filter(TFunctions.id_zh == id_zh).filter(
-        TFunctions.id_function.in_(id_function_list)).delete(synchronize_session='fetch')
-    post_functions(id_zh, functions)
+    try:
+        id_function_list = [
+            nomenclature.id_nomenclature for nomenclature in Nomenclatures.get_nomenclature_info(function_type)
+        ]
+        DB.session.query(TFunctions).filter(TFunctions.id_zh == id_zh).filter(
+            TFunctions.id_function.in_(id_function_list)).delete(synchronize_session='fetch')
+        post_functions(id_zh, functions)
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_update_functions_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_update_functions_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def update_hab_heritages(id_zh, hab_heritages):
-    # delete cascade t_hab_heritages
-    DB.session.query(THabHeritage).filter(
-        THabHeritage.id_zh == id_zh).delete()
-    # post new hab_heritages
-    post_hab_heritages(id_zh, hab_heritages)
+    try:
+        # delete cascade t_hab_heritages
+        DB.session.query(THabHeritage).filter(
+            THabHeritage.id_zh == id_zh).delete()
+        # post new hab_heritages
+        post_hab_heritages(id_zh, hab_heritages)
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_update_hab_heritages_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_update_hab_heritages_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def post_hab_heritages(id_zh, hab_heritages):
@@ -415,9 +583,17 @@ def post_hab_heritages(id_zh, hab_heritages):
 
 
 def update_ownerships(id_zh, ownerships):
-    DB.session.query(TOwnership).filter(
-        TOwnership.id_zh == id_zh).delete()
-    post_ownerships(id_zh, ownerships)
+    try:
+        DB.session.query(TOwnership).filter(
+            TOwnership.id_zh == id_zh).delete()
+        post_ownerships(id_zh, ownerships)
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_update_ownerships_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_update_ownerships_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def post_ownerships(id_zh, ownerships):
@@ -433,10 +609,18 @@ def post_ownerships(id_zh, ownerships):
 
 
 def update_managements(id_zh, managements):
-    DB.session.query(TManagementStructures).filter(
-        TManagementStructures.id_zh == id_zh).delete()
-    # verifier si suppression en cascade ok dans TManagementPlans
-    post_managements(id_zh, managements)
+    try:
+        DB.session.query(TManagementStructures).filter(
+            TManagementStructures.id_zh == id_zh).delete()
+        # verifier si suppression en cascade ok dans TManagementPlans
+        post_managements(id_zh, managements)
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_update_managements_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_update_managements_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def post_managements(id_zh, managements):
@@ -463,9 +647,17 @@ def post_managements(id_zh, managements):
 
 
 def update_instruments(id_zh, instruments):
-    DB.session.query(TInstruments).filter(
-        TInstruments.id_zh == id_zh).delete()
-    post_instruments(id_zh, instruments)
+    try:
+        DB.session.query(TInstruments).filter(
+            TInstruments.id_zh == id_zh).delete()
+        post_instruments(id_zh, instruments)
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_update_instruments_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_update_instruments_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def post_instruments(id_zh, instruments):
@@ -481,9 +673,17 @@ def post_instruments(id_zh, instruments):
 
 
 def update_protections(id_zh, protections):
-    DB.session.query(CorZhProtection).filter(
-        CorZhProtection.id_zh == id_zh).delete()
-    post_protections(id_zh, protections)
+    try:
+        DB.session.query(CorZhProtection).filter(
+            CorZhProtection.id_zh == id_zh).delete()
+        post_protections(id_zh, protections)
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_update_protections_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_update_protections_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def post_protections(id_zh, protections):
@@ -499,16 +699,32 @@ def post_protections(id_zh, protections):
 
 
 def update_zh_tab6(data):
-    DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
-        TZH.is_other_inventory: data['is_other_inventory']
-    })
-    DB.session.flush()
+    try:
+        DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
+            TZH.is_other_inventory: data['is_other_inventory']
+        })
+        DB.session.flush()
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="update_zh_tab6_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="update_zh_tab6_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def update_urban_docs(id_zh, urban_docs):
-    DB.session.query(TUrbanPlanningDocs).filter(
-        TUrbanPlanningDocs.id_zh == id_zh).delete()
-    post_urban_docs(id_zh, urban_docs)
+    try:
+        DB.session.query(TUrbanPlanningDocs).filter(
+            TUrbanPlanningDocs.id_zh == id_zh).delete()
+        post_urban_docs(id_zh, urban_docs)
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="update_urban_docs_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="update_urban_docs_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def post_urban_docs(id_zh, urban_docs):
@@ -540,11 +756,19 @@ def post_urban_docs(id_zh, urban_docs):
 
 
 def update_actions(id_zh, actions):
-    # delete cascade actions
-    DB.session.query(TActions).filter(
-        TActions.id_zh == id_zh).delete()
-    # post new actions
-    post_actions(id_zh, actions)
+    try:
+        # delete cascade actions
+        DB.session.query(TActions).filter(
+            TActions.id_zh == id_zh).delete()
+        # post new actions
+        post_actions(id_zh, actions)
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="update_actions_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="update_actions_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def post_actions(id_zh, actions):
@@ -562,34 +786,40 @@ def post_actions(id_zh, actions):
 
 
 def post_file_info(id_zh, title, author, description, media_path, extension):
-    unique_id_media = DB.session.query(TZH).filter(
-        TZH.id_zh == int(id_zh)).one().zh_uuid
-    uuid_attached_row = uuid.uuid4()
-    if extension == '.pdf':
-        mnemo = 'PDF'
-    elif extension == '.csv':
-        mnemo = 'Tableur'
-    else:
-        mnemo = 'Photo'
-    id_nomenclature_media_type = DB.session.query(TNomenclatures).filter(
-        TNomenclatures.mnemonique == mnemo).one().id_nomenclature
-    id_table_location = DB.session.query(BibTablesLocation).filter(and_(
-        BibTablesLocation.schema_name == 'pr_zh', BibTablesLocation.table_name == 't_zh')).one().id_table_location
-    post_date = datetime.datetime.now()
-    DB.session.add(TMedias(
-        unique_id_media=unique_id_media,
-        id_nomenclature_media_type=id_nomenclature_media_type,
-        id_table_location=id_table_location,
-        uuid_attached_row=uuid_attached_row,
-        title_fr=title,
-        media_path=media_path,
-        author=author,
-        description_fr=description,
-        is_public=True,
-        meta_create_date=str(post_date),
-        meta_update_date=str(post_date)
-    ))
-    DB.session.flush()
-    id_media = DB.session.query(TMedias).filter(
-        TMedias.uuid_attached_row == uuid_attached_row).one().id_media
-    return id_media
+    try:
+        unique_id_media = DB.session.query(TZH).filter(
+            TZH.id_zh == int(id_zh)).one().zh_uuid
+        uuid_attached_row = uuid.uuid4()
+        if extension == '.pdf':
+            mnemo = 'PDF'
+        elif extension == '.csv':
+            mnemo = 'Tableur'
+        else:
+            mnemo = 'Photo'
+        id_nomenclature_media_type = DB.session.query(TNomenclatures).filter(
+            TNomenclatures.mnemonique == mnemo).one().id_nomenclature
+        id_table_location = DB.session.query(BibTablesLocation).filter(and_(
+            BibTablesLocation.schema_name == 'pr_zh', BibTablesLocation.table_name == 't_zh')).one().id_table_location
+        post_date = datetime.datetime.now()
+        DB.session.add(TMedias(
+            unique_id_media=unique_id_media,
+            id_nomenclature_media_type=id_nomenclature_media_type,
+            id_table_location=id_table_location,
+            uuid_attached_row=uuid_attached_row,
+            title_fr=title,
+            media_path=media_path,
+            author=author,
+            description_fr=description,
+            is_public=True,
+            meta_create_date=str(post_date),
+            meta_update_date=str(post_date)
+        ))
+        DB.session.flush()
+        id_media = DB.session.query(TMedias).filter(
+            TMedias.uuid_attached_row == uuid_attached_row).one().id_media
+        return id_media
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_file_info_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        raise ZHApiError(message="post_file_info_error", details=str(e))

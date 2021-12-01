@@ -73,7 +73,11 @@ from .geometry import set_geom
 
 from .upload import upload
 
-from .utils import get_file_path, delete_file
+from .utils import (
+    get_file_path,
+    delete_file,
+    check_ref_geo_schema
+)
 
 from .model.repositories import (
     ZhRepository
@@ -94,65 +98,68 @@ blueprint = Blueprint("pr_zh", __name__)
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
 def get_zh(info_role):
-    q = DB.session.query(TZH)
+    try:
+        q = DB.session.query(TZH)
 
-    parameters = request.args
+        parameters = request.args
+        limit = int(parameters.get("limit", 100))
+        page = int(parameters.get("offset", 0))
 
-    limit = int(parameters.get("limit", 100))
-    page = int(parameters.get("offset", 0))
+        payload = request.json or None
 
-    payload = request.json or None
+        if payload is not None:
+            q = main_search(q, payload)
 
-    if payload is not None:
-        q = main_search(q, payload)
-
-    return get_all_zh(info_role=info_role, 
-                      query=q, 
-                      limit=limit, 
-                      page=page)
+        return get_all_zh(info_role=info_role,
+                        query=q,
+                        limit=limit,
+                        page=page)
+    except Exception as e:
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(message="filter_zh_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def get_all_zh(info_role, query, limit, page):
-    # Pour obtenir le nombre de résultat de la requete sans le LIMIT
-    nb_results_without_limit = query.count()
+    try:
+        # Pour obtenir le nombre de résultat de la requete sans le LIMIT
+        nb_results_without_limit = query.count()
 
-    user = info_role
-    user_cruved = get_or_fetch_user_cruved(
-        session=session, id_role=info_role.id_role, module_code="ZONES_HUMIDES"
-    )
 
-    data = query.limit(limit).offset(page * limit).all()
-
-    # check if municipalities and dep in ref_geo
-    id_type_com = DB.session.query(BibAreasTypes).filter(
-        BibAreasTypes.type_code == 'COM').one().id_type
-    id_type_dep = DB.session.query(BibAreasTypes).filter(
-        BibAreasTypes.type_code == 'DEP').one().id_type
-    n_com = DB.session.query(LAreas).filter(
-        LAreas.id_type == id_type_com).count()
-    n_dep = DB.session.query(LAreas).filter(
-        LAreas.id_type == id_type_dep).count()
-    if n_com == 0 or n_dep == 0:
-        is_ref_geo = False
-    else:
-        is_ref_geo = True
-
-    featureCollection = []
-    for n in data:
-        releve_cruved = n.get_releve_cruved(user, user_cruved)
-        feature = n.get_geofeature(
-            relationships=()
+        user = info_role
+        user_cruved = get_or_fetch_user_cruved(
+            session=session, id_role=info_role.id_role, module_code="ZONES_HUMIDES"
         )
-        feature["properties"]["rights"] = releve_cruved
-        featureCollection.append(feature)
-    return {
-        "total": nb_results_without_limit,
-        "total_filtered": len(data),
-        "page": page,
-        "limit": limit,
-        "items": FeatureCollection(featureCollection),
-        "check_ref_geo": is_ref_geo
-    }, 200
+
+        data = query.limit(limit).offset(page * limit).all()
+
+        # check if municipalities and dep in ref_geo
+        is_ref_geo = check_ref_geo_schema()
+
+        featureCollection = []
+        for n in data:
+            releve_cruved = n.get_releve_cruved(user, user_cruved)
+            feature = n.get_geofeature(
+                relationships=()
+            )
+            feature["properties"]["rights"] = releve_cruved
+            featureCollection.append(feature)
+        return {
+            "total": nb_results_without_limit,
+            "total_filtered": len(data),
+            "page": page,
+            "limit": limit,
+            "items": FeatureCollection(featureCollection),
+            "check_ref_geo": is_ref_geo
+        }, 200
+    except Exception as e:
+        if e.__class__.__name__ == 'ZHApiError':
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details))
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="get_zh_list_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+    finally:
+        DB.session.close()
 
 
 # Route pour afficher liste des zones humides
@@ -162,23 +169,18 @@ def get_all_zh(info_role, query, limit, page):
 def check_ref_geo(info_role):
     try:
         # check if municipalities and dep in ref_geo
-        id_type_com = DB.session.query(BibAreasTypes).filter(
-            BibAreasTypes.type_code == 'COM').one().id_type
-        id_type_dep = DB.session.query(BibAreasTypes).filter(
-            BibAreasTypes.type_code == 'DEP').one().id_type
-        n_com = DB.session.query(LAreas).filter(
-            LAreas.id_type == id_type_com).count()
-        n_dep = DB.session.query(LAreas).filter(
-            LAreas.id_type == id_type_dep).count()
-        if n_com == 0 or n_dep == 0:
-            is_ref_geo = False
-        else:
-            is_ref_geo = True
         return {
-            "check_ref_geo": is_ref_geo
+            "check_ref_geo": check_ref_geo_schema()
         }, 200
     except Exception as e:
-        raise ZHApiError(message=str(e), details=str(e))
+        if e.__class__.__name__ == 'ZHApiError':
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details))
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="check_ref_geo_route_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+    finally:
+        DB.session.close()
 
 
 @blueprint.route("/<int:id_zh>", methods=["GET"])
@@ -190,9 +192,20 @@ def get_zh_by_id(id_zh, info_role):
     try:
         return ZH(id_zh).__repr__()
     except Exception as e:
+        exc_type, value, tb = sys.exc_info()
         if e.__class__.__name__ == 'NoResultFound':
-            raise ZHApiError(message='zh id exist?', details=str(e))
-        raise ZHApiError(message=str(e), details=str(e))
+            raise ZHApiError(message='is_zh_id_exists', details=str(
+                exc_type) + ': ' + str(e.with_traceback(tb)))
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="get_zh_by_id_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        if e.__class__.__name__ == 'ZHApiError':
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details))
+        raise ZHApiError(
+            message="get_zh_by_id_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+    finally:
+        DB.session.close()
 
 
 @blueprint.route("/<int:id_zh>/complete_card", methods=["GET"])
@@ -202,14 +215,25 @@ def get_complete_info(id_zh, info_role):
     """Get zh complete info
     """
     try:
+        # get other referentials needed for the module from the config file
         ref_geo_config = [
             ref for ref in blueprint.config['ref_geo_referentiels'] if ref['active']]
         return Card(id_zh, "full", ref_geo_config).__repr__()
     except Exception as e:
-        print(e)
+        exc_type, value, tb = sys.exc_info()
         if e.__class__.__name__ == 'NoResultFound':
-            raise ZHApiError(message='zh id exist?', details=str(e))
-        raise ZHApiError(message=str(e), details=str(e))
+            raise ZHApiError(message='is_zh_id_exists', details=str(
+                exc_type) + ': ' + str(e.with_traceback(tb)))
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="get_complete_info_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        if e.__class__.__name__ == 'ZHApiError':
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details))
+        raise ZHApiError(
+            message="get_complete_info_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+    finally:
+        DB.session.close()
 
 
 @blueprint.route("/eval/<int:id_zh>", methods=["GET"])
@@ -222,9 +246,17 @@ def get_zh_eval(id_zh, info_role):
         zh_eval = ZH(id_zh).get_eval()
         return zh_eval
     except Exception as e:
+        exc_type, value, tb = sys.exc_info()
         if e.__class__.__name__ == 'NoResultFound':
-            raise ZHApiError(message='zh id exist?', details=str(e))
-        raise ZHApiError(message=str(e), details=str(e))
+            raise ZHApiError(message='is_zh_id_exists', details=str(
+                exc_type) + ': ' + str(e.with_traceback(tb)))
+        if e.__class__.__name__ == 'ZHApiError':
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details))
+        raise ZHApiError(
+            message="get_zh_eval_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+    finally:
+        DB.session.close()
 
 
 @blueprint.route("/municipalities/<int:id_zh>", methods=["GET"])
@@ -234,14 +266,27 @@ def get_municipalities(id_zh, info_role):
     """Get municipalities list
     """
     try:
-        return [{
-            "municipality_name": municipality.LiMunicipalities.nom_com,
-            "id_area": municipality.CorZhArea.id_area
-        } for municipality in CorZhArea.get_municipalities_info(id_zh)]
+        if not CorZhArea.get_municipalities_info(id_zh):
+            raise ZHApiError(message='no_municipality_error',
+                             details='Empty list of municipality returned from get_municipalities_info db request')
+        return [
+            {
+                "municipality_name": municipality.LiMunicipalities.nom_com,
+                "id_area": municipality.CorZhArea.id_area
+            } for municipality in CorZhArea.get_municipalities_info(id_zh)
+        ]
     except Exception as e:
+        exc_type, value, tb = sys.exc_info()
         if e.__class__.__name__ == 'NoResultFound':
-            raise ZHApiError(message='zh id exist?', details=str(e))
-        raise ZHApiError(message=str(e), details=str(e))
+            raise ZHApiError(message='is_zh_id_exists', details=str(
+                exc_type) + ': ' + str(e.with_traceback(tb)))
+        if e.__class__.__name__ == 'ZHApiError':
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details))
+        raise ZHApiError(
+            message="get_municipalities_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+    finally:
+        DB.session.close()
 
 
 @blueprint.route("/forms", methods=["GET"])
@@ -260,7 +305,14 @@ def get_tab(info_role):
         metadata["BIB_ACTIONS"] = BibActions.get_bib_actions()
         return metadata
     except Exception as e:
-        raise ZHApiError(message=str(e), details=str(e))
+        exc_type, value, tb = sys.exc_info()
+        if e.__class__.__name__ == 'ZHApiError':
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details))
+        raise ZHApiError(
+            message="get_tab_data_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+    finally:
+        DB.session.close()
 
 
 @blueprint.route("/forms/cahierhab/<string:lb_code>", methods=["GET"])
@@ -272,7 +324,14 @@ def get_cahier_hab(info_role, lb_code):
     try:
         return get_ch(lb_code)
     except Exception as e:
-        raise ZHApiError(message=str(e), details=str(e))
+        if e.__class__.__name__ == 'ZHApiError':
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details))
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="get_cahier_hab_route_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+    finally:
+        DB.session.close()
 
 
 @blueprint.route("/geometries", methods=["GET"])
@@ -282,6 +341,9 @@ def get_geometries(info_role):
     """Get list of all zh geometries (contours)
     """
     try:
+        if not DB.session.query(TZH).all():
+            raise ZHApiError(message='no_geometry',
+                             details='Empty list of zh returned from get_zh_list db request')
         return [
             {
                 "geometry": zh.get_geofeature()["geometry"],
@@ -289,43 +351,60 @@ def get_geometries(info_role):
             } for zh in DB.session.query(TZH).all()
         ]
     except Exception as e:
-        raise ZHApiError(message=str(e), details=str(e))
+        if e.__class__.__name__ == 'ZHApiError':
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details))
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="get_geometries_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+    finally:
+        DB.session.close()
 
 
 @ blueprint.route("/references/autocomplete", methods=["GET"])
 @ permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @ json_resp
 def get_ref_autocomplete(info_role):
-    params = request.args
-    search_title = params.get("search_title")
-    # search_title = 'MCD'
-    q = DB.session.query(
-        TReferences,
-        func.similarity(TReferences.title, search_title).label("idx_trgm"),
-    )
+    try:
+        params = request.args
+        search_title = params.get("search_title")
+        # search_title = 'MCD'
+        q = DB.session.query(
+            TReferences,
+            func.similarity(TReferences.title, search_title).label("idx_trgm"),
+        )
 
-    # if "id_list" in params:
-    #    q = q.join(
-    #        CorListHabitat, CorListHabitat.cd_hab == AutoCompleteHabitat.cd_hab
-    #    ).filter(CorListHabitat.id_list == params.get("id_list"))
+        # if "id_list" in params:
+        #    q = q.join(
+        #        CorListHabitat, CorListHabitat.cd_hab == AutoCompleteHabitat.cd_hab
+        #    ).filter(CorListHabitat.id_list == params.get("id_list"))
 
-    search_title = search_title.replace(" ", "%")
-    q = q.filter(
-        TReferences.title.ilike("%" + search_title + "%")
-    ).order_by(desc("idx_trgm"))
+        search_title = search_title.replace(" ", "%")
+        q = q.filter(
+            TReferences.title.ilike("%" + search_title + "%")
+        ).order_by(desc("idx_trgm"))
 
-    # filter by typology
-    # if "cd_typo" in params:
-    #    q = q.filter(AutoCompleteHabitat.cd_typo == params.get("cd_typo"))
+        # filter by typology
+        # if "cd_typo" in params:
+        #    q = q.filter(AutoCompleteHabitat.cd_typo == params.get("cd_typo"))
 
-    limit = request.args.get("limit", 20)
-    print(q)
+        limit = request.args.get("limit", 20)
+        print(q)
 
-    data = q.limit(limit).all()
-    if data:
-        return [d[0].as_dict() for d in data]
-    else:
-        return "No Result", 404
+        data = q.limit(limit).all()
+        if data:
+            return [d[0].as_dict() for d in data]
+        else:
+            return "No Result", 404
+    except Exception as e:
+        if e.__class__.__name__ == 'ZHApiError':
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details))
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="get_ref_autocomplete_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+    finally:
+        DB.session.close()
 
 
 @ blueprint.route("/references", methods=["POST"])
@@ -334,17 +413,28 @@ def get_ref_autocomplete(info_role):
 def post_reference(info_role):
     """create reference
     """
-    form_data = request.json
-    new_ref = TReferences(
-        authors=form_data["authors"],
-        pub_year=form_data["pub_year"],
-        title=form_data["title"],
-        editor=form_data["editor"],
-        editor_location=form_data["editor_location"]
-    )
-    DB.session.add(new_ref)
-    DB.session.commit()
-    return new_ref.as_dict()
+    try:
+        form_data = request.json
+        new_ref = TReferences(
+            authors=form_data["authors"],
+            pub_year=form_data["pub_year"],
+            title=form_data["title"],
+            editor=form_data["editor"],
+            editor_location=form_data["editor_location"]
+        )
+        DB.session.add(new_ref)
+        DB.session.commit()
+        return new_ref.as_dict()
+    except Exception as e:
+        DB.session.rollback()
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_reference_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_reference_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+    finally:
+        DB.session.close()
 
 
 @ blueprint.route("/references", methods=["PATCH"])
@@ -353,16 +443,27 @@ def post_reference(info_role):
 def patch_reference(info_role):
     """edit reference
     """
-    form_data = request.json
-    DB.session.query(TReferences).filter(TReferences.id_reference == form_data['id_reference']).update({
-        TReferences.authors: form_data["authors"],
-        TReferences.pub_year: form_data["pub_year"],
-        TReferences.title: form_data["title"],
-        TReferences.editor: form_data["editor"],
-        TReferences.editor_location: form_data["editor_location"]
-    })
-    DB.session.commit()
-    return form_data
+    try:
+        form_data = request.json
+        DB.session.query(TReferences).filter(TReferences.id_reference == form_data['id_reference']).update({
+            TReferences.authors: form_data["authors"],
+            TReferences.pub_year: form_data["pub_year"],
+            TReferences.title: form_data["title"],
+            TReferences.editor: form_data["editor"],
+            TReferences.editor_location: form_data["editor_location"]
+        })
+        DB.session.commit()
+        return form_data
+    except Exception as e:
+        DB.session.rollback()
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="edit_reference_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="edit_reference_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+    finally:
+        DB.session.close()
 
 
 @ blueprint.route("/<int:id_zh>/files", methods=["GET"])
@@ -371,13 +472,21 @@ def patch_reference(info_role):
 def get_file_list(id_zh, info_role):
     """get a list of the zh files contained in static repo
     """
-    zh_uuid = DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().zh_uuid
-    q_medias = DB.session.query(TMedias).filter(
-        TMedias.unique_id_media == zh_uuid).all()
-    return {
-        "media_data": [media.as_dict() for media in q_medias],
-        "main_pict_id": DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().main_pict_id
-    }
+    try:
+        zh_uuid = DB.session.query(TZH).filter(
+            TZH.id_zh == id_zh).one().zh_uuid
+        q_medias = DB.session.query(TMedias).filter(
+            TMedias.unique_id_media == zh_uuid).all()
+        return {
+            "media_data": [media.as_dict() for media in q_medias],
+            "main_pict_id": DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().main_pict_id
+        }
+    except Exception as e:
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="get_file_list_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+    finally:
+        DB.session.close()
 
 
 @ blueprint.route("files/<int:id_media>", methods=["DELETE"])
@@ -390,7 +499,11 @@ def delete_one_file(id_media, info_role):
         return ('', 204)
     except Exception as e:
         DB.session.rollback()
-        raise ZHApiError(message=str(e), details=str(e))
+        if e.__class__.__name__ == 'ZHApiError':
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details))
+        raise ZHApiError(
+            message="delete_one_file_error", details=str(e))
     finally:
         DB.session.close()
 
@@ -403,8 +516,11 @@ def download_file(id_media, info_role):
     try:
         return send_file(get_file_path(id_media), as_attachment=True)
     except Exception as e:
-        DB.session.rollback()
-        raise ZHApiError(message=str(e), details=str(e))
+        if e.__class__.__name__ == 'ZHApiError':
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details))
+        raise ZHApiError(
+            message="download_file_error", details=str(e))
     finally:
         DB.session.close()
 
@@ -421,7 +537,12 @@ def post_main_pict(id_zh, id_media, info_role):
         return ('', 204)
     except Exception as e:
         DB.session.rollback()
-        raise ZHApiError(message=str(e), details=str(e))
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_main_pict_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_main_pict_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
     finally:
         DB.session.close()
 
@@ -439,7 +560,8 @@ def get_tab_data(id_tab, info_role):
             zh_date = dt.now(timezone.utc)
             # set name
             if form_data['main_name'] == "":
-                return 'Empty mandatory field', 400
+                raise ZHApiError(
+                    message='empty_field_error', details='empty main name field', status_code=400)
 
             # select active geo refs in config
             active_geo_refs = [
@@ -581,14 +703,22 @@ def get_tab_data(id_tab, info_role):
             }, 200
 
     except Exception as e:
-        print(e)
         DB.session.rollback()
-        print(e)
         if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
-            return 'Empty mandatory field ?', 400
+            raise ZHApiError(
+                message='likely_empty_mandatory_field_error', details=str(e), status_code=400)
         if e.__class__.__name__ == 'IntegrityError':
-            return 'ZH_main_name_already_exists', 400
-        raise ZHApiError(message=str(e), details=str(e))
+            raise ZHApiError(
+                message='ZH_main_name_already_exists', details=str(e), status_code=400)
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_tab_form_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        if e.__class__.__name__ == 'ZHApiError':
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details))
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_tab_form_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
     finally:
         DB.session.close()
 
@@ -630,13 +760,12 @@ def deleteOneZh(id_zh, info_role):
 
         return {"message": "delete with success"}, 200
     except Exception as e:
-        print(e)
-        if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
-            return 'Empty mandatory field', 400
-        if e.__class__.__name__ == 'IntegrityError':
-            return 'ZH main_name already exists', 400
         DB.session.rollback()
-        raise ZHApiError(message=str(e), details=str(e))
+        if e.__class__.__name__ == 'ZHApiError':
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details), status_code=400)
+        raise ZHApiError(
+            message="error_during_zh_delete", details=str(e))
     finally:
         DB.session.close()
 
@@ -726,7 +855,15 @@ def write_csv(id_zh, info_role):
         return {"file_names": names}, 200
     except Exception as e:
         DB.session.rollback()
-        raise ZHApiError(message=str(e), details=str(e))
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="csv_taxa_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        if e.__class__.__name__ == 'ZHApiError':
+            raise ZHApiError(
+                message=str(e.message), details=str(e.details))
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="csv_taxa_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
     finally:
         DB.session.close()
 
