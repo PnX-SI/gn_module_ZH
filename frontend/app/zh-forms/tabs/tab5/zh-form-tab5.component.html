@@ -921,7 +921,8 @@
             [formControl]="corineBioForm.controls.cahierHab"
           >
             <option></option>
-            <option *ngFor="let habitat of cahierHabInput" [ngValue]="habitat">
+            <option *ngFor="let habitat of cahierHabInput" [ngValue]="habitat"
+            [attr.disabled]="habitat?.disabled ? '' : null">
               {{ habitat.lb_code }} - {{ habitat.lb_hab_fr }}
             </option>
           </select>
