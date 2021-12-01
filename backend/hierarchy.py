@@ -479,13 +479,12 @@ class Item:
 
     def __check_qualif(self, id_qualif):
         try:
-            # todo: in db, add unique constraint on rb_id,rule_id in cor_rb_rules table
             if self.active:
                 attribute_id_list = [getattr(item, 'attribute_id') for item in DB.session.query(
                     TItems).filter(TItems.cor_rule_id == self.cor_rule_id).all()]
                 if id_qualif not in attribute_id_list:
                     raise ZHApiError(
-                        message='wrong_qualif', details='zh qualif ({}) provided for {} rule is not part of the qualif list defined in the river basin hierarchy rules'.format(str(id_qualif), self.abb), status_code=400)
+                        message='wrong_qualif', details='zh qualif ({}) provided for {} rule is not part of the qualif list defined in the river basin hierarchy rules'.format(DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == id_qualif).one().mnemonique, self.abb), status_code=400)
                 return id_qualif
         except ZHApiError as e:
             raise ZHApiError(

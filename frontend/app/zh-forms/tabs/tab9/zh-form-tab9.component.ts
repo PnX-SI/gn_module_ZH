@@ -55,7 +55,11 @@ export class ZhFormTab9Component implements OnInit {
 
           },
           (error) => {
-            console.log(error.error)
+            this._toastr.error(error.error.details, "", {
+              positionClass: "toast-top-right",
+              disableTimeOut: true, 
+              closeButton: true
+            });
           }
         );
       }
