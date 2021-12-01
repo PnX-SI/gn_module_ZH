@@ -15,6 +15,7 @@ import {
 } from "../../../services/datepicker-i18n.service";
 
 import { ZhDataService } from "../../../services/zh-data.service";
+import { ErrorTranslatorService } from "../../../services/error-translator.service";
 
 @Component({
   selector: "zh-form-tab6",
@@ -100,6 +101,7 @@ export class ZhFormTab6Component implements OnInit {
     private _dataService: ZhDataService,
     private _toastr: ToastrService,
     private _modalService: ModalService,
+    private _error: ErrorTranslatorService,
     private _tabService: TabsService
   ) {}
 
@@ -965,7 +967,10 @@ export class ZhFormTab6Component implements OnInit {
         },
         (error) => {
           this.posted = false;
-          this._toastr.error(error.error, "", {
+          const frontMsg: string = this._error.getFrontError(
+            error.error.message
+          );
+          this._toastr.error(frontMsg, "", {
             positionClass: "toast-top-right",
           });
         }

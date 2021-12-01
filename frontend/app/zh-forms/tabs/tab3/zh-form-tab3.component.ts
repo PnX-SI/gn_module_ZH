@@ -7,6 +7,7 @@ import { debounceTime, distinctUntilChanged, map } from "rxjs/operators";
 import { ToastrService } from "ngx-toastr";
 import { TabsService } from "../../../services/tabs.service";
 import { ModalService } from "../../../services/modal.service";
+import { ErrorTranslatorService } from "../../../services/error-translator.service";
 
 @Component({
   selector: "zh-form-tab3",
@@ -59,6 +60,7 @@ export class ZhFormTab3Component implements OnInit {
     private _tabService: TabsService,
     public ngbModal: NgbModal,
     private _modalService: ModalService,
+    private _error: ErrorTranslatorService,
     private _toastr: ToastrService
   ) {}
 
@@ -421,7 +423,10 @@ export class ZhFormTab3Component implements OnInit {
         },
         (error) => {
           this.posted = false;
-          this._toastr.error(error.error, "", {
+          const frontMsg: string = this._error.getFrontError(
+            error.error.message
+          );
+          this._toastr.error(frontMsg, "", {
             positionClass: "toast-top-right",
           });
         }

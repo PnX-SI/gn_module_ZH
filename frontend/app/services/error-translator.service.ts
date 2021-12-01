@@ -24,6 +24,11 @@ export class ErrorTranslatorService {
         "Impossible de créer un identifiant unique avec les informations entrées. Le nom est peut-être déjà pris ?", //error to show to the user
       id: 2,
     },
+    {
+      api: "set_geom_error",
+      front: "Impossible de créer la géométrie, elle ne semble pas appropriée",
+      id: 3,
+    },
   ];
 
   getError(errorMsg: string): error {
