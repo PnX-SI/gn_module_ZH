@@ -48,7 +48,7 @@ INSERT INTO ref_nomenclatures.bib_nomenclatures_types(mnemonique,label_default,d
 
 INSERT INTO ref_nomenclatures.bib_nomenclatures_types(mnemonique, label_default, definition_default, label_fr, source, statut)  VALUES
 ('HIERARCHY', 'Hiérarchie', 'Hierarchie des zones humides', 'Hiérarchie', 'ZONES_HUMIDES', 'Non validé')
-ON CONFLICT (id_type, cd_nomenclature) DO NOTHING
+ON CONFLICT (id_type) DO NOTHING
 ;
 
     

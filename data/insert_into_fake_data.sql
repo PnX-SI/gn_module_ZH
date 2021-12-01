@@ -64,22 +64,22 @@ INSERT INTO ref_nomenclatures.t_nomenclatures(id_type, cd_nomenclature, mnemoniq
 -- example with bassin versant du calavon (here rb_id = 1) :
 
 INSERT INTO pr_zh.cor_rb_rules VALUES
-(1, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'Calavon'), 1),
-(2, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'Calavon'), 2),
-(3, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'Calavon'), 3),
-(4, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'Calavon'), 4),
-(5, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'Calavon'), 5),
-(6, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'Calavon'), 6),
-(7, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'Calavon'), 7),
-(8, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'Calavon'), 8),
-(9, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'Calavon'), 9),
-(10, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'Calavon'), 10),
-(11, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'Calavon'), 11),
-(12, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'Calavon'), 12),
-(13, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'Calavon'), 13),
-(14, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'Calavon'), 14),
-(15, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'Calavon'), 15),
-(16, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'Calavon'), 16),
+(1, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'bassin versant 1'), 1),
+(2, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'bassin versant 1'), 2),
+(3, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'bassin versant 1'), 3),
+(4, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'bassin versant 1'), 4),
+(5, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'bassin versant 1'), 5),
+(6, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'bassin versant 1'), 6),
+(7, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'bassin versant 1'), 7),
+(8, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'bassin versant 1'), 8),
+(9, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'bassin versant 1'), 9),
+(10, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'bassin versant 1'), 10),
+(11, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'bassin versant 1'), 11),
+(12, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'bassin versant 1'), 12),
+(13, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'bassin versant 1'), 13),
+(14, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'bassin versant 1'), 14),
+(15, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'bassin versant 1'), 15),
+(16, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'bassin versant 1'), 16),
 (17, (SELECT id_rb FROM pr_zh.t_river_basin WHERE name = 'bassin versant 2'), 1)
 ;
 
