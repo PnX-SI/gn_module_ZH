@@ -101,7 +101,6 @@ def filter_ensemble(query, json: dict):
 def filter_area_size(query, json: dict):
     ha = json.get("ha", None)
     symbol = json.get("symbol", None)
-    print('yoooooo', symbol, ha, flush=True)
     if symbol is None or ha is None:
         return query
 
