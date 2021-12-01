@@ -2,26 +2,33 @@ import { Component, EventEmitter, OnInit, Input, Output } from "@angular/core";
 import { Subscription } from "rxjs";
 
 import { ZhDataService } from "../../../services/zh-data.service";
-import { HierarchyService } from "../../../services/hierarchy.service"
-
+import { HierarchyService } from "../../../services/hierarchy.service";
+import { TabsService } from "../../../services/tabs.service";
 
 @Component({
   selector: "zh-form-tab9",
   templateUrl: "./zh-form-tab9.component.html",
-  styleUrls: ["./zh-form-tab9.component.scss"]
+  styleUrls: ["./zh-form-tab9.component.scss"],
 })
 export class ZhFormTab9Component implements OnInit {
-  
   private $_currentZhSub: Subscription;
+  public $_fromChangeSub: Subscription;
   public currentZh: any;
 
   constructor(
     private _dataService: ZhDataService,
+    private _tabService: TabsService,
     public hierarchy: HierarchyService
   ) {}
 
   ngOnInit() {
-    this.getCurrentZh();
+    this._tabService.getTabChange().subscribe((tabPosition: number) => {
+      if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
+      if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
+      if (tabPosition == 9) {
+        this.getCurrentZh();
+      }
+    });
   }
 
   // get current zone humides
@@ -33,5 +40,4 @@ export class ZhFormTab9Component implements OnInit {
       }
     });
   }
-
 }
