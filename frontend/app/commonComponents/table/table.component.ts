@@ -15,6 +15,8 @@ export class TableComponent {
 
   @Input() tableCols: TableColumn[];
   @Input() data: any;
+  @Input() bold_row_values: any = [];
+  @Input() italic_row_values: any = [];
   @Input() deletable: boolean;
   @Input() editable: boolean;
   @Input() downloadable: boolean;
