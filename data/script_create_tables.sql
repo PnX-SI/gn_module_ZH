@@ -820,3 +820,196 @@ CREATE OR REPLACE VIEW pr_zh.flora AS
 	AND (synthese_zh.date_max::timestamp > (NOW()::timestamp - interval '20 years'))
 	AND taxref.regne = 'Plantae'
 	GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, tpe.cd_protection, tpa.intitule, tpa.article, taxref.cd_nom, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;
+
+
+
+CREATE SCHEMA IF NOT EXISTS pr_zh;
+
+CREATE  TABLE pr_zh.bib_hier_categories ( 
+	cat_id               integer  NOT NULL ,
+	abbreviation		 varchar(4)  NOT NULL,
+	label                varchar(50)  NOT NULL ,
+	CONSTRAINT pk_bib_hier_categories_cat_id PRIMARY KEY ( cat_id )
+ );
+
+COMMENT ON TABLE pr_zh.bib_hier_categories IS 'Liste des rubriques pour la hiérarchisation';
+
+CREATE  TABLE pr_zh.bib_hier_panes ( 
+	pane_id              integer  NOT NULL ,
+	label                varchar(50)  NOT NULL ,
+	CONSTRAINT pk_bib_panes_pane_id PRIMARY KEY ( pane_id )
+ );
+
+COMMENT ON TABLE pr_zh.bib_hier_panes IS 'liste des volets';
+
+CREATE  TABLE pr_zh.bib_hier_subcategories ( 
+	subcat_id            integer  NOT NULL ,
+	label                varchar(50)  NOT NULL ,
+	CONSTRAINT pk_bib_subcategories_id_subcat PRIMARY KEY ( subcat_id )
+ );
+
+CREATE  TABLE pr_zh.bib_note_types ( 
+	note_id              integer  NOT NULL ,
+	id_knowledge         integer,
+	CONSTRAINT pk_bib_note_types_note_id PRIMARY KEY ( note_id )
+ );
+
+CREATE  TABLE pr_zh.t_rules ( 
+	rule_id              integer  NOT NULL ,
+	abbreviation		 varchar(15)  NOT NULL,
+	pane_id              integer  NOT NULL ,
+	cat_id               integer  NOT NULL ,
+	subcat_id            integer   ,
+	CONSTRAINT pk_t_items_item_id PRIMARY KEY ( rule_id )
+ );
+
+CREATE  TABLE pr_zh.cor_rb_rules ( 
+	cor_rule_id          integer  NOT NULL ,
+	rb_id                integer  NOT NULL ,
+	rule_id              integer  NOT NULL ,
+	UNIQUE (rb_id, rule_id),
+	CONSTRAINT pk_cor_rb_items_id_cor PRIMARY KEY ( cor_rule_id )
+ );
+
+COMMENT ON TABLE pr_zh.cor_rb_rules IS 'list of selected rules by river basin';
+
+CREATE  TABLE pr_zh.t_items ( 
+	val_id               integer  NOT NULL ,
+	cor_rule_id          integer  NOT NULL ,
+	attribute_id         integer  NOT NULL ,
+	note                 real  NOT NULL ,
+	note_type_id         integer  NOT NULL ,
+	CONSTRAINT pk_t_attribute_values_id_val PRIMARY KEY ( val_id )
+ );
+ 
+CREATE  TABLE pr_zh.cor_item_value ( 
+	attribute_id         integer  NOT NULL ,
+	val_min              real  NOT NULL ,
+	val_max              real  NOT NULL ,
+	CONSTRAINT pk_cor_item_value_id_val PRIMARY KEY ( attribute_id )
+ );
+
+CREATE  TABLE pr_zh.t_cor_qualif ( 
+	combination          varchar(4)  NOT NULL ,
+	id_qualification        integer  NOT NULL,
+CONSTRAINT pk_t_cor_qualif_combination PRIMARY KEY ( combination )
+);
+
+ALTER TABLE pr_zh.cor_rb_rules ADD CONSTRAINT fk_cor_rb_items_t_items FOREIGN KEY ( rule_id ) REFERENCES pr_zh.t_rules( rule_id )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.t_items ADD CONSTRAINT fk_t_items_rule FOREIGN KEY ( cor_rule_id ) REFERENCES pr_zh.cor_rb_rules( cor_rule_id )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.t_items ADD CONSTRAINT fk_t_items_attribute FOREIGN KEY ( attribute_id ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.t_items ADD CONSTRAINT fk_t_items_bib_note_types FOREIGN KEY ( note_type_id ) REFERENCES pr_zh.bib_note_types( note_id )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.t_rules ADD CONSTRAINT fk_t_items_pane FOREIGN KEY ( pane_id ) REFERENCES pr_zh.bib_hier_panes( pane_id )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.t_rules ADD CONSTRAINT fk_t_items_cat FOREIGN KEY ( cat_id ) REFERENCES pr_zh.bib_hier_categories( cat_id )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.t_rules ADD CONSTRAINT fk_t_items_subcat FOREIGN KEY ( subcat_id ) REFERENCES pr_zh.bib_hier_subcategories( subcat_id )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.cor_item_value ADD CONSTRAINT fk_cor_item_value_t_items FOREIGN KEY ( attribute_id ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.t_cor_qualif ADD CONSTRAINT fk_t_cor_qualif_id_qualification FOREIGN KEY ( id_qualification ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.bib_note_types ADD CONSTRAINT fk_bib_note_types FOREIGN KEY ( id_knowledge ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
+
+
+CREATE OR REPLACE VIEW pr_zh.all_rb_rules AS (
+SELECT 
+	rb.name,
+	rb_rules.cor_rule_id,
+	rb_rules.rule_id,
+	(SELECT label FROM pr_zh.bib_hier_panes WHERE pane_id = rules.pane_id) AS VOLET,
+	(SELECT label FROM pr_zh.bib_hier_categories WHERE cat_id = rules.cat_id) AS RUBRIQUE,
+	(SELECT label FROM pr_zh.bib_hier_subcategories WHERE subcat_id = rules.subcat_id) AS SOUSRUBRIQUE,
+	(SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE id_nomenclature = items.attribute_id) AS id_attribut,
+	(SELECT label_default FROM ref_nomenclatures.t_nomenclatures WHERE id_nomenclature = items.attribute_id) AS attribut,
+	items.note AS note,
+	(SELECT mnemonique FROM ref_nomenclatures.t_nomenclatures WHERE id_nomenclature = (SELECT id_knowledge FROM pr_zh.bib_note_types WHERE note_id = items.note_type_id)) AS note_type
+FROM pr_zh.t_river_basin rb
+RIGHT JOIN pr_zh.cor_rb_rules rb_rules ON rb.id_rb = rb_rules.rb_id
+LEFT JOIN pr_zh.t_rules rules ON rules.rule_id = rb_rules.rule_id
+LEFT JOIN pr_zh.t_items items ON items.cor_rule_id = rb_rules.cor_rule_id
+);
+
+
+CREATE OR REPLACE FUNCTION pr_zh.get_cat_note_without_subcats(
+	category_id integer
+	)
+    RETURNS TABLE(rb_id integer, note integer) 
+    LANGUAGE 'plpgsql'
+
+AS $$
+BEGIN
+   RETURN QUERY
+SELECT 
+	rb.id_rb AS id_rb,
+	max(items.note::integer) FILTER (WHERE rules.cat_id = category_id) AS note
+FROM pr_zh.t_river_basin rb
+RIGHT JOIN pr_zh.cor_rb_rules rb_rules ON rb.id_rb = rb_rules.rb_id
+JOIN pr_zh.t_rules rules ON rules.rule_id = rb_rules.rule_id
+LEFT JOIN pr_zh.t_items items ON items.cor_rule_id = rb_rules.cor_rule_id
+GROUP BY rb.id_rb;
+
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION pr_zh.get_cat_note_with_subcats(
+	category_id integer
+	)
+    RETURNS TABLE(rb_id integer, note integer) 
+    LANGUAGE 'plpgsql'
+
+AS $$
+BEGIN
+   RETURN QUERY
+
+SELECT 
+	id_rb,
+	SUM(max_note)::integer
+FROM (		
+		SELECT
+			rb.id_rb AS id_rb,
+			MAX(items.note) FILTER (WHERE rules.cat_id = category_id) AS max_note
+		FROM pr_zh.t_river_basin rb
+		RIGHT JOIN pr_zh.cor_rb_rules rb_rules ON rb.id_rb = rb_rules.rb_id
+		RIGHT JOIN pr_zh.t_rules rules ON rules.rule_id = rb_rules.rule_id
+		LEFT JOIN pr_zh.t_items items ON items.cor_rule_id = rb_rules.cor_rule_id
+		WHERE id_rb > 0
+		GROUP BY rb.id_rb,rules.subcat_id
+	) q1
+GROUP BY id_rb;
+END;
+$$;
+
+
+CREATE OR REPLACE VIEW pr_zh.rb_notes_summary AS (
+	SELECT
+		rb.name AS bassin_versant,
+		COALESCE(rub1.note,0) + COALESCE(rub2.note,0) + COALESCE(rub3.note,0) + COALESCE(rub4.note,0) + COALESCE(rub5.note,0) + COALESCE(rub6.note,0) + COALESCE(rub7.note,0) + COALESCE(rub8.note,0) AS global_note,
+		COALESCE(rub1.note,0) + COALESCE(rub2.note,0) + COALESCE(rub3.note,0) + COALESCE(rub4.note,0) + COALESCE(rub5.note,0) AS volet_1,
+		COALESCE(rub6.note,0) + COALESCE(rub7.note,0) + COALESCE(rub8.note,0) AS volet_2,
+		rub1.note AS rub_sdage,
+		rub2.note AS rub_interet_pat,
+		rub3.note AS rub_eco,
+		rub4.note AS rub_hydro,
+		rub5.note AS rub_socio,
+		rub6.note AS rub_statut,
+		rub7.note AS rub_etat_fonct,
+		rub8.note AS rub_menaces
+	FROM pr_zh.t_river_basin rb
+	RIGHT JOIN pr_zh.cor_rb_rules rb_rules ON rb.id_rb = rb_rules.rb_id
+	JOIN (SELECT * FROM pr_zh.get_cat_note_without_subcats(1)) rub1 ON rub1.rb_id = rb.id_rb
+JOIN (SELECT * FROM pr_zh.get_cat_note_with_subcats(2)) rub2 ON rub2.rb_id = rb.id_rb
+JOIN (SELECT * FROM pr_zh.get_cat_note_without_subcats(3)) rub3 ON rub3.rb_id = rb.id_rb
+JOIN (SELECT * FROM pr_zh.get_cat_note_with_subcats(4)) rub4 ON rub4.rb_id = rb.id_rb
+JOIN (SELECT * FROM pr_zh.get_cat_note_with_subcats(5)) rub5 ON rub5.rb_id = rb.id_rb
+JOIN (SELECT * FROM pr_zh.get_cat_note_with_subcats(6)) rub6 ON rub6.rb_id = rb.id_rb
+JOIN (SELECT * FROM pr_zh.get_cat_note_with_subcats(7)) rub7 ON rub7.rb_id = rb.id_rb
+JOIN (SELECT * FROM pr_zh.get_cat_note_without_subcats(8)) rub8 ON rub8.rb_id = rb.id_rb
+GROUP BY rb.id_rb, rb.name, rub1.note, rub2.note, rub3.note, rub4.note, rub5.note, rub6.note, rub7.note, rub8.note
+ORDER BY rb.id_rb ASC
+);
