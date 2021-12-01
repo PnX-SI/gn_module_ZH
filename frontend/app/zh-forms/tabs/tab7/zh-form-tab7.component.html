@@ -1,14 +1,19 @@
 <div *ngIf="evalZh" class="container-fluid">
   <h2 class="tabsTitle">Evaluation génerale du site                
-    <mat-icon
-    class="info-icon"
-    ngbTooltip="Cette rubrique met en avant les principaux enjeux liés à la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
-    >info</mat-icon>
 </h2>
   <form>
     <fieldset>
       <legend>
-        <h5 class="section-title">Fonctions et valeurs majeures</h5>
+        <h5 class="section-title">
+          Fonctions et valeurs majeures
+          <mat-icon
+          class="info-icon"
+          ngbTooltip="Cette rubrique met en avant les principaux enjeux liés à la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
+          placement="right"
+          >info
+        </mat-icon>
+      </h5>
+
       </legend>
       <div
         *ngIf="hydroFctData && hydroFctData.length > 0"
@@ -135,6 +140,12 @@
       <legend>
         <h5 class="section-title">
           Bilan des menaces et facteurs influençant la zone humide
+          <mat-icon
+          class="info-icon"
+          ngbTooltip="Cette rubrique met en avant les principales menaces liées à la zone humide en récupérant automatiquement les informations précédemment renseignées"
+          placement="top"
+          >info
+        </mat-icon>
         </h5>
       </legend>
       <div class="col-sm">
