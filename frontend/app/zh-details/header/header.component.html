@@ -24,11 +24,13 @@
       mat-raised-button
       color="primary"
       class="uppercase"
+      [class.spinner]="loading"
+      [disabled]="loadingPdf"
       (click)="onDownloadPdf()"
     >
-      Fiche pdf
+      <span *ngIf="!loadingPdf">Fiche pdf</span>  
       <mat-icon *ngIf="loadingPdf">
-        <mat-spinner color=warn diameter="30">
+        <mat-spinner class="loading" color=warn diameter="25">
         </mat-spinner>
       </mat-icon>
     </button>

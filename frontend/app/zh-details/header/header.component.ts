@@ -13,7 +13,7 @@ import { CruvedStoreService } from "@geonature_common/service/cruved-store.servi
 })
 export class HeaderComponent {
   @Input() zhId: number;
-  public loadingPdf: boolean;
+  public loadingPdf: boolean = false;
 
   constructor(
     public _cruvedStore: CruvedStoreService,
