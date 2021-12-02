@@ -200,9 +200,7 @@ def get_complete_info(id_zh, info_role):
     """
     try:
         # get other referentials needed for the module from the config file
-        ref_geo_config = [
-            ref for ref in blueprint.config['ref_geo_referentiels'] if ref['active']]
-        return Card(id_zh, "full", ref_geo_config).__repr__()
+        return get_complete_card(id_zh)
     except Exception as e:
         exc_type, value, tb = sys.exc_info()
         if e.__class__.__name__ == 'NoResultFound':
@@ -218,6 +216,12 @@ def get_complete_info(id_zh, info_role):
             message="get_complete_info_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
     finally:
         DB.session.close()
+
+
+def get_complete_card(id_zh: int) -> Card:
+    ref_geo_config = [
+            ref for ref in blueprint.config['ref_geo_referentiels'] if ref['active']]
+    return Card(id_zh, "full", ref_geo_config).__repr__()
 
 
 @blueprint.route("/eval/<int:id_zh>", methods=["GET"])
@@ -872,16 +876,7 @@ def download(id_zh: int):
     Downloads the report in pdf format
     """
     filename = "rapport.pdf"
-    dataset = ZH(id_zh).__repr__()
-    # dataset['map'] = request.form.get('map')
-    # dataset['chart'] = request.form.get('chart')
-
-    # url_list = [current_app.config['URL_APPLICATION'],
-    #             '#',
-    #             current_app.config['IMPORT'].get('MODULE_URL', "").replace('/',''),
-    #             'report',
-    #             str(dataset.get('id_import', 0))]
-    # dataset['url'] = '/'.join(url_list)
+    dataset = get_complete_card(id_zh)
     pdf_file = fm.generate_pdf("fiche_template_pdf.html", dataset, filename)
     pdf_file_posix = Path(pdf_file)
     return send_file(pdf_file_posix, as_attachment=True)
