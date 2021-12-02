@@ -47,7 +47,6 @@ from geonature.core.gn_commons.models import TMedias
 from geonature.core.gn_permissions import decorators as permissions
 from geonature.core.gn_permissions.tools import get_or_fetch_user_cruved
 
-
 from .model.zh_schema import (
     TZH,
     CorLimList,
