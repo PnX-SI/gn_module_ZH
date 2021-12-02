@@ -32,13 +32,6 @@ from sqlalchemy.orm.exc import NoResultFound
 import geoalchemy2
 from datetime import datetime as dt, timezone
 
-from io import BytesIO
-import base64
-try:
-    from staticmap import StaticMap, Line
-except ImportError:
-    print('cannot import staticmap, map generation in pdf will be unavailable')
-
 from pypn_habref_api.models import (
     Habref,
     CorespHab
@@ -53,8 +46,7 @@ from geonature.core.gn_commons.models import TMedias
 # import des fonctions utiles depuis le sous-module d'authentification
 from geonature.core.gn_permissions import decorators as permissions
 from geonature.core.gn_permissions.tools import get_or_fetch_user_cruved
-# Filemanager
-import geonature.utils.filemanager as fm
+
 
 from .model.zh_schema import (
     TZH,
@@ -91,6 +83,8 @@ from .utils import (
 from .model.repositories import (
     ZhRepository
 )
+
+from .pdf import gen_pdf
 
 from .api_error import ZHApiError
 
@@ -876,26 +870,6 @@ def returnUserCruved(info_role):
     )
     return user_cruved
 
-def gen_map(coordinates):
-    if coordinates:
-        m = StaticMap(width=600, height=300)
-        for coord in coordinates:
-            poly = Line(coord, 'blue', 4)
-            m.add_line(poly)
-        image = m.render()
-        with BytesIO() as output:
-            image.save(output, format='PNG')
-            contents =  base64.b64encode(output.getvalue())
-        return "data:image/jpeg;base64," + contents.decode()
-    return None
-
-
-def multi_to_polys(multi):
-    polys = []
-    for mul in multi:
-        polys += mul
-    return tuple(polys)
-
 
 @blueprint.route("/export_pdf/<int:id_zh>", methods=["GET"])
 @permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
@@ -903,20 +877,6 @@ def download(id_zh: int):
     """
     Downloads the report in pdf format
     """
-    filename = "rapport.pdf"
     dataset = get_complete_card(id_zh)
-    coordinates = dataset.get('geometry', {}).get('coordinates', [[]])
-    poly_type = dataset.get('geometry', {}).get('type', '')
-    if poly_type is not None:
-        if poly_type == 'Polygon':
-            coordinates = coordinates
-        else:
-            coordinates = multi_to_polys(coordinates)
-    try:
-        dataset['map'] = gen_map(coordinates)
-    except Exception as e:
-        print('Cannot generate the map inside the pdf... Continuing')
-        
-    pdf_file = fm.generate_pdf("fiche_template_pdf.html", dataset, filename)
-    pdf_file_posix = Path(pdf_file)
-    return send_file(pdf_file_posix, as_attachment=True)
+    pdf_file = gen_pdf(dataset=dataset)
+    return send_file(pdf_file, as_attachment=True)
