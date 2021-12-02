@@ -173,7 +173,6 @@ def get_zh_by_id(id_zh, info_role):
     """Get zh form data by id
     """
     try:
-        print(info_role)
         return ZH(id_zh).__repr__()
     except Exception as e:
         exc_type, value, tb = sys.exc_info()
