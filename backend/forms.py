@@ -785,7 +785,7 @@ def post_actions(id_zh, actions):
 # tab 8
 
 
-def post_file_info(id_zh, title, author, description, media_path, extension):
+def post_file_info(id_zh, title, author, description, extension):
     try:
         unique_id_media = DB.session.query(TZH).filter(
             TZH.id_zh == int(id_zh)).one().zh_uuid
@@ -807,7 +807,6 @@ def post_file_info(id_zh, title, author, description, media_path, extension):
             id_table_location=id_table_location,
             uuid_attached_row=uuid_attached_row,
             title_fr=title,
-            media_path=media_path,
             author=author,
             description_fr=description,
             is_public=True,
@@ -825,7 +824,7 @@ def post_file_info(id_zh, title, author, description, media_path, extension):
         raise ZHApiError(message="post_file_info_error", details=str(e))
 
 
-def patch_file_info(id_zh, id_media, title, author, description, media_path, extension):
+def patch_file_info(id_zh, id_media, title, author, description, extension):
     try:
         unique_id_media = DB.session.query(TZH).filter(
             TZH.id_zh == int(id_zh)).one().zh_uuid
@@ -847,7 +846,6 @@ def patch_file_info(id_zh, id_media, title, author, description, media_path, ext
             'id_table_location': id_table_location,
             'uuid_attached_row': uuid_attached_row,
             'title_fr': title,
-            'media_path': media_path,
             'author': author,
             'description_fr': description,
             'is_public': True,
