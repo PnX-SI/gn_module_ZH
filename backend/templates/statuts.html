@@ -6,7 +6,7 @@
           <h5 class="subtitle">
             Régime foncier - Statut de propriété
           </h5>
-          <div class="flex-container">
+          <div class="flex-container-col">
             <table class="custom-table">
               <thead>
                   <tr>
@@ -23,16 +23,6 @@
                   {% endfor %}
               </tbody>
             </table>
-          </div>
-        </section>
-        <section class="content col">
-          <h5 class="subtitle">
-            Principaux statuts
-          </h5>
-          <div class="flex-container-col">
-            {% for status in data['statuts']['statuts'] %}
-              <span class="small-title">{{ status }}</span>
-            {% endfor %}
           </div>
         </section>
       </div>
@@ -89,6 +79,18 @@
         </section>
       </div>
     </div>
+    <br>
+    <section class="content col">
+      <h5 class="subtitle">
+        Principaux statuts
+      </h5>
+      <div class="flex-container-col">
+        {% for status in data['statuts']['statuts'] %}
+          <span class="small-title">{{ status }}</span>
+        {% endfor %}
+      </div>
+    </section>
+    <br>
     <div class="flex-container">
       <section class="content col">
         <h5 class="subtitle">
