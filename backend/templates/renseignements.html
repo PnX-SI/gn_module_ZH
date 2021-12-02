@@ -73,8 +73,11 @@
     </section>
   </div>
 </div>
-<div class="flex-container">
-  <section class="content">
-    <p style="width: 100%;"> THIS IS THE MAP</p>
-  </section>
-</div>
+
+{% if data['map'] is not none %}
+  <div class="flex-container">
+    <section class="content">
+      <img src="{{ data['map'] }}">
+    </section>
+  </div>
+{% endif %}
