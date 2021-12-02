@@ -879,14 +879,22 @@ def returnUserCruved(info_role):
 def gen_map(coordinates):
     if coordinates:
         m = StaticMap(width=600, height=300)
-        poly = Line(coordinates, 'blue', 4)
-        m.add_line(poly)
+        for coord in coordinates:
+            poly = Line(coord, 'blue', 4)
+            m.add_line(poly)
         image = m.render()
         with BytesIO() as output:
             image.save(output, format='PNG')
             contents =  base64.b64encode(output.getvalue())
         return "data:image/jpeg;base64," + contents.decode()
     return None
+
+
+def multi_to_polys(multi):
+    polys = []
+    for mul in multi:
+        polys += mul
+    return tuple(polys)
 
 
 @blueprint.route("/export_pdf/<int:id_zh>", methods=["GET"])
@@ -897,9 +905,15 @@ def download(id_zh: int):
     """
     filename = "rapport.pdf"
     dataset = get_complete_card(id_zh)
-
+    coordinates = dataset.get('geometry', {}).get('coordinates', [[]])
+    poly_type = dataset.get('geometry', {}).get('type', '')
+    if poly_type is not None:
+        if poly_type == 'Polygon':
+            coordinates = coordinates
+        else:
+            coordinates = multi_to_polys(coordinates)
     try:
-        dataset['map'] = gen_map(dataset.get('geometry', {}).get('coordinates', [[]])[0])
+        dataset['map'] = gen_map(coordinates)
     except Exception as e:
         print('Cannot generate the map inside the pdf... Continuing')
         
