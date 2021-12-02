@@ -22,6 +22,9 @@
   </body>
 <style>
   /* Puts style here since I cannot make blueprint static files work...*/
+* {
+  font-family: Roboto;
+}
 .title {
   /* Auto Layout */
   display: flex;
@@ -30,7 +33,6 @@
   background: #ACBDA3;
   border-radius: 11px;
 
-  font-family: Roboto;
   font-style: normal;
   font-weight: 500;
   font-size: 15px;
@@ -52,6 +54,7 @@ section {
   box-sizing: border-box;
   border-radius: 4px;
   margin: 5px 5px 5px 5px;
+  padding: 5px 5px 5px 5px;
 }
 
 section.content {
@@ -142,9 +145,14 @@ p {
 }
 
 .custom-table {
+  border: solid 1px;
   border-radius: 4px;
   background: #FFFFFF;
   width: 100%;
+}
+
+.custom-table th {
+  border-bottom: solid 1px black;
 }
 
 tr {
