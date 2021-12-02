@@ -12,17 +12,13 @@
               </tr>
           </thead>
           <tbody>
+              {% for corine in data['description']['presentation']['corine_biotope'] %}
               <tr>
-                <td>44</td>
-                <td>Eaux douces stagnantes</td>
-                <td>P</td>
+                <td>{{ corine['code'] }}</td>
+                <td>{{ corine['label'] }}</td>
+                <td>{{ corine['Humidité'] }}</td>
               </tr>
-              <tr>
-                <td>22</td>
-                <td>Galeries méditerranéennes de
-                  saules blancs</td>
-                <td>H</td>
-              </tr>
+              {% endfor %}
           </tbody>
         </table>
       </div>

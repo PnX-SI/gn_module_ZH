@@ -4,100 +4,102 @@
       <div class="left">
         <section class="content col">
           <h5 class="subtitle">
-            Statuts
+            Régime foncier - Statut de propriété
           </h5>
           <div class="flex-container">
             <table class="custom-table">
               <thead>
                   <tr>
-                    <th>Régime foncier</th>
+                    <th>Statut</th>
+                    <th>Remarques</th>
                   </tr>
               </thead>
               <tbody>
+                  {% for regime in data['statuts']['regime'] %}
                   <tr>
-                    <td>collectivité territoriale (communal, départemental, régional, syndicat mixte)</td>
+                    <td>{{ regime['status'] }}</td>
+                    <td>{{ regime['remarques'] }}</td>
                   </tr>
+                  {% endfor %}
               </tbody>
             </table>
           </div>
         </section>
         <section class="content col">
           <h5 class="subtitle">
-            Principaux statuts de protection
+            Principaux statuts
           </h5>
-          <div class="flex-container">
-            <table class="custom-table">
-              <thead>
-                  <tr>
-                    <th>Régime foncier</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  <tr>
-                    <td>16 - Terrain acquis par un syndicat mixte de Parc Nationnal</td>
-                  </tr>
-                  <tr>
-                    <td>62 - Zone Spéciale de Conservation (Directive Habitats)</td>
-                  </tr>
-              </tbody>
-            </table>
+          <div class="flex-container-col">
+            {% for status in data['statuts']['statuts'] %}
+              <span class="small-title">{{ status }}</span>
+            {% endfor %}
           </div>
         </section>
       </div>
       <div class="right">
         <section class="content col">
           <h5 class="subtitle">
-            Gestion
+            Structure de gestion
           </h5>
-          <h5 class="subtitle center">
+            {% for structure in data['statuts']['structure'] %}
+              <span class="small-title"><b>{{ structure['structure'] }} : </b></span>
+              {% if structure['plans'] %}
+              <table class="custom-table">
+                <thead>
+                    <tr>
+                      <th>Plan</th>
+                      <th>Date</th>
+                      <th>Durée</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for plan in structure['plans'] %}
+                    <tr>
+                      <td>{{ plan['plan'] }} </td>
+                      <td>{{ plan['date'] }} </td>
+                      <td>{{ plan['duree'] }} </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+              {% endif %}
+          {% endfor %}
+          <br>
+          <h5 class="subtitle">
             Instruments contractuels et financiers
           </h5>
           <div class="flex-container">
             <table class="custom-table">
               <thead>
                   <tr>
-                    <th>Type</th>
-                    <th>Organisme</th>
+                    <th>Instruments contractuels et financiers</th>
+                    <th>Date de mise en oeuvre</th>
                   </tr>
               </thead>
               <tbody>
+                  {% for instru in data['statuts']['instruments'] %}
                   <tr>
-                    <td>Document d’objectifs 
-                      Natura 2000</td>
-                    <td>Parc Naturel Régional du Luberon
-                    </td>
+                    <td>{{ instru['instrument'] }}</td>
+                    <td>{{ instru['date'] }}</td>
                   </tr>
-                  <tr>
-                    <td>Document d’objectifs 
-                      Natura 2000</td>
-                    <td>Parc Naturel Régional du Luberon
-                    </td>
-                  </tr>
-              </tbody>
-            </table>
-          </div>
-          <h5 class="subtitle center">
-            Plan de gestion
-          </h5>
-          <div class="flex-container">
-            <table class="custom-table">
-              <thead>
-                  <tr>
-                    <th>Nature</th>
-                    <th>Opérateur</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  <tr>
-                    <td>naturaliste</td>
-                    <td>CEN PACA - F. MENETRIER / PNRL - J. BRICHARD
-                    </td>
-                  </tr>
+                  {% endfor %}
               </tbody>
             </table>
           </div>
         </section>
       </div>
+    </div>
+    <div class="flex-container">
+      <section class="content col">
+        <h5 class="subtitle">
+          Autres inventaires
+        </h5>
+        <div class="flex-container-col">
+          {% for autre in data['statuts']['autre_inventaire'] %}
+            <span class="small-title">{{ autre['zh_type_name'] }} - {{ autre['area_code'] }} - <a href="{{ autre['url']}}">{{ autre['area_name'] }}</a></span>
+          {% endfor %}
+        </div>
+      </section>
     </div>
     <div class="flex-container-col">
       <div class="flex-container">
@@ -116,37 +118,14 @@
                   </tr>
               </thead>
               <tbody>
+                  {% for zonage in data['statuts']['zonage'] %}
                   <tr>
-                    <td>Simiane-Collongue</td>
-                    <td>Plan d'Occupation des Sols (POS) </td>
-                    <td>Zones de protection des ressources naturelles agricoles (NC) </td>
-                    <td></td>
+                    <td>{{ zonage['commune'] }}</td>
+                    <td>{{ zonage['type_doc'] }}</td>
+                    <td>{{ zonage['type_classement'] }}</td>
+                    <td>{{ zonage['remarque']}}</td>
                   </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-      <br>
-      <div class="flex-container">
-        <section class="content col">
-          <h5 class="subtitle">
-            Autres inventaires
-          </h5>
-          <div class="flex-container">
-            <table class="custom-table">
-              <thead>
-                  <tr>
-                    <th>Test</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  <tr>
-                    <td>RAMSAR</td>
-                  </tr>
-                  <tr>
-                    <td>ZICO</td>
-                  </tr>
+                  {% endfor %}
               </tbody>
             </table>
           </div>

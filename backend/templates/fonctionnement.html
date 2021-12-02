@@ -3,43 +3,44 @@
     <div class="flex-container">
       <section class="content col">
         <h5 class="subtitle">Régime hydrique</h5>
-        <div class="flex-container">
-          <div class="left">
-            <table class="custom-table">
-              <thead>
-                  <tr>
-                    <th>Entrée d'eau</th>
-                    <th>Permanence</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  <tr>
-                    <td>Eaux de crues</td>
-                    <td>saisonnier</td>
-                  </tr>
-                  <tr>
-                    <td>nappes</td>
-                    <td>permanent</td>
-                  </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="right">
-            <table class="custom-table">
-              <thead>
-                  <tr>
-                    <th>Sortie d'eau</th>
-                    <th>Permanence</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  <tr>
-                    <td>évaporation</td>
-                    <td>saisonnier</td>
-                  </tr>
-              </tbody>
-            </table>
-          </div>
+        <div class="flex-container-col">
+          <table class="custom-table">
+            <thead>
+                <tr>
+                  <th>Entrée d'eau</th>
+                  <th>Permanence</th>
+                  <th>Toponymie et compléments d'information</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entree in data['fonctionnement']['regime']['entree'] %}
+                <tr>
+                  <td>{{ entree['type'] }}</td>
+                  <td>{{ entree['permanence'] }}</td>
+                  <td>{{ entree['toponymie'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+          <br>
+          <table class="custom-table">
+            <thead>
+                <tr>
+                  <th>Sortie d'eau</th>
+                  <th>Permanence</th>
+                  <th>Toponymie et compléments d'information</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sortie in data['fonctionnement']['regime']['sortie'] %}
+                <tr>
+                  <td>{{ sortie['type'] }}</td>
+                  <td>{{ sortie['permanence'] }}</td>
+                  <td>{{ sortie['toponymie'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+          </table>
         </div>
       </section>
     </div>
@@ -47,34 +48,9 @@
     <div class="flex-container">
       <section class="content col">
         <h5 class="subtitle">Connexion de la ZH dans son environnement</h5>
-        <div class="flex-container">
-          <p>IMG PASSE A COTE</p>
-        </div>
-      </section>
-    </div>
-    <div class="flex-container">
-      <section class="content col">
-        <h5 class="subtitle">Usage ou processus naturels</h5>
-        <div class="flex-container">
-          <table class="custom-table">
-            <thead>
-                <tr>
-                  <th>Activité</th>
-                  <th>Localisation</th>
-                  <th>Facteurs influençant l'écolution de la zone humide</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                  <td>19- gestion
-                    conservatoire</td>
-                  <td>au niveau de la zone humide et de 
-                    l'espace de fonctionnalité</td>
-                  <td>70- PRATIQUES DE GESTION OU D'EXPLOITATION DES ESPÈCES ET HABITATS</td>
-                </tr>
-            </tbody>
-          </table>
-        </div>
+        <span class="small-title">
+          <b>{{ data['fonctionnement']['connexion'] }}</b>
+        </span>
       </section>
     </div>
   </div>

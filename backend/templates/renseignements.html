@@ -4,52 +4,71 @@
     <section class="content col">
       <div class="fieldset">
         <label>Nom usuel zone humide</label>
-        <span>Zone humide</span>
+        <span>{{ data['renseignements']['identification']['nom'] }}</span>
+      </div>
+      <div class="fieldset">
+        <label>Autre nom</label>
+        <span>{{ data['renseignements']['identification']['autre'] }}</span>
+      </div>
+      <div class="fieldset">
+        <label>Partie d'un ensemble</label>
+        {% if data['renseignements']['identification']['ensemble'] %}
+          <span>{{ data['renseignements']['identification']['ensemble'] }}</span>
+        {% else %}
+          <span>Non</span>
+        {% endif %}   
+      </div>
+      <div class="fieldset">
+        <label>Code zone humide</label>
+        <span>{{ data['renseignements']['identification']['code'] }}</span>
       </div>
       <div class="flex-container">
         <div class="left">
           <div class="fieldset">
-            <label>Bassin versant</label>
-          </div>
-          <div class="fieldset">
-            <label>Typologie SDAGE</label>
+            <label>Region</label>
+            {% for region in data['renseignements']['localisation']['region'] %}
+              <span>{{ region }}</span><br>
+            {% endfor %}
           </div>
         </div>
         <div class="right">
           <div class="fieldset">
-            <label>Communes</label>
-            <span>Commune1</span><br>
-            <span>Commune2</span>
-          </div>
-          <div class="fieldset">
-            <label>Code zone humide</label>
+            <label>Département</label>
+            {% for dep in data['renseignements']['localisation']['departement'] %}
+              <span>{{ dep['nom'] }} ({{ dep['code'] }})</span><br>
+            {% endfor %}
           </div>
         </div>
+      </div>
+      <div class="fieldset">
+        <label>Communes [couverture]</label>
+        {% for com in data['renseignements']['localisation']['commune'] %}
+          <span>{{ com['nom'] }} ({{ com['insee'] }}) [{{ com['couverture'] }}%]</span><br>
+        {% endfor %}
       </div>
     </section>
   </div>
   <div class="right">
     <section class="content col">
       <div class="fieldset">
+        <label>Organisme</label>
+        <span>{{ data['renseignements']['auteur']['organism'] }}</span>
+      </div>
+      <div class="fieldset">
+        <label>Auteur de la fiche</label>
+        <span>{{ data['renseignements']['auteur']['auteur'] }}</span>
+      </div>
+      <div class="fieldset">
+        <label>Auteur des modifications</label>
+        <span>{{ data['renseignements']['auteur']['auteur_modif'] }}</span>
+      </div>
+      <div class="fieldset">
         <label>Date d'établissement</label>
+        <span>{{ data['renseignements']['auteur']['date'] }}</span>
       </div>
       <div class="fieldset">
         <label>Date de modification</label>
-      </div>
-      <div class="flex-container">
-        <div class="left">
-          <div class="fieldset">
-            <label>Auteur</label>
-          </div>
-          <div class="fieldset">
-            <label>Organisme</label>
-          </div>
-        </div>
-        <div class="right">
-          <div class="fieldset">
-            <label>Auteur</label>
-          </div>
-        </div>
+        <span>{{ data['renseignements']['auteur']['date_modif'] }}</span>
       </div>
     </section>
   </div>
@@ -57,13 +76,5 @@
 <div class="flex-container">
   <section class="content">
     <p style="width: 100%;"> THIS IS THE MAP</p>
-    <div class="left">
-      <div class="fieldset">
-        <label>Date de modification</label>
-      </div>
-      <div class="fieldset">
-        <label>Auteur</label>
-      </div>
-    </div>
   </section>
 </div>
