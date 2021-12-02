@@ -102,7 +102,8 @@ export class ZhDataService {
 
   getPdf(zhId: number) {
     return this._api.get(
-      `${AppConfig.API_ENDPOINT}/zones_humides/export_pdf/${zhId}`
+      `${AppConfig.API_ENDPOINT}/zones_humides/export_pdf/${zhId}`,
+      { responseType: "blob" }
     );
   }
 }
