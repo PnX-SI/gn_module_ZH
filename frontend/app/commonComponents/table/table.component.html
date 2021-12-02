@@ -16,7 +16,13 @@
             </li>
           </ul>
           <ng-template #elseBlock>
-            {{ item[col.name] }}
+            <b *ngIf="bold_row_values.includes(item['name']) else italic">{{ item[col.name] }}</b>
+            <ng-template #italic>
+              <i *ngIf="italic_row_values.includes(item['name']) else normal">{{ item[col.name] }}</i>
+            </ng-template>
+            <ng-template #normal>
+              {{ item[col.name] }}
+            </ng-template>
           </ng-template>
         </td>
         <td 
