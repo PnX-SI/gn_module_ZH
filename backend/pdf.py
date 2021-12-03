@@ -9,6 +9,15 @@ except ImportError:
 # Filemanager
 import geonature.utils.filemanager as fm
 
+from .utils import get_main_picture_id, get_file_path
+
+
+def get_main_picture(id_zh: int):
+    id_media = get_main_picture_id(id_zh)
+    if id_media:
+        return get_file_path(id_media)
+    return None
+
 
 def gen_map(coordinates):
     if coordinates:
@@ -31,19 +40,24 @@ def multi_to_polys(multi):
     return tuple(polys)
 
 
-def gen_pdf(dataset, filename = "rapport.pdf"):
-  coordinates = dataset.get('geometry', {}).get('coordinates', [[]])
-  poly_type = dataset.get('geometry', {}).get('type', '')
-  if poly_type is not None:
-      if poly_type == 'Polygon':
-          coordinates = coordinates
-      else:
-          coordinates = multi_to_polys(coordinates)
-  try:
-      dataset['map'] = gen_map(coordinates)
-  except Exception as e:
-      print('Cannot generate the map inside the pdf... Continuing')
-      
-  pdf_file = fm.generate_pdf("fiche_template_pdf.html", dataset, filename)
-  return Path(pdf_file)
+def gen_pdf(id_zh, dataset, filename = "rapport.pdf"):
+    coordinates = dataset.get('geometry', {}).get('coordinates', [[]])
+    poly_type = dataset.get('geometry', {}).get('type', '')
+    if poly_type is not None:
+        if poly_type == 'Polygon':
+            coordinates = coordinates
+        else:
+            coordinates = multi_to_polys(coordinates)
+    try:
+        dataset['map'] = gen_map(coordinates)
+    except Exception as e:
+        print('Cannot generate the map inside the pdf... Continuing')
+    
+    try:
+        dataset['image'] = get_main_picture(id_zh=id_zh)
+    except Exception as e:
+        print('Cannot find image')
+
+    pdf_file = fm.generate_pdf("fiche_template_pdf.html", dataset, filename)
+    return Path(pdf_file)
   

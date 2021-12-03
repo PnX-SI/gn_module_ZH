@@ -78,7 +78,8 @@ from .hierarchy import *
 from .utils import (
     get_file_path,
     delete_file,
-    check_ref_geo_schema
+    check_ref_geo_schema,
+    get_main_picture_id
 )
 
 from .model.repositories import (
@@ -468,7 +469,7 @@ def get_file_list(id_zh, info_role):
             TMedias.unique_id_media == zh_uuid).all()
         return {
             "media_data": [media.as_dict() for media in q_medias],
-            "main_pict_id": DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().main_pict_id
+            "main_pict_id": get_main_picture_id(id_zh)
         }
     except Exception as e:
         exc_type, value, tb = sys.exc_info()
@@ -878,7 +879,7 @@ def download(id_zh: int):
     Downloads the report in pdf format
     """
     dataset = get_complete_card(id_zh)
-    pdf_file = gen_pdf(dataset=dataset)
+    pdf_file = gen_pdf(id_zh=id_zh, dataset=dataset)
     return send_file(pdf_file, as_attachment=True)
 
 
