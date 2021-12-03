@@ -15,7 +15,10 @@ from .utils import get_main_picture_id, get_file_path
 def get_main_picture(id_zh: int):
     id_media = get_main_picture_id(id_zh)
     if id_media:
-        return get_file_path(id_media)
+        file_path: str = get_file_path(id_media)
+        with open(file_path, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read())
+        return "data:image/jpeg;base64," + encoded_string.decode()
     return None
 
 
