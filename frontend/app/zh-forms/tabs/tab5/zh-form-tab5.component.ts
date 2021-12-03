@@ -8,6 +8,7 @@ import { ZhDataService } from "../../../services/zh-data.service";
 import { TabsService } from "../../../services/tabs.service";
 import { ModalService } from "../../../services/modal.service";
 import { TaxaFile } from "./zh-form-tab5.models";
+import { FilesService } from "../../../services/files.service";
 
 @Component({
   selector: "zh-form-tab5",
@@ -74,6 +75,15 @@ export class ZhFormTab5Component implements OnInit {
     { name: "knowledge", label: "Connaissance" },
   ];
 
+  public fileTableCol = [
+    {
+      name: "title_fr",
+      label: "Titre du document",
+    },
+    { name: "author", label: "Auteur" },
+    { name: "description_fr", label: "Résumé" },
+  ];
+
   private tempID: any;
   corinBioMetaData: any[];
   public submitted: boolean;
@@ -89,7 +99,8 @@ export class ZhFormTab5Component implements OnInit {
     private _toastr: ToastrService,
     private _dataService: ZhDataService,
     private _modalService: ModalService,
-    private _tabService: TabsService
+    private _tabService: TabsService,
+    private _filesService: FilesService
   ) {}
 
   ngOnInit() {
@@ -191,11 +202,6 @@ export class ZhFormTab5Component implements OnInit {
       async (zh: any) => {
         if (zh) {
           this.currentZh = zh;
-          this.fctHydroTable = [];
-          this.bioFctTable = [];
-          this.interetPatTable = [];
-          this.valSocEcoTable = [];
-          this.corineBioTable = [];
           //patch forms values
           this.formTab5.patchValue({
             is_carto_hab: this.currentZh.properties.is_carto_hab,
@@ -244,6 +250,7 @@ export class ZhFormTab5Component implements OnInit {
   }
 
   getInteretPatrim(fonctions) {
+    this.interetPatTable = [];
     fonctions.forEach((pat: any) => {
       this.interetPatTable.push({
         function: this.interetPatInput
@@ -261,6 +268,7 @@ export class ZhFormTab5Component implements OnInit {
   }
 
   getValSocEco(fonctions) {
+    this.valSocEcoTable = [];
     fonctions.forEach((valSoc: any) => {
       this.valSocEcoTable.push({
         function: this.valSocEcoInput
@@ -278,6 +286,7 @@ export class ZhFormTab5Component implements OnInit {
   }
 
   getBio(fonctions) {
+    this.bioFctTable = [];
     fonctions.forEach((bioFct: any) => {
       this.bioFctTable.push({
         function: this.bioFctInput
@@ -295,6 +304,7 @@ export class ZhFormTab5Component implements OnInit {
   }
 
   getHydro(fonctions) {
+    this.fctHydroTable = [];
     fonctions.forEach((hydroFct: any) => {
       this.fctHydroTable.push({
         function: this.fctHydroInput
@@ -312,6 +322,10 @@ export class ZhFormTab5Component implements OnInit {
   }
 
   async getCorineBio(habitats) {
+    // Since it is async, need to set a temporary
+    //   table. This prevents duplicate pushes on
+    //   this.corineBioTable
+    const tempCorineTable: any[] = [];
     habitats.forEach(async (corineBio: any) => {
       let selectedCahierHab;
       await this._dataService
@@ -322,7 +336,7 @@ export class ZhFormTab5Component implements OnInit {
           selectedCahierHab = this.cahierHabInput.find(
             (item: any) => item.cd_hab == Number(corineBio.id_cahier_hab)
           );
-          this.corineBioTable.push({
+          tempCorineTable.push({
             corinBio: this.corinBioMetaData.find(
               (item: any) => item.CB_code == corineBio.id_corine_bio
             ),
@@ -333,8 +347,10 @@ export class ZhFormTab5Component implements OnInit {
             cahierHab: selectedCahierHab,
             habCover: corineBio.hab_cover,
           });
+          this.sortCorineBio();
         });
     });
+    this.corineBioTable = tempCorineTable;
   }
 
   // open the add fonction hydrologique modal
@@ -665,6 +681,10 @@ export class ZhFormTab5Component implements OnInit {
       })
       .finally(() => {
         this.taxaLoading = false;
+        this._filesService
+          .loadFiles(this.currentZh.properties.id_zh)
+          .toPromise()
+          .then(() => {});
       });
   }
 
@@ -787,14 +807,8 @@ export class ZhFormTab5Component implements OnInit {
   onPostCorineBio() {
     this.modalFormSubmitted = true;
     if (this.corineBioForm.valid) {
-      let formValues = this.corineBioForm.value;
-      // check if the corineBio to add is already added
-      let itemExist = this.corineBioTable.some(
-        (item: any) => item.corinBio.CB_code == formValues.corinBio.CB_code
-      );
-      if (!itemExist) {
-        this.corineBioTable.push(formValues);
-      }
+      this.corineBioTable.push(this.corineBioForm.value);
+      this.sortCorineBio();
       this.ngbModal.dismissAll();
       this.corineBioForm.reset();
       this.corineBioForm.get("cahierHab").disable();
@@ -805,9 +819,9 @@ export class ZhFormTab5Component implements OnInit {
 
   //delete corineBio from the corineBio array
   onDeleteCorineBio(corineBio: any) {
-    this.corineBioTable = this.corineBioTable.filter((item: any) => {
-      return item.corinBio.CB_code != corineBio.corinBio.CB_code;
-    });
+    this.corineBioTable = this.corineBioTable.filter(
+      (item: any) => item != corineBio
+    );
     this.canChangeTab.emit(false);
   }
 
@@ -857,6 +871,7 @@ export class ZhFormTab5Component implements OnInit {
       this.corineBioTable = this.corineBioTable.map((item: any) =>
         item.corinBio.CB_code != this.tempID ? item : formValues
       );
+      this.sortCorineBio();
       this.tempID = null;
       this.ngbModal.dismissAll();
       this.corineBioForm.reset();
@@ -889,7 +904,12 @@ export class ZhFormTab5Component implements OnInit {
     this._dataService
       .getHabitatByCorine(corineBio.CB_code)
       .subscribe((habitats: any) => {
-        this.cahierHabInput = habitats;
+        this.cahierHabInput = habitats.map((item) => {
+          item.disabled = this.corineBioTable
+            .map((cor) => cor.cahierHab)
+            .some((e) => e.cd_hab === item.cd_hab);
+          return item;
+        });
         this.corineBioForm.get("cahierHab").enable();
       });
   }
@@ -1003,6 +1023,16 @@ export class ZhFormTab5Component implements OnInit {
       a.function.mnemonique.slice(0, 2) > b.function.mnemonique.slice(0, 2)
         ? 1
         : b.function.mnemonique.slice(0, 2) > a.function.mnemonique.slice(0, 2)
+        ? -1
+        : 0
+    );
+  }
+
+  sortCorineBio() {
+    this.corineBioTable.sort((a, b) =>
+      a.corinBio.CB_label > b.corinBio.CB_label
+        ? 1
+        : b.corinBio.CB_label > a.corinBio.CB_label
         ? -1
         : 0
     );

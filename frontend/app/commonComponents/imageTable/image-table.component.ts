@@ -2,37 +2,32 @@ import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
 import { Output, EventEmitter } from "@angular/core";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 
-import { TableColumn } from "./table-interface";
+import { TableColumn } from "../table/table-interface";
 
 @Component({
-  selector: "zh-table",
-  templateUrl: "./table.component.html",
-  styleUrls: ["./table.component.scss"],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: "zh-image-table",
+  templateUrl: "./image-table.component.html",
+  styleUrls: ["./image-table.component.scss"],
 })
-export class TableComponent {
+export class ImageTableComponent {
+  public mainPhoto: any;
+
   constructor(public deleteModal: NgbModal) {}
 
   @Input() tableCols: TableColumn[];
   @Input() data: any;
-  @Input() bold_row_values: any = [];
-  @Input() italic_row_values: any = [];
   @Input() deletable: boolean;
   @Input() editable: boolean;
   @Input() downloadable: boolean;
   @Output() onDelete = new EventEmitter<object>();
   @Output() onEdit = new EventEmitter<object>();
   @Output() onDownload = new EventEmitter<object>();
-
-  isArray(value) {
-    // Since Array cannot be called in the template,
-    // do it inside a method
-    return Array.isArray(value);
-  }
+  @Output() onRadioChanged = new EventEmitter<object>();
 
   onEditItem(value: object) {
     // No modal to open, just an event with the object
     // to emit
+    console.log(value);
     this.onEdit.emit(value);
   }
 
@@ -56,5 +51,9 @@ export class TableComponent {
 
   onDownloadItem(value: object) {
     this.onDownload.emit(value);
+  }
+
+  onRadioChangedItem(event) {
+    this.onRadioChanged.emit(event);
   }
 }
