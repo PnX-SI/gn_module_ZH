@@ -1,0 +1,46 @@
+<div class="card">
+  <div class="card-body">
+    <zh-advanced-search-fonctions 
+    title="Fonctions hydrologiques / biogéochimiques"
+    [form]="form.get('hydro')"
+    [data]="data.FONCTIONS_HYDRO"
+    [connaissances]="data.FONCTIONS_CONNAISSANCE"
+    [qualifications]="data.FONCTIONS_QUALIF">
+  </zh-advanced-search-fonctions>
+  <zh-advanced-search-fonctions 
+    title="Fonctions biologiques / écologiques"
+    [form]="form.get('bio')"
+    [data]="data.FONCTIONS_BIO"
+    [connaissances]="data.FONCTIONS_CONNAISSANCE"
+    [qualifications]="data.FONCTIONS_QUALIF">
+  </zh-advanced-search-fonctions>
+  <zh-advanced-search-fonctions 
+  title="Valeurs socio-économiques"
+  [form]="form.get('socio')"
+  fonctionLabel="Valeur"
+  [data]="data.VAL_SOC_ECO"
+  [connaissances]="data.FONCTIONS_CONNAISSANCE"
+  [qualifications]="data.FONCTIONS_QUALIF">
+  </zh-advanced-search-fonctions>
+  <zh-advanced-search-fonctions 
+  title="Intérêts patrimoniaux"
+  [form]="form.get('interet')"
+  fonctionLabel="Intérêt"
+  [data]="data.INTERET_PATRIM"
+  [connaissances]="data.FONCTIONS_CONNAISSANCE"
+  [qualifications]="data.FONCTIONS_QUALIF">
+  </zh-advanced-search-fonctions>
+  <zh-advanced-search-statuts
+  [form]="form.get('statuts')"
+  [statuts]="data.STATUT_PROPRIETE"
+  [plans]="data.PLAN_GESTION"
+  ></zh-advanced-search-statuts>
+  <zh-advanced-search-evaluations
+  [form]="form.get('evaluations')"
+  [hydros]="data.FONCTIONNALITE_HYDRO"
+  [bios]="data.FONCTIONNALITE_BIO"
+  [menaces]="data.EVAL_GLOB_MENACES"
+  >
+  </zh-advanced-search-evaluations>
+  </div>
+</div>

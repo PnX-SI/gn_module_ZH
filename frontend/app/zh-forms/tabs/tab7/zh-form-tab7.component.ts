@@ -57,8 +57,16 @@ export class ZhFormTab7Component implements OnInit {
   ];
 
   public actionTableCol = [
-    { name: "action", label: "Propositions d’actions" },
-    { name: "priority", label: "Niveau de priorité" },
+    {
+      name: "action",
+      label: "Propositions d’actions",
+      subcell: { name: "name" },
+    },
+    {
+      name: "priority",
+      label: "Niveau de priorité",
+      subcell: { name: "mnemonique" },
+    },
     { name: "remark", label: "Remarques" },
   ];
 
@@ -253,6 +261,7 @@ export class ZhFormTab7Component implements OnInit {
               }
             });
           });
+          this.sortAction(this.actionTable);
         }
       }
       this.$_fromChangeSub = this.formTab7.valueChanges.subscribe(() => {
@@ -300,6 +309,7 @@ export class ZhFormTab7Component implements OnInit {
       this.actionForm.reset();
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
+      this.sortAction(this.actionTable);
     }
   }
 
@@ -377,6 +387,7 @@ export class ZhFormTab7Component implements OnInit {
       this.actionForm.reset();
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
+      this.sortAction(this.actionTable);
     }
   }
 
@@ -426,5 +437,17 @@ export class ZhFormTab7Component implements OnInit {
         }
       );
     }
+  }
+
+  sortAction(action) {
+    const sortingArr = this.formMetaData["NIVEAU_PRIORITE"].map(
+      (item) => item.mnemonique
+    );
+    action.sort(function (a, b) {
+      return (
+        sortingArr.indexOf(a.priority.mnemonique) -
+        sortingArr.indexOf(b.priority.mnemonique)
+      );
+    });
   }
 }

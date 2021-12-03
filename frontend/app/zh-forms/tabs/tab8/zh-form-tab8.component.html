@@ -9,75 +9,52 @@
           mat-raised-button
           class="mb-3"
           color="primary"
-          (click)="onAddDoc($event, docModal)"
+          (click)="onAddFile($event, fileModal)"
         >
           <mat-icon>add_box</mat-icon>
           Ajouter
         </button>
-        <div *ngIf="docTable && docTable.length > 0" class="table-responsive">
-          <table class="table">
-            <thead class="thead-inverse table-header">
-              <tr>
-                <th *ngFor="let col of docTableCol">{{ col.label }}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of docTable">
-                <td *ngFor="let col of docTableCol">
-                  {{ item[col.name]?.mnemonique || item[col.name] }}
-                </td>
-                <td>
-                  <div>
-                    <button
-                      mat-icon-button
-                      class="mr-2"
-                      placement="top"
-                      ngbTooltip="Editer"
-                      (click)="onEditStatus(docModal, item)"
-                    >
-                      <mat-icon class="edit-icon">edit</mat-icon>
-                    </button>
-                    <button
-                      mat-icon-button
-                      placement="top"
-                      ngbTooltip="Supprimer"
-                      (click)="onDeleteStatus(item)"
-                    >
-                      <mat-icon class="delete-icon">close</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
       </div>
+      <collapse [title]="imageFiles.name" *ngIf="imageFiles.files && imageFiles.files.length > 0">
+        <zh-image-table
+          [tableCols]="fileTableCol" 
+          [data]="imageFiles.files"
+          [deletable]="true"
+          [editable]="false"
+          [downloadable]="true"
+          (onDelete)="onDeleteFile($event)"
+          (onEdit)="onEditFile($event, fileModal)"
+          (onDownload)="_filesService.downloadFile($event)"
+          (onRadioChanged)="onChangeMainPhoto($event)">
+        </zh-image-table>
+      </collapse>
+      <ng-container *ngFor="let item of corFilesExt">
+        <collapse [title]="item.name" *ngIf="item.files && item.files.length > 0">
+          <zh-table
+            [tableCols]="fileTableCol" 
+            [data]="item.files"
+            [deletable]="true"
+            [editable]="false"
+            [downloadable]="true"
+            (onDelete)="onDeleteFile($event)"
+            (onEdit)="onEditFile($event, fileModal)"
+            (onDownload)="_filesService.downloadFile($event)"
+          ></zh-table>
+        </collapse>
+      </ng-container>
     </fieldset>
 
     <div class="footer-btn">
       <zh-cancelButton
-        *ngIf="currentZh"
-        [zhId]="currentZh.properties.id_zh"
+        *ngIf="zh"
+        [zhId]="zh.properties.id_zh"
       ></zh-cancelButton>
-      <button
-        type="submit"
-        mat-raised-button
-        color="primary"
-        class="ml-3"
-        [disabled]="posted"
-        (click)="onFormSubmit()"
-      >
-        <mat-icon *ngIf="!posted">save_outline</mat-icon>
-        <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
-        Enregister
-      </button>
     </div>
   </form>
 </div>
 
 <!-- Modal recources documentaires -->
-<ng-template #docModal let-c="close" let-d="dismiss">
+<ng-template #fileModal let-c="close" let-d="dismiss">
   <div class="modal-header">
     <h6>{{ modalTitle }}</h6>
     <button mat-icon-button class="closeModalBtn" (click)="c()">
@@ -85,34 +62,48 @@
     </button>
   </div>
   <div class="modal-body">
-    <form [formGroup]="docForm">
+    <form [formGroup]="fileForm">
       <div class="form-row">
-        <div class="form-group col-md-6">
-          <label for="file">Parcourir</label>
+        <div class="form-group col-md-12">
           <input
+            #fileInput
+            hidden="true"
             id="file"
             type="file"
             (change)="handleFileInput($event.target.files)"
+            accept="image/*,.pdf"
           />
-        </div>
+          <button mat-raised-button color="primary" (click)="fileInput.click()">Parcourir</button>
+          <small class="file-name" *ngIf="fileToUpload !== null">Fichier renseigné : {{ fileToUpload.name }}</small>
+          </div>
         <div class="form-group col-md-12">
-          <small class="required">Profil</small>
+          <small
+              *ngIf="
+                fileForm.controls.file.errors?.fileSizeValidator
+              "
+              class="error-msg"
+              >Le fichier excède le poids maximum autorisé qui est de {{ config.max_jpg_size }}Mo pour les photos, {{ config.max_pdf_size }}Mo pour les pdf.<br>Poids mesuré : {{ fileToUpload.size / 1000000 | number: '1.0-1' }}Mo</small>
           <small
             *ngIf="
-              (docForm.controls.profile.touched || modalFormSubmitted) &&
-              docForm.controls.profile.errors?.required
+              fileForm.controls.file.errors?.fileNameValidator
             "
             class="error-msg"
-            >Champ requis</small
-          >
+            >Le fichier ne respecte pas le format suivant : &lt;ZHCODE&gt;_&lt;nombre&gt;. Pour cette zone humide, un nom correct serait : {{ zh.properties.code }}_3.jpg<br></small>
+          <small
+          *ngIf="
+            fileForm.controls.file.errors?.fileFormatValidator
+          "
+          class="error-msg"
+          >Le fichier n'est pas du bon format (image ou pdf)<br></small>
         </div>
+
         <div class="form-group col-md-6">
           <small class="required">Titre du document</small>
-          <input class="form-control" [formControl]="docForm.controls.title" />
+          <input class="form-control" [formControl]="fileForm.controls.title" />
           <small
             *ngIf="
-              (docForm.controls.title.touched || modalFormSubmitted) &&
-              docForm.controls.title.errors?.required
+              (fileForm.controls.title.touched || modalFormSubmitted) &&
+              fileForm.controls.title.errors?.required
             "
             class="error-msg"
             >Champ requis</small
@@ -120,11 +111,11 @@
         </div>
         <div class="form-group col-md-6">
           <small class="required">Auteur du document</small>
-          <input class="form-control" [formControl]="docForm.controls.author" />
+          <input class="form-control" [formControl]="fileForm.controls.author" />
           <small
             *ngIf="
-              (docForm.controls.author.touched || modalFormSubmitted) &&
-              docForm.controls.author.errors?.required
+              (fileForm.controls.author.touched || modalFormSubmitted) &&
+              fileForm.controls.author.errors?.required
             "
             class="error-msg"
             >Champ requis</small
@@ -135,7 +126,7 @@
           <small>Résumé</small>
           <textarea
             class="form-control"
-            [formControl]="docForm.controls.summary"
+            [formControl]="fileForm.controls.summary"
             rows="3"
           ></textarea>
         </div>
@@ -148,9 +139,10 @@
       mat-raised-button
       color="primary"
       class="uppercase"
-      (click)="patchModal ? onPatchStatus() : onPostStatus()"
+      (click)="patchModal ? patchFile() : postFile()"
     >
-      {{ addModalBtnLabel }}
+    <mat-spinner *ngIf="loadingUpload" color="warn" diameter="25"></mat-spinner>
+    Téléverser
     </button>
   </div>
 </ng-template>
