@@ -8,6 +8,7 @@ import { ZhDataService } from "../../../services/zh-data.service";
 import { TabsService } from "../../../services/tabs.service";
 import { ModalService } from "../../../services/modal.service";
 import { TaxaFile } from "./zh-form-tab5.models";
+import { FilesService } from "../../../services/files.service";
 
 @Component({
   selector: "zh-form-tab5",
@@ -134,6 +135,15 @@ export class ZhFormTab5Component implements OnInit {
     },
   ];
 
+  public fileTableCol = [
+    {
+      name: "title_fr",
+      label: "Titre du document",
+    },
+    { name: "author", label: "Auteur" },
+    { name: "description_fr", label: "Résumé" },
+  ];
+
   private tempID: any;
   corinBioMetaData: any[];
   public submitted: boolean;
@@ -149,7 +159,8 @@ export class ZhFormTab5Component implements OnInit {
     private _toastr: ToastrService,
     private _dataService: ZhDataService,
     private _modalService: ModalService,
-    private _tabService: TabsService
+    private _tabService: TabsService,
+    private _filesService: FilesService
   ) {}
 
   ngOnInit() {
@@ -730,6 +741,10 @@ export class ZhFormTab5Component implements OnInit {
       })
       .finally(() => {
         this.taxaLoading = false;
+        this._filesService
+          .loadFiles(this.currentZh.properties.id_zh)
+          .toPromise()
+          .then(() => {});
       });
   }
 

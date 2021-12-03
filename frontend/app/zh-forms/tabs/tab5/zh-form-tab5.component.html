@@ -230,6 +230,18 @@
           <mat-spinner *ngIf="taxaLoading" color="warn" diameter="25"></mat-spinner>
           Générer la liste des espèces
         </button>
+        <br>
+        <small>Fichiers d'espèces présents sur cette zone humide :</small>
+        <zh-table
+          *ngIf="_filesService.filterByExtension('csv').length > 0"
+          [tableCols]="fileTableCol" 
+          [data]="_filesService.filterByExtension('csv')"
+          [downloadable]="true"
+          (onDownload)="_filesService.downloadFile($event)"
+        ></zh-table>
+        <small>
+          Vous pouvez retrouver ces fichiers dans l'onglet des ressources documentaires (onglet 8)
+        </small>
       </fieldset>
     </fieldset>
 
