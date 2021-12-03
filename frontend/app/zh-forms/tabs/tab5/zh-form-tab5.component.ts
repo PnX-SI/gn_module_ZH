@@ -42,37 +42,97 @@ export class ZhFormTab5Component implements OnInit {
   public corineBioTable: any[] = [];
 
   public hydroFctTableCol = [
-    { name: "function", label: "Fonctions hydrologiques / biogéochimiques" },
+    {
+      name: "function",
+      label: "Fonctions hydrologiques / biogéochimiques",
+      subcell: { name: "mnemonique" },
+    },
     { name: "justification", label: "Justifications" },
-    { name: "qualification", label: "Qualifications" },
-    { name: "knowledge", label: "Connaissance" },
+    {
+      name: "qualification",
+      label: "Qualifications",
+      subcell: { name: "mnemonique" },
+    },
+    {
+      name: "knowledge",
+      label: "Connaissance",
+      subcell: { name: "mnemonique" },
+    },
   ];
   public bioFctTableCol = [
-    { name: "function", label: "Fonctions biologiques / écologiques" },
+    {
+      name: "function",
+      label: "Fonctions biologiques / écologiques",
+      subcell: { name: "mnemonique" },
+    },
     { name: "justification", label: "Justifications" },
-    { name: "qualification", label: "Qualifications" },
-    { name: "knowledge", label: "Connaissance" },
+    {
+      name: "qualification",
+      label: "Qualifications",
+      subcell: { name: "mnemonique" },
+    },
+    {
+      name: "knowledge",
+      label: "Connaissance",
+      subcell: { name: "mnemonique" },
+    },
   ];
 
   public interetsTableCol = [
-    { name: "function", label: "Intérêts patrimoniaux" },
+    {
+      name: "function",
+      label: "Intérêts patrimoniaux",
+      subcell: { name: "mnemonique" },
+    },
     { name: "justification", label: "Justifications" },
-    { name: "qualification", label: "Qualifications" },
-    { name: "knowledge", label: "Connaissance" },
+    {
+      name: "qualification",
+      label: "Qualifications",
+      subcell: { name: "mnemonique" },
+    },
+    {
+      name: "knowledge",
+      label: "Connaissance",
+      subcell: { name: "mnemonique" },
+    },
   ];
 
   public corineTableCol = [
-    { name: "corinBio", label: "Corine biotopes" },
-    { name: "cahierHab", label: "Cahier d'habitats" },
-    { name: "preservationState", label: "État de conservation" },
+    {
+      name: "corinBio",
+      label: "Corine biotopes",
+      subcell: { name: "CB_label" },
+    },
+    {
+      name: "cahierHab",
+      label: "Cahier d'habitats",
+      subcell: { name: "lb_hab_fr" },
+    },
+    {
+      name: "preservationState",
+      label: "État de conservation",
+      subcell: { name: "mnemonique" },
+    },
     { name: "habCover", label: "Recouvrement sur la ZH (%)" },
   ];
 
   public socioEcoTableCol = [
-    { name: "function", label: "Valeurs socio-économiques" },
+    {
+      name: "function",
+      label: "Valeurs socio-économiques",
+      subcell: { name: "mnemonique" },
+    },
     { name: "justification", label: "Justifications" },
-    { name: "qualification", label: "Qualifications" },
-    { name: "knowledge", label: "Connaissance" },
+    {
+      name: "qualification",
+      label: "Qualifications",
+      subcell: { name: "mnemonique" },
+    },
+    {
+      name: "knowledge",
+      label: "Connaissance",
+      subcell: { name: "mnemonique" },
+    },
   ];
 
   public fileTableCol = [

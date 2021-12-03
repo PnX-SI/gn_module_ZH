@@ -27,46 +27,15 @@
         <div
           *ngIf="inflowsTable && inflowsTable.length > 0"
           class="table-responsive"
-        >
-          <table class="table">
-            <thead class="thead-inverse table-header">
-              <tr>
-                <th *ngFor="let col of inflowTableCol">{{ col.label }}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let inflow of inflowsTable">
-                <td *ngFor="let col of inflowTableCol">
-                  {{ inflow[col.name]?.mnemonique || inflow[col.name] }}
-                </td>
-                <td>
-                  <div>
-                    <button
-                      mat-icon-button
-                      class="mr-2"
-                      placement="top"
-                      ngbTooltip="Editer"
-                    >
-                      <mat-icon
-                        class="edit-icon"
-                        (click)="onEditInflow(inflowModal, inflow)"
-                        >edit</mat-icon
-                      >
-                    </button>
-                    <button
-                      mat-icon-button
-                      placement="top"
-                      ngbTooltip="Supprimer"
-                      (click)="onDeleteInflow(inflow)"
-                    >
-                      <mat-icon class="delete-icon">close</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        >        
+        <zh-table
+          [tableCols]="inflowTableCol"
+          [data]="inflowsTable"
+          [deletable]="true"
+          [editable]="true"
+          (onDelete)="onDeleteInflow($event)"
+          (onEdit)="onEditInflow(inflowModal, $event)"
+        ></zh-table>
         </div>
       </div>
       <div class="form-row">
@@ -74,45 +43,14 @@
           *ngIf="outflowsTable && outflowsTable.length > 0"
           class="table-responsive"
         >
-          <table class="table">
-            <thead class="thead-inverse table-header">
-              <tr>
-                <th *ngFor="let col of outflowTableCol">{{ col.label }}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let outflow of outflowsTable">
-                <td *ngFor="let col of outflowTableCol">
-                  {{ outflow[col.name]?.mnemonique || outflow[col.name] }}
-                </td>
-                <td>
-                  <div>
-                    <button
-                      mat-icon-button
-                      class="mr-2"
-                      placement="top"
-                      ngbTooltip="Editer"
-                    >
-                      <mat-icon
-                        class="edit-icon"
-                        (click)="onEditOutflow(outflowModal, outflow)"
-                        >edit</mat-icon
-                      >
-                    </button>
-                    <button
-                      mat-icon-button
-                      placement="top"
-                      ngbTooltip="Supprimer"
-                      (click)="onDeleteOutflow(outflow)"
-                    >
-                      <mat-icon class="delete-icon">close</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <zh-table
+          [tableCols]="outflowTableCol"
+          [data]="outflowsTable"
+          [deletable]="true"
+          [editable]="true"
+          (onDelete)="onDeleteOutflow($event)"
+          (onEdit)="onEditOutflow(outflowModal, $event)"
+        ></zh-table>
         </div>
       </div>
       <div class="form-row">

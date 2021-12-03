@@ -96,36 +96,14 @@
         *ngIf="listBib && listBib.length > 0"
         class="card-body table-responsive"
       >
-        <table class="table">
-          <thead class="thead-inverse table-header">
-            <tr>
-              <th *ngFor="let col of cols">{{ col.label }}</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let bib of listBib">
-              <td *ngFor="let col of cols">{{ bib[col.name] }}</td>
-              <td>
-                <div>
-                  <button mat-icon-button class="mr-2">
-                    <mat-icon
-                      class="edit-icon"
-                      (click)="onEditBib(bibModal, bib)"
-                      >edit</mat-icon
-                    >
-                  </button>
-                  <button
-                    mat-icon-button
-                    (click)="onDeleteBib(bib.id_reference)"
-                  >
-                    <mat-icon class="delete-icon">close</mat-icon>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <zh-table
+        [tableCols]="cols"
+        [data]="listBib"
+        [editable]="true"
+        [deletable]="true"
+        (onEdit)="onEditBib(bibModal, $event)"
+        (onDelete)="onDeleteBib($event?.id_reference)"
+        ></zh-table>
       </div>
     </fieldset>
   </form>

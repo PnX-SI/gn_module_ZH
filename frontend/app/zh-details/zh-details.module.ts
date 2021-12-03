@@ -55,6 +55,7 @@ const routes: Routes = [
     CollapseComponent,
     TableComponent,
     ImageTableComponent,
+    DeleteModalComponent,
     LabelComponent,
   ],
 })
