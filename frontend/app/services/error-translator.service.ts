@@ -29,6 +29,23 @@ export class ErrorTranslatorService {
       front: "Impossible de créer la géométrie, elle ne semble pas appropriée",
       id: 3,
     },
+    {
+      api: "wrong_qualif", // error returned by backend
+      front:
+        "Le SDAGE selectionné ne fait pas partie des règles définies pour le bassin versant", //error to show to the user
+      id: 4,
+    },
+    {
+      api: "post_cor_zh_rb_db_error",
+      front: "Veuillez tracer une zone humide sur la carte",
+      id: 5,
+    },
+    {
+      api: "Hierarchy class: get_rb_error",
+      front:
+        "Impossible d'effectuer la hierarchisation car la zone humide ne se situe sur aucun bassin versant",
+      id: 6,
+    },
   ];
 
   getError(errorMsg: string): error {

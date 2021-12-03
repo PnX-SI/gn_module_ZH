@@ -41,15 +41,29 @@ export class ZhFormTab4Component implements OnInit {
   private tempId: number;
 
   public inflowTableCol = [
-    { name: "inflow", label: "Entrée d'eau" },
-    { name: "permanance", label: "Permanence" },
-    { name: "topo", label: "Toponymie et compléments d'information" },
+    { name: "inflow", label: "Entrée d'eau", subcell: { name: "mnemonique" } },
+    {
+      name: "permanance",
+      label: "Permanence",
+      subcell: { name: "mnemonique" },
+    },
+    {
+      name: "topo",
+      label: "Toponymie et compléments d'information",
+    },
   ];
 
   public outflowTableCol = [
-    { name: "outflow", label: "Sortie d'eau" },
-    { name: "permanance", label: "Permanence" },
-    { name: "topo", label: "Toponymie et compléments d'information" },
+    { name: "outflow", label: "Sortie d'eau", subcell: { name: "mnemonique" } },
+    {
+      name: "permanance",
+      label: "Permanence",
+      subcell: { name: "mnemonique" },
+    },
+    {
+      name: "topo",
+      label: "Toponymie et compléments d'information",
+    },
   ];
 
   private readonly corConnectionType = {

@@ -62,33 +62,12 @@
         *ngIf="listCorinBio && listCorinBio.length > 0"
         class="table-responsive"
       >
-        <table class="table">
-          <thead class="thead-inverse table-header">
-            <tr>
-              <th *ngFor="let col of corinTableCol">
-                {{ col.label }}
-              </th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let corin of listCorinBio">
-              <td *ngFor="let col of corinTableCol">{{ corin[col.name] }}</td>
-              <td>
-                <div>
-                  <button
-                    mat-icon-button
-                    placement="top"
-                    ngbTooltip="Supprimer"
-                    (click)="onDeleteCorin(corin.CB_code)"
-                  >
-                    <mat-icon class="delete-icon">close</mat-icon>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <zh-table
+          [tableCols]="corinTableCol"
+          [data]="listCorinBio"
+          [deletable]="true"
+          (onDelete)="onDeleteCorin($event?.CB_code)"
+        ></zh-table>
       </div>
       <div class="form-row">
         <div class="form-group col-md-12">
@@ -134,45 +113,14 @@
         *ngIf="listActivity && listActivity.length > 0"
         class="table-responsive"
       >
-        <table class="table">
-          <thead class="thead-inverse table-header">
-            <tr>
-              <th *ngFor="let col of activityTableCol">{{ col.label }}</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let activity of listActivity">
-              <td class="backToLigne" *ngFor="let col of activityTableCol">
-                {{ activity[col.name]?.mnemonique || activity[col.name] }}
-              </td>
-              <td>
-                <div>
-                  <button
-                    mat-icon-button
-                    class="mr-2"
-                    placement="top"
-                    ngbTooltip="Editer"
-                  >
-                    <mat-icon
-                      class="edit-icon"
-                      (click)="onEditActivity(activityModal, activity)"
-                      >edit</mat-icon
-                    >
-                  </button>
-                  <button
-                    mat-icon-button
-                    placement="top"
-                    ngbTooltip="Supprimer"
-                    (click)="onDeleteActivity(activity)"
-                  >
-                    <mat-icon class="delete-icon">close</mat-icon>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <zh-table
+          [tableCols]="activityTableCol"
+          [data]="listActivity"
+          [deletable]="true"
+          [editable]="true"
+          (onEdit)="onEditActivity(activityModal, $event)"
+          (onDelete)="onDeleteActivity($event)"
+      ></zh-table>
       </div>
       <div class="form-row">
         <div class="form-group col-md-12">

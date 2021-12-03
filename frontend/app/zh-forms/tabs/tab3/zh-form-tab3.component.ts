@@ -30,12 +30,39 @@ export class ZhFormTab3Component implements OnInit {
     { name: "CB_label", label: "Libellé Corine biotopes" },
     { name: "CB_humidity", label: "Humidité" },
   ];
+  // subcell : if the data contain a list inside the data list
+  //   example use : consider this
+  // {
+  //   "human_activity": {
+  //     "id_nomenclature": 604,
+  //     "mnemonique": "02 - sylviculture"
+  //   },
+  //   "impacts": {
+  //     "impacts": [
+  //       {
+  //         "mnemonique": "12.0- 12.0- zone industrielle ou commerciale",
+  //       }
+  //     ],
+  //   }
+  // }
+  // then use name for human_activity with name="mnemonique"
+  // use key and name for impacts with key="impacts"; name="mnemonique"
+
   activityTableCol = [
-    { name: "human_activity", label: "Activités humaines" },
-    { name: "localisation", label: "Localisation" },
+    {
+      name: "human_activity",
+      label: "Activités humaines",
+      subcell: { name: "mnemonique" },
+    },
+    {
+      name: "localisation",
+      label: "Localisation",
+      subcell: { name: "mnemonique" },
+    },
     {
       name: "impacts",
       label: "Impacts (facteurs influençant l'évolution de la zone)",
+      subcell: { key: "impacts", name: "mnemonique" },
     },
     { name: "remark_activity", label: "Remarques" },
   ];
@@ -165,6 +192,7 @@ export class ZhFormTab3Component implements OnInit {
               mnemonique: impactNames.join("\r\n"),
             },
           });
+          console.log(this.listActivity);
           this.sortHumanActivities();
           this.activitiesInput.map((item) => {
             if (item.id_nomenclature == activity.id_human_activity) {
@@ -236,6 +264,12 @@ export class ZhFormTab3Component implements OnInit {
                   v.CB_code.toLowerCase().indexOf(term.toLowerCase()) > -1
               )
               .slice(0, 10)
+      ),
+      // Not to display a Corine that is already in the table
+      map((term) =>
+        term.filter(
+          (t) => !this.listCorinBio.map((c) => c.CB_code).includes(t.CB_code)
+        )
       )
     );
 

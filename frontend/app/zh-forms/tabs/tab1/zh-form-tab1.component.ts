@@ -5,8 +5,8 @@ import {
   debounceTime,
   distinctUntilChanged,
   switchMap,
-  tap,
   catchError,
+  map,
 } from "rxjs/operators";
 import { ToastrService } from "ngx-toastr";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
@@ -286,6 +286,13 @@ export class ZhFormTab1Component implements OnInit {
       distinctUntilChanged(),
       switchMap((searchText: string) =>
         this._dataService.autocompletBib(searchText).pipe(
+          map((res: any) =>
+            res.filter((r) => {
+              return !this.listBib
+                .map((bib) => bib.id_reference)
+                .includes(r.id_reference);
+            })
+          ),
           catchError(() => {
             return of([]);
           })

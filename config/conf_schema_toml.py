@@ -107,6 +107,10 @@ max_pdf_size = 1.5  # Mo
 
 max_jpg_size = 0.5  # Mo
 
+filename_validated = True
+
+fileformat_validated = True
+
 file_path = "static"
 
 module_dir_name = 'gn_module_zones_humides'
@@ -128,5 +132,7 @@ class GnModuleSchemaConf(Schema):
     allowed_extensions = fields.List(fields.String, missing=allowed_extensions)
     max_pdf_size = fields.Float(missing=max_pdf_size)
     max_jpg_size = fields.Float(missing=max_jpg_size)
+    fileformat_validated = fields.Boolean(missing=fileformat_validated)
+    filename_validated = fields.Boolean(missing=filename_validated)
     file_path = fields.String(missing=file_path)
     module_dir_name = fields.String(missing=module_dir_name)

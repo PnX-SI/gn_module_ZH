@@ -5,6 +5,9 @@
     color: #333;
   }
 
+  .selected-list .c-list {
+    padding-right: 10px;
+  }
   .selected-list .c-list .c-token {
     background: #219653;
   }
@@ -302,6 +305,11 @@ button:focus {
   justify-content: flex-end;
   margin-top: 36px;
   margin-bottom: 36px;
+}
+
+.toast-top-center {
+  top: 12px;
+  width: 18%;
 }
 
 /* .footer-btn {

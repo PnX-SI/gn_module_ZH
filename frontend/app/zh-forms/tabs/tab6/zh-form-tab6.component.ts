@@ -48,6 +48,13 @@ export class ZhFormTab6Component implements OnInit {
   public statusTable: any[] = [];
   public instrumentTable: any[] = [];
   public urbanDocTable: any[] = [];
+  public structures: {
+    id_org: number;
+    name: string;
+    abbreviation: string;
+    is_op_org: boolean;
+    plans: [];
+  }[] = [];
   public managements: any[] = [];
   public plans: any[] = [];
   private tempID: any;
@@ -55,19 +62,31 @@ export class ZhFormTab6Component implements OnInit {
   public selectedItems = [];
 
   public statusTableCol = [
-    { name: "status", label: "Statut" },
+    { name: "status", label: "Statut", subcell: { name: "mnemonique" } },
     { name: "remark", label: "Remarques" },
   ];
 
   public instrumentTableCol = [
-    { name: "instrument", label: "Instruments contractuels et financiers" },
+    {
+      name: "instrument",
+      label: "Instruments contractuels et financiers",
+      subcell: { name: "mnemonique" },
+    },
     { name: "instrument_date", label: "Date de mise en oeuvre" },
   ];
 
   public urbanDocTableCol = [
-    { name: "area", label: "Commune" },
-    { name: "urbanType", label: "Type de document communal" },
-    { name: "typeClassement", label: "Type de classement" },
+    { name: "area", label: "Commune", subcell: { name: "municipality_name" } },
+    {
+      name: "urbanType",
+      label: "Type de document communal",
+      subcell: { name: "mnemonique" },
+    },
+    {
+      name: "typeClassement",
+      label: "Type de classement",
+      subcell: { name: "mnemonique" },
+    },
     { name: "remark", label: "Remarques" },
   ];
   public planTableCol = [
@@ -86,6 +105,7 @@ export class ZhFormTab6Component implements OnInit {
     labelKey: string;
     primaryKey: string;
     enableFilterSelectAll: boolean;
+    noDataLabel: string;
   };
   public currentZh: any;
   selectedManagement: any;
@@ -122,6 +142,7 @@ export class ZhFormTab6Component implements OnInit {
       labelKey: "name",
       primaryKey: "id_org",
       enableFilterSelectAll: false,
+      noDataLabel: "Aucun organisme disponible",
     };
     this.dropdownSettings = {
       enableCheckAll: false,
@@ -691,6 +712,14 @@ export class ZhFormTab6Component implements OnInit {
     }
   }
 
+  onStructureOpened() {
+    // When the multiselect is opened
+    // Filter the structure with the ones present in the table
+    this.structures = this.formMetaData.BIB_MANAGEMENT_STRUCTURES.filter(
+      (item) => !this.managements.map((m) => m.id_org).includes(item.id_org)
+    );
+  }
+
   onAddStructure() {
     // multi select : returns an Array...
     const structure = this.formTab6.value.structure[0];
@@ -704,6 +733,22 @@ export class ZhFormTab6Component implements OnInit {
       this.formTab6.get("structure").reset();
       this.canChangeTab.emit(false);
     }
+  }
+
+  onDeleteStrutureModal(modal, structure) {
+    this.ngbModal
+      .open(modal, {
+        centered: true,
+        size: "lg",
+        windowClass: "bib-modal",
+      })
+      .result.then(
+        () => {
+          //When suppr is clicked
+          this.onDeleteStructure(structure);
+        },
+        () => {}
+      );
   }
 
   //delete Structure from the StructureS array
@@ -778,6 +823,22 @@ export class ZhFormTab6Component implements OnInit {
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
     }
+  }
+
+  onDeletePlanModal(modal, plan, structure) {
+    this.ngbModal
+      .open(modal, {
+        centered: true,
+        size: "lg",
+        windowClass: "bib-modal",
+      })
+      .result.then(
+        () => {
+          //When suppr is clicked
+          this.onDeletePlan(plan, structure);
+        },
+        () => {}
+      );
   }
 
   //delete plan from the plan array
