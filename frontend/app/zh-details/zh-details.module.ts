@@ -56,6 +56,7 @@ const routes: Routes = [
     TableComponent,
     ImageTableComponent,
     DeleteModalComponent,
+    LabelComponent,
   ],
 })
 export class ZhDetailsModule {}
