@@ -114,6 +114,13 @@ export class ZhDataService {
     );
   }
 
+  patchFile(mediaId: number, form: FormData) {
+    return this._api.patch(
+      `${AppConfig.API_ENDPOINT}/zones_humides/files/${mediaId}`,
+      form
+    );
+  }
+
   postMainPicture(zhId: number, mediaId: number) {
     return this._api.patch(
       `${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/main_pict/${mediaId}`,
@@ -131,5 +138,36 @@ export class ZhDataService {
     return this._api.get<HierarchyModel>(
       `${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/hierarchy`
     );
+  }
+
+  getDepartments() {
+    return this._api.get(`${AppConfig.API_ENDPOINT}/zones_humides/departments`);
+  }
+
+  getCommuneFromDepartment(code: number) {
+    const payload = { code: code };
+    return this._api.post(
+      `${AppConfig.API_ENDPOINT}/zones_humides/communes`,
+      payload
+    );
+  }
+
+  getBasins() {
+    return this._api.get(`${AppConfig.API_ENDPOINT}/zones_humides/bassins`);
+  }
+
+  getHydroZoneFromBasin(code: number) {
+    const payload = { code: code };
+    return this._api.post(
+      `${AppConfig.API_ENDPOINT}/zones_humides/zones_hydro`,
+      payload
+    );
+  }
+
+  // Search is a function that filter or not all the ZH
+  search(payload: Object, options?) {
+    return this._api.post(`${AppConfig.API_ENDPOINT}/zones_humides`, payload, {
+      params: options,
+    });
   }
 }

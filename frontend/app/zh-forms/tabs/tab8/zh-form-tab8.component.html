@@ -24,7 +24,7 @@
           [downloadable]="true"
           (onDelete)="onDeleteFile($event)"
           (onEdit)="onEditFile($event, fileModal)"
-          (onDownload)="onDownloadFile($event)"
+          (onDownload)="_filesService.downloadFile($event)"
           (onRadioChanged)="onChangeMainPhoto($event)">
         </zh-image-table>
       </collapse>
@@ -38,7 +38,7 @@
             [downloadable]="true"
             (onDelete)="onDeleteFile($event)"
             (onEdit)="onEditFile($event, fileModal)"
-            (onDownload)="onDownloadFile($event)"
+            (onDownload)="_filesService.downloadFile($event)"
           ></zh-table>
         </collapse>
       </ng-container>
@@ -82,7 +82,7 @@
                 fileForm.controls.file.errors?.fileSizeValidator
               "
               class="error-msg"
-              >Le fichier excède le poids maximum autorisé (500ko pour les photos, 1500ko pour les pdf)<br></small>
+              >Le fichier excède le poids maximum autorisé qui est de {{ config.max_jpg_size }}Mo pour les photos, {{ config.max_pdf_size }}Mo pour les pdf.<br>Poids mesuré : {{ fileToUpload.size / 1000000 | number: '1.0-1' }}Mo</small>
           <small
             *ngIf="
               fileForm.controls.file.errors?.fileNameValidator

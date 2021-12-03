@@ -108,9 +108,9 @@ def create_zh(form_data, info_role, zh_date, polygon, ref_geo_referentiels):
 
         DB.session.flush()
         return new_zh.id_zh
+    except ZHApiError:
+        raise
     except Exception as e:
-        # e.orig.diag.source_line
-        # e.orig.diag.statement_position
         if e.__class__.__name__ == 'DataError':
             raise ZHApiError(
                 message="create_zh_post_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)

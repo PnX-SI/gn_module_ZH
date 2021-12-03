@@ -24,7 +24,7 @@
           </div>
         </td>
         <td>
-          <img [src]="item.image"/>
+          <img *ngIf="item.image" [src]="item.image"/>
         </td>
         <td *ngFor="let col of tableCols">
             {{ item[col.name] !== "null" ? item[col.name] : "" }}

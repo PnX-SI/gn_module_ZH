@@ -4,12 +4,13 @@ import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 
 import { ToastrService } from "ngx-toastr";
 
+import { ModuleConfig } from "../../../module.config";
 import { ZhDataService } from "../../../services/zh-data.service";
 import { fileSizeValidator } from "../../../validators/fileSizeValidator";
 import { fileNameValidator } from "../../../validators/fileNameValidator";
 import { fileFormatValidator } from "../../../validators/fileFormatValidator";
 
-import { ZhFile, ZhFiles } from "./zh-form-tab8.models";
+import { ZhFile } from "./zh-form-tab8.models";
 import { FilesService } from "../../../services/files.service";
 import { TabsService } from "../../../services/tabs.service";
 
@@ -23,10 +24,11 @@ export class ZhFormTab8Component implements OnInit {
   @Output() public canChangeTab = new EventEmitter<boolean>();
   @Output() nextTab = new EventEmitter<number>();
   public zh: any;
+  public config = ModuleConfig;
   public formTab8: FormGroup;
   public fileForm: FormGroup;
-  public files: ZhFile[];
   public fileToUpload: File | null = null;
+  public fileIdToPatch: number | null = null;
   public loadingUpload: boolean = false;
 
   public modalTitle: string;
@@ -36,7 +38,7 @@ export class ZhFormTab8Component implements OnInit {
   public posted: boolean;
   public submitted: boolean;
 
-  public fileTypeAccepted: string[] = ["application/pdf", "image/*"];
+  public fileTypeAccepted: string[] = ["application/pdf", "image/jpeg"];
 
   public fileTableCol = [
     {
@@ -71,19 +73,30 @@ export class ZhFormTab8Component implements OnInit {
   // initialize forms
   initForms() {
     this.fileForm = this.fb.group({
-      file: [
-        null,
-        Validators.compose([
-          Validators.required,
-          fileFormatValidator(this.fileTypeAccepted),
-          fileSizeValidator(500, 1500),
-          fileNameValidator(this.zh.properties.code),
-        ]),
-      ],
+      file: [null, Validators.compose(this.getValidators())],
       title: [null, Validators.required],
       author: [null, Validators.required],
       summary: null,
     });
+  }
+
+  getValidators() {
+    let validators = [Validators.required];
+    if (this.config.fileformat_validated) {
+      validators.push(fileFormatValidator(this.fileTypeAccepted));
+    }
+    if (this.config.filename_validated) {
+      validators.push(fileNameValidator(this.zh.properties.code));
+    }
+
+    validators.push(
+      fileSizeValidator(
+        this.config.max_jpg_size * 1000,
+        this.config.max_pdf_size * 1000
+      )
+    );
+
+    return validators;
   }
 
   initExtensions() {
@@ -104,7 +117,7 @@ export class ZhFormTab8Component implements OnInit {
   handleImages() {
     let files = this.getFilesByExtensions(this._filesService.EXT_IMAGES);
     files.map((item) => {
-      this.downloadFile(item.id_media).then((res) => {
+      this._filesService.downloadFilePromise(item.id_media).then((res) => {
         const reader = new FileReader();
         reader.readAsDataURL(res);
         reader.onloadend = () => {
@@ -131,13 +144,13 @@ export class ZhFormTab8Component implements OnInit {
   // Enables to filter files from their extension
   // so that they can be separated in the html
   getFilesByExtensions(extensions: string[]): ZhFile[] {
-    return this._filesService.filterByExtension(this.files, extensions);
+    return this._filesService.filterByExtension(extensions);
   }
 
   // Function to gather all the files that do not
   // respect the extensions provided
   getOtherFiles(extensions: string[]): ZhFile[] {
-    return this._filesService.unfilterByExtension(this.files, extensions);
+    return this._filesService.unfilterByExtension(extensions);
   }
 
   onAddFile(event: any, modal: any) {
@@ -154,6 +167,7 @@ export class ZhFormTab8Component implements OnInit {
       event.author,
       event.description_fr
     );
+    this.fileIdToPatch = event.id_media;
     this.patchModal = true;
     this.onOpenModal(modal);
   }
@@ -169,71 +183,25 @@ export class ZhFormTab8Component implements OnInit {
     });
   }
 
-  getFiles() {
-    this._dataService
-      .getZhFiles(this.zh.id)
+  async getFiles() {
+    await this._filesService
+      .loadFiles(this.zh.id)
       .toPromise()
-      .then((res: ZhFiles) => {
-        this.files = res.media_data;
-        this.files.map((item) => (item.mainPictureId = res.main_pict_id));
-        this.initExtensions();
-      })
-      .catch((error) => {
-        this.displayError(
-          `Une erreur est survenue, impossible de récupérer les fichiers : <${error.message}>`
-        );
-      });
+      .then(() => this.initExtensions());
   }
 
   onDeleteFile(event) {
-    this._dataService
+    this._filesService
       .deleteFile(event.id_media)
       .toPromise()
-      .then(() => {
-        this.displayInfo("Fichier supprimé avec succès");
-      })
-      .catch((error) => {
-        this.displayError(
-          `Une erreur est survenue, impossible de supprimer ce fichier. Erreur : <${error.message}>`
-        );
-      })
-      .finally(() => {
-        this.getFiles();
-      });
-  }
-
-  onDownloadFile(event) {
-    this.downloadFile(event.id_media)
-      .then((res) => {
-        this._filesService.saveFile(res, event.media_path);
-      })
-      .catch((error) => {
-        this.displayError(
-          `Une erreur est survenue ! Impossible de télécharger ce fichier. Erreur : <${error.message}>`
-        );
-      });
-  }
-
-  downloadFile(id: number) {
-    return this._dataService.downloadFile(id).toPromise();
+      .finally(() => this.getFiles());
   }
 
   onChangeMainPhoto(event) {
-    console.log(event);
-    this._dataService
-      .postMainPicture(this.zh.id, event.id_media)
+    this._filesService
+      .changeMainPhoto(this.zh.id, event.id_media)
       .toPromise()
-      .then(() => {
-        this.displayInfo("Photo principale changée avec succès");
-      })
-      .catch((error) => {
-        this.displayError(
-          `Une erreur est survenue ! Impossible de changer la photo principale. Erreur : <${error.message}>`
-        );
-      })
-      .finally(() => {
-        this.getFiles();
-      });
+      .finally(() => this.getFiles());
   }
 
   onOpenModal(modal) {
@@ -255,26 +223,25 @@ export class ZhFormTab8Component implements OnInit {
     });
   }
 
-  postFile() {
-    this.loadingUpload = true;
+  fillUploadForm(patchFile: boolean = true): FormData {
     const uploadForm = new FormData();
     uploadForm.append("id_zh", this.zh.id);
     uploadForm.append("title", this.fileForm.value.title);
     uploadForm.append("author", this.fileForm.value.author);
     uploadForm.append("summary", this.fileForm.value.summary);
-    uploadForm.append("file", this.fileToUpload, this.fileToUpload.name);
-    this._dataService
-      .postDataForm(uploadForm, 8)
+    if (patchFile) {
+      uploadForm.append("file", this.fileToUpload, this.fileToUpload.name);
+    }
+    return uploadForm;
+  }
+
+  postFile() {
+    this.loadingUpload = true;
+    const uploadForm = this.fillUploadForm(true);
+    this._filesService
+      .postFile(uploadForm)
       .toPromise()
-      .then(() => {
-        this.activeModal.close();
-        this.displayInfo("Fichier téléversé avec succès !");
-      })
-      .catch((error) => {
-        this.displayError(
-          `Une erreur est survenue, impossible d'uploader un fichier : <${error.message}>`
-        );
-      })
+      .then(() => this.activeModal.close())
       .finally(() => {
         this.loadingUpload = false;
         this.getFiles();
@@ -282,8 +249,21 @@ export class ZhFormTab8Component implements OnInit {
   }
 
   patchFile() {
-    // Check if file is empty: not changed
-    console.log("Not implemented yet");
+    this.loadingUpload = true;
+    const uploadForm: FormData = this.fillUploadForm(
+      this.fileToUpload.size !== 0
+    );
+    this._filesService
+      .patchFile(this.fileIdToPatch, uploadForm)
+      .toPromise()
+      .then(() => {
+        this.activeModal.close();
+        this.getFiles();
+      })
+      .catch((err) => console.log(err))
+      .finally(() => {
+        this.loadingUpload = false;
+      });
   }
 
   resetForm() {
@@ -291,9 +271,6 @@ export class ZhFormTab8Component implements OnInit {
     this.fileToUpload = null;
   }
 
-  displayInfo(message: string) {
-    this._toastr.success(message);
-  }
   displayError(error: string) {
     this._toastr.error(error);
   }
