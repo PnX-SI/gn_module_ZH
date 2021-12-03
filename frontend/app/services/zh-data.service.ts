@@ -129,9 +129,7 @@ export class ZhDataService {
   }
 
   getTaxa(zhId: number) {
-    return this._api.get(
-      `${AppConfig.API_ENDPOINT}/zones_humides/`
-    );
+    return this._api.get(`${AppConfig.API_ENDPOINT}/zones_humides/`);
   }
 
   getHierZh(zhId: string) {
@@ -145,5 +143,36 @@ export class ZhDataService {
       `${AppConfig.API_ENDPOINT}/zones_humides/export_pdf/${zhId}`,
       { responseType: "blob" }
     );
+  }
+
+  getDepartments() {
+    return this._api.get(`${AppConfig.API_ENDPOINT}/zones_humides/departments`);
+  }
+
+  getCommuneFromDepartment(code: number) {
+    const payload = { code: code };
+    return this._api.post(
+      `${AppConfig.API_ENDPOINT}/zones_humides/communes`,
+      payload
+    );
+  }
+
+  getBasins() {
+    return this._api.get(`${AppConfig.API_ENDPOINT}/zones_humides/bassins`);
+  }
+
+  getHydroZoneFromBasin(code: number) {
+    const payload = { code: code };
+    return this._api.post(
+      `${AppConfig.API_ENDPOINT}/zones_humides/zones_hydro`,
+      payload
+    );
+  }
+
+  // Search is a function that filter or not all the ZH
+  search(payload: Object, options?) {
+    return this._api.post(`${AppConfig.API_ENDPOINT}/zones_humides`, payload, {
+      params: options,
+    });
   }
 }

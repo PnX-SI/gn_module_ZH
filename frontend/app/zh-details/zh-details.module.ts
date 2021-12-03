@@ -51,6 +51,12 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     MatRadioModule,
   ],
-  exports: [CollapseComponent, TableComponent, ImageTableComponent],
+  exports: [
+    CollapseComponent,
+    TableComponent,
+    ImageTableComponent,
+    DeleteModalComponent,
+    LabelComponent,
+  ],
 })
 export class ZhDetailsModule {}

@@ -10,18 +10,30 @@
     <ng-container *ngIf="data && data.length > 0">
       <tr *ngFor="let item of data">
         <td *ngFor="let col of tableCols">
-          <ul *ngIf="isArray(item[col.name]); else elseBlock">
-            <li class="item" *ngFor="let item of item[col.name]">
-              {{ item }}
-            </li>
-          </ul>
-          <ng-template #elseBlock>
-            <b *ngIf="bold_row_values.includes(item['name']) else italic">{{ item[col.name] }}</b>
-            <ng-template #italic>
-              <i *ngIf="italic_row_values.includes(item['name']) else normal">{{ item[col.name] }}</i>
-            </ng-template>
-            <ng-template #normal>
-              {{ item[col.name] }}
+          <ng-container *ngIf="col.subcell; else elseBlockSub">
+            <ul *ngIf="isArray(item[col.name][col.subcell.key]); else elseBlockSubArr">
+              <li class="item" *ngFor="let item of item[col.name][col.subcell.key]">
+                {{ item[col.subcell.name] }}
+              </li>
+            </ul>
+          </ng-container>
+          <ng-template #elseBlockSubArr>
+            {{ item[col.name][col.subcell.name] }}
+          </ng-template>
+          <ng-template #elseBlockSub>
+            <ul *ngIf="isArray(item[col.name]); else elseBlockSub">
+              <li class="item" *ngFor="let item of item[col.name]">
+                {{ item }}
+              </li>
+            </ul>
+            <ng-template #elseBlockSub>
+              <b *ngIf="bold_row_values.includes(item['name']) else italic">{{ item[col.name] }}</b>
+              <ng-template #italic>
+                <i *ngIf="italic_row_values.includes(item['name']) else normal">{{ item[col.name] }}</i>
+              </ng-template>
+              <ng-template #normal>
+                {{ item[col.name] }}
+              </ng-template>
             </ng-template>
           </ng-template>
         </td>
