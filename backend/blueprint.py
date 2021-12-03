@@ -78,12 +78,15 @@ from .hierarchy import *
 from .utils import (
     get_file_path,
     delete_file,
-    check_ref_geo_schema
+    check_ref_geo_schema,
+    get_main_picture_id
 )
 
 from .model.repositories import (
     ZhRepository
 )
+
+from .pdf import gen_pdf
 
 from .api_error import ZHApiError
 
@@ -91,8 +94,7 @@ from .search import main_search
 
 import pdb
 
-
-blueprint = Blueprint("pr_zh", __name__)
+blueprint = Blueprint("pr_zh", __name__, template_folder='templates')
 
 
 # Route pour afficher liste des zones humides
@@ -218,9 +220,7 @@ def get_complete_info(id_zh, info_role):
     """
     try:
         # get other referentials needed for the module from the config file
-        ref_geo_config = [
-            ref for ref in blueprint.config['ref_geo_referentiels'] if ref['active']]
-        return Card(id_zh, "full", ref_geo_config).__repr__()
+        return get_complete_card(id_zh)
     except Exception as e:
         exc_type, value, tb = sys.exc_info()
         if e.__class__.__name__ == 'NoResultFound':
@@ -236,6 +236,12 @@ def get_complete_info(id_zh, info_role):
             message="get_complete_info_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
     finally:
         DB.session.close()
+
+
+def get_complete_card(id_zh: int) -> Card:
+    ref_geo_config = [
+            ref for ref in blueprint.config['ref_geo_referentiels'] if ref['active']]
+    return Card(id_zh, "full", ref_geo_config).__repr__()
 
 
 @blueprint.route("/eval/<int:id_zh>", methods=["GET"])
@@ -481,7 +487,7 @@ def get_file_list(id_zh, info_role):
             TMedias.unique_id_media == zh_uuid).all()
         return {
             "media_data": [media.as_dict() for media in q_medias],
-            "main_pict_id": DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().main_pict_id
+            "main_pict_id": get_main_picture_id(id_zh)
         }
     except Exception as e:
         exc_type, value, tb = sys.exc_info()
@@ -882,6 +888,17 @@ def returnUserCruved(info_role):
         module_code=blueprint.config['MODULE_CODE']
     )
     return user_cruved
+
+
+@blueprint.route("/export_pdf/<int:id_zh>", methods=["GET"])
+@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
+def download(id_zh: int):
+    """
+    Downloads the report in pdf format
+    """
+    dataset = get_complete_card(id_zh)
+    pdf_file = gen_pdf(id_zh=id_zh, dataset=dataset)
+    return send_file(pdf_file, as_attachment=True)
 
 
 @blueprint.route("/departments", methods=['GET'])
