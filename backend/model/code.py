@@ -1,10 +1,12 @@
 from sqlalchemy.sql import func
 
+import sys
+
 from geonature.utils.env import DB
 
 from .zh_schema import *
-
 from .zh import ZH
+from ..api_error import ZHApiError
 
 
 class Code(ZH):
@@ -15,16 +17,27 @@ class Code(ZH):
         self.zh_geom = zh_geom
 
     def get_departments(self):
-        departments = CorZhArea.get_departments(self.id_zh)
-        area = 0
-        my_geom = DB.session.query(func.ST_Transform(func.ST_SetSRID(
-            TZH.geom, 4326), 2154)).filter(TZH.id_zh == self.id_zh).one()[0]
-        for dep in departments:
-            if DB.session.scalar(dep.LAreas.geom.ST_Intersection(my_geom).ST_Area()) > area:
-                area = DB.session.scalar(
-                    dep.LAreas.geom.ST_Intersection(my_geom).ST_Area())
-                main_dep = dep.LAreas.area_code
-        return main_dep
+        try:
+            departments = CorZhArea.get_departments(self.id_zh)
+            area = 0
+            my_geom = DB.session.query(func.ST_Transform(func.ST_SetSRID(
+                TZH.geom, 4326), 2154)).filter(TZH.id_zh == self.id_zh).one()[0]
+            main_dep = None
+            for dep in departments:
+                if DB.session.scalar(dep.LAreas.geom.ST_Intersection(my_geom).ST_Area()) > area:
+                    area = DB.session.scalar(
+                        dep.LAreas.geom.ST_Intersection(my_geom).ST_Area())
+                    main_dep = dep.LAreas.area_code
+            if main_dep is None:
+                raise ZHApiError(
+                    message="no_department", details="main_dep value is none")
+            return main_dep
+        except ZHApiError:
+            raise
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="set_geom_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
     def get_organism(self):
         return BibOrganismes.get_abbrevation(self.id_org)
