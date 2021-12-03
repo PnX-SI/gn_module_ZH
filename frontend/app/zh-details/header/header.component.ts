@@ -13,6 +13,7 @@ import { CruvedStoreService } from "@geonature_common/service/cruved-store.servi
 })
 export class HeaderComponent {
   @Input() zhId: number;
+  @Input() zhCode: number;
   public loadingPdf: boolean = false;
 
   constructor(
@@ -63,7 +64,10 @@ export class HeaderComponent {
     this._zhService.getPdf(this.zhId).subscribe(
       (result) => {
         this.loadingPdf = false;
-        saveAs(result, "export.pdf");
+        const rawDate: string = new Date().toLocaleDateString();
+        const date: string = rawDate.replace(/\//g, "-");
+        const filename: string = `${this.zhCode}_${date}_fiche.pdf`;
+        saveAs(result, filename);
       },
       (error) => {
         this.loadingPdf = false;
