@@ -30,11 +30,18 @@ class Code(ZH):
         return BibOrganismes.get_abbrevation(self.id_org)
 
     def get_number(self):
-        number = DB.session.query(CorZhArea).join(LAreas, LAreas.id_area == CorZhArea.id_area).join(
-            TZH, TZH.id_zh == CorZhArea.id_zh).filter(TZH.id_org == self.id_org, LAreas.area_code == self.get_departments()).count()
-        if number > 9999:
+        base_code = self.get_departments() + self.get_organism()
+        q_codes = DB.session.query(TZH).filter(
+            TZH.code.contains(base_code)).all()
+        if q_codes:
+            code_numbers = [int(zh.code.split(self.get_organism())[
+                1]) for zh in q_codes]
+            max_code = max(code_numbers)
+        else:
+            max_code = 0
+        if max_code > 9999:
             raise ValueError("code error : zh_number_greater_than_9999")
-        return number+1
+        return max_code+1
 
     def __repr__(self):
         return f'{self.get_departments()}{self.get_organism()}{self.get_number():04d}'
