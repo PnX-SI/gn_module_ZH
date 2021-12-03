@@ -38,7 +38,7 @@ export class ZhFormTab8Component implements OnInit {
   public posted: boolean;
   public submitted: boolean;
 
-  public fileTypeAccepted: string[] = ["application/pdf", "image/*"];
+  public fileTypeAccepted: string[] = ["application/pdf", "image/jpeg"];
 
   public fileTableCol = [
     {
