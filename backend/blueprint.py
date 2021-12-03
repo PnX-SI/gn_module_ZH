@@ -73,6 +73,8 @@ from .geometry import set_geom
 
 from .upload import upload
 
+from .hierarchy import *
+
 from .utils import (
     get_file_path,
     delete_file,
@@ -85,13 +87,16 @@ from .model.repositories import (
 
 from .api_error import ZHApiError
 
+from .search import main_search
+
 import pdb
+
 
 blueprint = Blueprint("pr_zh", __name__)
 
 
 # Route pour afficher liste des zones humides
-@blueprint.route("", methods=["GET"])
+@blueprint.route("", methods=["GET", "POST"])
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
 def get_zh(info_role):
@@ -99,19 +104,35 @@ def get_zh(info_role):
         q = DB.session.query(TZH)
 
         parameters = request.args
-
         limit = int(parameters.get("limit", 100))
         page = int(parameters.get("offset", 0))
 
+        payload = request.json or None
+
+        if payload is not None:
+            q = main_search(q, payload)
+
+        return get_all_zh(info_role=info_role,
+                        query=q,
+                        limit=limit,
+                        page=page)
+    except Exception as e:
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(message="filter_zh_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+
+
+def get_all_zh(info_role, query, limit, page):
+    try:
         # Pour obtenir le nombre de résultat de la requete sans le LIMIT
-        nb_results_without_limit = q.count()
+        nb_results_without_limit = query.count()
+
 
         user = info_role
         user_cruved = get_or_fetch_user_cruved(
             session=session, id_role=info_role.id_role, module_code="ZONES_HUMIDES"
         )
 
-        data = q.limit(limit).offset(page * limit).all()
+        data = query.limit(limit).offset(page * limit).all()
 
         # check if municipalities and dep in ref_geo
         is_ref_geo = check_ref_geo_schema()
@@ -664,7 +685,7 @@ def get_tab_data(id_tab, info_role):
 
             # checks if error in user file or user http request:
             if "error" in uploaded_resp:
-                return {"id_zh": request.form.to_dict['id_zh'], "errors": uploaded_resp["error"]}, 400
+                return {"id_zh": request.form.to_dict()['id_zh'], "errors": uploaded_resp["error"]}, 400
 
             # save in db
             id_media = post_file_info(
@@ -861,3 +882,78 @@ def returnUserCruved(info_role):
         module_code=blueprint.config['MODULE_CODE']
     )
     return user_cruved
+
+
+@blueprint.route("/departments", methods=['GET'])
+@json_resp
+def departments():
+    query = DB.session.query(LAreas).with_entities(LAreas.area_name, LAreas.area_code, LAreas.id_type, BibAreasTypes.type_code).join(BibAreasTypes, LAreas.id_type == BibAreasTypes.id_type)
+    query = query.filter(BibAreasTypes.type_code == 'DEP')
+    query = query.order_by(LAreas.area_code)
+    resp = query.all()
+    return [{"code": r.area_code, "name": r.area_name} for r in resp]
+
+
+@blueprint.route("/communes", methods=['POST'])
+@json_resp
+def get_area_from_department() -> dict:
+    code = request.json.get('code')
+    if code: 
+        query = DB.session.query(LiMunicipalities).with_entities(LiMunicipalities.id_area, LAreas.area_name, LAreas.area_code)\
+            .join(LAreas, LiMunicipalities.id_area == LAreas.id_area)\
+            .filter(LiMunicipalities.insee_com.like('{}%'.format(code)))
+        query = query.order_by(LAreas.area_code)
+        resp = query.all()
+        return [{"code": r.area_code, "name": r.area_name} for r in resp]
+    
+    return []
+
+
+@blueprint.route("/bassins", methods=['GET'])
+@json_resp
+def bassins():
+    query = DB.session.query(TRiverBasin).with_entities(
+        TRiverBasin.id_rb,
+        TRiverBasin.name)
+    resp = query.all()
+    return [{"code": r.id_rb, "name": r.name} for r in resp]
+
+
+@blueprint.route("/zones_hydro", methods=['POST'])
+@json_resp
+def get_hydro_zones_from_bassin() -> dict:
+    code = request.json.get('code')
+    if code:
+        query = DB.session.query(THydroArea).with_entities(
+            THydroArea.id_hydro,
+            THydroArea.name,
+            TRiverBasin.id_rb
+        ).filter(TRiverBasin.id_rb == code).join(TRiverBasin, TRiverBasin.geom.ST_Intersects(THydroArea.geom))
+
+        resp = query.all()
+        return [{"code": r.id_hydro, "name": r.name} for r in resp]
+
+    return []
+
+
+@blueprint.route("/<int:id_zh>/hierarchy", methods=["GET"])
+@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@json_resp
+def get_hierarchy(id_zh, info_role):
+    """Get zh note
+    """
+    try:
+        hierarchy = Hierarchy(id_zh).__str__()
+        # pdb.set_trace()
+        # separer notes volet 1 et notes volet 2 et créer champs dans t_zh
+        return hierarchy
+    except ZHApiError as e:
+        raise ZHApiError(
+            message=str(e.message), details=str(e.details), status_code=e.status_code)
+    except Exception as e:
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="get_hierarchy_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+    finally:
+        DB.session.rollback()
+        DB.session.close()

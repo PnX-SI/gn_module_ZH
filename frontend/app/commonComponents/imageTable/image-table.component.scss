@@ -1,0 +1,30 @@
+@import "../../../app.module";
+
+.item {
+  list-style: none;
+}
+
+.tab-buttons {
+  text-align: end;
+}
+
+img {
+  width: 150px;
+}
+
+.radio {
+  input {
+    position: relative;
+    top: 40%;
+    left: 50%;
+    bottom: 40%;
+  }
+}
+
+.photo-principale {
+  width: 50px;
+}
+
+.image {
+  width: 150px;
+}

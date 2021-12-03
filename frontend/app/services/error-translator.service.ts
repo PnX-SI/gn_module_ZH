@@ -24,6 +24,12 @@ export class ErrorTranslatorService {
         "Impossible de créer un identifiant unique avec les informations entrées. Le nom est peut-être déjà pris ?", //error to show to the user
       id: 2,
     },
+    {
+      api: "wrong_qualif", // error returned by backend
+      front:
+        "Le SDAGE selectionné ne fait pas partie des règles définies pour le bassin versant", //error to show to the user
+      id: 3,
+    },
   ];
 
   getError(errorMsg: string): error {
