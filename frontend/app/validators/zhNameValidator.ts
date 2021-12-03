@@ -9,7 +9,15 @@ export function zhNameValidator(dataService: ZhDataService, time: number) {
     return timer(time).pipe(
       switchMap(() => dataService.search({ nameorcode: name })),
       map((res: any) => {
-        return res.total === 0 ? null : { zh_exists: true };
+        let currentZhId: number = null;
+        dataService.currentZh.subscribe((data) => {
+          if (data) currentZhId = data.id;
+        });
+        return res.total === 0
+          ? null
+          : res.items.features[0].id === currentZhId
+          ? null
+          : { zh_exists: true };
       })
     );
   };
