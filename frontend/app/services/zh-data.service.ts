@@ -4,6 +4,7 @@ import { BehaviorSubject, pipe } from "rxjs";
 import { map } from "rxjs/operators";
 import { AppConfig } from "@geonature_config/app.config";
 import { DetailsModel } from "../zh-details/models/zh-details.model";
+import { HierarchyModel } from "../zh-details/models/hierarchy.model";
 
 @Injectable({
   providedIn: "root",
@@ -129,7 +130,13 @@ export class ZhDataService {
 
   getTaxa(zhId: number) {
     return this._api.get(
-      `${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/taxa`
+      `${AppConfig.API_ENDPOINT}/zones_humides/`
+    );
+  }
+
+  getHierZh(zhId: string) {
+    return this._api.get<HierarchyModel>(
+      `${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/hierarchy`
     );
   }
 }

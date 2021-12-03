@@ -73,7 +73,7 @@
                 [routerLink]="['forms', row.id_zh]"
               >
                 <i
-                  matTooltip="{{ 'Editer la ' }}"
+                  matTooltip="{{ 'Editer' }}"
                   class="fa fa-pencil-square-o"
                   aria-hidden="true"
                 ></i>
@@ -87,9 +87,10 @@
               <a
                 class="btn btn-outline-shadow btn-no-padding btn-ghost"
                 [routerLink]="['zhDetails', row.id_zh]"
+                target="_blank"
               >
                 <i
-                  matTooltip="{{ 'Info' }}"
+                  matTooltip="{{ 'Fiche complète de la zone humide' }}"
                   class="fa fa-info-circle"
                   aria-hidden="true"
                 ></i>
@@ -119,7 +120,7 @@
               <i
                 [ngClass]="{ disabled: !row.rights.D }"
                 #iElement
-                matTooltip="{{ 'Supprimer la ' }}"
+                matTooltip="{{ 'Supprimer' }}"
                 class="fa fa-trash-o"
                 aria-hidden="true"
               ></i>

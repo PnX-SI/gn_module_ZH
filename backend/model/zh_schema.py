@@ -1194,3 +1194,165 @@ def get_view_model(table_name, schema_name):
         )
 
     return TaxaView
+
+
+class BibHierPanes(DB.Model):
+    __tablename__ = "bib_hier_panes"
+    __table_args__ = {"schema": "pr_zh"}
+    pane_id = DB.Column(
+        DB.Integer,
+        primary_key=True)
+    label = DB.Column(
+        DB.Unicode,
+        nullable=False
+    )
+
+
+class BibHierCategories(DB.Model):
+    __tablename__ = "bib_hier_categories"
+    __table_args__ = {"schema": "pr_zh"}
+    cat_id = DB.Column(
+        DB.Integer,
+        primary_key=True)
+    abbreviation = DB.Column(
+        DB.Unicode(length=4),
+        nullable=False
+    )
+    label = DB.Column(
+        DB.Unicode,
+        nullable=False
+    )
+
+
+class BibHierSubcategories(DB.Model):
+    __tablename__ = "bib_hier_subcategories"
+    __table_args__ = {"schema": "pr_zh"}
+    subcat_id = DB.Column(
+        DB.Integer,
+        primary_key=True)
+    label = DB.Column(
+        DB.Unicode,
+        nullable=False
+    )
+
+
+class BibNoteTypes(DB.Model):
+    __tablename__ = "bib_note_types"
+    __table_args__ = {"schema": "pr_zh"}
+    note_id = DB.Column(
+        DB.Integer,
+        primary_key=True)
+    id_knowledge = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        nullable=True
+    )
+
+
+class TRules(DB.Model):
+    __tablename__ = "t_rules"
+    __table_args__ = {"schema": "pr_zh"}
+    rule_id = DB.Column(
+        DB.Integer,
+        primary_key=True)
+    abbreviation = DB.Column(
+        DB.Unicode(length=15),
+        nullable=False
+    )
+    pane_id = DB.Column(
+        DB.Integer,
+        ForeignKey(BibHierPanes.pane_id)
+    )
+    cat_id = DB.Column(
+        DB.Integer,
+        ForeignKey(BibHierCategories.cat_id)
+    )
+    subcat_id = DB.Column(
+        DB.Integer,
+        ForeignKey(BibHierSubcategories.subcat_id)
+    )
+
+
+class CorRbRules(DB.Model):
+    __tablename__ = "cor_rb_rules"
+    __table_args__ = {"schema": "pr_zh"}
+    cor_rule_id = DB.Column(
+        DB.Integer,
+        primary_key=True)
+    rb_id = DB.Column(
+        DB.Integer,
+        ForeignKey(TRiverBasin.id_rb)
+    )
+    rule_id = DB.Column(
+        DB.Integer,
+        ForeignKey(TRules.rule_id)
+    )
+
+
+class TItems(DB.Model):
+    __tablename__ = "t_items"
+    __table_args__ = {"schema": "pr_zh"}
+    val_id = DB.Column(
+        DB.Integer,
+        primary_key=True)
+    cor_rule_id = DB.Column(
+        DB.Integer,
+        ForeignKey(CorRbRules.cor_rule_id)
+    )
+    attribute_id = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature)
+    )
+    note = DB.Column(
+        DB.Integer,
+        nullable=False)
+    note_type_id = DB.Column(
+        DB.Integer,
+        ForeignKey(BibNoteTypes.note_id)
+    )
+
+
+class CorItemValue(DB.Model):
+    __tablename__ = "cor_item_value"
+    __table_args__ = {"schema": "pr_zh"}
+    attribute_id = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True)
+    val_min = DB.Column(
+        DB.Integer,
+        nullable=False
+    )
+    val_max = DB.Column(
+        DB.Integer,
+        nullable=False
+    )
+
+
+class RbNotesSummary(DB.Model):
+    __tablename__ = "rb_notes_summary"
+    __table_args__ = {"schema": "pr_zh"}
+    bassin_versant = DB.Column(DB.Unicode, primary_key=True)
+    global_note = DB.Column(DB.Integer)
+    volet_1 = DB.Column(DB.Integer)
+    volet_2 = DB.Column(DB.Integer)
+    rub_sdage = DB.Column(DB.Integer)
+    rub_interet_pat = DB.Column(DB.Integer)
+    rub_eco = DB.Column(DB.Integer)
+    rub_hydro = DB.Column(DB.Integer)
+    rub_socio = DB.Column(DB.Integer)
+    rub_statut = DB.Column(DB.Integer)
+    rub_etat_fonct = DB.Column(DB.Integer)
+    rub_menaces = DB.Column(DB.Integer)
+
+
+class TCorQualif(DB.Model):
+    __tablename__ = "t_cor_qualif"
+    __table_args__ = {"schema": "pr_zh"}
+    combination = DB.Column(
+        DB.Unicode(length=4),
+        primary_key=True)
+    id_qualification = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature)
+    )

@@ -113,6 +113,13 @@
           (nextTab)="onNext($event)"
         ></zh-form-tab8>
       </mat-tab>
+      <mat-tab [disabled]="disabledTabs">
+        <ng-template mat-tab-label>9. Hierarchisation </ng-template>
+        <zh-form-tab9
+          class="d-flex flex-column"
+          [ngStyle]="{ 'height.px': cardContentHeight }"
+        ></zh-form-tab9>
+      </mat-tab>
     </mat-tab-group>
   </div>
 </div>
