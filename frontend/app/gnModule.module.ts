@@ -6,7 +6,6 @@ import { GN2CommonModule } from "@geonature_common/GN2Common.module";
 import { MapListService } from "@geonature_common/map-list/map-list.service";
 import { ZhDetailsModule } from "./zh-details/zh-details.module";
 import { NgMultiSelectDropDownModule } from "ng-multiselect-dropdown";
-import { AngularMultiSelectModule } from "angular2-multiselect-dropdown";
 //Components
 import { ZhMapListComponent } from "./zh-map-list/zh-map-list.component";
 import { ZhFormMapComponent } from "./zh-forms/map/map.component";
@@ -27,6 +26,7 @@ import { DatepickerI18n } from "./services/datepicker-i18n.service";
 import { CancelButtonComponent } from "./zh-forms/cancelButton/cancelButton.component";
 import { ZhFormTab8Component } from "./zh-forms/tabs/tab8/zh-form-tab8.component";
 import { ErrorTranslatorService } from "./services/error-translator.service";
+import { ZhSearchModule } from "./zh-search/zh-search.module";
 
 // my module routing
 const routes: Routes = [
@@ -57,10 +57,10 @@ const routes: Routes = [
     GN2CommonModule,
     RouterModule.forChild(routes),
     NgbModule.forRoot(),
-    AngularMultiSelectModule,
     NgMultiSelectDropDownModule.forRoot(),
     NgbModule,
     ZhDetailsModule,
+    ZhSearchModule,
   ],
   providers: [
     ZhDataService,
