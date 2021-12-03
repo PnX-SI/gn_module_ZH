@@ -76,7 +76,6 @@ export class ZhSearchComponent implements OnInit {
         this.advancedForm.value
       );
       const filtered = this.filterFormGroup(searchObj);
-      console.log("filtered", filtered);
 
       this.onSearch.emit(filtered);
     }

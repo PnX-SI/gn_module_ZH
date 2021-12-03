@@ -211,7 +211,6 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   filterZh(filtered) {
-    console.log("filter", filtered);
     const ms = this.mapListService;
     ms.isLoading = true;
     this._zhService

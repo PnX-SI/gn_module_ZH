@@ -38,8 +38,6 @@ export class ZhAdvancedSearchFonctionsComponent implements OnInit {
   }
 
   onDeSelectAllFcts() {
-    console.log("coucou");
-
     this.form.get("functions").reset();
   }
   onDeSelectAllQual() {
