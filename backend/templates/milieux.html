@@ -1,0 +1,30 @@
+<div class="flex-container">
+  <section class="content col">
+    <h5 class="subtitle">Corine Biotope</h5>
+    <div class="flex-container">
+      <div class="left">
+        <table class="custom-table">
+          <thead>
+              <tr>
+                  <th>Code Corine Biotope</th>
+                  <th>Libellé Corine Biotope</th>
+                  <th>Humidité</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for corine in data['description']['presentation']['corine_biotope'] %}
+              <tr>
+                <td>{{ corine['code'] }}</td>
+                <td>{{ corine['label'] }}</td>
+                <td>{{ corine['Humidité'] }}</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="right">
+        <img class="image" src="{{ data['image'] }}">
+      </div>
+    </div>
+  </section>
+</div>

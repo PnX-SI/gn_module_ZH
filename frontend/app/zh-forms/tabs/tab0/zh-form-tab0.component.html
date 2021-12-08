@@ -61,6 +61,14 @@
                 class="error-msg"
                 >Champ requis</small
               >
+              <small
+                *ngIf="
+                  (form.controls.main_name.touched || submitted) &&
+                  form.controls.main_name.errors?.zh_exists
+                "
+                class="error-msg"
+                >Ce nom est déjà pris. Veuillez entrer un autre nom</small
+              >
             </div>
           </div>
           <div class="form-row">

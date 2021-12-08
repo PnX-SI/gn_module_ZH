@@ -1,14 +1,19 @@
 <div *ngIf="evalZh" class="container-fluid">
   <h2 class="tabsTitle">Evaluation génerale du site                
-    <mat-icon
-    class="info-icon"
-    ngbTooltip="Cette rubrique met en avant les principaux enjeux liés à la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
-    >info</mat-icon>
 </h2>
   <form>
     <fieldset>
       <legend>
-        <h5 class="section-title">Fonctions et valeurs majeures</h5>
+        <h5 class="section-title">
+          Fonctions et valeurs majeures
+          <mat-icon
+          class="info-icon"
+          ngbTooltip="Cette rubrique met en avant les principaux enjeux liés à la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
+          placement="right"
+          >info
+        </mat-icon>
+      </h5>
+
       </legend>
       <div
         *ngIf="hydroFctData && hydroFctData.length > 0"
@@ -135,6 +140,12 @@
       <legend>
         <h5 class="section-title">
           Bilan des menaces et facteurs influençant la zone humide
+          <mat-icon
+          class="info-icon"
+          ngbTooltip="Cette rubrique met en avant les principales menaces liées à la zone humide en récupérant automatiquement les informations précédemment renseignées"
+          placement="top"
+          >info
+        </mat-icon>
         </h5>
       </legend>
       <div class="col-sm">
@@ -188,49 +199,14 @@
           *ngIf="actionTable && actionTable.length > 0"
           class="table-responsive"
         >
-          <table class="table mb-4">
-            <thead class="thead-inverse table-header">
-              <tr>
-                <th *ngFor="let col of actionTableCol">{{ col.label }}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of actionTable">
-                <td *ngFor="let col of actionTableCol">
-                  {{
-                    item[col.name]?.mnemonique ||
-                      item[col.name]?.name ||
-                      item[col.name]
-                  }}
-                </td>
-                <td>
-                  <div>
-                    <button
-                      mat-icon-button
-                      class="mr-2"
-                      placement="top"
-                      ngbTooltip="Editer"
-                    >
-                      <mat-icon
-                        class="edit-icon"
-                        (click)="onEditAction(actionModal, item)"
-                        >edit</mat-icon
-                      >
-                    </button>
-                    <button
-                      mat-icon-button
-                      placement="top"
-                      ngbTooltip="Supprimer"
-                      (click)="onDeleteAction(item)"
-                    >
-                      <mat-icon class="delete-icon">close</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <zh-table
+          [tableCols]="actionTableCol"
+          [data]="actionTable"
+          [deletable]="true"
+          [editable]="true"
+          (onDelete)="onDeleteAction($event)"
+          (onEdit)="onEditAction(actionModal, $event)"
+        ></zh-table>
         </div>
       </div>
       <div class="form-group col-md-12">

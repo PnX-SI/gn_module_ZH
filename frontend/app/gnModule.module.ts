@@ -6,7 +6,6 @@ import { GN2CommonModule } from "@geonature_common/GN2Common.module";
 import { MapListService } from "@geonature_common/map-list/map-list.service";
 import { ZhDetailsModule } from "./zh-details/zh-details.module";
 import { NgMultiSelectDropDownModule } from "ng-multiselect-dropdown";
-import { AngularMultiSelectModule } from "angular2-multiselect-dropdown";
 //Components
 import { ZhMapListComponent } from "./zh-map-list/zh-map-list.component";
 import { ZhFormMapComponent } from "./zh-forms/map/map.component";
@@ -18,6 +17,8 @@ import { ZhFormTab4Component } from "./zh-forms/tabs/tab4/zh-form-tab4.component
 import { ZhFormTab5Component } from "./zh-forms/tabs/tab5/zh-form-tab5.component";
 import { ZhFormTab6Component } from "./zh-forms/tabs/tab6/zh-form-tab6.component";
 import { ZhFormTab7Component } from "./zh-forms/tabs/tab7/zh-form-tab7.component";
+import { ZhFormTab9Component } from "./zh-forms/tabs/tab9/zh-form-tab9.component";
+
 // Service
 import { ZhDataService } from "./services/zh-data.service";
 import { ZhTabsComponent } from "./zh-forms/tabs/zh-tabs.component";
@@ -25,6 +26,7 @@ import { DatepickerI18n } from "./services/datepicker-i18n.service";
 import { CancelButtonComponent } from "./zh-forms/cancelButton/cancelButton.component";
 import { ZhFormTab8Component } from "./zh-forms/tabs/tab8/zh-form-tab8.component";
 import { ErrorTranslatorService } from "./services/error-translator.service";
+import { ZhSearchModule } from "./zh-search/zh-search.module";
 
 // my module routing
 const routes: Routes = [
@@ -47,6 +49,7 @@ const routes: Routes = [
     ZhFormTab6Component,
     ZhFormTab7Component,
     ZhFormTab8Component,
+    ZhFormTab9Component,
     CancelButtonComponent,
   ],
   imports: [
@@ -54,10 +57,10 @@ const routes: Routes = [
     GN2CommonModule,
     RouterModule.forChild(routes),
     NgbModule.forRoot(),
-    AngularMultiSelectModule,
     NgMultiSelectDropDownModule.forRoot(),
     NgbModule,
     ZhDetailsModule,
+    ZhSearchModule,
   ],
   providers: [
     ZhDataService,

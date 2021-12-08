@@ -31,7 +31,7 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
   public rowPerPage: number;
   public cardContentHeight: number;
   public moduleSub: Subscription;
-  private metaData: any;
+  private metaData: any = [];
 
   constructor(
     public mapListService: MapListService,
@@ -89,6 +89,8 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
         [{ param: "limit", value: this.rowPerPage }],
         this.zhCustomCallBack.bind(this)
       );
+      // Filter without data = get all ZH
+      //this.filterZh({});
     });
 
     // end OnInit
@@ -206,6 +208,23 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.ngbModal.open(modal, {
       centered: true,
     });
+  }
+
+  filterZh(filtered) {
+    const ms = this.mapListService;
+    ms.isLoading = true;
+    this._zhService
+      .search(filtered, { limit: this.rowPerPage })
+      .toPromise()
+      .then((res: any) => {
+        ms.page.totalElements = res.total;
+        ms.page.itemPerPage = this.rowPerPage;
+        ms.page.pageNumber = res.page;
+        ms.geojsonData = res.items;
+        ms.loadTableData(res.items, this.zhCustomCallBack.bind(this));
+      })
+      .catch((error) => console.log(error))
+      .finally(() => (ms.isLoading = false));
   }
 
   ngOnDestroy() {
