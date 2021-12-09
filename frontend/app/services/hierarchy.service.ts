@@ -33,7 +33,6 @@ export class HierarchyService {
   getHierarchy(zhId) {
     this._dataService.getHierZh(zhId).subscribe(
       (data: HierarchyModel) => {
-        console.log(data);
         this.hierZh = data;
         this.items = this.setItems(this.hierZh);
       },
@@ -48,8 +47,23 @@ export class HierarchyService {
             closeButton: true,
           });
         }
+      },
+      () => {
+        if (this.hierZh.volet1.cat1_sdage.note == null) {
+          this.items = [];
+          const frontError: string = this._error.getFrontError(
+            'wrong_qualif'
+          );
+          this._toastr.error(frontError, "", {
+            positionClass: "toast-top-right",
+            disableTimeOut: true,
+            closeButton: true,
+          });
+        }
       }
     );
+
+    
   }
 
   // set list of hierarchy items

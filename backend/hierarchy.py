@@ -483,8 +483,7 @@ class Item:
                 attribute_id_list = [getattr(item, 'attribute_id') for item in DB.session.query(
                     TItems).filter(TItems.cor_rule_id == self.cor_rule_id).all()]
                 if id_qualif not in attribute_id_list:
-                    raise ZHApiError(
-                        message='wrong_qualif', details='zh qualif ({}) provided for {} rule is not part of the qualif list defined in the river basin hierarchy rules'.format(DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == id_qualif).one().mnemonique, self.abb), status_code=400)
+                    return None
                 return id_qualif
         except ZHApiError as e:
             raise ZHApiError(
@@ -499,7 +498,9 @@ class Item:
     def __get_note(self):
         try:
             if self.active:
-                return round(getattr(DB.session.query(TItems).filter(and_(TItems.attribute_id == self.id_qualif, TItems.cor_rule_id == self.cor_rule_id, TItems.note_type_id == self.knowledge)).one(), 'note'), 2)
+                if self.id_qualif:
+                    return round(getattr(DB.session.query(TItems).filter(and_(TItems.attribute_id == self.id_qualif, TItems.cor_rule_id == self.cor_rule_id, TItems.note_type_id == self.knowledge)).one(), 'note'), 2)
+                return None
         except ZHApiError as e:
             raise ZHApiError(
                 message=str(e.message), details=str(e.details), status_code=e.status_code)
@@ -541,7 +542,9 @@ class Item:
     def __get_qualif_mnemo(self):
         try:
             if self.active:
-                return getattr(DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == self.id_qualif).one(), 'label_default')
+                if self.id_qualif:
+                    return getattr(DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == self.id_qualif).one(), 'label_default')
+                return None
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
@@ -581,7 +584,10 @@ class Cat:
     @staticmethod
     def get_note(value):
         try:
-            return round(sum(filter(None, [float(item['note'].split('/')[0]) for item in value if item['active']])))
+            for item in value:
+                if item['active'] and item['note'] is not None:
+                    return round(sum(filter(None, [float(item['note'].split('/')[0]) for item in value if item['active']])))
+                return None
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
@@ -711,7 +717,8 @@ class Volet:
         cat = Cat(self.id_zh, self.rb_id, cat_abb, cat_class)
         cat.denominator = view_abb
         cat.note = cat.get_note(cat.items.__str__())
-        self.note += cat.note
+        if cat.note is not None:
+            self.note += cat.note
         return cat
 
     def __str__(self):
