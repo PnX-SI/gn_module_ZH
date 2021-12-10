@@ -1356,3 +1356,21 @@ class TCorQualif(DB.Model):
         DB.Integer,
         ForeignKey(TNomenclatures.id_nomenclature)
     )
+
+
+class CorRuleNomenc(DB.Model):
+    __tablename__ = "cor_rule_nomenc"
+    __table_args__ = {"schema": "pr_zh"}
+    rule_id = DB.Column(
+        DB.Integer,
+        ForeignKey(TRules.rule_id),
+        primary_key=True
+    )
+    nomenc_id = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+    id_qualif = DB.Column(
+        DB.Integer
+    )

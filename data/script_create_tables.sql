@@ -892,8 +892,17 @@ CREATE  TABLE pr_zh.cor_item_value (
 CREATE  TABLE pr_zh.t_cor_qualif ( 
 	combination          varchar(4)  NOT NULL ,
 	id_qualification        integer  NOT NULL,
-CONSTRAINT pk_t_cor_qualif_combination PRIMARY KEY ( combination )
+	CONSTRAINT pk_t_cor_qualif_combination PRIMARY KEY ( combination )
 );
+
+CREATE  TABLE pr_zh.cor_rule_nomenc ( 
+	rule_id              integer  NOT NULL ,
+	nomenc_id            integer  NOT NULL ,
+	qualif_id			 integer ,
+	CONSTRAINT pk_cor_rule_nomenc PRIMARY KEY ( rule_id, nomenc_id )
+ );
+
+COMMENT ON TABLE pr_zh.cor_rule_nomenc IS 'correspondance between hierarchy rules and cd_nomenclatures (through nomenclature ids) used for rule evaluation';
 
 ALTER TABLE pr_zh.cor_rb_rules ADD CONSTRAINT fk_cor_rb_items_t_items FOREIGN KEY ( rule_id ) REFERENCES pr_zh.t_rules( rule_id )  ON UPDATE CASCADE;
 
@@ -915,6 +924,9 @@ ALTER TABLE pr_zh.t_cor_qualif ADD CONSTRAINT fk_t_cor_qualif_id_qualification F
 
 ALTER TABLE pr_zh.bib_note_types ADD CONSTRAINT fk_bib_note_types FOREIGN KEY ( id_knowledge ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
+ALTER TABLE pr_zh.cor_rule_nomenc ADD CONSTRAINT fk_cor_rule_nomenc_nomenc_id FOREIGN KEY ( nomenc_id ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.cor_rule_nomenc ADD CONSTRAINT fk_cor_rule_nomenc_rule_id FOREIGN KEY ( rule_id ) REFERENCES pr_zh.t_rules( rule_id )  ON UPDATE CASCADE;
 
 CREATE OR REPLACE VIEW pr_zh.all_rb_rules AS (
 SELECT 
