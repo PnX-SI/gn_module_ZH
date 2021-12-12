@@ -23,14 +23,14 @@ import pdb
 
 class Item:
 
-    def __init__(self, id_zh, rb_id, abb, cd_nomenclature=None):
+    def __init__(self, id_zh, rb_id, abb):
         self.id_zh = id_zh
         self.abb = abb
         self.rule_id = self.__get_rule_id(abb)
         self.rb_id = rb_id
         self.active = self.__is_rb_rule()
         self.cor_rule_id = self.__get_cor_rule_id()
-        self.cd_nomenclatures = self.__get_cd_nomenclature()
+        self.nomenc_ids = self.__get_nomenc_ids()
         self.id_qualif = self.__check_qualif(self.__get_qualif())
         self.knowledge = self.__get_knowledge()
         self.note = self.__get_note()
@@ -71,45 +71,36 @@ class Item:
         finally:
             DB.session.close()
 
-    def __get_cd_nomencs(self, mnemo_type):
-        return [getattr(q_.TNomenclatures, 'cd_nomenclature') for q_ in DB.session.query(BibNomenclaturesTypes, TNomenclatures).join(TNomenclatures).filter(BibNomenclaturesTypes.mnemonique == 'STATUT_PROTECTION').all()]
+    def __get_id_nomenc(self, id_type: int, cd_nomenc: str) -> int:
+        return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type == id_type, TNomenclatures.cd_nomenclature == cd_nomenc)).first(), 'id_nomenclature', None)
 
-    def __get_cd_nomenclature(self):
-        if self.abb == 'protection':
-            return ['41', '42', '51']
-        if self.abb == 'epuration':
-            return ['44']
-        if self.abb == 'support':
-            return ['43']
-        if self.abb == 'eco':
-            return ['61', '62']
-        if self.abb == 'pedagogy':
-            return ['4', '5', '6', '7', '8']
-        if self.abb == 'production':
-            return ['1', '2', '3']
-        if self.abb == 'status':
-            total = self.__get_cd_nomencs('STATUT_PROTECTION')
-            nothing = ['0', '1']
-            high = ['11', '13', '15', '16', '17', '31', '32', '33',
-                    '34', '35', '36', '37', '38', '39', '40', '41', '100']
-            low = sorted(np.setdiff1d(total, nothing+high))
+    def __get_nomencs(self, abb, cat=None):
+        cat_id = self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), cat)
+        return [getattr(q_.CorRuleNomenc, 'nomenc_id') for q_ in DB.session.query(CorRuleNomenc, TRules).join(TRules).filter(and_(TRules.abbreviation == abb, CorRuleNomenc.id_qualif == cat_id)).all()]
+
+    def __get_nomenc_ids(self):
+        if self.abb in ['protection', 'epuration', 'support', 'eco', 'pedagogy', 'production']:
+            return self.__get_nomencs(self.abb)
+        elif self.abb == 'status':
             return {
-                "nothing": nothing,
-                "low": low,
-                "high": high
+                "nothing": self.__get_nomencs(self.abb, '0'),
+                "low": self.__get_nomencs(self.abb, 'faible'),
+                "high": self.__get_nomencs(self.abb, 'fort')
             }
+        else:
+            return None
 
     def __get_qualif_cat7(self):
         try:
             id_nomenc = self.__get_qualif_val()
             if getattr(DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == id_nomenc).one(), 'cd_nomenclature') == '0':
-                return getattr(DB.session.query(BibNomenclaturesTypes, TNomenclatures).join(TNomenclatures, TNomenclatures.id_type == BibNomenclaturesTypes.id_type).filter(and_(BibNomenclaturesTypes.mnemonique == 'HIERARCHY', TNomenclatures.cd_nomenclature == 'NE')).one().TNomenclatures, 'id_nomenclature')
+                return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), 'NE')
             if getattr(DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == id_nomenc).one(), 'cd_nomenclature') == '1':
-                return getattr(DB.session.query(BibNomenclaturesTypes, TNomenclatures).join(TNomenclatures, TNomenclatures.id_type == BibNomenclaturesTypes.id_type).filter(and_(BibNomenclaturesTypes.mnemonique == 'HIERARCHY', TNomenclatures.cd_nomenclature == 'mauvais')).one().TNomenclatures, 'id_nomenclature')
+                return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), 'bon')
             if getattr(DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == id_nomenc).one(), 'cd_nomenclature') == '2':
-                return getattr(DB.session.query(BibNomenclaturesTypes, TNomenclatures).join(TNomenclatures, TNomenclatures.id_type == BibNomenclaturesTypes.id_type).filter(and_(BibNomenclaturesTypes.mnemonique == 'HIERARCHY', TNomenclatures.cd_nomenclature == 'moyen')).one().TNomenclatures, 'id_nomenclature')
+                return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), 'moyen')
             if getattr(DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == id_nomenc).one(), 'cd_nomenclature') == '3':
-                return getattr(DB.session.query(BibNomenclaturesTypes, TNomenclatures).join(TNomenclatures, TNomenclatures.id_type == BibNomenclaturesTypes.id_type).filter(and_(BibNomenclaturesTypes.mnemonique == 'HIERARCHY', TNomenclatures.cd_nomenclature == 'bon')).one().TNomenclatures, 'id_nomenclature')
+                return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), 'mauvais')
         except ZHApiError as e:
             raise ZHApiError(
                 message=str(e.message), details=str(e.details), status_code=e.status_code)
@@ -173,24 +164,21 @@ class Item:
 
     def __get_qualif_status(self):
         try:
-            hier_id_type = self.__get_hier_nomenc_id()
-
             # get selected status cds
             q_status = self.__get_selected_status()
 
             # if nothing selected
             if not q_status:
-                return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type ==
-                                                                            hier_id_type, TNomenclatures.cd_nomenclature == '0')).one(), 'id_nomenclature')
+                return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), '0')
 
             # get id_qualif
             for cd in q_status:
-                if cd in self.cd_nomenclatures['high']:
-                    return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type == hier_id_type, TNomenclatures.cd_nomenclature == 'fort')).one(), 'id_nomenclature')
-                elif cd in self.cd_nomenclatures['nothing']:
-                    return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type == hier_id_type, TNomenclatures.cd_nomenclature == '0')).one(), 'id_nomenclature')
+                if cd in self.nomenc_ids['high']:
+                    return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), 'fort')
+                elif cd in self.nomenc_ids['nothing']:
+                    return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), '0')
                 else:
-                    return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type == hier_id_type, TNomenclatures.cd_nomenclature == 'faible')).one(), 'id_nomenclature')
+                    return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), 'faible')
 
         except ZHApiError as e:
             raise ZHApiError(
@@ -205,11 +193,10 @@ class Item:
     def __get_qualif_eco(self):
         try:
             # get selected functions
-            q_functions = self.__get_selected_functions(
-                'FONCTIONS_BIO', self.cd_nomenclatures)
+            q_functions = self.__get_selected_functions(self.nomenc_ids)
 
             # get id_type of 'hierarchy' in TNomenclatures
-            hier_type_id = self.__get_hier_nomenc_id()
+            hier_type_id = self.__get_id_type('HIERARCHY')
 
             if len(q_functions) >= 1:
                 # if 61 and/or 62 : get nomenc id of continum ('res')
@@ -228,7 +215,7 @@ class Item:
 
     def __get_selected_status(self):
         try:
-            return [getattr(q_.TNomenclatures, 'cd_nomenclature') for q_ in DB.session.query(CorZhProtection, CorProtectionLevelType, TNomenclatures).join(CorProtectionLevelType, CorZhProtection.id_protection == CorProtectionLevelType.id_protection).join(TNomenclatures, TNomenclatures.id_nomenclature == CorProtectionLevelType.id_protection_status).all()]
+            return [getattr(q_.TNomenclatures, 'id_nomenclature') for q_ in DB.session.query(CorZhProtection, CorProtectionLevelType, TNomenclatures).join(CorProtectionLevelType, CorZhProtection.id_protection == CorProtectionLevelType.id_protection).join(TNomenclatures, TNomenclatures.id_nomenclature == CorProtectionLevelType.id_protection_status).all()]
         except ZHApiError as e:
             raise ZHApiError(
                 message=str(e.message), details=str(e.details), status_code=e.status_code)
@@ -239,14 +226,14 @@ class Item:
         finally:
             DB.session.close()
 
-    def __get_selected_functions(self, nomenc_type_mnemo, cd_ids):
+    def __get_selected_functions(self, nomenc_ids):
         try:
             # get nomenclature id
-            type_id = getattr(DB.session.query(BibNomenclaturesTypes).filter(
-                BibNomenclaturesTypes.mnemonique == nomenc_type_mnemo).one(), 'id_type')
+            # type_id = getattr(DB.session.query(BibNomenclaturesTypes).filter(
+            #     BibNomenclaturesTypes.mnemonique == nomenc_type_mnemo).one(), 'id_type')
             # get selected functions
             q_ = DB.session.query(TFunctions, TNomenclatures).join(TNomenclatures, TNomenclatures.id_nomenclature == TFunctions.id_function).filter(
-                TFunctions.id_zh == self.id_zh).filter(and_(TNomenclatures.id_type == type_id, TNomenclatures.cd_nomenclature.in_(cd_ids))).all()
+                TFunctions.id_zh == self.id_zh).filter(TNomenclatures.id_nomenclature.in_(nomenc_ids)).all()
             return q_
         except ZHApiError as e:
             raise ZHApiError(
@@ -258,15 +245,15 @@ class Item:
         finally:
             DB.session.close()
 
-    def __get_hier_nomenc_id(self):
+    def __get_id_type(self, mnemo):
         try:
-            # get id_type of 'hierarchy' in TNomenclatures
+            # get id_type in TNomenclatures
             return getattr(DB.session.query(BibNomenclaturesTypes).filter(
-                BibNomenclaturesTypes.mnemonique == 'HIERARCHY').one(), 'id_type')
+                BibNomenclaturesTypes.mnemonique == mnemo).one(), 'id_type')
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
-                message="Item class: __get_hier_nomenc_id", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+                message="Item class: __get_id_type", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
         finally:
             DB.session.close()
 
@@ -295,10 +282,9 @@ class Item:
         res_strings = [str(res) for res in res_list]
         return "".join(res_strings)
 
-    def __get_combination(self, mnemo_type):
+    def __get_combination(self):
         # get selected functions ids
-        q_functions = self.__get_selected_functions(
-            mnemo_type, self.cd_nomenclatures)
+        q_functions = self.__get_selected_functions(self.nomenc_ids)
         selected_ids = [getattr(function.TFunctions, 'id_qualification')
                         for function in q_functions]
 
@@ -318,13 +304,10 @@ class Item:
 
     def __get_qualif_cat4_cat5(self):
         try:
-            if self.abb in ['protection', 'epuration', 'support', 'pedagogy', 'production']:
-                combination = self.__get_combination('FONCTIONS_HYDRO')
-            if self.abb in ['pedagogy', 'production']:
-                combination = self.__get_combination('VAL_SOC_ECO')
+            combination = self.__get_combination()
             # set id_qualif
             id_qualif = getattr(DB.session.query(TCorQualif).filter(
-                TCorQualif.combination == combination).one(), 'id_qualification')
+                TCorQualif.combination == combination).first(), 'id_qualification')
             return id_qualif
         except ZHApiError as e:
             raise ZHApiError(
@@ -383,9 +366,9 @@ class Item:
                 TManagementStructures, TManagementPlans.id_structure == TManagementStructures.id_structure).filter(TManagementStructures.id_zh == self.id_zh).all()]
             if cd_id_nature_naturaliste in selected_id_nature:
                 # if id_nature == 'naturaliste' in selected plans : return
-                return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type == self.__get_hier_nomenc_id(), TNomenclatures.cd_nomenclature == 'OUI')).one(), 'id_nomenclature')
+                return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type == self.__get_id_type('HIERARCHY'), TNomenclatures.cd_nomenclature == 'OUI')).one(), 'id_nomenclature')
             else:
-                return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type == self.__get_hier_nomenc_id(), TNomenclatures.cd_nomenclature == 'NON')).one(), 'id_nomenclature')
+                return getattr(DB.session.query(TNomenclatures).filter(and_(TNomenclatures.id_type == self.__get_id_type('HIERARCHY'), TNomenclatures.cd_nomenclature == 'NON')).one(), 'id_nomenclature')
         except ZHApiError as e:
             raise ZHApiError(
                 message=str(e.message), details=str(e.details), status_code=e.status_code)
@@ -436,8 +419,7 @@ class Item:
 
     def __set_protection_knowledge(self):
         try:
-            selected_functions = self.__get_selected_functions(
-                'FONCTIONS_HYDRO', self.cd_nomenclatures)
+            selected_functions = self.__get_selected_functions(self.nomenc_ids)
             if len(selected_functions) in [0, 1]:
                 # if 0 or 1 functions selected: low_knowlege
                 return 2
@@ -447,10 +429,8 @@ class Item:
                 #   else: 'low knowledge'
 
                 # get good knowldege id in TNomenclatures
-                id_type = getattr(DB.session.query(BibNomenclaturesTypes).filter(
-                    BibNomenclaturesTypes.mnemonique == 'FONCTIONS_CONNAISSANCE').one(), 'id_type')
-                high_know_id = DB.session.query(TNomenclatures).filter(and_(
-                    TNomenclatures.cd_nomenclature == '1', TNomenclatures.id_type == id_type)).one().id_nomenclature
+                id_type = self.__get_id_type('FONCTIONS_CONNAISSANCE')
+                high_know_id = self.__get_id_nomenc(id_type, '1')
 
                 # count good knowledge ids in user selected functions
                 selected_functions_ids = [
