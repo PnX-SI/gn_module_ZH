@@ -42,6 +42,7 @@
             [data]="structures"
             [formControl]="formTab6.controls.structure"
             (onOpen)="onStructureOpened()"
+            (onDeSelectAll)="onAllStructuresDeselected()"
           >
           </angular2-multiselect>
         </div>
@@ -52,7 +53,7 @@
             class="mb-3"
             color="primary"
             (click)="onAddStructure()"
-            [ngbTooltip]="this.formTab6.value.structure ? '' : 'Veuillez sélectionner une structure dans le menu ci-contre'"
+            [ngbTooltip]="this.formTab6.value.structure ? '' : 'Veuillez d\'abord sélectionner un organisme dans le menu ci-contre'"
           >
             <mat-icon>add_box</mat-icon>
             Ajouter

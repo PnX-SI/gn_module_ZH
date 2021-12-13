@@ -733,6 +733,10 @@ export class ZhFormTab6Component implements OnInit {
     }
   }
 
+  onAllStructuresDeselected() {
+    this.formTab6.get("structure").reset();
+  }
+
   onDeleteStrutureModal(modal, structure) {
     this.ngbModal
       .open(modal, {
