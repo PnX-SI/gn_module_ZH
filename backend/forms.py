@@ -19,7 +19,7 @@ from sqlalchemy.sql.expression import delete
 
 from geonature.utils.env import DB
 
-from geonature.core.ref_geo.models import BibAreasTypes
+from geonature.core.ref_geo.models import BibAreasTypes, LAreas
 
 from geonature.core.gn_commons.models import (
     BibTablesLocation,
@@ -138,19 +138,15 @@ def post_cor_lim_list(uuid_lim, criteria):
 
 def post_cor_zh_area(polygon, id_zh, id_type):
     try:
-        query = \
-            """
-                SELECT (ref_geo.fct_get_area_intersection(
-                ST_SetSRID('{geom}'::geometry,4326), {type})).id_area
-            """.format(geom=str(polygon), type=id_type)
-        q_list = DB.session.execute(text(query)).fetchall()
-        for element in q_list:
+        elements = [getattr(element, 'id_area') for element in DB.session.query(LAreas).filter(LAreas.geom.ST_Intersects(
+            func.ST_Transform(func.ST_SetSRID(func.ST_AsText(polygon), 4326), 2154))).filter(LAreas.id_type == id_type).all()]
+        for element in elements:
             # if 'Communes', % of zh in the municipality must be calculated
             if id_type == CorZhArea.get_id_type('Communes'):
-                municipality_geom = DB.session.query(LAreas).filter(
-                    LAreas.id_area == element[0]).one().geom
+                municipality_geom = getattr(DB.session.query(LAreas).filter(
+                    LAreas.id_area == element).first(), 'geom')
                 polygon_2154 = DB.session.query(func.ST_Transform(
-                    func.ST_SetSRID(func.ST_AsText(polygon), 4326), 2154)).one()[0]
+                    func.ST_SetSRID(func.ST_AsText(polygon), 4326), 2154)).scalar()
                 intersect_area = DB.session.query(func.ST_Area(
                     func.ST_Intersection(municipality_geom, polygon_2154))).scalar()
                 municipality_area = DB.session.query(
@@ -162,7 +158,7 @@ def post_cor_zh_area(polygon, id_zh, id_type):
                 cover = None
             DB.session.add(
                 CorZhArea(
-                    id_area=element[0],
+                    id_area=element,
                     id_zh=id_zh,
                     cover=cover
                 )
