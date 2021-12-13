@@ -17,6 +17,7 @@ from geonature.utils.env import DB
 from .api_error import ZHApiError
 from .model.zh_schema import *
 from .model.zh import ZH
+from .geometry import get_main_rb
 
 import pdb
 
@@ -787,13 +788,9 @@ class Hierarchy(ZH):
             if not q_rb:
                 raise ZHApiError(message='no_river_basin',
                                  details="zh is not part of any river basin", status_code=400)
-            elif len(q_rb) > 1:
-                # todo : if several rb intersect the zh polygon, calculate rb areas to determine which one is the main one
-                # temp fix:
-                raise ZHApiError(message='several_river_basin',
-                                 details="zh is part of several river basins")
-            else:
-                return DB.session.query(CorZhRb, TRiverBasin).join(TRiverBasin).filter(CorZhRb.id_zh == self.id_zh).one().TRiverBasin.id_rb
+            if len(q_rb) > 1:
+                return get_main_rb(q_rb)
+            return DB.session.query(CorZhRb, TRiverBasin).join(TRiverBasin).filter(CorZhRb.id_zh == self.id_zh).one().TRiverBasin.id_rb
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
