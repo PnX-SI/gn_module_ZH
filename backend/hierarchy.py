@@ -762,6 +762,7 @@ class Hierarchy(ZH):
     def __init__(self, id_zh):
         self.id_zh = id_zh
         self.rb_id = self.__get_rb()
+        self.is_rules = self.__check_if_rules()
         self.volet1 = Volet1(self.id_zh, self.rb_id)
         self.volet2 = Volet2(self.id_zh, self.rb_id)
         self.total_denom = self.__get_total_denom()
@@ -798,7 +799,18 @@ class Hierarchy(ZH):
             raise ZHApiError(
                 message="Hierarchy class: get_rb_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
         finally:
-            DB.session.rollback()
+            DB.session.close()
+
+    def __check_if_rules(self):
+        try:
+            if not DB.session.query(CorRbRules).filter(CorRbRules.rb_id == self.rb_id).first():
+                raise ZHApiError(message='no_rb_rules',
+                                 details='no existing rules for the river basin')
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Hierarchy class: __get_is_rules", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
             DB.session.close()
 
     @staticmethod

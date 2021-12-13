@@ -115,19 +115,19 @@ def get_zh(info_role):
             q = main_search(q, payload)
 
         return get_all_zh(info_role=info_role,
-                        query=q,
-                        limit=limit,
-                        page=page)
+                          query=q,
+                          limit=limit,
+                          page=page)
     except Exception as e:
         exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(message="filter_zh_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        raise ZHApiError(message="filter_zh_error", details=str(
+            exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 def get_all_zh(info_role, query, limit, page):
     try:
         # Pour obtenir le nombre de résultat de la requete sans le LIMIT
         nb_results_without_limit = query.count()
-
 
         user = info_role
         user_cruved = get_or_fetch_user_cruved(
@@ -240,7 +240,7 @@ def get_complete_info(id_zh, info_role):
 
 def get_complete_card(id_zh: int) -> Card:
     ref_geo_config = [
-            ref for ref in blueprint.config['ref_geo_referentiels'] if ref['active']]
+        ref for ref in blueprint.config['ref_geo_referentiels'] if ref['active']]
     return Card(id_zh, "full", ref_geo_config).__repr__()
 
 
@@ -904,7 +904,8 @@ def download(id_zh: int):
 @blueprint.route("/departments", methods=['GET'])
 @json_resp
 def departments():
-    query = DB.session.query(LAreas).with_entities(LAreas.area_name, LAreas.area_code, LAreas.id_type, BibAreasTypes.type_code).join(BibAreasTypes, LAreas.id_type == BibAreasTypes.id_type)
+    query = DB.session.query(LAreas).with_entities(LAreas.area_name, LAreas.area_code, LAreas.id_type,
+                                                   BibAreasTypes.type_code).join(BibAreasTypes, LAreas.id_type == BibAreasTypes.id_type)
     query = query.filter(BibAreasTypes.type_code == 'DEP')
     query = query.order_by(LAreas.area_code)
     resp = query.all()
@@ -915,14 +916,14 @@ def departments():
 @json_resp
 def get_area_from_department() -> dict:
     code = request.json.get('code')
-    if code: 
+    if code:
         query = DB.session.query(LiMunicipalities).with_entities(LiMunicipalities.id_area, LAreas.area_name, LAreas.area_code)\
             .join(LAreas, LiMunicipalities.id_area == LAreas.id_area)\
             .filter(LiMunicipalities.insee_com.like('{}%'.format(code)))
         query = query.order_by(LAreas.area_code)
         resp = query.all()
         return [{"code": r.area_code, "name": r.area_name} for r in resp]
-    
+
     return []
 
 
@@ -961,8 +962,6 @@ def get_hierarchy(id_zh, info_role):
     """
     try:
         hierarchy = Hierarchy(id_zh).__str__()
-        # pdb.set_trace()
-        # separer notes volet 1 et notes volet 2 et créer champs dans t_zh
         return hierarchy
     except ZHApiError as e:
         raise ZHApiError(
