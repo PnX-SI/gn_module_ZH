@@ -483,6 +483,9 @@ class Item:
                 attribute_id_list = [getattr(item, 'attribute_id') for item in DB.session.query(
                     TItems).filter(TItems.cor_rule_id == self.cor_rule_id).all()]
                 if id_qualif not in attribute_id_list:
+                    if id_qualif not in attribute_id_list:
+                        raise ZHApiError(message='wrong_qualif', details='zh qualif ({}) provided for {} rule is not part of the qualif list defined in the river basin hierarchy rules'.format(
+                            DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == id_qualif).one().mnemonique, self.abb), status_code=400)
                     return None
                 return id_qualif
         except ZHApiError as e:
@@ -584,10 +587,7 @@ class Cat:
     @staticmethod
     def get_note(value):
         try:
-            for item in value:
-                if item['active'] and item['note'] is not None:
-                    return round(sum(filter(None, [float(item['note'].split('/')[0]) for item in value if item['active']])))
-                return None
+            return round(sum(filter(None, [(float(item['note'].split('/')[0])) if item['note'] is not None else None for item in value if item['active']])))
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(

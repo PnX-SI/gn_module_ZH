@@ -37,6 +37,7 @@ export class HierarchyService {
         this.items = this.setItems(this.hierZh);
       },
       (error) => {
+        this.items = []
         if (error.status === 400) {
           const frontError: string = this._error.getFrontError(
             error.error.message
