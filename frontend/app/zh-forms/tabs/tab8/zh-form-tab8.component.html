@@ -135,6 +135,7 @@
   </div>
   <div class="modal-footer">
     <button
+      [disabled]="!fileForm.valid"
       type="button"
       mat-raised-button
       color="primary"
