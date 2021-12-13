@@ -59,7 +59,7 @@ def update_tzh(data):
 # tab 0
 
 
-def create_zh(form_data, info_role, zh_date, polygon, ref_geo_referentiels):
+def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referentiels):
 
     try:
         uuid_id_lim_list = uuid.uuid4()
@@ -79,7 +79,8 @@ def create_zh(form_data, info_role, zh_date, polygon, ref_geo_referentiels):
             update_date=zh_date,
             id_lim_list=uuid_id_lim_list,
             id_sdage=form_data['sdage'],
-            geom=polygon
+            geom=polygon,
+            area=zh_area
         )
         DB.session.add(new_zh)
         DB.session.flush()
@@ -226,7 +227,7 @@ def post_cor_zh_fct_area(geom, id_zh):
             message="post_cor_zh_fct_area_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
-def update_zh_tab0(form_data, polygon, info_role, zh_date, geo_refs):
+def update_zh_tab0(form_data, polygon, area, info_role, zh_date, geo_refs):
     try:
         is_geom_new = check_polygon(polygon, form_data['id_zh'])
 
@@ -244,7 +245,8 @@ def update_zh_tab0(form_data, polygon, info_role, zh_date, geo_refs):
             TZH.update_author: info_role.id_role,
             TZH.update_date: zh_date,
             TZH.id_sdage: form_data['sdage'],
-            TZH.geom: polygon
+            TZH.geom: polygon,
+            TZH.area: area
         })
         DB.session.flush()
 

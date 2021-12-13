@@ -283,6 +283,7 @@ class TZH(ZhModel):
     remark_eval_thread = DB.Column(DB.Unicode)
     remark_eval_actions = DB.Column(DB.Unicode)
     main_pict_id = DB.Column(DB.Integer)
+    area = DB.Column(DB.Float)
 
     authors = DB.relationship(
         User,
