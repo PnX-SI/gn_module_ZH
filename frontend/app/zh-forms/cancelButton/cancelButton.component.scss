@@ -7,16 +7,20 @@
 .footer-modal-btn {
   margin: 20px 24px;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
 }
 .modal-body {
   font-size: 18px;
   padding: 10px 24px 16px;
 }
 
+::ng-deep .cancel-modal .modal-dialog {
+  max-width: 600px;
+}
+
 .warning-icon {
   position: relative;
-  top: 5px
+  top: 5px;
 }
 
 .warning {
