@@ -31,7 +31,7 @@ def set_geom(geometry, id_zh=None):
                     func.ST_GeogFromWKB(func.ST_AsEWKB(polygon))).scalar()
                 if DB.session.query(func.ST_Intersects(polygon_geom, zh_geom)).scalar():
                     is_intersected = True
-                if DB.session.query(func.ST_Contains(zh.geom, polygon)).scalar():
+                if DB.session.query(func.ST_Contains(func.ST_GeomFromText(func.ST_AsText(zh_geom)), func.ST_GeomFromText(func.ST_AsText(polygon_geom)))).scalar():
                     raise ZHApiError(
                         message="polygon_contained_in_zh",
                         details="the new zh contour is fully contained in an existing one",
