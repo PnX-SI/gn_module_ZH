@@ -30,6 +30,11 @@ export class ErrorTranslatorService {
         "Le SDAGE selectionné ne fait pas partie des règles définies pour le bassin versant", //error to show to the user
       id: 3,
     },
+    {
+      api: "csv_taxa_error", // error returned by backend
+      front: "Impossible de générer le csv des espèces", //error to show to the user
+      id: 4,
+    },
   ];
 
   getError(errorMsg: string): error {
