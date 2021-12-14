@@ -19,7 +19,7 @@ from sqlalchemy.sql.expression import delete
 
 from geonature.utils.env import DB
 
-from geonature.core.ref_geo.models import BibAreasTypes
+from geonature.core.ref_geo.models import BibAreasTypes, LAreas
 
 from geonature.core.gn_commons.models import (
     BibTablesLocation,
@@ -59,7 +59,7 @@ def update_tzh(data):
 # tab 0
 
 
-def create_zh(form_data, info_role, zh_date, polygon, ref_geo_referentiels):
+def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referentiels):
 
     try:
         uuid_id_lim_list = uuid.uuid4()
@@ -79,7 +79,8 @@ def create_zh(form_data, info_role, zh_date, polygon, ref_geo_referentiels):
             update_date=zh_date,
             id_lim_list=uuid_id_lim_list,
             id_sdage=form_data['sdage'],
-            geom=polygon
+            geom=polygon,
+            area=zh_area
         )
         DB.session.add(new_zh)
         DB.session.flush()
@@ -137,19 +138,15 @@ def post_cor_lim_list(uuid_lim, criteria):
 
 def post_cor_zh_area(polygon, id_zh, id_type):
     try:
-        query = \
-            """
-                SELECT (ref_geo.fct_get_area_intersection(
-                ST_SetSRID('{geom}'::geometry,4326), {type})).id_area
-            """.format(geom=str(polygon), type=id_type)
-        q_list = DB.session.execute(text(query)).fetchall()
-        for element in q_list:
+        elements = [getattr(element, 'id_area') for element in DB.session.query(LAreas).filter(LAreas.geom.ST_Intersects(
+            func.ST_Transform(func.ST_SetSRID(func.ST_AsText(polygon), 4326), 2154))).filter(LAreas.id_type == id_type).all()]
+        for element in elements:
             # if 'Communes', % of zh in the municipality must be calculated
             if id_type == CorZhArea.get_id_type('Communes'):
-                municipality_geom = DB.session.query(LAreas).filter(
-                    LAreas.id_area == element[0]).one().geom
+                municipality_geom = getattr(DB.session.query(LAreas).filter(
+                    LAreas.id_area == element).first(), 'geom')
                 polygon_2154 = DB.session.query(func.ST_Transform(
-                    func.ST_SetSRID(func.ST_AsText(polygon), 4326), 2154)).one()[0]
+                    func.ST_SetSRID(func.ST_AsText(polygon), 4326), 2154)).scalar()
                 intersect_area = DB.session.query(func.ST_Area(
                     func.ST_Intersection(municipality_geom, polygon_2154))).scalar()
                 municipality_area = DB.session.query(
@@ -161,7 +158,7 @@ def post_cor_zh_area(polygon, id_zh, id_type):
                 cover = None
             DB.session.add(
                 CorZhArea(
-                    id_area=element[0],
+                    id_area=element,
                     id_zh=id_zh,
                     cover=cover
                 )
@@ -226,7 +223,7 @@ def post_cor_zh_fct_area(geom, id_zh):
             message="post_cor_zh_fct_area_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
-def update_zh_tab0(form_data, polygon, info_role, zh_date, geo_refs):
+def update_zh_tab0(form_data, polygon, area, info_role, zh_date, geo_refs):
     try:
         is_geom_new = check_polygon(polygon, form_data['id_zh'])
 
@@ -244,7 +241,8 @@ def update_zh_tab0(form_data, polygon, info_role, zh_date, geo_refs):
             TZH.update_author: info_role.id_role,
             TZH.update_date: zh_date,
             TZH.id_sdage: form_data['sdage'],
-            TZH.geom: polygon
+            TZH.geom: polygon,
+            TZH.area: area
         })
         DB.session.flush()
 
@@ -785,7 +783,7 @@ def post_actions(id_zh, actions):
 # tab 8
 
 
-def post_file_info(id_zh, title, author, description, media_path, extension):
+def post_file_info(id_zh, title, author, description, extension):
     try:
         unique_id_media = DB.session.query(TZH).filter(
             TZH.id_zh == int(id_zh)).one().zh_uuid
@@ -807,7 +805,6 @@ def post_file_info(id_zh, title, author, description, media_path, extension):
             id_table_location=id_table_location,
             uuid_attached_row=uuid_attached_row,
             title_fr=title,
-            media_path=media_path,
             author=author,
             description_fr=description,
             is_public=True,
@@ -823,3 +820,50 @@ def post_file_info(id_zh, title, author, description, media_path, extension):
             raise ZHApiError(
                 message="post_file_info_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
         raise ZHApiError(message="post_file_info_error", details=str(e))
+
+
+def patch_file_info(id_zh, id_media, title, author, description):
+    try:
+        unique_id_media = DB.session.query(TZH).filter(
+            TZH.id_zh == int(id_zh)).one().zh_uuid
+        uuid_attached_row = uuid.uuid4()
+        id_table_location = DB.session.query(BibTablesLocation).filter(and_(
+            BibTablesLocation.schema_name == 'pr_zh', BibTablesLocation.table_name == 't_zh')).one().id_table_location
+        post_date = datetime.datetime.now()
+        DB.session.query(TMedias).filter(TMedias.id_media == id_media).update({
+            'unique_id_media': unique_id_media,
+            'id_table_location': id_table_location,
+            'uuid_attached_row': uuid_attached_row,
+            'title_fr': title,
+            'author': author,
+            'description_fr': description,
+            'is_public': True,
+            'meta_update_date': str(post_date)
+        })
+        DB.session.flush()
+    except exc.DataError as e:
+        raise ZHApiError(
+            message="patch_file_info_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+    except Exception as e:
+        raise ZHApiError(message="patch_file_info_error", details=str(e))
+
+
+def update_file_extension(id_media, extension):
+    try:
+        if extension == '.pdf':
+            mnemo = 'PDF'
+        elif extension == '.csv':
+            mnemo = 'Tableur'
+        else:
+            mnemo = 'Photo'
+        id_nomenclature_media_type = DB.session.query(TNomenclatures).filter(
+            TNomenclatures.mnemonique == mnemo).one().id_nomenclature
+        DB.session.query(TMedias).filter(TMedias.id_media == id_media).update({
+            'id_nomenclature_media_type': id_nomenclature_media_type
+        })
+        DB.session.flush()
+    except exc.DataError as e:
+        raise ZHApiError(
+            message="update_file_extension_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+    except Exception as e:
+        raise ZHApiError(message="update_file_extension_error", details=str(e))
