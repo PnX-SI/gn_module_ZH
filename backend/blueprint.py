@@ -851,11 +851,14 @@ def write_csv(id_zh, info_role):
             if query:
                 rows = [
                     {
-                        "Groupe d'étude": row.group,
+                        "Groupe d'étude - classe": row.group_class,
+                        "Groupe d'étude - ordre": row.group_order,
                         "Nom Scientifique": row.scientific_name,
                         "Nom vernaculaire": row.vernac_name,
-                        "Réglementation": row.reglementation,
+                        "Statut types": row.statut_type,
+                        "Statuts d’évaluation, de protection et de menace": row.statut,
                         "Article": row.article,
+                        "URL doc": row.doc_url,
                         "Nombre d'observations": row.obs_nb,
                         "Date de la dernière observation": row.last_date,
                         "Dernier observateur": row.observer,
@@ -873,14 +876,21 @@ def write_csv(id_zh, info_role):
                     writer.writeheader()
                     writer.writerows(rows)
 
-                post_file_info(
+                id_media = post_file_info(
                     id_zh,
                     blueprint.config[i]['category'] + "_" +
                     current_date.strftime("%Y-%m-%d_%H:%M:%S"),
                     author,
                     'liste des taxons générée sur demande de l''utilisateur dans l''onglet 5',
-                    str(media_path),
                     '.csv')
+
+                DB.session.flush()
+
+                # update TMedias.media_path with media_filename
+                DB.session.query(TMedias)\
+                    .filter(TMedias.id_media == id_media)\
+                    .update({'media_path': str(media_path)})
+
                 DB.session.commit()
         return {"file_names": names}, 200
     except Exception as e:
