@@ -1371,6 +1371,6 @@ class CorRuleNomenc(DB.Model):
         ForeignKey(TNomenclatures.id_nomenclature),
         primary_key=True
     )
-    id_qualif = DB.Column(
+    qualif_id = DB.Column(
         DB.Integer
     )

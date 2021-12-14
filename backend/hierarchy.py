@@ -31,7 +31,7 @@ class Item:
         self.active = self.__is_rb_rule()
         self.cor_rule_id = self.__get_cor_rule_id()
         self.nomenc_ids = self.__get_nomenc_ids()
-        self.id_qualif = self.__check_qualif(self.__get_qualif())
+        self.qualif_id = self.__check_qualif(self.__get_qualif())
         self.knowledge = self.__get_knowledge()
         self.note = self.__get_note()
         self.denominator = self.__get_denominator()
@@ -76,7 +76,7 @@ class Item:
 
     def __get_nomencs(self, abb, cat=None):
         cat_id = self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), cat)
-        return [getattr(q_.CorRuleNomenc, 'nomenc_id') for q_ in DB.session.query(CorRuleNomenc, TRules).join(TRules).filter(and_(TRules.abbreviation == abb, CorRuleNomenc.id_qualif == cat_id)).all()]
+        return [getattr(q_.CorRuleNomenc, 'nomenc_id') for q_ in DB.session.query(CorRuleNomenc, TRules).join(TRules).filter(and_(TRules.abbreviation == abb, CorRuleNomenc.qualif_id == cat_id)).all()]
 
     def __get_nomenc_ids(self):
         if self.abb in ['protection', 'epuration', 'support', 'eco', 'pedagogy', 'production']:
@@ -150,7 +150,7 @@ class Item:
             except Exception as e:
                 exc_type, value, tb = sys.exc_info()
                 raise ZHApiError(
-                    message="__get_id_qualif_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+                    message="__get_qualif_id_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
             return qualif.TItems.attribute_id
         except ZHApiError as e:
             raise ZHApiError(
@@ -171,7 +171,7 @@ class Item:
             if not q_status:
                 return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), '0')
 
-            # get id_qualif
+            # get qualif_id
             for cd in q_status:
                 if cd in self.nomenc_ids['high']:
                     return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), 'fort')
@@ -305,10 +305,10 @@ class Item:
     def __get_qualif_cat4_cat5(self):
         try:
             combination = self.__get_combination()
-            # set id_qualif
-            id_qualif = getattr(DB.session.query(TCorQualif).filter(
+            # set qualif_id
+            qualif_id = getattr(DB.session.query(TCorQualif).filter(
                 TCorQualif.combination == combination).first(), 'id_qualification')
-            return id_qualif
+            return qualif_id
         except ZHApiError as e:
             raise ZHApiError(
                 message=str(e.message), details=str(e.details), status_code=e.status_code)
@@ -400,7 +400,7 @@ class Item:
                 elif self.abb in ['epuration', 'support']:
                     try:
                         # return id_knowledge if abb function selected
-                        return getattr(DB.session.query(TFunctions, BibNoteTypes).join(TFunctions, TFunctions.id_knowledge == BibNoteTypes.id_knowledge).filter(and_(TFunctions.id_zh == self.id_zh, TFunctions.id_qualification == self.id_qualif)).one().BibNoteTypes, 'note_id')
+                        return getattr(DB.session.query(TFunctions, BibNoteTypes).join(TFunctions, TFunctions.id_knowledge == BibNoteTypes.id_knowledge).filter(and_(TFunctions.id_zh == self.id_zh, TFunctions.id_qualification == self.qualif_id)).one().BibNoteTypes, 'note_id')
                     except:
                         pass
                     # if no function selected, return lacunaire ou nulle
@@ -457,15 +457,15 @@ class Item:
             return True
         return False
 
-    def __check_qualif(self, id_qualif):
+    def __check_qualif(self, qualif_id):
         try:
             if self.active:
                 attribute_id_list = [getattr(item, 'attribute_id') for item in DB.session.query(
                     TItems).filter(TItems.cor_rule_id == self.cor_rule_id).all()]
-                if id_qualif not in attribute_id_list:
+                if qualif_id not in attribute_id_list:
                     raise ZHApiError(
-                        message='wrong_qualif', details='zh qualif ({}) provided for {} rule is not part of the qualif list defined in the river basin hierarchy rules'.format(DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == id_qualif).one().mnemonique, self.abb), status_code=400)
-                return id_qualif
+                        message='wrong_qualif', details='zh qualif ({}) provided for {} rule is not part of the qualif list defined in the river basin hierarchy rules'.format(DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == qualif_id).one().mnemonique, self.abb), status_code=400)
+                return qualif_id
         except ZHApiError as e:
             raise ZHApiError(
                 message=str(e.message), details=str(e.details), status_code=e.status_code)
@@ -479,7 +479,7 @@ class Item:
     def __get_note(self):
         try:
             if self.active:
-                return round(getattr(DB.session.query(TItems).filter(and_(TItems.attribute_id == self.id_qualif, TItems.cor_rule_id == self.cor_rule_id, TItems.note_type_id == self.knowledge)).one(), 'note'), 2)
+                return round(getattr(DB.session.query(TItems).filter(and_(TItems.attribute_id == self.qualif_id, TItems.cor_rule_id == self.cor_rule_id, TItems.note_type_id == self.knowledge)).one(), 'note'), 2)
         except ZHApiError as e:
             raise ZHApiError(
                 message=str(e.message), details=str(e.details), status_code=e.status_code)
@@ -521,7 +521,7 @@ class Item:
     def __get_qualif_mnemo(self):
         try:
             if self.active:
-                return getattr(DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == self.id_qualif).one(), 'label_default')
+                return getattr(DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == self.qualif_id).one(), 'label_default')
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
