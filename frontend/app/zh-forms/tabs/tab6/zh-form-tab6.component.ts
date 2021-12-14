@@ -6,6 +6,7 @@ import { NgbDatepickerI18n } from "@ng-bootstrap/ng-bootstrap";
 import { NgbDateFRParserFormatter } from "../../../services/dateFrFormatter";
 import { TabsService } from "../../../services/tabs.service";
 import { ModalService } from "../../../services/modal.service";
+import { ModuleConfig } from "../../../module.config";
 
 import { ToastrService } from "ngx-toastr";
 import { Subscription } from "rxjs";
@@ -30,6 +31,8 @@ export class ZhFormTab6Component implements OnInit {
   @Input() public formMetaData: any;
   @Output() public canChangeTab = new EventEmitter<boolean>();
   @Output() nextTab = new EventEmitter<number>();
+  // FIXME: only used for URL path... Must be a better way to do this..
+  private config = ModuleConfig;
   public formTab6: FormGroup;
   public statusForm: FormGroup;
   public instrumentForm: FormGroup;
