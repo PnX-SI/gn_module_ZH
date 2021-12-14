@@ -69,7 +69,7 @@ from .nomenclatures import (
 
 from .forms import *
 
-from .geometry import set_geom
+from .geometry import set_geom, set_area
 
 from .upload import upload_process
 
@@ -579,16 +579,20 @@ def get_tab_data(id_tab, info_role):
             if 'id_zh' not in form_data.keys():
                 # set geometry from coordinates
                 geom = set_geom(form_data['geom']['geometry'])
+                # geom area
+                area = set_area(geom)
                 # create_zh
                 zh = create_zh(form_data, info_role, zh_date,
-                               geom['polygon'], active_geo_refs)
+                               geom['polygon'], area, active_geo_refs)
                 intersection = geom['is_intersected']
             else:
                 # edit geometry
                 geom = set_geom(
                     form_data['geom']['geometry'], form_data['id_zh'])
+                # geom area
+                area = set_area(geom)
                 # edit zh
-                zh = update_zh_tab0(form_data, geom['polygon'],
+                zh = update_zh_tab0(form_data, geom['polygon'], area,
                                     info_role, zh_date, active_geo_refs)
                 intersection = geom['is_intersected']
 

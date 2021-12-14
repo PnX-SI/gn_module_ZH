@@ -52,6 +52,19 @@ def set_geom(geometry, id_zh=None):
             message="set_geom_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
+def set_area(geom):
+    try:
+        # unit : ha
+        return round((DB.session.query(func.ST_Area(func.ST_GeomFromText(
+            func.ST_AsText(geom['polygon'])), False)).scalar()) / 10000, 2)
+    except ZHApiError:
+        raise
+    except Exception as e:
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="set_area_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+
+
 def get_main_rb(query: list) -> int:
     try:
         rb_id = None
