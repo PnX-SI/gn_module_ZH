@@ -64,3 +64,8 @@ def check_ref_geo_schema():
         exc_type, value, tb = sys.exc_info()
         raise ZHApiError(
             message="check_ref_geo_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+
+
+def get_extension(file_name):
+    split_filename = file_name.split('.')
+    return '.' + split_filename[len(split_filename)-1]

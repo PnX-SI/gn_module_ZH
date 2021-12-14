@@ -181,7 +181,7 @@ export class ZhFormTab6Component implements OnInit {
 
     this.instrumentForm = this.fb.group({
       instrument: [null, Validators.required],
-      instrument_date: [null, Validators.required],
+      instrument_date: [null],
     });
 
     this.urbanDocForm = this.fb.group({
@@ -483,9 +483,9 @@ export class ZhFormTab6Component implements OnInit {
           item.instrument.id_nomenclature ==
           formValues.instrument.id_nomenclature
       );
-      formValues.instrument_date = this.dateParser.format(
-        formValues.instrument_date
-      );
+      formValues.instrument_date =
+        this.dateParser.format(formValues.instrument_date) || null;
+
       if (!itemExist) {
         this.instrumentTable.push(formValues);
       }
