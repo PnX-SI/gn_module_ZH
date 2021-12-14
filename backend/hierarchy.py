@@ -561,7 +561,7 @@ class Cat:
     @staticmethod
     def get_note(value):
         try:
-            return round(sum(filter(None, [float(item['note'].split('/')[0]) for item in value if item['active']])))
+            return round(sum(filter(None, [(float(item['note'].split('/')[0])) if item['note'] is not None else None for item in value if item['active']])))
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
@@ -691,7 +691,8 @@ class Volet:
         cat = Cat(self.id_zh, self.rb_id, cat_abb, cat_class)
         cat.denominator = view_abb
         cat.note = cat.get_note(cat.items.__str__())
-        self.note += cat.note
+        if cat.note is not None:
+            self.note += cat.note
         return cat
 
     def __str__(self):

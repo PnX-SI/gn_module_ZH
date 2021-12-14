@@ -1165,7 +1165,10 @@ def get_view_model(table_name, schema_name):
             ForeignKey(Taxref.cd_nom),
             primary_key=True
         )
-        group = DB.Column(
+        group_class = DB.Column(
+            DB.Unicode
+        )
+        group_order = DB.Column(
             DB.Unicode
         )
         scientific_name = DB.Column(
@@ -1174,10 +1177,16 @@ def get_view_model(table_name, schema_name):
         vernac_name = DB.Column(
             DB.Unicode
         )
-        reglementation = DB.Column(
+        statut_type = DB.Column(
+            DB.Unicode
+        )
+        statut = DB.Column(
             DB.Unicode
         )
         article = DB.Column(
+            DB.Unicode
+        )
+        doc_url = DB.Column(
             DB.Unicode
         )
         obs_nb = DB.Column(
