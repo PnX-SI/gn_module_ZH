@@ -803,6 +803,8 @@ class Hierarchy(ZH):
             if not DB.session.query(CorRbRules).filter(CorRbRules.rb_id == self.rb_id).first():
                 raise ZHApiError(message='no_rb_rules',
                                  details='no existing rules for the river basin')
+        except ZHApiError:
+            raise
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
