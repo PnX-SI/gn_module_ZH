@@ -15,6 +15,7 @@ export class ZhFormTab7Component implements OnInit {
   @Input() public formMetaData: any;
   @Output() public canChangeTab = new EventEmitter<boolean>();
   @Output() nextTab = new EventEmitter<number>();
+  public dropdownSettings;
   public formTab7: FormGroup;
   public patchModal: boolean;
   public modalFormSubmitted: boolean;
@@ -101,6 +102,15 @@ export class ZhFormTab7Component implements OnInit {
         this.getCurrentZh();
       }
     });
+    this.dropdownSettings = {
+      enableCheckAll: false,
+      text: "Selectionner",
+      labelKey: "name",
+      primaryKey: "id_action",
+      searchPlaceholderText: "Rechercher",
+      enableSearchFilter: true,
+      singleSelection: true,
+    };
   }
 
   // get metaData forms
@@ -286,11 +296,16 @@ export class ZhFormTab7Component implements OnInit {
     });
   }
 
+  onDeSelectAllActions() {
+    this.actionForm.get("action").reset();
+  }
+
   // add a new action to action array
   onPostAction() {
     this.modalFormSubmitted = true;
     if (this.actionForm.valid) {
       let formValues = this.actionForm.value;
+      formValues.action = formValues.action[0];
       // check if the action to add is already added
       let itemExist = this.actionTable.some(
         (item: any) => item.action.id_action == formValues.action.id_action

@@ -249,64 +249,56 @@
     </button>
   </div>
   <div class="modal-body">
-    <form [formGroup]="actionForm">
-      <div class="form-row">
-        <div class="form-group col-md-6">
-          <small class="required">Propositions d'actions</small>
-          <select
-            class="form-control custom-select"
-            ngbAutofocus
-            [formControl]="actionForm.controls.action"
-          >
-            <option
-              *ngFor="let item of actionInput"
-              [ngValue]="item"
-              [disabled]="item.disabled"
-            >
-              {{ item.name }}
-            </option>
-          </select>
-          <small
-            *ngIf="
-              (actionForm.controls.action.touched || modalFormSubmitted) &&
-              actionForm.controls.action.errors?.required
-            "
-            class="error-msg"
-            >Champ requis</small
-          >
-        </div>
-        <div class="form-group col-md-6">
-          <small class="required">Niveau de priorité</small>
-          <select
-            class="form-control"
-            [formControl]="actionForm.controls.priority"
-          >
-            <option
-              *ngFor="let qualif of formMetaData.NIVEAU_PRIORITE"
-              [ngValue]="qualif"
-            >
-              {{ qualif.mnemonique }}
-            </option>
-          </select>
-          <small
-            *ngIf="
-              (actionForm.controls.priority.touched || modalFormSubmitted) &&
-              actionForm.controls.priority.errors?.required
-            "
-            class="error-msg"
-            >Champ requis</small
-          >
-        </div>
-        <div class="form-group col-md-12">
-          <small>Remarques</small>
-          <textarea
-            class="form-control"
-            [formControl]="actionForm.controls.remark"
-            rows="3"
-          ></textarea>
-        </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <small class="required">Propositions d'actions</small>
+        <angular2-multiselect
+          [settings]="dropdownSettings"
+          [data]="actionInput"
+          [formControl]="actionForm.controls.action"
+          (onDeSelectAll)="onDeSelectAllActions()"
+        >
+        </angular2-multiselect>
+        <small
+          *ngIf="
+            (actionForm.controls.action.touched || modalFormSubmitted) &&
+            actionForm.controls.action.errors?.required
+          "
+          class="error-msg"
+          >Champ requis</small
+        >
       </div>
-    </form>
+      <div class="form-group col-md-6">
+        <small class="required">Niveau de priorité</small>
+        <select
+          class="form-control"
+          [formControl]="actionForm.controls.priority"
+        >
+          <option
+            *ngFor="let qualif of formMetaData.NIVEAU_PRIORITE"
+            [ngValue]="qualif"
+          >
+            {{ qualif.mnemonique }}
+          </option>
+        </select>
+        <small
+          *ngIf="
+            (actionForm.controls.priority.touched || modalFormSubmitted) &&
+            actionForm.controls.priority.errors?.required
+          "
+          class="error-msg"
+          >Champ requis</small
+        >
+      </div>
+      <div class="form-group col-md-12">
+        <small>Remarques</small>
+        <textarea
+          class="form-control"
+          [formControl]="actionForm.controls.remark"
+          rows="3"
+        ></textarea>
+      </div>
+    </div>
   </div>
   <div class="modal-footer">
     <button
