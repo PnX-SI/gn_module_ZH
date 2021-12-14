@@ -11,7 +11,7 @@ from geoalchemy2.shape import to_shape
 from geoalchemy2.types import Geography, Geometry
 
 
-from .model.zh_schema import TZH, CorZhArea
+from .model.zh_schema import TZH, CorZhArea, CorZhRb, TRiverBasin
 from .api_error import ZHApiError
 
 
@@ -31,7 +31,7 @@ def set_geom(geometry, id_zh=None):
                     func.ST_GeogFromWKB(func.ST_AsEWKB(polygon))).scalar()
                 if DB.session.query(func.ST_Intersects(polygon_geom, zh_geom)).scalar():
                     is_intersected = True
-                if DB.session.query(func.ST_Contains(zh.geom, polygon)).scalar():
+                if DB.session.query(func.ST_Contains(func.ST_GeomFromText(func.ST_AsText(zh_geom)), func.ST_GeomFromText(func.ST_AsText(polygon_geom)))).scalar():
                     raise ZHApiError(
                         message="polygon_contained_in_zh",
                         details="the new zh contour is fully contained in an existing one",
@@ -63,3 +63,27 @@ def set_area(geom):
         exc_type, value, tb = sys.exc_info()
         raise ZHApiError(
             message="set_area_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+
+
+def get_main_rb(query: list) -> int:
+    try:
+        rb_id = None
+        area = 0
+        for q_ in query:
+            zh_polygon = DB.session.query(TZH.geom).filter(
+                TZH.id_zh == getattr(q_, 'id_zh')).first().geom
+            rb_polygon = DB.session.query(CorZhRb, TRiverBasin).join(TRiverBasin, TRiverBasin.id_rb == CorZhRb.id_rb).filter(
+                TRiverBasin.id_rb == getattr(q_, 'id_rb')).first().TRiverBasin.geom
+            intersection = DB.session.query(func.ST_Intersection(func.ST_GeomFromText(
+                func.ST_AsText(zh_polygon)), func.ST_GeomFromText(func.ST_AsText(rb_polygon)))).scalar()
+            if DB.session.query(func.ST_Area(intersection, False)).scalar() > area:
+                area = DB.session.query(
+                    func.ST_Area(intersection, False)).scalar()
+                rb_id = getattr(q_, 'id_rb')
+        return rb_id
+    except ZHApiError:
+        raise
+    except Exception as e:
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="get_main_rb", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))

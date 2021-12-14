@@ -13,10 +13,10 @@ class MapListConfig(Schema):
 
 
 default_map_list_conf = [
-    {"prop": "code", "name": "Code"},
     {"prop": "main_name", "name": "Nom principal"},
-    {"prop": "author", "name": "Auteur"},
-    {"prop": "create_date", "name": "Date de creation"}
+    {"prop": "code", "name": "Code"},
+    {"prop": "sdage", "name": "Typologie SDAGE"},
+    {"prop": "bassin_versant", "name": "Bassin versant"}
 ]
 
 

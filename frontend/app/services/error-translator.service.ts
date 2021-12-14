@@ -30,6 +30,11 @@ export class ErrorTranslatorService {
         "Le SDAGE selectionné ne fait pas partie des règles définies pour le bassin versant", //error to show to the user
       id: 3,
     },
+    {
+      api: "no_rb_rules",
+      front: "Il n'existe pas de règle pour ce bassin versant",
+      id: 4,
+    },
   ];
 
   getError(errorMsg: string): error {

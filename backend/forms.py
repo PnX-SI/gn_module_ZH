@@ -783,7 +783,7 @@ def post_actions(id_zh, actions):
 # tab 8
 
 
-def post_file_info(id_zh, title, author, description, media_path, extension):
+def post_file_info(id_zh, title, author, description, extension):
     try:
         unique_id_media = DB.session.query(TZH).filter(
             TZH.id_zh == int(id_zh)).one().zh_uuid
@@ -805,7 +805,6 @@ def post_file_info(id_zh, title, author, description, media_path, extension):
             id_table_location=id_table_location,
             uuid_attached_row=uuid_attached_row,
             title_fr=title,
-            media_path=media_path,
             author=author,
             description_fr=description,
             is_public=True,
@@ -821,3 +820,50 @@ def post_file_info(id_zh, title, author, description, media_path, extension):
             raise ZHApiError(
                 message="post_file_info_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
         raise ZHApiError(message="post_file_info_error", details=str(e))
+
+
+def patch_file_info(id_zh, id_media, title, author, description):
+    try:
+        unique_id_media = DB.session.query(TZH).filter(
+            TZH.id_zh == int(id_zh)).one().zh_uuid
+        uuid_attached_row = uuid.uuid4()
+        id_table_location = DB.session.query(BibTablesLocation).filter(and_(
+            BibTablesLocation.schema_name == 'pr_zh', BibTablesLocation.table_name == 't_zh')).one().id_table_location
+        post_date = datetime.datetime.now()
+        DB.session.query(TMedias).filter(TMedias.id_media == id_media).update({
+            'unique_id_media': unique_id_media,
+            'id_table_location': id_table_location,
+            'uuid_attached_row': uuid_attached_row,
+            'title_fr': title,
+            'author': author,
+            'description_fr': description,
+            'is_public': True,
+            'meta_update_date': str(post_date)
+        })
+        DB.session.flush()
+    except exc.DataError as e:
+        raise ZHApiError(
+            message="patch_file_info_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+    except Exception as e:
+        raise ZHApiError(message="patch_file_info_error", details=str(e))
+
+
+def update_file_extension(id_media, extension):
+    try:
+        if extension == '.pdf':
+            mnemo = 'PDF'
+        elif extension == '.csv':
+            mnemo = 'Tableur'
+        else:
+            mnemo = 'Photo'
+        id_nomenclature_media_type = DB.session.query(TNomenclatures).filter(
+            TNomenclatures.mnemonique == mnemo).one().id_nomenclature
+        DB.session.query(TMedias).filter(TMedias.id_media == id_media).update({
+            'id_nomenclature_media_type': id_nomenclature_media_type
+        })
+        DB.session.flush()
+    except exc.DataError as e:
+        raise ZHApiError(
+            message="update_file_extension_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+    except Exception as e:
+        raise ZHApiError(message="update_file_extension_error", details=str(e))
