@@ -730,7 +730,7 @@ CREATE OR REPLACE VIEW pr_zh.vertebrates AS
 				lb_type_statut || ' - ' || label_statut AS statut,
 				full_citation AS article,
 				doc_url AS doc_url
-			FROM taxonomie.taxref_bdc_statut
+			FROM taxonomie.bdc_statut
 			WHERE (
 				regroupement_type = 'Liste rouge'
 				AND code_statut IN ('VU', 'EN', 'CR')
@@ -823,7 +823,7 @@ CREATE OR REPLACE VIEW pr_zh.invertebrates AS
 				lb_type_statut || ' - ' || label_statut AS statut,
 				full_citation AS article,
 				doc_url AS doc_url
-			FROM taxonomie.taxref_bdc_statut
+			FROM taxonomie.bdc_statut
 			WHERE (
 				regroupement_type = 'Liste rouge'
 				AND code_statut IN ('VU', 'EN', 'CR')
@@ -917,7 +917,7 @@ CREATE OR REPLACE VIEW pr_zh.flora AS
 				lb_type_statut || ' - ' || label_statut AS statut,
 				full_citation AS article,
 				doc_url AS doc_url
-			FROM taxonomie.taxref_bdc_statut
+			FROM taxonomie.bdc_statut
 			WHERE (
 				regroupement_type = 'Liste rouge'
 				AND code_statut IN ('VU', 'EN', 'CR')
