@@ -110,15 +110,23 @@ export class ZhFormTab7Component implements OnInit {
       searchPlaceholderText: "Rechercher",
       enableSearchFilter: true,
       singleSelection: true,
+      noDataLabel:
+        "Toutes les propositions disponibles ont déjà été renseignées dans le tableau",
     };
   }
 
   // get metaData forms
-  getMetaData() {
+  getMetaData(action?) {
     this.actionInput = [...this.formMetaData.BIB_ACTIONS];
-    this.actionInput.map((item: any) => {
-      item.disabled = false;
-    });
+    console.log(action);
+
+    this.actionInput = this.actionInput.filter(
+      (item) =>
+        !this.actionTable
+          .map((m) => m.action.id_action)
+          .includes(item.id_action)
+    );
+    console.log(this.actionInput);
   }
 
   // initialize forms
@@ -265,11 +273,6 @@ export class ZhFormTab7Component implements OnInit {
               ),
               remark: action.remark,
             });
-            this.actionInput.map((item: any) => {
-              if (item.id_action == action.id_action) {
-                item.disabled = true;
-              }
-            });
           });
           this.sortAction(this.actionTable);
         }
@@ -282,6 +285,7 @@ export class ZhFormTab7Component implements OnInit {
 
   // open the add action modal
   onAddAction(event: any, modal: any) {
+    this.getMetaData();
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'une proposition d'action";
@@ -311,14 +315,9 @@ export class ZhFormTab7Component implements OnInit {
         (item: any) => item.action.id_action == formValues.action.id_action
       );
       if (!itemExist) {
+        console.log("yolo", formValues);
         this.actionTable.push(formValues);
       }
-      // disable the added action on the select input list
-      this.actionInput.map((item: any) => {
-        if (item.id_action == formValues.action.id_action) {
-          item.disabled = true;
-        }
-      });
 
       this.ngbModal.dismissAll();
       this.actionForm.reset();
@@ -332,11 +331,6 @@ export class ZhFormTab7Component implements OnInit {
   onDeleteAction(action: any) {
     this.actionTable = this.actionTable.filter((item: any) => {
       return item.action.id_action != action.action.id_action;
-    });
-    this.actionInput.map((item: any) => {
-      if (item.id_action == action.action.id_action) {
-        item.disabled = false;
-      }
     });
     this.canChangeTab.emit(false);
   }
@@ -362,22 +356,12 @@ export class ZhFormTab7Component implements OnInit {
     });
     this.tempID = action.action.id_action;
 
-    const $_hydroFctInputSub = this.actionForm
-      .get("action")
-      .valueChanges.subscribe(() => {
-        this.actionInput.map((item: any) => {
-          if (item.id_action == action.action.id_action) {
-            item.disabled = false;
-          }
-        });
-      });
     const modalRef = this.ngbModal.open(modal, {
       centered: true,
       size: "lg",
       windowClass: "bib-modal",
     });
     modalRef.result.then().finally(() => {
-      $_hydroFctInputSub.unsubscribe();
       this.actionForm.reset();
     });
   }
@@ -392,11 +376,6 @@ export class ZhFormTab7Component implements OnInit {
         item.action.id_action != this.tempID ? item : formValues
       );
 
-      this.actionInput.map((item: any) => {
-        if (item.id_action == formValues.action.id_action) {
-          item.disabled = true;
-        }
-      });
       this.tempID = null;
       this.ngbModal.dismissAll();
       this.actionForm.reset();
@@ -412,6 +391,7 @@ export class ZhFormTab7Component implements OnInit {
       this.$_fromChangeSub.unsubscribe();
       let actions = [];
 
+      console.log(this.actionTable);
       if (this.actionTable && this.actionTable.length > 0) {
         this.actionTable.forEach((item: any) => {
           actions.push({
