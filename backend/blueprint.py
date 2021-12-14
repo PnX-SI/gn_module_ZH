@@ -69,7 +69,7 @@ from .nomenclatures import (
 
 from .forms import *
 
-from .geometry import set_geom
+from .geometry import set_geom, set_area
 
 from .upload import upload_process
 
@@ -579,16 +579,20 @@ def get_tab_data(id_tab, info_role):
             if 'id_zh' not in form_data.keys():
                 # set geometry from coordinates
                 geom = set_geom(form_data['geom']['geometry'])
+                # geom area
+                area = set_area(geom)
                 # create_zh
                 zh = create_zh(form_data, info_role, zh_date,
-                               geom['polygon'], active_geo_refs)
+                               geom['polygon'], area, active_geo_refs)
                 intersection = geom['is_intersected']
             else:
                 # edit geometry
                 geom = set_geom(
                     form_data['geom']['geometry'], form_data['id_zh'])
+                # geom area
+                area = set_area(geom)
                 # edit zh
-                zh = update_zh_tab0(form_data, geom['polygon'],
+                zh = update_zh_tab0(form_data, geom['polygon'], area,
                                     info_role, zh_date, active_geo_refs)
                 intersection = geom['is_intersected']
 
@@ -851,11 +855,14 @@ def write_csv(id_zh, info_role):
             if query:
                 rows = [
                     {
-                        "Groupe d'étude": row.group,
+                        "Groupe d'étude - classe": row.group_class,
+                        "Groupe d'étude - ordre": row.group_order,
                         "Nom Scientifique": row.scientific_name,
                         "Nom vernaculaire": row.vernac_name,
-                        "Réglementation": row.reglementation,
+                        "Statut types": row.statut_type,
+                        "Statuts d’évaluation, de protection et de menace": row.statut,
                         "Article": row.article,
+                        "URL doc": row.doc_url,
                         "Nombre d'observations": row.obs_nb,
                         "Date de la dernière observation": row.last_date,
                         "Dernier observateur": row.observer,
@@ -873,14 +880,21 @@ def write_csv(id_zh, info_role):
                     writer.writeheader()
                     writer.writerows(rows)
 
-                post_file_info(
+                id_media = post_file_info(
                     id_zh,
                     blueprint.config[i]['category'] + "_" +
                     current_date.strftime("%Y-%m-%d_%H:%M:%S"),
                     author,
                     'liste des taxons générée sur demande de l''utilisateur dans l''onglet 5',
-                    str(media_path),
                     '.csv')
+
+                DB.session.flush()
+
+                # update TMedias.media_path with media_filename
+                DB.session.query(TMedias)\
+                    .filter(TMedias.id_media == id_media)\
+                    .update({'media_path': str(media_path)})
+
                 DB.session.commit()
         return {"file_names": names}, 200
     except Exception as e:
@@ -984,8 +998,6 @@ def get_hierarchy(id_zh, info_role):
     """
     try:
         hierarchy = Hierarchy(id_zh).__str__()
-        # pdb.set_trace()
-        # separer notes volet 1 et notes volet 2 et créer champs dans t_zh
         return hierarchy
     except ZHApiError as e:
         raise ZHApiError(

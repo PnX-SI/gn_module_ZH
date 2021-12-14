@@ -229,6 +229,7 @@ CREATE  TABLE pr_zh.t_zh (
 	remark_eval_thread   varchar(2000)   ,
 	remark_eval_actions  varchar(2000)   ,
 	main_pict_id         integer   ,
+	area				 real	,
 	CONSTRAINT pk_t_zh_zh_id PRIMARY KEY ( id_zh ),
 	CONSTRAINT unq_t_zh_code UNIQUE ( code ) ,
 	CONSTRAINT unq_t_zh_name UNIQUE ( main_name ) ,
@@ -697,133 +698,284 @@ ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_id_org FOREIGN KEY ( id_org ) REFE
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_id_media FOREIGN KEY ( main_pict_id ) REFERENCES gn_commons.t_medias( id_media )  ON UPDATE CASCADE;
 
 CREATE OR REPLACE VIEW pr_zh.vertebrates AS
-	WITH synthese_zh AS (
-		SELECT 
-			synthese.id_synthese,
-			( 
-				SELECT t_zh.id_zh
-				FROM pr_zh.t_zh
-				WHERE st_intersects(st_setsrid(t_zh.geom, 4326), st_setsrid(synthese.the_geom_point, 4326))
-			) AS id_zh,
-			synthese.cd_nom,
-			synthese.date_max,
-			synthese.observers,
-			(	
-				SELECT organisme 
-				FROM utilisateurs.v_userslist_forall_applications 
-				WHERE nom_role || ' ' || prenom_role = synthese.observers limit 1
+	WITH 
+		synthese_taxa AS (
+			SELECT 
+				synthese.id_synthese,
+				( 
+					SELECT t_zh.id_zh
+					FROM pr_zh.t_zh
+					WHERE st_intersects(st_setsrid(t_zh.geom, 4326), st_setsrid(synthese.the_geom_point, 4326))
+				) AS id_zh,
+				synthese.cd_nom,
+				synthese.date_max,
+				synthese.observers,
+				(	
+					SELECT organisme 
+					FROM utilisateurs.v_userslist_forall_applications 
+					WHERE nom_role || ' ' || prenom_role = synthese.observers limit 1
+				)
+			FROM gn_synthese.synthese
+		),
+		synthese_zh AS (
+				SELECT DISTINCT ON (id_zh, cd_nom) *
+				FROM synthese_taxa
+				WHERE id_zh IS NOT null
+				ORDER BY id_zh, cd_nom, date_max DESC
+		),
+		bdc_statut AS (
+			SELECT 
+				cd_nom,
+				cd_sig,
+				regroupement_type AS statut_type,
+				lb_type_statut || ' - ' || label_statut AS statut,
+				full_citation AS article,
+				doc_url AS doc_url
+			FROM taxonomie.bdc_statut
+			WHERE (
+				regroupement_type = 'Liste rouge'
+				AND code_statut IN ('VU', 'EN', 'CR')
 			)
-		FROM gn_synthese.synthese
-	)
-	SELECT 
-		synthese_zh.id_zh,
-		taxref.cd_nom,
-		tpe.cd_protection,
-		taxref.classe AS "group",
-		taxref.nom_complet AS scientific_name,
-		taxref.nom_vern AS vernac_name,
-		tpa.intitule AS reglementation,
-		tpa.article AS article,
-		synthese_zh.date_max AS last_date,
-		synthese_zh.observers AS observer,
-		synthese_zh.organisme AS organisme,
-		count(taxref.cd_nom)::integer AS obs_nb
-	FROM synthese_zh
-	LEFT JOIN taxonomie.taxref taxref ON synthese_zh.cd_nom = taxref.cd_nom
-	LEFT JOIN taxonomie.taxref_protection_especes tpe ON taxref.cd_nom = tpe.cd_nom
-	LEFT JOIN taxonomie.taxref_protection_articles tpa ON tpa.cd_protection = tpe.cd_protection
-	WHERE synthese_zh.id_zh IS NOT NULL
-	AND (synthese_zh.date_max::timestamp > (NOW()::timestamp - interval '20 years'))
-	AND taxref.phylum = 'Chordata'
-	GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, tpe.cd_protection, tpa.intitule, tpa.article, taxref.cd_nom, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;
+			OR (
+				regroupement_type IN ('ZNIEFF', 'Réglementation', 'Protection', 'Directives européennes')
+			)
+		)
+
+		SELECT 
+			synthese_zh.id_zh,
+			taxref.cd_nom,
+			taxref.classe AS group_class,
+			taxref.ordre AS group_order,
+			taxref.nom_complet AS scientific_name,
+			taxref.nom_vern AS vernac_name,
+			bdc_statut.statut_type AS statut_type,
+			bdc_statut.statut AS statut,
+			bdc_statut.article AS article,
+			bdc_statut.doc_url AS doc_url,
+			synthese_zh.date_max AS last_date,
+			synthese_zh.observers AS observer,
+			synthese_zh.organisme AS organisme,
+			(select count(cd_nom) from synthese_taxa where id_zh = synthese_zh.id_zh and cd_nom = taxref.cd_nom)::integer AS obs_nb
+		FROM synthese_zh
+		LEFT JOIN taxonomie.taxref taxref ON synthese_zh.cd_nom = taxref.cd_nom
+		LEFT JOIN bdc_statut ON bdc_statut.cd_nom = taxref.cd_nom
+		WHERE synthese_zh.id_zh IS NOT NULL
+		AND (synthese_zh.date_max::timestamp > (NOW()::timestamp - interval '20 years'))
+		AND taxref.phylum = 'Chordata'
+		AND (
+			bdc_statut.cd_sig = 'ETATFRA'
+			OR bdc_statut.cd_sig IN
+				(
+					SELECT 
+						DISTINCT('INSEER' || lim.insee_reg) AS cd_sig
+					FROM pr_zh.t_zh tzh
+					LEFT JOIN pr_zh.cor_zh_area cza ON cza.id_zh = tzh.id_zh
+					LEFT JOIN ref_geo.l_areas lareas ON cza.id_area = lareas.id_area
+					LEFT JOIN ref_geo.li_municipalities lim ON lim.id_area = lareas.id_area
+					WHERE tzh.id_zh = synthese_zh.id_zh
+					AND lim.insee_reg IS NOT NULL
+				)
+			OR bdc_statut.cd_sig IN 
+				(
+					SELECT 
+						DISTINCT('INSEED' || lareas.area_code) AS cd_sig
+					FROM pr_zh.t_zh tzh
+					LEFT JOIN pr_zh.cor_zh_area cza ON cza.id_zh = tzh.id_zh
+					LEFT JOIN ref_geo.l_areas lareas ON cza.id_area = lareas.id_area
+					WHERE tzh.id_zh = synthese_zh.id_zh
+					AND id_type = (SELECT id_type FROM ref_geo.bib_areas_types WHERE type_code = 'DEP')
+					AND lareas.area_code IS NOT NULL
+			)
+			OR (bdc_statut.statut_type in ('Liste rouge', 'Réglementation', 'Protection', 'Directives européennes') and bdc_statut.cd_sig = 'TERFXFR')
+		)
+		GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, taxref.cd_nom, bdc_statut.statut_type, bdc_statut.article, bdc_statut.statut, bdc_statut.doc_url, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;
 
 CREATE OR REPLACE VIEW pr_zh.invertebrates AS
-	WITH synthese_zh AS (
-		SELECT 
-			synthese.id_synthese,
-			( 
-				SELECT t_zh.id_zh
-				FROM pr_zh.t_zh
-				WHERE st_intersects(st_setsrid(t_zh.geom, 4326), st_setsrid(synthese.the_geom_point, 4326))
-			) AS id_zh,
-			synthese.cd_nom,
-			synthese.date_max,
-			synthese.observers,
-			(	
-				SELECT organisme 
-				FROM utilisateurs.v_userslist_forall_applications 
-				WHERE nom_role || ' ' || prenom_role = synthese.observers limit 1
+	WITH 
+		synthese_taxa AS (
+			SELECT 
+				synthese.id_synthese,
+				( 
+					SELECT t_zh.id_zh
+					FROM pr_zh.t_zh
+					WHERE st_intersects(st_setsrid(t_zh.geom, 4326), st_setsrid(synthese.the_geom_point, 4326))
+				) AS id_zh,
+				synthese.cd_nom,
+				synthese.date_max,
+				synthese.observers,
+				(	
+					SELECT organisme 
+					FROM utilisateurs.v_userslist_forall_applications 
+					WHERE nom_role || ' ' || prenom_role = synthese.observers limit 1
+				)
+			FROM gn_synthese.synthese
+		),
+		synthese_zh AS (
+				SELECT DISTINCT ON (id_zh, cd_nom) *
+				FROM synthese_taxa
+				WHERE id_zh IS NOT null
+				ORDER BY id_zh, cd_nom, date_max DESC
+		),
+		bdc_statut AS (
+			SELECT 
+				cd_nom,
+				cd_sig,
+				regroupement_type AS statut_type,
+				lb_type_statut || ' - ' || label_statut AS statut,
+				full_citation AS article,
+				doc_url AS doc_url
+			FROM taxonomie.bdc_statut
+			WHERE (
+				regroupement_type = 'Liste rouge'
+				AND code_statut IN ('VU', 'EN', 'CR')
 			)
-		FROM gn_synthese.synthese
-	)
-	SELECT 
-		synthese_zh.id_zh,
-		taxref.cd_nom,
-		tpe.cd_protection,
-		taxref.classe AS "group",
-		taxref.nom_complet AS scientific_name,
-		taxref.nom_vern AS vernac_name,
-		tpa.intitule AS reglementation,
-		tpa.article AS article,
-		synthese_zh.date_max AS last_date,
-		synthese_zh.observers AS observer,
-		synthese_zh.organisme AS organisme,
-		count(taxref.cd_nom)::integer AS obs_nb
-	FROM synthese_zh
-	LEFT JOIN taxonomie.taxref taxref ON synthese_zh.cd_nom = taxref.cd_nom
-	LEFT JOIN taxonomie.taxref_protection_especes tpe ON taxref.cd_nom = tpe.cd_nom
-	LEFT JOIN taxonomie.taxref_protection_articles tpa ON tpa.cd_protection = tpe.cd_protection
-	WHERE synthese_zh.id_zh IS NOT NULL
-	AND (synthese_zh.date_max::timestamp > (NOW()::timestamp - interval '20 years'))
-	AND taxref.phylum != 'Chordata'
-	AND taxref.regne = 'Animalia'
-	GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, tpe.cd_protection, tpa.intitule, tpa.article, taxref.cd_nom, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;
+			OR (
+				regroupement_type IN ('ZNIEFF', 'Réglementation', 'Protection', 'Directives européennes')
+			)
+		)
 
-
+		SELECT 
+			synthese_zh.id_zh,
+			taxref.cd_nom,
+			taxref.classe AS group_class,
+			taxref.ordre AS group_order,
+			taxref.nom_complet AS scientific_name,
+			taxref.nom_vern AS vernac_name,
+			bdc_statut.statut_type AS statut_type,
+			bdc_statut.statut AS statut,
+			bdc_statut.article AS article,
+			bdc_statut.doc_url AS doc_url,
+			synthese_zh.date_max AS last_date,
+			synthese_zh.observers AS observer,
+			synthese_zh.organisme AS organisme,
+			(select count(cd_nom) from synthese_taxa where id_zh = synthese_zh.id_zh and cd_nom = taxref.cd_nom)::integer AS obs_nb
+		FROM synthese_zh
+		LEFT JOIN taxonomie.taxref taxref ON synthese_zh.cd_nom = taxref.cd_nom
+		LEFT JOIN bdc_statut ON bdc_statut.cd_nom = taxref.cd_nom
+		WHERE synthese_zh.id_zh IS NOT NULL
+		AND (synthese_zh.date_max::timestamp > (NOW()::timestamp - interval '20 years'))
+		AND taxref.phylum != 'Chordata'
+		AND taxref.regne = 'Animalia'
+		AND (
+			bdc_statut.cd_sig = 'ETATFRA'
+			OR bdc_statut.cd_sig IN
+				(
+					SELECT 
+						DISTINCT('INSEER' || lim.insee_reg) AS cd_sig
+					FROM pr_zh.t_zh tzh
+					LEFT JOIN pr_zh.cor_zh_area cza ON cza.id_zh = tzh.id_zh
+					LEFT JOIN ref_geo.l_areas lareas ON cza.id_area = lareas.id_area
+					LEFT JOIN ref_geo.li_municipalities lim ON lim.id_area = lareas.id_area
+					WHERE tzh.id_zh = synthese_zh.id_zh
+					AND lim.insee_reg IS NOT NULL
+				)
+			OR bdc_statut.cd_sig IN 
+				(
+					SELECT 
+						DISTINCT('INSEED' || lareas.area_code) AS cd_sig
+					FROM pr_zh.t_zh tzh
+					LEFT JOIN pr_zh.cor_zh_area cza ON cza.id_zh = tzh.id_zh
+					LEFT JOIN ref_geo.l_areas lareas ON cza.id_area = lareas.id_area
+					WHERE tzh.id_zh = synthese_zh.id_zh
+					AND id_type = (SELECT id_type FROM ref_geo.bib_areas_types WHERE type_code = 'DEP')
+					AND lareas.area_code IS NOT NULL
+			)
+			OR (bdc_statut.statut_type in ('Liste rouge', 'Réglementation', 'Protection', 'Directives européennes') and bdc_statut.cd_sig = 'TERFXFR')
+		)
+		GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, taxref.cd_nom, bdc_statut.statut_type, bdc_statut.article, bdc_statut.statut, bdc_statut.doc_url, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;
+	
 CREATE OR REPLACE VIEW pr_zh.flora AS
-	WITH synthese_zh AS (
-		SELECT 
-			synthese.id_synthese,
-			( 
-				SELECT t_zh.id_zh
-				FROM pr_zh.t_zh
-				WHERE st_intersects(st_setsrid(t_zh.geom, 4326), st_setsrid(synthese.the_geom_point, 4326))
-			) AS id_zh,
-			synthese.cd_nom,
-			synthese.date_max,
-			synthese.observers,
-			(	
-				SELECT organisme 
-				FROM utilisateurs.v_userslist_forall_applications 
-				WHERE nom_role || ' ' || prenom_role = synthese.observers limit 1
+	WITH 
+		synthese_taxa AS (
+			SELECT 
+				synthese.id_synthese,
+				( 
+					SELECT t_zh.id_zh
+					FROM pr_zh.t_zh
+					WHERE st_intersects(st_setsrid(t_zh.geom, 4326), st_setsrid(synthese.the_geom_point, 4326))
+				) AS id_zh,
+				synthese.cd_nom,
+				synthese.date_max,
+				synthese.observers,
+				(	
+					SELECT organisme 
+					FROM utilisateurs.v_userslist_forall_applications 
+					WHERE nom_role || ' ' || prenom_role = synthese.observers limit 1
+				)
+			FROM gn_synthese.synthese
+		),
+		synthese_zh AS (
+				SELECT DISTINCT ON (id_zh, cd_nom) *
+				FROM synthese_taxa
+				WHERE id_zh IS NOT null
+				ORDER BY id_zh, cd_nom, date_max DESC
+		),
+		bdc_statut AS (
+			SELECT 
+				cd_nom,
+				cd_sig,
+				regroupement_type AS statut_type,
+				lb_type_statut || ' - ' || label_statut AS statut,
+				full_citation AS article,
+				doc_url AS doc_url
+			FROM taxonomie.bdc_statut
+			WHERE (
+				regroupement_type = 'Liste rouge'
+				AND code_statut IN ('VU', 'EN', 'CR')
 			)
-		FROM gn_synthese.synthese
-	)
-	SELECT 
-		synthese_zh.id_zh,
-		taxref.cd_nom,
-		tpe.cd_protection,
-		taxref.classe AS "group",
-		taxref.nom_complet AS scientific_name,
-		taxref.nom_vern AS vernac_name,
-		tpa.intitule AS reglementation,
-		tpa.article AS article,
-		synthese_zh.date_max AS last_date,
-		synthese_zh.observers AS observer,
-		synthese_zh.organisme AS organisme,
-		count(taxref.cd_nom)::integer AS obs_nb
-	FROM synthese_zh
-	LEFT JOIN taxonomie.taxref taxref ON synthese_zh.cd_nom = taxref.cd_nom
-	LEFT JOIN taxonomie.taxref_protection_especes tpe ON taxref.cd_nom = tpe.cd_nom
-	LEFT JOIN taxonomie.taxref_protection_articles tpa ON tpa.cd_protection = tpe.cd_protection
-	WHERE synthese_zh.id_zh IS NOT NULL
-	AND (synthese_zh.date_max::timestamp > (NOW()::timestamp - interval '20 years'))
-	AND taxref.regne = 'Plantae'
-	GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, tpe.cd_protection, tpa.intitule, tpa.article, taxref.cd_nom, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;
+			OR (
+				regroupement_type IN ('ZNIEFF', 'Réglementation', 'Protection', 'Directives européennes')
+			)
+		)
 
-
-
-CREATE SCHEMA IF NOT EXISTS pr_zh;
+		SELECT 
+			synthese_zh.id_zh,
+			taxref.cd_nom,
+			taxref.classe AS group_class,
+			taxref.ordre AS group_order,
+			taxref.nom_complet AS scientific_name,
+			taxref.nom_vern AS vernac_name,
+			bdc_statut.statut_type AS statut_type,
+			bdc_statut.statut AS statut,
+			bdc_statut.article AS article,
+			bdc_statut.doc_url AS doc_url,
+			synthese_zh.date_max AS last_date,
+			synthese_zh.observers AS observer,
+			synthese_zh.organisme AS organisme,
+			(select count(cd_nom) from synthese_taxa where id_zh = synthese_zh.id_zh and cd_nom = taxref.cd_nom)::integer AS obs_nb
+		FROM synthese_zh
+		LEFT JOIN taxonomie.taxref taxref ON synthese_zh.cd_nom = taxref.cd_nom
+		LEFT JOIN bdc_statut ON bdc_statut.cd_nom = taxref.cd_nom
+		WHERE synthese_zh.id_zh IS NOT NULL
+		AND (synthese_zh.date_max::timestamp > (NOW()::timestamp - interval '20 years'))
+		AND taxref.regne = 'Plantae'
+		AND (
+			bdc_statut.cd_sig = 'ETATFRA'
+			OR bdc_statut.cd_sig IN
+				(
+					SELECT 
+						DISTINCT('INSEER' || lim.insee_reg) AS cd_sig
+					FROM pr_zh.t_zh tzh
+					LEFT JOIN pr_zh.cor_zh_area cza ON cza.id_zh = tzh.id_zh
+					LEFT JOIN ref_geo.l_areas lareas ON cza.id_area = lareas.id_area
+					LEFT JOIN ref_geo.li_municipalities lim ON lim.id_area = lareas.id_area
+					WHERE tzh.id_zh = synthese_zh.id_zh
+					AND lim.insee_reg IS NOT NULL
+				)
+			OR bdc_statut.cd_sig IN 
+				(
+					SELECT 
+						DISTINCT('INSEED' || lareas.area_code) AS cd_sig
+					FROM pr_zh.t_zh tzh
+					LEFT JOIN pr_zh.cor_zh_area cza ON cza.id_zh = tzh.id_zh
+					LEFT JOIN ref_geo.l_areas lareas ON cza.id_area = lareas.id_area
+					WHERE tzh.id_zh = synthese_zh.id_zh
+					AND id_type = (SELECT id_type FROM ref_geo.bib_areas_types WHERE type_code = 'DEP')
+					AND lareas.area_code IS NOT NULL
+			)
+			OR (bdc_statut.statut_type in ('Liste rouge', 'Réglementation', 'Protection', 'Directives européennes') and bdc_statut.cd_sig = 'TERFXFR')
+		)
+		GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, taxref.cd_nom, bdc_statut.statut_type, bdc_statut.article, bdc_statut.statut, bdc_statut.doc_url, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;
 
 CREATE  TABLE pr_zh.bib_hier_categories ( 
 	cat_id               integer  NOT NULL ,
@@ -892,8 +1044,17 @@ CREATE  TABLE pr_zh.cor_item_value (
 CREATE  TABLE pr_zh.t_cor_qualif ( 
 	combination          varchar(4)  NOT NULL ,
 	id_qualification        integer  NOT NULL,
-CONSTRAINT pk_t_cor_qualif_combination PRIMARY KEY ( combination )
+	CONSTRAINT pk_t_cor_qualif_combination PRIMARY KEY ( combination )
 );
+
+CREATE  TABLE pr_zh.cor_rule_nomenc ( 
+	rule_id              integer  NOT NULL ,
+	nomenc_id            integer  NOT NULL ,
+	qualif_id			 integer ,
+	CONSTRAINT pk_cor_rule_nomenc PRIMARY KEY ( rule_id, nomenc_id )
+ );
+
+COMMENT ON TABLE pr_zh.cor_rule_nomenc IS 'correspondance between hierarchy rules and cd_nomenclatures (through nomenclature ids) used for rule evaluation';
 
 ALTER TABLE pr_zh.cor_rb_rules ADD CONSTRAINT fk_cor_rb_items_t_items FOREIGN KEY ( rule_id ) REFERENCES pr_zh.t_rules( rule_id )  ON UPDATE CASCADE;
 
@@ -915,6 +1076,9 @@ ALTER TABLE pr_zh.t_cor_qualif ADD CONSTRAINT fk_t_cor_qualif_id_qualification F
 
 ALTER TABLE pr_zh.bib_note_types ADD CONSTRAINT fk_bib_note_types FOREIGN KEY ( id_knowledge ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
+ALTER TABLE pr_zh.cor_rule_nomenc ADD CONSTRAINT fk_cor_rule_nomenc_nomenc_id FOREIGN KEY ( nomenc_id ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.cor_rule_nomenc ADD CONSTRAINT fk_cor_rule_nomenc_rule_id FOREIGN KEY ( rule_id ) REFERENCES pr_zh.t_rules( rule_id )  ON UPDATE CASCADE;
 
 CREATE OR REPLACE VIEW pr_zh.all_rb_rules AS (
 SELECT 

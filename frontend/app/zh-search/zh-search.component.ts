@@ -43,28 +43,30 @@ export class ZhSearchComponent implements OnInit {
   }
 
   onDepartmentSelected(event) {
+    // Reset form
+    this.searchForm.get("communes").reset();
+    // reset it for the select to be disabled
+    this.communes = undefined;
     if (event && event.length > 0) {
       const department = event[0].code;
       this._dataService
         .getCommuneFromDepartment(department)
         .toPromise()
         .then((resp: any) => (this.communes = resp));
-    } else {
-      // reset it for the select to be disabled
-      this.communes = undefined;
     }
   }
 
   onBasinSelected(event) {
+    // Reset form
+    this.searchForm.get("zones").reset();
+    // reset it for the select to be disabled
+    this.hydrographicZones = undefined;
     if (event && event.length > 0) {
       const basin = event[0].code;
       this._dataService
         .getHydroZoneFromBasin(basin)
         .toPromise()
         .then((resp: any) => (this.hydrographicZones = resp));
-    } else {
-      this.searchForm.get("zones").reset();
-      this.hydrographicZones = undefined;
     }
   }
 
