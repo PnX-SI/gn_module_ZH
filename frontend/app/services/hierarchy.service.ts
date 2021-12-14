@@ -37,7 +37,7 @@ export class HierarchyService {
         this.items = this.setItems(this.hierZh);
       },
       (error) => {
-        this.items = []
+        this.items = [];
         if (error.status === 400) {
           const frontError: string = this._error.getFrontError(
             error.error.message
@@ -48,23 +48,8 @@ export class HierarchyService {
             closeButton: true,
           });
         }
-      },
-      () => {
-        if (this.hierZh.volet1.cat1_sdage.note == null) {
-          this.items = [];
-          const frontError: string = this._error.getFrontError(
-            'wrong_qualif'
-          );
-          this._toastr.error(frontError, "", {
-            positionClass: "toast-top-right",
-            disableTimeOut: true,
-            closeButton: true,
-          });
-        }
       }
     );
-
-    
   }
 
   // set list of hierarchy items
