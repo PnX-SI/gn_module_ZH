@@ -994,8 +994,6 @@ def get_hierarchy(id_zh, info_role):
     """
     try:
         hierarchy = Hierarchy(id_zh).__str__()
-        # pdb.set_trace()
-        # separer notes volet 1 et notes volet 2 et créer champs dans t_zh
         return hierarchy
     except ZHApiError as e:
         raise ZHApiError(

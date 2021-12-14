@@ -17,6 +17,7 @@ from geonature.utils.env import DB
 from .api_error import ZHApiError
 from .model.zh_schema import *
 from .model.zh import ZH
+from .geometry import get_main_rb
 
 import pdb
 
@@ -743,6 +744,7 @@ class Hierarchy(ZH):
     def __init__(self, id_zh):
         self.id_zh = id_zh
         self.rb_id = self.__get_rb()
+        self.is_rules = self.__check_if_rules()
         self.volet1 = Volet1(self.id_zh, self.rb_id)
         self.volet2 = Volet2(self.id_zh, self.rb_id)
         self.total_denom = self.__get_total_denom()
@@ -767,19 +769,28 @@ class Hierarchy(ZH):
             if not q_rb:
                 raise ZHApiError(message='no_river_basin',
                                  details="zh is not part of any river basin", status_code=400)
-            elif len(q_rb) > 1:
-                # todo : if several rb intersect the zh polygon, calculate rb areas to determine which one is the main one
-                # temp fix:
-                raise ZHApiError(message='several_river_basin',
-                                 details="zh is part of several river basins")
-            else:
-                return DB.session.query(CorZhRb, TRiverBasin).join(TRiverBasin).filter(CorZhRb.id_zh == self.id_zh).one().TRiverBasin.id_rb
+            if len(q_rb) > 1:
+                return get_main_rb(q_rb)
+            return DB.session.query(CorZhRb, TRiverBasin).join(TRiverBasin).filter(CorZhRb.id_zh == self.id_zh).one().TRiverBasin.id_rb
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
                 message="Hierarchy class: get_rb_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
         finally:
-            DB.session.rollback()
+            DB.session.close()
+
+    def __check_if_rules(self):
+        try:
+            if not DB.session.query(CorRbRules).filter(CorRbRules.rb_id == self.rb_id).first():
+                raise ZHApiError(message='no_rb_rules',
+                                 details='no existing rules for the river basin')
+        except ZHApiError:
+            raise
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Hierarchy class: __get_is_rules", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+        finally:
             DB.session.close()
 
     @staticmethod

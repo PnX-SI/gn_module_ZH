@@ -20,7 +20,7 @@ export class HierarchyService {
   public bold_row_values: any = [];
   public italic_row_values: any = ["Total rubrique"];
   public currentZh: any;
-  public hierZh: HierarchyModel;
+  //public hierZh: HierarchyModel = null;
   public items: ItemModel[];
 
   constructor(
@@ -33,12 +33,11 @@ export class HierarchyService {
   getHierarchy(zhId) {
     this._dataService.getHierZh(zhId).subscribe(
       (data: HierarchyModel) => {
-        this.hierZh = data;
-        this.items = this.setItems(this.hierZh);
+        this.items = this.setItems(data);
       },
       (error) => {
         this.items = [];
-        if (error.status === 400) {
+        if (error.status === 400 || error.status === 500) {
           const frontError: string = this._error.getFrontError(
             error.error.message
           );
