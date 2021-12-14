@@ -17,7 +17,7 @@ export class CancelButtonComponent {
     } else {
       this.ngbModal.open(modal, {
         centered: true,
-        windowClass: "cancel-modal",
+        windowClass: "bib-modal cancel-modal",
       });
     }
   }
