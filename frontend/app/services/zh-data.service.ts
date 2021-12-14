@@ -129,7 +129,9 @@ export class ZhDataService {
   }
 
   getTaxa(zhId: number) {
-    return this._api.get(`${AppConfig.API_ENDPOINT}/zones_humides/`);
+    return this._api.get(
+      `${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/taxa`
+    );
   }
 
   getHierZh(zhId: string) {

@@ -739,6 +739,7 @@ export class ZhFormTab5Component implements OnInit {
           });
         }
       })
+      .catch((err) => console.log(err))
       .finally(() => {
         this.taxaLoading = false;
         this._filesService
