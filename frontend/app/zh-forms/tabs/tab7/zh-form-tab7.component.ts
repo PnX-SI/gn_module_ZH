@@ -390,7 +390,6 @@ export class ZhFormTab7Component implements OnInit {
       this.submitted = true;
       this.$_fromChangeSub.unsubscribe();
       let actions = [];
-
       console.log(this.actionTable);
       if (this.actionTable && this.actionTable.length > 0) {
         this.actionTable.forEach((item: any) => {
@@ -413,16 +412,11 @@ export class ZhFormTab7Component implements OnInit {
       this.posted = true;
       this._dataService.postDataForm(formToPost, 7).subscribe(
         () => {
-          this._dataService
-            .getZhById(this.currentZh.properties.id_zh)
-            .subscribe((zh: any) => {
-              this._dataService.setCurrentZh(zh);
-              this.posted = false;
-              this.canChangeTab.emit(true);
-              this._toastr.success("Vos données sont bien enregistrées", "", {
-                positionClass: "toast-top-right",
-              });
-            });
+          this.posted = false;
+          this.canChangeTab.emit(true);
+          this._toastr.success("Vos données sont bien enregistrées", "", {
+            positionClass: "toast-top-right",
+          });
         },
         (error) => {
           this.posted = false;
