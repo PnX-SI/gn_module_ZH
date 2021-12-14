@@ -876,14 +876,21 @@ def write_csv(id_zh, info_role):
                     writer.writeheader()
                     writer.writerows(rows)
 
-                post_file_info(
+                id_media = post_file_info(
                     id_zh,
                     blueprint.config[i]['category'] + "_" +
                     current_date.strftime("%Y-%m-%d_%H:%M:%S"),
                     author,
                     'liste des taxons générée sur demande de l''utilisateur dans l''onglet 5',
-                    str(media_path),
                     '.csv')
+
+                DB.session.flush()
+
+                # update TMedias.media_path with media_filename
+                DB.session.query(TMedias)\
+                    .filter(TMedias.id_media == id_media)\
+                    .update({'media_path': str(media_path)})
+
                 DB.session.commit()
         return {"file_names": names}, 200
     except Exception as e:
