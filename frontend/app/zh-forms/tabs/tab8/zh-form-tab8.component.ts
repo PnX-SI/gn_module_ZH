@@ -181,6 +181,11 @@ export class ZhFormTab8Component implements OnInit {
       author: author,
       summary: summary,
     });
+    // FIXME: Bug in Angular7, need to use timeout for this method
+    // https://github.com/angular/angular/issues/19170
+    setTimeout(() => {
+      this.fileForm.get("file").setErrors(null);
+    }, 1);
   }
 
   async getFiles() {
@@ -236,34 +241,38 @@ export class ZhFormTab8Component implements OnInit {
   }
 
   postFile() {
-    this.loadingUpload = true;
-    const uploadForm = this.fillUploadForm(true);
-    this._filesService
-      .postFile(uploadForm)
-      .toPromise()
-      .then(() => this.activeModal.close())
-      .finally(() => {
-        this.loadingUpload = false;
-        this.getFiles();
-      });
+    if (this.fileForm.valid) {
+      this.loadingUpload = true;
+      const uploadForm = this.fillUploadForm(true);
+      this._filesService
+        .postFile(uploadForm)
+        .toPromise()
+        .then(() => this.activeModal.close())
+        .finally(() => {
+          this.loadingUpload = false;
+          this.getFiles();
+        });
+    }
   }
 
   patchFile() {
-    this.loadingUpload = true;
-    const uploadForm: FormData = this.fillUploadForm(
-      this.fileToUpload.size !== 0
-    );
-    this._filesService
-      .patchFile(this.fileIdToPatch, uploadForm)
-      .toPromise()
-      .then(() => {
-        this.activeModal.close();
-        this.getFiles();
-      })
-      .catch((err) => console.log(err))
-      .finally(() => {
-        this.loadingUpload = false;
-      });
+    if (this.fileForm.valid) {
+      this.loadingUpload = true;
+      const uploadForm: FormData = this.fillUploadForm(
+        this.fileToUpload.size !== 0
+      );
+      this._filesService
+        .patchFile(this.fileIdToPatch, uploadForm)
+        .toPromise()
+        .then(() => {
+          this.activeModal.close();
+          this.getFiles();
+        })
+        .catch((err) => console.log(err))
+        .finally(() => {
+          this.loadingUpload = false;
+        });
+    }
   }
 
   resetForm() {

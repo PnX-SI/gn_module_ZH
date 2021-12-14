@@ -33,13 +33,11 @@ export class HierarchyService {
   getHierarchy(zhId) {
     this._dataService.getHierZh(zhId).subscribe(
       (data: HierarchyModel) => {
-        //console.log(data);
-        //this.hierZh = data;
         this.items = this.setItems(data);
       },
       (error) => {
         this.items = [];
-        if (error.status === 400 ||  error.status === 500) {
+        if (error.status === 400 || error.status === 500) {
           const frontError: string = this._error.getFrontError(
             error.error.message
           );
