@@ -972,29 +972,9 @@ CREATE OR REPLACE VIEW pr_zh.flora AS
 					AND id_type = (SELECT id_type FROM ref_geo.bib_areas_types WHERE type_code = 'DEP')
 					AND lareas.area_code IS NOT NULL
 			)
-		FROM gn_synthese.synthese
-	)
-	SELECT 
-		synthese_zh.id_zh,
-		taxref.cd_nom,
-		tpe.cd_protection,
-		taxref.classe AS "group",
-		taxref.nom_complet AS scientific_name,
-		taxref.nom_vern AS vernac_name,
-		tpa.intitule AS reglementation,
-		tpa.article AS article,
-		synthese_zh.date_max AS last_date,
-		synthese_zh.observers AS observer,
-		synthese_zh.organisme AS organisme,
-		count(taxref.cd_nom)::integer AS obs_nb
-	FROM synthese_zh
-	LEFT JOIN taxonomie.taxref taxref ON synthese_zh.cd_nom = taxref.cd_nom
-	LEFT JOIN taxonomie.taxref_protection_especes tpe ON taxref.cd_nom = tpe.cd_nom
-	LEFT JOIN taxonomie.taxref_protection_articles tpa ON tpa.cd_protection = tpe.cd_protection
-	WHERE synthese_zh.id_zh IS NOT NULL
-	AND (synthese_zh.date_max::timestamp > (NOW()::timestamp - interval '20 years'))
-	AND taxref.regne = 'Plantae'
-	GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, tpe.cd_protection, tpa.intitule, tpa.article, taxref.cd_nom, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;
+			OR (bdc_statut.statut_type in ('Liste rouge', 'Réglementation', 'Protection', 'Directives européennes') and bdc_statut.cd_sig = 'TERFXFR')
+		)
+		GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, taxref.cd_nom, bdc_statut.statut_type, bdc_statut.article, bdc_statut.statut, bdc_statut.doc_url, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;
 
 CREATE  TABLE pr_zh.bib_hier_categories ( 
 	cat_id               integer  NOT NULL ,
