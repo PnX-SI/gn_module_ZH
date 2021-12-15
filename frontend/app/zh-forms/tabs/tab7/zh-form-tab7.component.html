@@ -255,6 +255,7 @@
         <angular2-multiselect
           [settings]="dropdownSettings"
           [data]="actionInput"
+          [(ngModel)]="selectedAction"
           [formControl]="actionForm.controls.action"
           (onDeSelectAll)="onDeSelectAllActions()"
         >

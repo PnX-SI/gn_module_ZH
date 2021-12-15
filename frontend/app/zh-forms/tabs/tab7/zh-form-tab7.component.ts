@@ -22,6 +22,7 @@ export class ZhFormTab7Component implements OnInit {
   public modalTitle: string;
   public addModalBtnLabel: string;
   public actionForm: FormGroup;
+  public selectedAction: [any];
   public hydroFctData: any;
   public bioFctData: any;
   public patrimData: any;
@@ -92,7 +93,6 @@ export class ZhFormTab7Component implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.getMetaData();
     this.initForms();
     this.getCurrentZh();
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
@@ -115,18 +115,26 @@ export class ZhFormTab7Component implements OnInit {
     };
   }
 
+  initActionInput() {
+    this.actionInput = [...this.formMetaData.BIB_ACTIONS];
+  }
+
   // get metaData forms
   getMetaData(action?) {
-    this.actionInput = [...this.formMetaData.BIB_ACTIONS];
-    console.log(action);
-
+    this.initActionInput();
     this.actionInput = this.actionInput.filter(
       (item) =>
         !this.actionTable
           .map((m) => m.action.id_action)
           .includes(item.id_action)
     );
-    console.log(this.actionInput);
+    this.selectedAction = null;
+    if (action != null) {
+      const actionTmp = action.action;
+      // push back the action to edit it
+      this.actionInput.push(actionTmp);
+      this.selectedAction = [actionTmp];
+    }
   }
 
   // initialize forms
@@ -262,9 +270,10 @@ export class ZhFormTab7Component implements OnInit {
           this.currentZh.properties.actions &&
           this.currentZh.properties.actions.length > 0
         ) {
-          this.actionTable = [];
+          this.initActionInput();
+          const actionTable = [];
           this.currentZh.properties.actions.forEach((action: any) => {
-            this.actionTable.push({
+            actionTable.push({
               action: this.actionInput.find(
                 (item: any) => item.id_action == action.id_action
               ),
@@ -274,6 +283,7 @@ export class ZhFormTab7Component implements OnInit {
               remark: action.remark,
             });
           });
+          this.actionTable = actionTable;
           this.sortAction(this.actionTable);
         }
       }
@@ -315,7 +325,6 @@ export class ZhFormTab7Component implements OnInit {
         (item: any) => item.action.id_action == formValues.action.id_action
       );
       if (!itemExist) {
-        console.log("yolo", formValues);
         this.actionTable.push(formValues);
       }
 
@@ -337,20 +346,18 @@ export class ZhFormTab7Component implements OnInit {
 
   // open the edit action modal
   onEditAction(modal: any, action: any) {
+    this.getMetaData(action);
     this.patchModal = true;
     this.addModalBtnLabel = "Modifier";
     this.modalTitle = "Modifier la proposition d'action";
 
     // init inputs object type
-    const selectedAction = this.actionInput.find(
-      (item: any) => item.id_action == action.action.id_action
-    );
     const selectedPriority = this.formMetaData["NIVEAU_PRIORITE"].find(
       (item: any) => item.id_nomenclature == action.priority.id_nomenclature
     );
     // patch form values
     this.actionForm.patchValue({
-      action: selectedAction,
+      action: action.action,
       priority: selectedPriority,
       remark: action.remark,
     });
@@ -372,6 +379,7 @@ export class ZhFormTab7Component implements OnInit {
     this.modalFormSubmitted = true;
     if (this.actionForm.valid) {
       let formValues = this.actionForm.value;
+      formValues.action = formValues.action[0];
       this.actionTable = this.actionTable.map((item: any) =>
         item.action.id_action != this.tempID ? item : formValues
       );
@@ -390,7 +398,7 @@ export class ZhFormTab7Component implements OnInit {
       this.submitted = true;
       this.$_fromChangeSub.unsubscribe();
       let actions = [];
-      console.log(this.actionTable);
+
       if (this.actionTable && this.actionTable.length > 0) {
         this.actionTable.forEach((item: any) => {
           actions.push({
@@ -412,11 +420,16 @@ export class ZhFormTab7Component implements OnInit {
       this.posted = true;
       this._dataService.postDataForm(formToPost, 7).subscribe(
         () => {
-          this.posted = false;
-          this.canChangeTab.emit(true);
-          this._toastr.success("Vos données sont bien enregistrées", "", {
-            positionClass: "toast-top-right",
-          });
+          this._dataService
+            .getZhById(this.currentZh.properties.id_zh)
+            .subscribe((zh: any) => {
+              this._dataService.setCurrentZh(zh);
+              this.posted = false;
+              this.canChangeTab.emit(true);
+              this._toastr.success("Vos données sont bien enregistrées", "", {
+                positionClass: "toast-top-right",
+              });
+            });
         },
         (error) => {
           this.posted = false;
