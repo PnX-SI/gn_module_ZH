@@ -284,9 +284,9 @@ export class ZhFormTab0Component implements OnInit {
     };
   }
 
-  slideToggleChanged(event) {
+  slideToggleChanged() {
     this.geomLayers.forEach((layer: any) => {
-      layer.setStyle(this.getLayerStyle(event.checked));
+      layer.setStyle(this.getLayerStyle(this.toggleChecked));
     });
   }
 
