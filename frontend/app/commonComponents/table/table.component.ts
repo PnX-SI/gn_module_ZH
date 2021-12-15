@@ -17,7 +17,7 @@ export class TableComponent {
   @Input() bold_row_values: any = [];
   @Input() italic_row_values: any = [];
   @Input() color_col_name: string;
-  @Input() color_value: string;
+  @Input() color_value: string = "";
   @Input() deletable: boolean;
   @Input() editable: boolean;
   @Input() downloadable: boolean;
