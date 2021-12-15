@@ -8,15 +8,11 @@ import { HierarchyService } from "../../services/hierarchy.service";
   styleUrls: ["./hierarchy.component.scss"],
 })
 export class HierarchyComponent {
-
   @Input() data: HierarchyModel;
 
-  constructor(
-    public hierarchy: HierarchyService
-  ) {}
+  constructor(public hierarchy: HierarchyService) {}
 
   ngOnInit() {
     this.hierarchy.setItems(this.data);
   }
-
 }

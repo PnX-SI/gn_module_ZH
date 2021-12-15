@@ -19,8 +19,8 @@ export class HierarchyService {
 
   public bold_row_values: any = [];
   public italic_row_values: any = ["Total rubrique"];
-  public color_col_name: string = 'name'
-  public color_value: string = ''
+  public color_col_name: string = "name";
+  public color_value: string = "";
   public currentZh: any;
   //public hierZh: HierarchyModel = null;
   public items: ItemModel[];
@@ -37,7 +37,6 @@ export class HierarchyService {
     this._dataService.getHierZh(zhId).subscribe(
       (data: HierarchyModel) => {
         this.items = this.setItems(data);
-        this.rb_name = data.river_basin_name
       },
       (error) => {
         this.items = [];
@@ -57,6 +56,7 @@ export class HierarchyService {
 
   // set list of hierarchy items
   setItems(data) {
+    this.rb_name = data.river_basin_name;
     if (data == null) {
       return [];
     }
