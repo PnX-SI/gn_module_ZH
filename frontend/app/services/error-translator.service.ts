@@ -56,6 +56,11 @@ export class ErrorTranslatorService {
       front: "Il n'existe pas de règle pour ce bassin versant",
       id: 5,
     },
+    {
+      api: "no_river_basin",
+      front: "Cette zone humide n'intersecte aucun bassin versant",
+      id: 6,
+    },
   ];
 
   getError(errorMsg: string): error {

@@ -772,6 +772,8 @@ class Hierarchy(ZH):
             if len(q_rb) > 1:
                 return get_main_rb(q_rb)
             return DB.session.query(CorZhRb, TRiverBasin).join(TRiverBasin).filter(CorZhRb.id_zh == self.id_zh).one().TRiverBasin.id_rb
+        except ZHApiError:
+            raise
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
