@@ -8,7 +8,7 @@
   </thead>
   <tbody>
     <ng-container *ngIf="data && data.length > 0">
-      <tr [ngStyle]="{'background':item[color_col_name] == color_value ? '#EBFFE5' : '#ffffff'}" *ngFor="let item of data">
+      <tr [ngStyle]="{'background':item[color_col_name] == color_value ? '#EBFFE5' : 'rgba(67, 175, 0, 0.04)'}" *ngFor="let item of data">
         <td *ngFor="let col of tableCols">
           <ng-container *ngIf="col.subcell; else elseBlockSub">
             <ul *ngIf="isArray(item[col.name][col.subcell.key]); else elseBlockSubArr">
