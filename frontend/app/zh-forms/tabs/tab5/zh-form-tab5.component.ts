@@ -10,7 +10,6 @@ import { ModalService } from "../../../services/modal.service";
 import { TaxaFile } from "./zh-form-tab5.models";
 import { ErrorTranslatorService } from "../../../services/error-translator.service";
 import { FilesService } from "../../../services/files.service";
-import { ErrorTranslatorService } from "../../../services/error-translator.service";
 
 @Component({
   selector: "zh-form-tab5",
@@ -163,8 +162,7 @@ export class ZhFormTab5Component implements OnInit {
     private _modalService: ModalService,
     private _error: ErrorTranslatorService,
     private _tabService: TabsService,
-    private _filesService: FilesService,
-    private _error: ErrorTranslatorService
+    private _filesService: FilesService
   ) {}
 
   ngOnInit() {
