@@ -6,6 +6,7 @@ import { NgbDatepickerI18n } from "@ng-bootstrap/ng-bootstrap";
 import { NgbDateFRParserFormatter } from "../../../services/dateFrFormatter";
 import { TabsService } from "../../../services/tabs.service";
 import { ModalService } from "../../../services/modal.service";
+import { ModuleConfig } from "../../../module.config";
 
 import { ToastrService } from "ngx-toastr";
 import { Subscription } from "rxjs";
@@ -31,6 +32,8 @@ export class ZhFormTab6Component implements OnInit {
   @Input() public formMetaData: any;
   @Output() public canChangeTab = new EventEmitter<boolean>();
   @Output() nextTab = new EventEmitter<number>();
+  // FIXME: only used for URL path... Must be a better way to do this..
+  private config = ModuleConfig;
   public formTab6: FormGroup;
   public statusForm: FormGroup;
   public instrumentForm: FormGroup;
@@ -183,7 +186,7 @@ export class ZhFormTab6Component implements OnInit {
 
     this.instrumentForm = this.fb.group({
       instrument: [null, Validators.required],
-      instrument_date: [null, Validators.required],
+      instrument_date: [null],
     });
 
     this.urbanDocForm = this.fb.group({
@@ -485,9 +488,9 @@ export class ZhFormTab6Component implements OnInit {
           item.instrument.id_nomenclature ==
           formValues.instrument.id_nomenclature
       );
-      formValues.instrument_date = this.dateParser.format(
-        formValues.instrument_date
-      );
+      formValues.instrument_date =
+        this.dateParser.format(formValues.instrument_date) || null;
+
       if (!itemExist) {
         this.instrumentTable.push(formValues);
       }
@@ -733,6 +736,10 @@ export class ZhFormTab6Component implements OnInit {
       this.formTab6.get("structure").reset();
       this.canChangeTab.emit(false);
     }
+  }
+
+  onAllStructuresDeselected() {
+    this.formTab6.get("structure").reset();
   }
 
   onDeleteStrutureModal(modal, structure) {

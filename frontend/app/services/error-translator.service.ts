@@ -46,6 +46,16 @@ export class ErrorTranslatorService {
         "Impossible d'effectuer la hierarchisation car la zone humide ne se situe sur aucun bassin versant",
       id: 6,
     },
+    {
+      api: "csv_taxa_error", // error returned by backend
+      front: "Impossible de générer le csv des espèces", //error to show to the user
+      id: 4,
+    },
+    {
+      api: "no_rb_rules",
+      front: "Il n'existe pas de règle pour ce bassin versant",
+      id: 5,
+    },
   ];
 
   getError(errorMsg: string): error {

@@ -130,13 +130,20 @@ export class ZhDataService {
 
   getTaxa(zhId: number) {
     return this._api.get(
-      `${AppConfig.API_ENDPOINT}/zones_humides/`
+      `${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/taxa`
     );
   }
 
   getHierZh(zhId: string) {
     return this._api.get<HierarchyModel>(
       `${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/hierarchy`
+    );
+  }
+
+  getPdf(zhId: number) {
+    return this._api.get(
+      `${AppConfig.API_ENDPOINT}/zones_humides/export_pdf/${zhId}`,
+      { responseType: "blob" }
     );
   }
 

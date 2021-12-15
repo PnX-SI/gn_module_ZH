@@ -1,5 +1,6 @@
 import { Component, Input } from "@angular/core";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { saveAs } from "file-saver";
 import { ZhDataService } from "../../services/zh-data.service";
 import { CommonService } from "@geonature_common/service/common.service";
 import { Router } from "@angular/router";
@@ -12,6 +13,8 @@ import { CruvedStoreService } from "@geonature_common/service/cruved-store.servi
 })
 export class HeaderComponent {
   @Input() zhId: number;
+  @Input() zhCode: number;
+  public loadingPdf: boolean = false;
 
   constructor(
     public _cruvedStore: CruvedStoreService,
@@ -53,6 +56,24 @@ export class HeaderComponent {
           this._commonService.translateToaster("error", `Erreur : ${error}`);
         }
       }
+    );
+  }
+
+  onDownloadPdf() {
+    this.loadingPdf = true;
+    this._zhService.getPdf(this.zhId).subscribe(
+      (result) => {
+        this.loadingPdf = false;
+        const rawDate: string = new Date().toLocaleDateString();
+        const date: string = rawDate.replace(/\//g, "-");
+        const filename: string = `${this.zhCode}_${date}_fiche.pdf`;
+        saveAs(result, filename);
+      },
+      (error) => {
+        this.loadingPdf = false;
+        console.log(error);
+      },
+      () => (this.loadingPdf = false)
     );
   }
 }

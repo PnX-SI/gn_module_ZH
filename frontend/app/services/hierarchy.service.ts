@@ -19,9 +19,12 @@ export class HierarchyService {
 
   public bold_row_values: any = [];
   public italic_row_values: any = ["Total rubrique"];
+  public color_col_name: string = "name";
+  public color_value: string = "";
   public currentZh: any;
-  public hierZh: HierarchyModel;
+  //public hierZh: HierarchyModel = null;
   public items: ItemModel[];
+  public rb_name: string;
 
   constructor(
     private _dataService: ZhDataService,
@@ -33,12 +36,11 @@ export class HierarchyService {
   getHierarchy(zhId) {
     this._dataService.getHierZh(zhId).subscribe(
       (data: HierarchyModel) => {
-        console.log(data);
-        this.hierZh = data;
-        this.items = this.setItems(this.hierZh);
+        this.items = this.setItems(data);
       },
       (error) => {
-        if ([400, 500].includes(error.status)) {
+        this.items = [];
+        if (error.status === 400 || error.status === 500) {
           const frontError: string = this._error.getFrontError(
             error.error.message
           );
@@ -54,6 +56,7 @@ export class HierarchyService {
 
   // set list of hierarchy items
   setItems(data) {
+    this.rb_name = data.river_basin_name;
     if (data == null) {
       return [];
     }

@@ -1,0 +1,126 @@
+<div class="flex-container">
+  <section class="content col">
+    <h5 class="subtitle">
+      Fonctions et valeurs majeures
+    </h5>
+    <div class="flex-container-col">
+      <table class="custom-table">
+        <thead>
+            <tr>
+              <th>Principales fonctions hydrologiques / biogéochimiques</th>
+              <th>Qualifications</th>
+              <th>Connaissance</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for fct in data['evaluation']['fonctions']['hydrologique'] %}
+            <tr>
+              <td>{{ fct['type'] }}</td>
+              <td>{{ fct['qualification'] }}</td>
+              <td>{{ fct['connaissance'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+      <br>
+      <table class="custom-table">
+        <thead>
+            <tr>
+              <th>Principales fonctions biologiques / écologiques</th>
+              <th>Qualifications</th>
+              <th>Connaissance</th>
+            </tr>
+        </thead>
+        <tbody>
+          {% for fct in data['evaluation']['fonctions']['biologique'] %}
+          <tr>
+            <td>{{ fct['type'] }}</td>
+            <td>{{ fct['qualification'] }}</td>
+            <td>{{ fct['connaissance'] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <br>
+      <table class="custom-table">
+        <thead>
+            <tr>
+              <th>Intérêts patrimoniaux</th>
+              <th>Qualifications</th>
+              <th>Connaissance</th>
+            </tr>
+        </thead>
+        <tbody>
+          {% for interet in data['evaluation']['interet']['interet'] %}
+            <tr>
+              <td>{{ interet['type'] }}</td>
+              <td>{{ interet['qualification'] }}</td>
+              <td>{{ interet['connaissance'] }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <br>
+      <div class="fieldset">
+        <label>Commentaires : </label>
+        <span>{{ data['evaluation']['interet']['Commentaire'] or '' }}</span>
+    </div>
+  </div>
+  </section>
+</div>
+<br>
+<div class="flex-container-col">
+  <section class="content col">
+    <h5 class="subtitle">
+      Bilan des menaces potentielles influençant la zone humide
+    </h5>
+    <div class="flex-container-col">
+      <div class="fieldset">
+        <label>Evaluation globales des menaces potentielles ou avérées</label>
+        <span>{{ data['evaluation']['bilan']['menaces'] }}</span>
+      </div>
+      <div class="fieldset">
+        <label>Fonctionnalité hydrologique / biogéochimique</label>
+        <span>{{ data['evaluation']['bilan']['hydrologique'] }}</span>
+      </div>
+      <div class="fieldset">
+        <label>Fonctionnalité hydrologique / écologique (habitats / faune /flore) :</label>
+        <span>{{ data['evaluation']['bilan']['biologique'] }}</span>
+      </div>
+      <div class="fieldset">
+        <label>Commentaires</label>
+        <span>{{ data['evaluation']['bilan']['Commentaire'] or '' }}</span>
+      </div>
+    </div>
+  </section>
+</div>
+<br>
+<div class="flex-container-col">
+  <section class="content col">
+    <h5 class="subtitle">
+      Stratégie de gestion et orientations d'actions 
+    </h5>
+    <table class="custom-table">
+      <thead>
+          <tr>
+            <th>Propositions d'actions</th>
+            <th>Niveau de priorité</th>
+            <th>Remarques</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for prop in data['evaluation']['strategie']['propositions'] %}
+          <tr>
+            <td>{{ prop['proposition'] }}</td>
+            <td>{{ prop['niveau'] }}</td>
+            <td>{{ prop['remarque'] }}</td>
+          </tr>
+          {% endfor %}
+      </tbody>
+    </table>
+    <div class="fieldset">
+      <label>Commentaires</label>
+      <span>{{ data['evaluation']['strategie']['commentaires'] or '' }}</span>
+    </div>
+  </section>
+</div>

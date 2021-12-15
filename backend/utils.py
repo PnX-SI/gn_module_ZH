@@ -7,7 +7,11 @@ from geonature.core.gn_commons.models import TMedias
 
 from .api_error import ZHApiError
 
-from .model.zh_schema import BibAreasTypes, LAreas
+from .model.zh_schema import BibAreasTypes, LAreas, TZH
+
+
+def get_main_picture_id(id_zh):
+    return DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().main_pict_id
 
 
 def get_file_path(id_media):
@@ -60,3 +64,8 @@ def check_ref_geo_schema():
         exc_type, value, tb = sys.exc_info()
         raise ZHApiError(
             message="check_ref_geo_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+
+
+def get_extension(file_name):
+    split_filename = file_name.split('.')
+    return '.' + split_filename[len(split_filename)-1]
