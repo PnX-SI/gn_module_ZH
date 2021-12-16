@@ -1,4 +1,11 @@
-import { Component, HostListener, OnInit, AfterViewInit } from "@angular/core";
+import {
+  Component,
+  HostListener,
+  OnInit,
+  AfterViewInit,
+  ViewChild,
+} from "@angular/core";
+import { MatAccordion } from "@angular/material/expansion";
 import { ActivatedRoute } from "@angular/router";
 import { MapService } from "@geonature_common/map/map.service";
 import { ZhDataService } from "../services/zh-data.service";
@@ -14,9 +21,11 @@ import { DetailsModel } from "./models/zh-details.model";
   styleUrls: ["./zh-details.component.scss"],
 })
 export class ZhDetailsComponent implements OnInit, AfterViewInit {
+  @ViewChild(MatAccordion) accordion: MatAccordion;
   public cardContentHeight: number;
   public id_zh: number;
   public zhDetails: DetailsModel;
+  public expanded: boolean = false;
 
   constructor(
     private _mapService: MapService,
@@ -83,5 +92,9 @@ export class ZhDetailsComponent implements OnInit, AfterViewInit {
         this._mapService.map.invalidateSize();
       }, 10);
     }
+  }
+
+  onWrapAll() {
+    this.expanded ? (this.expanded = false) : (this.expanded = true);
   }
 }
