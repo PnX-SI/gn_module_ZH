@@ -1,13 +1,16 @@
-import { Component, Input } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { StatutsModel } from "../models/status.model";
+import { ModuleConfig } from "../../module.config";
 
 @Component({
   selector: "zh-details-statuts",
   templateUrl: "./statuts.component.html",
   styleUrls: ["./statuts.component.scss"],
 })
-export class StatutsComponent {
+export class StatutsComponent implements OnInit {
   @Input() data: StatutsModel;
+  public config = ModuleConfig;
+  public table: any;
 
   public regimeTableCol = [
     { name: "status", label: "Statut" },
@@ -31,4 +34,15 @@ export class StatutsComponent {
     { name: "date", label: "Date de réalisation" },
     { name: "duree", label: "Durée (années)" },
   ];
+
+  ngOnInit() {
+    var groupBy = function (xs, key) {
+      return xs.reduce(function (rv, x) {
+        (rv[x[key]] = rv[x[key]] || []).push(x);
+        return rv;
+      }, {});
+    };
+
+    this.table = groupBy(this.data.autre_inventaire, "type_code");
+  }
 }
