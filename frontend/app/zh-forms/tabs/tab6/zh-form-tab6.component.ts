@@ -943,6 +943,10 @@ export class ZhFormTab6Component implements OnInit {
     this.moreDetails = status;
   }
 
+  onDeSelectAll() {
+    this.formTab6.get("protections").reset();
+  }
+
   onFormSubmit() {
     if (this.formTab6.valid) {
       this.submitted = true;
