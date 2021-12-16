@@ -1,81 +1,93 @@
 <div>
-  <fieldset>
-    <legend>
-      <h5 class="section-title">Fonctions et valeurs majeures</h5>
-    </legend>
-    <zh-table
-      [tableCols]="hydroFunctionsCols"
-      [data]="data.fonctions?.hydrologique"
-    ></zh-table>
-    <zh-table
-      [tableCols]="bioFunctionsCols"
-      [data]="data.fonctions?.biologique"
-    ></zh-table>
-    <zh-table
-      [tableCols]="patrimonialInterestsCols"
-      [data]="data.interet?.interet"
-    ></zh-table>
-    <div class="row">
-      <div class="col-12 col-xl-6">
+  <div class="row my-3">
+    <div class="col-12 h-100">
+      <fieldset>
+        <legend>
+          <h5 class="section-title">
+            Fonctions et valeurs majeures
+            <mat-icon
+            class="info-icon"
+            ngbTooltip="Cette rubrique met en avant les principaux enjeux liés à la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
+            placement="right"
+            >info
+          </mat-icon>
+          </h5>
+        </legend>
         <zh-table
-          [tableCols]="nbFauneFloreCols"
-          [data]="getFauneFloreData()"
+          [tableCols]="hydroFunctionsCols"
+          [data]="data.fonctions?.hydrologique"
         ></zh-table>
-      </div>
-      <div class="col-12 col-xl-6">
-        <zh-table [tableCols]="nbHabCols" [data]="getHabitatData()"></zh-table>
-      </div>
-    </div>
-    <zh-table [tableCols]="valCols" [data]="data.interet?.valeur"></zh-table>
-    <zh-label label="Commentaires :">
-      <span>{{ data.interet?.Commentaire }}</span>
-    </zh-label>
-  </fieldset>
-  <fieldset>
-    <legend>
-      <h5 class="section-title">
-        Bilan des menaces potentielles influençant la zone humide
-      </h5>
-    </legend>
-    <div class="row">
-      <div class="col-12 col-xl-6">
-        <zh-label
-          label="Evaluation globales des menaces potentielles ou avérées :"
-        >
-          <span>{{ data.bilan.menaces }}</span>
-        </zh-label>
-      </div>
-      <div class="col-12 col-xl-6">
-        <zh-label label="Fonctionnalité hydrologique / biogéochimique :">
-          <span>{{ data.bilan.hydrologique }}</span>
-        </zh-label>
-      </div>
-      <div class="col-12">
-        <zh-label
-          label="Fonctionnalité hydrologique / écologique (habitats / faune /flore) :"
-        >
-          <span>{{ data.bilan.biologique }}</span>
-        </zh-label>
-      </div>
-      <div class="col-12">
+        <zh-table
+          [tableCols]="bioFunctionsCols"
+          [data]="data.fonctions?.biologique"
+        ></zh-table>
+        <zh-table
+          [tableCols]="patrimonialInterestsCols"
+          [data]="data.interet?.interet"
+        ></zh-table>
+        <div class="row">
+          <div class="col-12 col-xl-6">
+            <zh-table
+              [tableCols]="nbFauneFloreCols"
+              [data]="getFauneFloreData()"
+            ></zh-table>
+          </div>
+          <div class="col-12 col-xl-6">
+            <zh-table [tableCols]="nbHabCols" [data]="getHabitatData()"></zh-table>
+          </div>
+        </div>
+        <zh-table [tableCols]="valCols" [data]="data.interet?.valeur"></zh-table>
         <zh-label label="Commentaires :">
-          <span>{{ data.bilan.Commentaire }}</span>
+          <span>{{ data.interet?.Commentaire }}</span>
         </zh-label>
-      </div>
+      </fieldset>
+      <fieldset>
+        <legend>
+          <h5 class="section-title">
+            Bilan des menaces potentielles influençant la zone humide
+          </h5>
+        </legend>
+        <div class="row">
+          <div class="col-12 col-xl-6">
+            <zh-label
+              label="Evaluation globales des menaces potentielles ou avérées :"
+            >
+              <span>{{ data.bilan.menaces }}</span>
+            </zh-label>
+          </div>
+          <div class="col-12 col-xl-6">
+            <zh-label label="Fonctionnalité hydrologique / biogéochimique :">
+              <span>{{ data.bilan.hydrologique }}</span>
+            </zh-label>
+          </div>
+          <div class="col-12">
+            <zh-label
+              label="Fonctionnalité hydrologique / écologique (habitats / faune /flore) :"
+            >
+              <span>{{ data.bilan.biologique }}</span>
+            </zh-label>
+          </div>
+          <div class="col-12">
+            <zh-label label="Commentaires :">
+              <span>{{ data.bilan.Commentaire }}</span>
+            </zh-label>
+          </div>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>
+          <h5 class="section-title">
+            Stratégie de gestion et orientations d'actions
+          </h5>
+        </legend>
+        <zh-table
+          [tableCols]="propositionsCol"
+          [data]="data.strategie?.propositions"
+        ></zh-table>
+        <zh-label label="Commentaires :">
+          <span>{{ data.strategie?.commentaires }}</span>
+        </zh-label>
+      </fieldset>
     </div>
-  </fieldset>
-  <fieldset>
-    <legend>
-      <h5 class="section-title">
-        Stratégie de gestion et orientations d'actions
-      </h5>
-    </legend>
-    <zh-table
-      [tableCols]="propositionsCol"
-      [data]="data.strategie?.propositions"
-    ></zh-table>
-    <zh-label label="Commentaires :">
-      <span>{{ data.strategie?.commentaires }}</span>
-    </zh-label>
-  </fieldset>
+  </div>
 </div>
