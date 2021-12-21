@@ -18,7 +18,7 @@ CREATE SEQUENCE pr_zh.t_zh_id_zh_seq START WITH 1 INCREMENT BY 1;
 
 CREATE  TABLE pr_zh.bib_actions ( 
 	id_action            integer DEFAULT nextval('pr_zh.bib_actions_id_action_seq'::regclass) NOT NULL ,
-	name                 varchar(100)  NOT NULL ,
+	name                 varchar(255)  NOT NULL ,
 	CONSTRAINT pk_bib_actions_id_action PRIMARY KEY ( id_action )
  );
 
