@@ -1,6 +1,8 @@
 CREATE SCHEMA IF NOT EXISTS pr_zh;
 
-CREATE SEQUENCE pr_zh.bib_actions_id_action_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE pr_zh.bib_actions_id_site_space_seq START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE pr_zh.bib_site_space_id_bib_seq START WITH 1 INCREMENT BY 1;
 
 CREATE SEQUENCE pr_zh.cor_lim_list_seq START WITH 1 INCREMENT BY 1;
 
@@ -50,7 +52,7 @@ COMMENT ON COLUMN pr_zh.bib_organismes.abbrevation IS 'abbreviation used for cre
 COMMENT ON COLUMN pr_zh.bib_organismes.is_op_org IS 'is it an operator organism (not management structure)';
 
 CREATE  TABLE pr_zh.bib_site_space ( 
-	id_site_space        integer  NOT NULL ,
+	id_site_space        integer DEFAULT nextval('pr_zh.bib_site_space_id_bib_seq'::regclass) NOT NULL ,
 	name                 varchar(255)  NOT NULL ,
 	CONSTRAINT pk_bib_site_space_id_site_space PRIMARY KEY ( id_site_space )
  );
