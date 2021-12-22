@@ -195,6 +195,36 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     );
   }
 
+  openModalCol(event, modal) {
+    this.ngbModal.open(modal);
+  }
+
+  isChecked(col) {
+    let i = 0;
+    while (
+      i < this.mapListService.displayColumns.length &&
+      this.mapListService.displayColumns[i].prop !== col.prop
+    ) {
+      i = i + 1;
+    }
+    return i === this.mapListService.displayColumns.length ? false : true;
+  }
+
+  toggle(col) {
+    const isChecked = this.isChecked(col);
+    if (isChecked) {
+      this.mapListService.displayColumns =
+        this.mapListService.displayColumns.filter((c) => {
+          return c.prop !== col.prop;
+        });
+    } else {
+      this.mapListService.displayColumns = [
+        ...this.mapListService.displayColumns,
+        col,
+      ];
+    }
+  }
+
   openDeleteModal(event, modal, iElement, row) {
     this.mapListService.urlQuery;
     this.mapListService.selectedRow = [];

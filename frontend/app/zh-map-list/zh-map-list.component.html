@@ -113,6 +113,18 @@
             </ng-template>
           </ngx-datatable-column>
           <ngx-datatable-column maxWidth="10">
+            <ng-template ngx-datatable-header-template>
+              <i
+                class="fa fa-cog clickable"
+                aria-hidden="true"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                matTooltip="{{'List.Columns' | translate}}"
+                (click)="openModalCol($event, modalCol)"
+              >
+              </i>
+            </ng-template>
             <ng-template let-row="row" ngx-datatable-cell-template>
               <button
                 class="btn btn-outline-shadow btn-no-padding btn-ghost"
@@ -147,6 +159,32 @@
     </mat-drawer-content>
   </mat-drawer-container>
 </div>
+  <!-- MODAL COLUMNS -->
+  <ng-template
+  #modalCol
+  let-c="close"
+  let-d="dismiss"
+  >
+  <div class="modal-header">
+    <h4> {{'List.DisplayColumns' | translate}} </h4>
+  </div>
+  <div class="modal-body">
+    <li
+      class="col-list"
+      *ngFor="let col of mapListService.availableColumns"
+    >
+      <a>
+        <input
+          type='checkbox'
+          [id]="col.name"
+          (click)='toggle(col)'
+          [checked]='isChecked(col)'
+        />
+        <label [attr.for]="col.name">{{col.name | readablePropertie }}</label>
+      </a>
+    </li>
+  </div>
+  </ng-template>
 
     <!-- MODAL DELETE -->
     <ng-template #modalConfirm let-c="close" let-d="dismiss">
