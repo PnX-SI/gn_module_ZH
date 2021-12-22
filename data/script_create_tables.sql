@@ -1,14 +1,18 @@
 CREATE SCHEMA IF NOT EXISTS pr_zh;
 
-CREATE SEQUENCE pr_zh.bib_actions_id_site_space_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE pr_zh.bib_actions_id_action_seq START WITH 1 INCREMENT BY 1;
 
 CREATE SEQUENCE pr_zh.bib_site_space_id_bib_seq START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE pr_zh.bib_organismes_id_org_seq START WITH 1 INCREMENT BY 1;
 
 CREATE SEQUENCE pr_zh.cor_lim_list_seq START WITH 1 INCREMENT BY 1;
 
 CREATE SEQUENCE pr_zh.cor_main_fct_seq START WITH 1 INCREMENT BY 1;
 
 CREATE SEQUENCE pr_zh.t_activity_id_activity_seq START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE pr_zh.t_hydro_area_id_hydro_seq START WITH 1 INCREMENT BY 1;
 
 CREATE SEQUENCE pr_zh.t_management_plans_id_plan_seq START WITH 1 INCREMENT BY 1;
 
@@ -38,8 +42,8 @@ COMMENT ON COLUMN pr_zh.bib_cb.humidity IS 'H = humide ou P = potentiellement hu
 COMMENT ON COLUMN pr_zh.bib_cb.is_ch IS 'true si le Corine Biotope est utilisé pour la liste des cahiers habitats des zones humides';
 
 CREATE  TABLE pr_zh.bib_organismes ( 
-	id_org               integer  NOT NULL ,
-	name                 varchar(100)  NOT NULL ,
+	id_org               integer DEFAULT nextval('pr_zh.bib_organismes_id_org_seq'::regclass) NOT NULL ,
+	name                 varchar(255)  NOT NULL ,
 	abbrevation          varchar(6) DEFAULT 'XXXXXX' NOT NULL ,
 	is_op_org            boolean DEFAULT true NOT NULL ,
 	CONSTRAINT pk_t_organismes_id_org PRIMARY KEY ( id_org )
@@ -146,7 +150,7 @@ CREATE  TABLE pr_zh.cor_zh_cb (
 COMMENT ON TABLE pr_zh.cor_zh_cb IS 'Correspondance zh et corine biotope';
 
 CREATE  TABLE pr_zh.t_hydro_area ( 
-	id_hydro             integer  NOT NULL ,
+	id_hydro             integer  DEFAULT nextval('pr_zh.t_hydro_area_id_hydro_seq'::regclass) NOT NULL ,
 	name                 varchar(100)  NOT NULL ,
 	geom                 geometry  NOT NULL ,
 	CONSTRAINT pk_t_hydro_area_id_hydro PRIMARY KEY ( id_hydro )
