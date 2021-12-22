@@ -44,7 +44,7 @@ export class HierarchyService {
           const frontError: string = this._error.getFrontError(
             error.error.message
           );
-          var timeOut: number = 10000;
+          const timeOut: number = 10000;
           this._toastr.error(frontError, "", {
             positionClass: "toast-top-right",
             closeButton: true,
