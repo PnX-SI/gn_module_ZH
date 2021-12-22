@@ -108,6 +108,8 @@ def get_zh(info_role):
         parameters = request.args
         limit = int(parameters.get("limit", 100))
         page = int(parameters.get("offset", 0))
+        orderby = str(parameters.get("orderby", None))
+        order = str(parameters.get("order", "asc"))
 
         payload = request.json or None
 
@@ -117,14 +119,16 @@ def get_zh(info_role):
         return get_all_zh(info_role=info_role,
                           query=q,
                           limit=limit,
-                          page=page)
+                          page=page,
+                          orderby=orderby,
+                          order=order)
     except Exception as e:
         exc_type, value, tb = sys.exc_info()
         raise ZHApiError(message="filter_zh_error", details=str(
             exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
-def get_all_zh(info_role, query, limit, page):
+def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
     try:
         # Pour obtenir le nombre de résultat de la requete sans le LIMIT
         nb_results_without_limit = query.count()
@@ -134,7 +138,17 @@ def get_all_zh(info_role, query, limit, page):
             session=session, id_role=info_role.id_role, module_code="ZONES_HUMIDES"
         )
 
+        if orderby in TZH.__table__.columns:
+            col = getattr(TZH, orderby, None)
+            print(col)
+            if col is not None:
+                if order == 'desc':
+                    col = col.desc()
+                query = query.order_by(col)
+
         data = query.limit(limit).offset(page * limit).all()
+
+                    
 
         # check if municipalities and dep in ref_geo
         is_ref_geo = check_ref_geo_schema()
