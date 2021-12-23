@@ -218,6 +218,9 @@ class ZH(TZH):
         regions = [region.region_name for region in q_region]
         return regions
 
+    def get_area(self):
+        return {"area": self.zh.area}
+
     def get_geo_info(self):
         departments = self.get_departments()
         q_municipalities = CorZhArea.get_municipalities_info(self.zh.id_zh)
@@ -247,6 +250,7 @@ class ZH(TZH):
 
     def __repr__(self):
         zh = self.zh.get_geofeature()
+        zh.properties.update(self.get_area())
         zh.properties.update(self.get_geo_info())
         zh.properties.update(self.get_id_lims())
         zh.properties.update(self.get_id_lims_fs())
