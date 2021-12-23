@@ -183,15 +183,20 @@ class ZH(TZH):
         }
 
     def get_fauna_nb(self):
+        vertebrates = self.zh.as_dict()['nb_vertebrate_sp']
+        invertebrates = self.zh.as_dict()['nb_invertebrate_sp']
+
+        if vertebrates is None and invertebrates is None:
+            return None
         try:
-            vertebrates = int(self.zh.as_dict()['nb_vertebrate_sp'])
+            vertebrates = int(vertebrates)
         except TypeError:
             vertebrates = 0
         try:
-            invertebrates = int(self.zh.as_dict()['nb_invertebrate_sp'])
+            invertebrates = int(invertebrates)
         except TypeError:
             invertebrates = 0
-        return vertebrates+invertebrates
+        return vertebrates + invertebrates
 
     def get_departments(self):
         return [
