@@ -24,9 +24,6 @@
             </zh-label>
           </div>
         </div>
-        <zh-label label="Remarques :">
-          <span>{{ data.presentation.remarques }}</span>
-        </zh-label>
         <p class="section-label">Corine Biotope :</p>
         <mat-icon
           class="info-icon"
@@ -39,6 +36,9 @@
             [data]="data.presentation.corine_biotope"
           ></zh-table>
         </div>
+        <zh-label label="Remarques :">
+          <span>{{ data.presentation.remarques }}</span>
+        </zh-label>
       </fieldset>
     </div>
     <div class="col-12 h-100">
