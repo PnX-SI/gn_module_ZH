@@ -10,8 +10,8 @@ import { DescriptionModel } from "../models/description.model";
 export class DescriptionComponent {
   @Input() data: DescriptionModel;
   public corineTableCols: TableColumn[] = [
-    { name: "code", label: "Code corine Biotope" },
-    { name: "label", label: "Libellé corine biotope" },
+    { name: "code", label: "Code Corine biotopes" },
+    { name: "label", label: "Libellé Corine biotopes" },
     { name: "Humidité", label: "Humidité" },
   ];
   activitiesTableCols: TableColumn[] = [
