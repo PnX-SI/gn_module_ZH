@@ -92,7 +92,7 @@ export class ZhFormTab6Component implements OnInit {
     { name: "remark", label: "Remarques" },
   ];
   public planTableCol = [
-    { name: "plan", label: "Nature du plan" },
+    { name: "plan", label: "Nature du plan de gestion" },
     { name: "plan_date", label: "Date de réalisation" },
     { name: "duration", label: "Durée (années)" },
   ];
