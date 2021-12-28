@@ -208,7 +208,6 @@ export class ZhFormTab7Component implements OnInit {
                 qualification: nameQaulif,
                 knowledge: nameKnowledge,
               });
-              console.log(this.bioFctData);
             });
           }
           if (evalZh.fonctions_hydro && evalZh.fonctions_hydro.length > 0) {
