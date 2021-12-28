@@ -19,56 +19,29 @@
         *ngIf="hydroFctData && hydroFctData.length > 0"
         class="table-responsive"
       >
-        <table class="table eval-table fct-table mb-4">
-          <thead class="thead-inverse table-header">
-            <tr>
-              <th *ngFor="let col of hydroFctTableCol">{{ col.label }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of hydroFctData">
-              <td *ngFor="let col of hydroFctTableCol">
-                {{ item[col.name]?.mnemonique || item[col.name] }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <zh-table
+      class="eval-table"
+      [tableCols]="hydroFctTableCol"
+      [data]="hydroFctData"
+      ></zh-table>
       </div>
       <div *ngIf="bioFctData && bioFctData.length > 0" class="table-responsive">
-        <table class="table eval-table fct-table mb-4">
-          <thead class="thead-inverse table-header">
-            <tr>
-              <th *ngFor="let col of bioFctTableCol">{{ col.label }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of bioFctData">
-              <td *ngFor="let col of bioFctTableCol">
-                {{ item[col.name]?.mnemonique || item[col.name] }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <zh-table
+          class="eval-table fct-table"
+          [tableCols]="bioFctTableCol"
+          [data]="bioFctData"
+        ></zh-table>
       </div>
       <div *ngIf="patrimData && patrimData.length > 0" class="table-responsive">
-        <table class="table eval-table fct-table mb-4">
-          <thead class="thead-inverse table-header">
-            <tr>
-              <th *ngFor="let col of patrimTableCol">{{ col.label }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of patrimData">
-              <td *ngFor="let col of patrimTableCol">
-                {{ item[col.name]?.mnemonique || item[col.name] }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <zh-table
+          class="eval-table fct-table"
+          [tableCols]="patrimTableCol"
+          [data]="patrimData"
+        ></zh-table>
       </div>
       <div class="row">
         <div class="col-sm">
-          <table class="table eval-table mb-4">
+          <table class="table white-table mb-4">
             <thead class="thead-inverse table-header">
               <tr>
                 <th>
@@ -90,7 +63,7 @@
           </table>
         </div>
         <div class="col-sm">
-          <table class="table eval-table mb-4">
+          <table class="table white-table mb-4">
             <thead class="thead-inverse table-header">
               <tr>
                 <th>Nombre d'habitats naturels humides patrimoniaux</th>
@@ -111,20 +84,11 @@
         </div>
       </div>
       <div *ngIf="socEcoData && socEcoData.length > 0" class="table-responsive">
-        <table class="table eval-table fct-table mb-4">
-          <thead class="thead-inverse table-header">
-            <tr>
-              <th *ngFor="let col of socEcoTableCol">{{ col.label }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of socEcoData">
-              <td *ngFor="let col of socEcoTableCol">
-                {{ item[col.name]?.mnemonique || item[col.name] }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <zh-table
+          class="eval-table fct-table"
+          [tableCols]="socEcoTableCol"
+          [data]="socEcoData"
+        ></zh-table>
       </div>
       <div class="form-group col-md-12">
         <small>Commentaires</small>
@@ -149,7 +113,7 @@
         </h5>
       </legend>
       <div class="col-sm">
-        <table class="table eval-table mb-4">
+        <table class="table white-table mb-4">
           <thead class="thead-inverse table-header">
             <tr>
               <th>Évaluation globale des menaces potentielles ou avérées</th>
