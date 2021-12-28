@@ -77,15 +77,15 @@
                   <td>
                     <i
                       *ngIf="
-                        !moreDetails && item.plans && item.plans.length > 0
+                        !item.moreDetails && item.plans && item.plans.length > 0
                       "
                       class="fa fa-angle-down morePlan"
-                      (click)="onMoreDetails(true)"
+                      (click)="onMoreDetails(item)"
                     ></i>
                     <i
-                      *ngIf="moreDetails && item.plans && item.plans.length > 0"
+                      *ngIf="item.moreDetails && item.plans && item.plans.length > 0"
                       class="fa fa-angle-up morePlan"
-                      (click)="onMoreDetails(false)"
+                      (click)="onMoreDetails(item)"
                     ></i
                     >{{ item.name }}
                   </td>
@@ -112,7 +112,7 @@
                 </tr>
                 <tr
                   class="tr-plans"
-                  *ngIf="moreDetails && item.plans && item.plans.length > 0"
+                  *ngIf="item.moreDetails && item.plans && item.plans.length > 0"
                 >
                   <td colspan="3" class="tr-plans">
                     <p>Plans de gestion :</p>
