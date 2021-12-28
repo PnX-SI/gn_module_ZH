@@ -126,22 +126,13 @@ class Localisation:
         self.regions = regions
         self.departments = departments
         self.municipalities = self.__get_municipalities_info()
-        self.river_basin = self.__get_river_basin()
 
     def __str__(self):
         return {
             "region": self.regions,
             "departement": self.departments,
             "commune": self.municipalities,
-            "bassin_versant": self.river_basin
         }
-
-    def __get_river_basin(self):
-        return [
-            DB.session.query(TRiverBasin)
-            .filter(TRiverBasin.id_rb == id).one().name
-            for id in [rb.id_rb for rb in DB.session.query(CorZhRb).filter(CorZhRb.id_zh == self.id_zh).all()]
-        ]
 
     def __get_municipalities_info(self):
         return [
