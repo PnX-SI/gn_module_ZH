@@ -39,7 +39,11 @@ export class FonctionsComponent {
   ];
 
   public socioEcoTableCol = [
-    { name: "type", label: "Valeurs socio-économiques", size: this.functionSize },
+    {
+      name: "type",
+      label: "Valeurs socio-économiques",
+      size: this.functionSize,
+    },
     { name: "qualification", label: "Qualifications", size: this.qualifSize },
     { name: "connaissance", label: "Connaissance", size: this.knowledgeSize },
     { name: "justification", label: "Justifications" },
