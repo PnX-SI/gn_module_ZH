@@ -160,6 +160,10 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     return sdage.mnemonique;
   }
 
+  displayOrganism(authors): string {
+    return authors.organisme.nom_organisme;
+  }
+
   zhCustomCallBack(feature): any {
     // set Author name
     feature["properties"]["author"] = this.displayAuthorName(
@@ -177,6 +181,15 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     feature["properties"]["sdage"] = this.displaySdageName(
       feature["properties"]["id_sdage"]
     );
+
+    feature["properties"]["organism"] = this.displayOrganism(
+      feature["properties"]["authors"]
+    );
+
+    feature["properties"]["update_organism"] = this.displayOrganism(
+      feature["properties"]["coauthors"]
+    );
+
     return feature;
   }
 

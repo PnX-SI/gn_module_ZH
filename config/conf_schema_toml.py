@@ -26,8 +26,10 @@ available_maplist_column = [
     {"prop": "sdage", "name": "Typologie SDAGE"},
     {"prop": "bassin_versant", "name": "Bassin versant"},
     {"prop": "author", "name": "Auteur"},
-    {"prop": "update_author", "name": "Auteur derniere modification"},
-    {"prop": "create_date", "name": "Date de creation"},
+    {"prop": "organism", "name": "Organisme"},
+    {"prop": "update_author", "name": "Auteur dernière modification"},
+    {"prop": "update_organism", "name": "Organisme de dernière modification"},
+    {"prop": "create_date", "name": "Date de création"},
     {"prop": "update_date", "name": "Date de modification"}
 ]
 
