@@ -680,7 +680,7 @@ class Status:
             "instruments": [instrument.__str__() for instrument in self.instruments],
             "autre_inventaire": self.__other_ref_geo,
             "autre_etude": Utils.get_bool(self.is_other_inventory),
-            "autres_etude_commentaire": self.remark_is_other_inventory,
+            "autre_etude_commentaire": self.remark_is_other_inventory,
             "statuts": self.__str_protections(),
             "zonage": [urban_doc.__str__() for urban_doc in self.urban_docs]
         }
