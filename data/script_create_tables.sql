@@ -228,6 +228,7 @@ CREATE  TABLE pr_zh.t_zh (
 	remark_eval_heritage varchar(2000)   ,
 	remark_eval_thread   varchar(2000)   ,
 	remark_eval_actions  varchar(2000)   ,
+	remark_is_other_inventory  varchar(2000)   ,
 	main_pict_id         integer   ,
 	area				 real	,
 	CONSTRAINT pk_t_zh_zh_id PRIMARY KEY ( id_zh ),
@@ -311,6 +312,8 @@ COMMENT ON COLUMN pr_zh.t_zh.remark_eval_heritage IS 'remarque sur interet patri
 COMMENT ON COLUMN pr_zh.t_zh.remark_eval_thread IS 'remarque sur les menaces et facteurs influancant la zh dans l''evaluation generale du site. 7.3';
 
 COMMENT ON COLUMN pr_zh.t_zh.remark_eval_actions IS 'remarque sur les orientations d''actions de la zh dans l''evaluation generale du site. 7.4';
+
+COMMENT ON COLUMN pr_zh.t_zh.remark_is_other_inventory IS 'remarque pour préciser les autres études / inventaires naturalistes';
 
 CREATE  TABLE pr_zh.cor_impact_list ( 
 	id_impact_list       uuid NOT NULL ,
