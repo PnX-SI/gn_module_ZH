@@ -21,9 +21,10 @@ default_map_list_conf = [
 
 
 available_maplist_column = [
-    {"prop": "id_zh", "name": "Id"},
-    {"prop": "code", "name": "Code"},
     {"prop": "main_name", "name": "Nom principal"},
+    {"prop": "code", "name": "Code"},
+    {"prop": "sdage", "name": "Typologie SDAGE"},
+    {"prop": "bassin_versant", "name": "Bassin versant"},
     {"prop": "author", "name": "Auteur"},
     {"prop": "update_author", "name": "Auteur derniere modification"},
     {"prop": "create_date", "name": "Date de creation"},

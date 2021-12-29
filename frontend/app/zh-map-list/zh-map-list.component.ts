@@ -165,6 +165,10 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     feature["properties"]["author"] = this.displayAuthorName(
       feature["properties"]["authors"]
     );
+    // set Change Author name
+    feature["properties"]["update_author"] = this.displayAuthorName(
+      feature["properties"]["coauthors"]
+    );
     // format Date
     feature["properties"]["create_date"] = this.displayDate(
       feature["properties"]["create_date"]
