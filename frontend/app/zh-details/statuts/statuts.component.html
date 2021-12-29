@@ -58,6 +58,9 @@
         <zh-label label="Autres études / inventaires naturalistes : ">
           <span>{{ data.autre_etude }}</span>
         </zh-label>
+        <zh-label *ngIf="data?.autres_etude_commentaire" label="Commentaires : ">
+          <span>{{ data?.autres_etude_commentaire }}</span>
+        </zh-label>
       </fieldset>
     </div>
     <div class="col-12 h-100">
