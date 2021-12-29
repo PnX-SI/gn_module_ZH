@@ -61,6 +61,12 @@ export class ErrorTranslatorService {
       front: "Cette zone humide n'intersecte aucun bassin versant",
       id: 6,
     },
+    {
+      api: "user_not_allowed",
+      front:
+        "Vous n'avez pas les droits pour supprimer/modifier/lire cette zone humide",
+      id: 7,
+    },
   ];
 
   getError(errorMsg: string): error {
