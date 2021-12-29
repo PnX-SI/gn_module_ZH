@@ -212,10 +212,20 @@
           <small style="display: block; margin-bottom: 8px"
             >Autres études / inventaires naturalistes </small
           >
-          <mat-label ngClass="labelBeforeSlide">Non</mat-label>
-          <mat-slide-toggle [formControl]="formTab6.controls.is_other_inventory"
-            ></mat-slide-toggle>
-          <mat-label ngClass="labelBeforeSlide">Oui</mat-label>
+          <div class="ml-3">
+            <mat-label ngClass="labelBeforeSlide">Non</mat-label>
+            <mat-slide-toggle [formControl]="formTab6.controls.is_other_inventory"
+              ></mat-slide-toggle>
+            <mat-label ngClass="labelBeforeSlide">Oui</mat-label>
+            
+            <!-- DO NOT FORGET formControl [formControl]="formTab4.controls.remark_diag" -->
+            <textarea
+              *ngIf="formTab6.controls.is_other_inventory.value"
+              [formControl]="formTab6.controls.remark_is_other_inventory"
+              class="form-control mt-3"
+              placeholder="Commentaires"
+          ></textarea>
+        </div>
         </div>
       </div>
     </fieldset>

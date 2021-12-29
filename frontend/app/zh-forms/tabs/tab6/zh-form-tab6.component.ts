@@ -175,6 +175,7 @@ export class ZhFormTab6Component implements OnInit {
       protections: null,
       structure: null,
       is_other_inventory: false,
+      remark_is_other_inventory: null,
     });
 
     this.statusForm = this.fb.group({
@@ -247,6 +248,8 @@ export class ZhFormTab6Component implements OnInit {
             this.formTab6.patchValue({
               protections: protections,
               is_other_inventory: this.currentZh.properties.is_other_inventory,
+              remark_is_other_inventory:
+                this.currentZh.properties.remark_is_other_inventory,
             });
             if (
               this.currentZh.properties.ownerships &&
@@ -1013,6 +1016,8 @@ export class ZhFormTab6Component implements OnInit {
         instruments: instruments,
         protections: protections,
         is_other_inventory: this.formTab6.value.is_other_inventory,
+        remark_is_other_inventory:
+          this.formTab6.value.remark_is_other_inventory,
         urban_docs: urban_docs,
       };
 
