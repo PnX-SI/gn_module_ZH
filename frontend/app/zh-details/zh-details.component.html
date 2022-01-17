@@ -1,5 +1,8 @@
 <div *ngIf="zhDetails" class="container-fluid">
-  <zh-details-header [zhId]="id_zh" [zhCode]="zhDetails?.renseignements?.identification?.code"></zh-details-header>
+  <zh-details-header
+    [zhId]="id_zh"
+    [zhCode]="zhDetails?.renseignements?.identification?.code"
+  ></zh-details-header>
   <pnx-map height="40vh" searchBar="false">
     <pnx-geojson [geojson]="this.validBbox" [zoomOnFirstTime]="true">
     </pnx-geojson>
@@ -40,9 +43,10 @@
       [data]="zhDetails.evaluation"
     ></zh-details-evaluation
   ></collapse>
+  <collapse [title]="'8. Ressources documentaires'"
+    ><zh-details-ressources [zhId]="id_zh"></zh-details-ressources
+  ></collapse>
   <collapse [title]="'9. Hiérarchie'"
-    ><zh-details-hierarchy
-      [data]="zhDetails.hierarchy"
-    ></zh-details-hierarchy
+    ><zh-details-hierarchy [data]="zhDetails.hierarchy"></zh-details-hierarchy
   ></collapse>
 </div>
