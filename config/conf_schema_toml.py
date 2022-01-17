@@ -115,6 +115,9 @@ file_path = "static"
 
 module_dir_name = 'gn_module_zones_humides'
 
+# Name of the source of species data (tab5)
+species_source_name = 'GeoNature'
+
 
 class GnModuleSchemaConf(Schema):
     default_maplist_columns = fields.List(
@@ -136,3 +139,4 @@ class GnModuleSchemaConf(Schema):
     filename_validated = fields.Boolean(missing=filename_validated)
     file_path = fields.String(missing=file_path)
     module_dir_name = fields.String(missing=module_dir_name)
+    species_source_name = fields.String(missing=species_source_name)
