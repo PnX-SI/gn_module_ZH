@@ -115,19 +115,9 @@ export class ZhFormTab8Component implements OnInit {
   }
 
   handleImages() {
-    let files = this.getFilesByExtensions(this._filesService.EXT_IMAGES);
-    files.map((item) => {
-      this._filesService.downloadFilePromise(item.id_media).then((res) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(res);
-        reader.onloadend = () => {
-          item.image = reader.result;
-        };
-      });
-    });
     this.imageFiles = {
       name: "Photos",
-      files: files,
+      files: this.getFilesByExtensions(this._filesService.EXT_IMAGES)
     };
   }
 
