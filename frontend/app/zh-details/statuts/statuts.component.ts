@@ -30,5 +30,6 @@ export class StatutsComponent {
     { name: "plan", label: "Nature du plan" },
     { name: "date", label: "Date de réalisation" },
     { name: "duree", label: "Durée (années)" },
+    { name: "remark", label: "Ramarques" },
   ];
 }
