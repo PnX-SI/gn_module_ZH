@@ -415,66 +415,6 @@ def get_ref_autocomplete(info_role):
         DB.session.close()
 
 
-@ blueprint.route("/references", methods=["POST"])
-@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
-@ json_resp
-def post_reference(info_role):
-    """create reference
-    """
-    try:
-        form_data = request.json
-        new_ref = TReferences(
-            authors=form_data["authors"],
-            pub_year=form_data["pub_year"],
-            title=form_data["title"],
-            editor=form_data["editor"],
-            editor_location=form_data["editor_location"]
-        )
-        DB.session.add(new_ref)
-        DB.session.commit()
-        return new_ref.as_dict()
-    except Exception as e:
-        DB.session.rollback()
-        if e.__class__.__name__ == 'DataError':
-            raise ZHApiError(
-                message="post_reference_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="post_reference_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
-    finally:
-        DB.session.close()
-
-
-@ blueprint.route("/references", methods=["PATCH"])
-@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
-@ json_resp
-def patch_reference(info_role):
-    """edit reference
-    """
-    try:
-        pdb.set_trace()
-        form_data = request.json
-        DB.session.query(TReferences).filter(TReferences.id_reference == form_data['id_reference']).update({
-            TReferences.authors: form_data["authors"],
-            TReferences.pub_year: form_data["pub_year"],
-            TReferences.title: form_data["title"],
-            TReferences.editor: form_data["editor"],
-            TReferences.editor_location: form_data["editor_location"]
-        })
-        DB.session.commit()
-        return form_data
-    except Exception as e:
-        DB.session.rollback()
-        if e.__class__.__name__ == 'DataError':
-            raise ZHApiError(
-                message="edit_reference_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="edit_reference_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
-    finally:
-        DB.session.close()
-
-
 @ blueprint.route("/<int:id_zh>/files", methods=["GET"])
 @ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
 @ json_resp_accept_empty_list
