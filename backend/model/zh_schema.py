@@ -1145,6 +1145,9 @@ class TManagementPlans(DB.Model):
     duration = DB.Column(
         DB.Integer
     )
+    remark = DB.Column(
+        DB.Unicode(length=2000)
+    )
 
 
 def get_view_model(table_name, schema_name):

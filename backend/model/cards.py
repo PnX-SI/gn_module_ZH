@@ -600,7 +600,8 @@ class Status:
                 Plan(
                     plan['id_nature'],
                     plan['plan_date'],
-                    plan['duration']
+                    plan['duration'],
+                    plan['remark']
                 ) for plan in management['plans']
             ]
             mng = Management()
@@ -708,16 +709,18 @@ class Management:
 
 class Plan:
 
-    def __init__(self, id_nature, plan_date, duration):
+    def __init__(self, id_nature, plan_date, duration, remark: str):
         self.id_nature: int = id_nature
         self.plan_date: str = plan_date
         self.duration: int = duration
+        self.remark: str = remark
 
     def __str__(self):
         return {
             "plan": Utils.get_mnemo(self.id_nature),
             "date": Utils.get_string(str(self.plan_date)),
-            "duree": self.duration
+            "duree": self.duration,
+            "remark": self.remark
         }
 
 
