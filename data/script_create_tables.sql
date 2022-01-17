@@ -164,15 +164,18 @@ COMMENT ON COLUMN pr_zh.t_hydro_area.geom IS 'emprise geographique de la zone hy
 
 CREATE  TABLE pr_zh.t_references ( 
 	id_reference         integer DEFAULT nextval('pr_zh.t_references_id_reference_seq'::regclass) NOT NULL ,
+	ref_number			 varchar(20)   ,
+	reference			 varchar(1000)   ,
 	authors              varchar(100)   ,
 	pub_year             integer   ,
 	title                varchar(1000)  NOT NULL ,
 	editor               varchar(100)   ,
 	editor_location      varchar(50)   ,
-	CONSTRAINT pk_t_references_id_reference PRIMARY KEY ( id_reference )
+	CONSTRAINT pk_t_references_id_reference PRIMARY KEY ( id_reference ) ,
+	CONSTRAINT unq_t_references_ref_number UNIQUE ( ref_number )
  );
 
-COMMENT ON TABLE pr_zh.t_references IS 'Liste des références bibliographiques par bassin versant';
+COMMENT ON TABLE pr_zh.t_references IS 'Liste des références bibliographiques';
 
 COMMENT ON COLUMN pr_zh.t_references.pub_year IS 'published_year';
 

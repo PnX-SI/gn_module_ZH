@@ -747,27 +747,6 @@ INSERT INTO pr_zh.cor_protection_level_type VALUES
 ;
 
 
-INSERT INTO pr_zh.bib_organismes VALUES
-(1, 'organisme 1', 'GE1', false),
-(2, 'organisme 2', 'GE2', true),
-(3, 'organisme 3', 'GE3', true)
-;
-
-
-INSERT INTO pr_zh.bib_site_space VALUES
-(1, 'grand ensemble 1'),
-(2, 'grand ensemble 2'),
-(3, 'grand ensemble 3')
-;
-
-
-INSERT INTO pr_zh.bib_actions VALUES
-(1, 'proposition d''action 1'),
-(2, 'proposition d''action 2'),
-(3, 'proposition d''action 3')
-;
-
-
 INSERT INTO pr_zh.cor_urban_type_range VALUES
 (1, (SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','1')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','1'))),
 (2, (SELECT ref_nomenclatures.get_id_nomenclature('TYP_DOC_COMM','2')), (SELECT ref_nomenclatures.get_id_nomenclature('TYP_CLASS_COMM','2'))),
