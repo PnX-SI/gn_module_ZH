@@ -37,26 +37,8 @@
         Bilan des menaces potentielles influençant la zone humide
       </h5>
     </legend>
+    <zh-table [tableCols]="menacesCols" [data]="getBilanData()"></zh-table>
     <div class="row">
-      <div class="col-12 col-xl-6">
-        <zh-label
-          label="Evaluation globales des menaces potentielles ou avérées :"
-        >
-          <span>{{ data.bilan.menaces }}</span>
-        </zh-label>
-      </div>
-      <div class="col-12 col-xl-6">
-        <zh-label label="Fonctionnalité hydrologique / biogéochimique :">
-          <span>{{ data.bilan.hydrologique }}</span>
-        </zh-label>
-      </div>
-      <div class="col-12">
-        <zh-label
-          label="Fonctionnalité hydrologique / écologique (habitats / faune /flore) :"
-        >
-          <span>{{ data.bilan.biologique }}</span>
-        </zh-label>
-      </div>
       <div class="col-12">
         <zh-label label="Commentaires :">
           <span>{{ data.bilan.Commentaire }}</span>

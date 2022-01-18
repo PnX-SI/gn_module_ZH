@@ -63,6 +63,18 @@ export class EvaluationComponent {
     { name: "remarque", label: "Remarques" },
   ];
 
+  public menacesCols: TableColumn[] = [
+    {
+      name: "menaces",
+      label: "Évaluation globale des menaces potentielles ou avérées",
+    },
+    {
+      name: "hydrologique",
+      label: "Fonctionnalité hydrologique / biogéochimique",
+    },
+    { name: "biologique", label: "Fonctionnalité biologique / écologique" },
+  ];
+
   getFauneFloreData() {
     return [
       {
@@ -77,6 +89,16 @@ export class EvaluationComponent {
       {
         nb_hab: this.data.interet.nb_hab,
         total_hab_cover: this.data.interet.total_hab_cover,
+      },
+    ];
+  }
+
+  getBilanData() {
+    return [
+      {
+        menaces: this.data.bilan.menaces,
+        hydrologique: this.data.bilan.hydrologique,
+        biologique: this.data.bilan.biologique,
       },
     ];
   }
