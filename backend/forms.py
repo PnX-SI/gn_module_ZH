@@ -699,7 +699,9 @@ def post_protections(id_zh, protections):
 def update_zh_tab6(data):
     try:
         DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
-            TZH.is_other_inventory: data['is_other_inventory']
+            TZH.is_other_inventory: data['is_other_inventory'],
+            TZH.update_author: data['update_author'],
+            TZH.update_date: data['update_date']
         })
         DB.session.flush()
     except Exception as e:
