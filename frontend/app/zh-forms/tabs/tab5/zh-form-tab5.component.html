@@ -167,6 +167,31 @@
       </div>
       <h3 class="sub-title">Faune et flore patrimoniale</h3>
       <div class="form-row">
+        <div class="mb-1 col-12">
+          <small>Liste des espèces à statut de protection</small>
+        </div>
+        <div class="mb-2 col-12">
+          <button
+            mat-raised-button
+            class="mb-3"
+            color="primary"
+            (click)="onGenerateTaxa()"
+          >
+            <mat-icon>add_box</mat-icon>
+            <mat-spinner *ngIf="taxaLoading" color="warn" diameter="25"></mat-spinner>
+            Générer la liste des espèces
+          </button>
+          <zh-table
+            *ngIf="_filesService.filterByExtension('csv').length > 0"
+            [tableCols]="fileTableCol" 
+            [data]="_filesService.filterByExtension('csv')"
+            [downloadable]="true"
+            (onDownload)="_filesService.downloadFile($event)"
+          ></zh-table>
+          <p class="hint">
+            Vous pouvez retrouver ces fichiers dans l'onglet des ressources documentaires (<a [routerLink]="" (click)="nextTab.emit(8)">onglet 8</a>)
+          </p>
+        </div>
         <div class="form-group col-md-4">
           <small>Flore - nombre d'espèces</small>
           <input
@@ -216,33 +241,6 @@
           </small>
         </div>
       </div>
-      <fieldset>
-        <legend>
-          <h5 class="section-title">Liste des espèces à statut de protection</h5>
-        </legend>
-        <button
-          mat-raised-button
-          class="mb-3"
-          color="primary"
-          (click)="onGenerateTaxa()"
-        >
-          <mat-icon>add_box</mat-icon>
-          <mat-spinner *ngIf="taxaLoading" color="warn" diameter="25"></mat-spinner>
-          Générer la liste des espèces
-        </button>
-        <br>
-        <small>Fichiers d'espèces présents sur cette zone humide :</small>
-        <zh-table
-          *ngIf="_filesService.filterByExtension('csv').length > 0"
-          [tableCols]="fileTableCol" 
-          [data]="_filesService.filterByExtension('csv')"
-          [downloadable]="true"
-          (onDownload)="_filesService.downloadFile($event)"
-        ></zh-table>
-        <small>
-          Vous pouvez retrouver ces fichiers dans l'onglet des ressources documentaires (onglet 8)
-        </small>
-      </fieldset>
     </fieldset>
 
     <fieldset>
