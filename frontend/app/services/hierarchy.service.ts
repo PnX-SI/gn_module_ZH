@@ -91,25 +91,24 @@ export class HierarchyService {
       note: "",
     });
 
-    // cat 2
+    // cat 4
     this.items.push({
-      name: data.volet1.cat2_heritage.name.toUpperCase(),
+      name: data.volet1.cat4_hydro.name.toUpperCase(),
       active: true,
       qualification: "",
       knowledge: "",
       note: "",
     });
-    this.bold_row_values.push(data.volet1.cat2_heritage.name.toUpperCase());
-    this.items.push(data.volet1.cat2_heritage.items[0]);
-    this.items.push(data.volet1.cat2_heritage.items[1]);
-    this.items.push(data.volet1.cat2_heritage.items[2]);
-    this.items.push(data.volet1.cat2_heritage.items[3]);
+    this.bold_row_values.push(data.volet1.cat4_hydro.name.toUpperCase());
+    this.items.push(data.volet1.cat4_hydro.items[0]);
+    this.items.push(data.volet1.cat4_hydro.items[1]);
+    this.items.push(data.volet1.cat4_hydro.items[2]);
     this.items.push({
       name: " ",
       active: true,
       qualification: "",
       knowledge: "Total rubrique",
-      note: data.volet1.cat2_heritage.note,
+      note: data.volet1.cat4_hydro.note,
     });
 
     this.items.push({
@@ -145,25 +144,26 @@ export class HierarchyService {
       knowledge: "",
       note: "",
     });
-
-    // cat 4
+    
+    // cat 2
     this.items.push({
-      name: data.volet1.cat4_hydro.name.toUpperCase(),
+      name: data.volet1.cat2_heritage.name.toUpperCase(),
       active: true,
       qualification: "",
       knowledge: "",
       note: "",
     });
-    this.bold_row_values.push(data.volet1.cat4_hydro.name.toUpperCase());
-    this.items.push(data.volet1.cat4_hydro.items[0]);
-    this.items.push(data.volet1.cat4_hydro.items[1]);
-    this.items.push(data.volet1.cat4_hydro.items[2]);
+    this.bold_row_values.push(data.volet1.cat2_heritage.name.toUpperCase());
+    this.items.push(data.volet1.cat2_heritage.items[0]);
+    this.items.push(data.volet1.cat2_heritage.items[1]);
+    this.items.push(data.volet1.cat2_heritage.items[2]);
+    this.items.push(data.volet1.cat2_heritage.items[3]);
     this.items.push({
       name: " ",
       active: true,
       qualification: "",
       knowledge: "Total rubrique",
-      note: data.volet1.cat4_hydro.note,
+      note: data.volet1.cat2_heritage.note,
     });
 
     this.items.push({
@@ -173,6 +173,7 @@ export class HierarchyService {
       knowledge: "",
       note: "",
     });
+
 
     // cat 5
     this.items.push({
