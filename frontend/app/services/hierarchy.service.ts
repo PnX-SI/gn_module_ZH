@@ -11,13 +11,13 @@ import { ErrorTranslatorService } from "./error-translator.service";
 })
 export class HierarchyService {
   public hierTableCols: TableColumn[] = [
-    { name: "name", label: "RUBRIQUES" },
-    { name: "qualification", label: "QUALIFICATIONS" },
-    { name: "knowledge", label: "CONNAISSANCES" },
+    { name: "name", label: "RUBRIQUE" },
+    { name: "qualification", label: "QUALIFICATION" },
+    { name: "knowledge", label: "CONNAISSANCE" },
     { name: "note", label: "NOTE" },
   ];
 
-  public bold_row_values: any = [];
+  public bold_row_values: any = [" "];
   public italic_row_values: any = ["Total rubrique"];
   public color_col_name: string = "name";
   public color_value: string = "";
@@ -76,10 +76,10 @@ export class HierarchyService {
     this.bold_row_values.push(data.volet1.cat1_sdage.name.toUpperCase());
     this.items.push(data.volet1.cat1_sdage.items[0]);
     this.items.push({
-      name: "Total rubrique",
+      name: " ",
       active: true,
       qualification: "",
-      knowledge: "",
+      knowledge: "Total rubrique",
       note: data.volet1.cat1_sdage.note,
     });
 
@@ -105,10 +105,10 @@ export class HierarchyService {
     this.items.push(data.volet1.cat2_heritage.items[2]);
     this.items.push(data.volet1.cat2_heritage.items[3]);
     this.items.push({
-      name: "Total rubrique",
+      name: " ",
       active: true,
       qualification: "",
-      knowledge: "",
+      knowledge: "Total rubrique",
       note: data.volet1.cat2_heritage.note,
     });
 
@@ -131,10 +131,10 @@ export class HierarchyService {
     this.bold_row_values.push(data.volet1.cat3_eco.name.toUpperCase());
     this.items.push(data.volet1.cat3_eco.items[0]);
     this.items.push({
-      name: "Total rubrique",
+      name: " ",
       active: true,
       qualification: "",
-      knowledge: "",
+      knowledge: "Total rubrique",
       note: data.volet1.cat3_eco.note,
     });
 
@@ -159,10 +159,10 @@ export class HierarchyService {
     this.items.push(data.volet1.cat4_hydro.items[1]);
     this.items.push(data.volet1.cat4_hydro.items[2]);
     this.items.push({
-      name: "Total rubrique",
+      name: " ",
       active: true,
       qualification: "",
-      knowledge: "",
+      knowledge: "Total rubrique",
       note: data.volet1.cat4_hydro.note,
     });
 
@@ -186,10 +186,10 @@ export class HierarchyService {
     this.items.push(data.volet1.cat5_soc_eco.items[0]);
     this.items.push(data.volet1.cat5_soc_eco.items[1]);
     this.items.push({
-      name: "Total rubrique",
+      name: " ",
       active: true,
       qualification: "",
-      knowledge: "",
+      knowledge: "Total rubrique",
       note: data.volet1.cat5_soc_eco.note,
     });
 
@@ -203,13 +203,13 @@ export class HierarchyService {
 
     // note volet 1
     this.items.push({
-      name: "NOTE VOLET 1 - VALEUR GLOBALE",
+      name: " ",
       active: true,
       qualification: "",
-      knowledge: "",
+      knowledge: "NOTE VOLET 1 - VALEUR GLOBALE",
       note: data.volet1.note,
     });
-    this.bold_row_values.push("NOTE VOLET 1 - VALEUR GLOBALE");
+    //this.bold_row_values.push("NOTE VOLET 1 - VALEUR GLOBALE");
     this.items.push({
       name: "",
       active: true,
@@ -230,10 +230,10 @@ export class HierarchyService {
     this.items.push(data.volet2.cat6_status.items[0]);
     this.items.push(data.volet2.cat6_status.items[1]);
     this.items.push({
-      name: "Total rubrique",
+      name: " ",
       active: true,
       qualification: "",
-      knowledge: "",
+      knowledge: "Total rubrique",
       note: data.volet2.cat6_status.note,
     });
 
@@ -257,10 +257,10 @@ export class HierarchyService {
     this.items.push(data.volet2.cat7_fct_state.items[0]);
     this.items.push(data.volet2.cat7_fct_state.items[1]);
     this.items.push({
-      name: "Total rubrique",
+      name: " ",
       active: true,
       qualification: "",
-      knowledge: "",
+      knowledge: "Total rubrique",
       note: data.volet2.cat7_fct_state.note,
     });
 
@@ -283,10 +283,10 @@ export class HierarchyService {
     this.bold_row_values.push(data.volet2.cat8_thread.name.toUpperCase());
     this.items.push(data.volet2.cat8_thread.items[0]);
     this.items.push({
-      name: "Total rubrique",
+      name: " ",
       active: true,
       qualification: "",
-      knowledge: "",
+      knowledge: "Total rubrique",
       note: data.volet2.cat8_thread.note,
     });
 
@@ -300,13 +300,13 @@ export class HierarchyService {
 
     // note volet 2 - priorite d'intervention
     this.items.push({
-      name: "NOTE VOLET 2 - PRIORITE D'INTERVENTION",
+      name: " ",
       active: true,
       qualification: "",
-      knowledge: "",
+      knowledge: "NOTE VOLET 2 - PRIORITE D'INTERVENTION",
       note: data.volet2.note,
     });
-    this.bold_row_values.push("NOTE VOLET 2 - PRIORITE D'INTERVENTION");
+    //this.bold_row_values.push("NOTE VOLET 2 - PRIORITE D'INTERVENTION");
 
     this.items.push({
       name: "",
@@ -318,23 +318,23 @@ export class HierarchyService {
 
     // note globale
     this.items.push({
-      name: "TOTAL",
+      name: " ",
       active: true,
       qualification: "",
-      knowledge: "",
+      knowledge: "TOTAL",
       note: data.global_note,
     });
-    this.bold_row_values.push("TOTAL");
+    //this.bold_row_values.push("TOTAL");
 
     // note globale
     this.items.push({
-      name: "NOTE FINALE",
+      name: " ",
       active: true,
       qualification: "",
-      knowledge: "",
+      knowledge: "NOTE FINALE",
       note: data.final_note,
     });
-    this.bold_row_values.push("NOTE FINALE");
+    //this.bold_row_values.push("NOTE FINALE");
 
     return this.items;
   }

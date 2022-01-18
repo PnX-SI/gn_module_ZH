@@ -501,11 +501,11 @@ class Item:
     def __get_rule_name(self):
         try:
             return DB.session.query(TRules, BibHierSubcategories).join(TRules).filter(
-                TRules.rule_id == self.rule_id).one().BibHierSubcategories.label
+                TRules.rule_id == self.rule_id).one().BibHierSubcategories.label.capitalize()
         except NoResultFound:
             pass
         return DB.session.query(TRules, BibHierCategories).join(TRules).filter(
-            TRules.rule_id == self.rule_id).one().BibHierCategories.label
+            TRules.rule_id == self.rule_id).one().BibHierCategories.label.capitalize()
 
     def __get_knowledge_mnemo(self):
         try:
