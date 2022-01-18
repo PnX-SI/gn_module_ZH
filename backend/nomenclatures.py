@@ -33,7 +33,7 @@ def get_sage_list():
     try:
         return [
             {
-                float(sdage_id): [
+                int(sdage_id): [
                     {
                         "id_nomenclature": sage.CorSdageSage.id_sage,
                         "mnemonique": sage.TNomenclatures.mnemonique
