@@ -1,6 +1,7 @@
 from pathlib import Path
 from io import BytesIO
 import base64
+from datetime import datetime as dt
 
 from flask import current_app, render_template
 from weasyprint import HTML
@@ -70,6 +71,10 @@ def gen_pdf(id_zh, dataset, filename = "rapport.pdf"):
     pdf_file = generate_pdf_from_template("fiche_template_pdf.html", dataset, filename)
     return Path(pdf_file)
 
+@current_app.template_filter('datetime_format')
+def datetime_format(value: str, format="%d-%m-%y"):
+    date = dt.strptime(value, '%Y-%m-%d %H:%M:%S')
+    return date.strftime(format)
 
 def generate_pdf_from_template(template, data, filename):
     template_rendered = render_template(template, data=data)

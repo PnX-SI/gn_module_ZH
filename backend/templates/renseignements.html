@@ -3,7 +3,7 @@
   <div class="left">
     <section class="content col">
       <div class="fieldset">
-        <label>Nom usuel zone humide</label>
+        <label>Nom usuel de la zone humide</label>
         <span>{{ data['renseignements']['identification']['nom'] }}</span>
       </div>
       <div class="fieldset">
@@ -19,7 +19,7 @@
         {% endif %}   
       </div>
       <div class="fieldset">
-        <label>Code zone humide</label>
+        <label>Code de la zone humide</label>
         <span>{{ data['renseignements']['identification']['code'] }}</span>
       </div>
       <div class="flex-container">
@@ -64,13 +64,12 @@
       </div>
       <div class="fieldset">
         <label>Date d'établissement</label>
-        {# Hack that keep the dd/MM/yy of the date, not to implement a custom formatter... #}
-        <span>{{ data['renseignements']['auteur']['date'].split()[0] }}</span>
+        <span>{{ data['renseignements']['auteur']['date'] | datetime_format }}</span>
       </div>
       <div class="fieldset">
         <label>Date de modification</label>
-        {# Hack that keep the dd/MM/yy of the date, not to implement a custom formatter... #}
-        <span>{{ data['renseignements']['auteur']['date_modif'].split()[0] }}</span>
+        {# Hack to keep only seconds and no microseconds: split('.')[0] #}
+        <span>{{ data['renseignements']['auteur']['date_modif'].split('.')[0] | datetime_format }}</span>
       </div>
       <div class="fieldset">
         <label>Typologie SDAGE</label>
