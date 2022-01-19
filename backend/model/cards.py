@@ -168,8 +168,8 @@ class Author:
         return {
             "auteur": self.create_author,
             "auteur_modif": self.edit_author,
-            "date": datetime.strptime(self.create_date, '%Y-%m-%d %H:%M:%S').date().strftime("%d/%m/%Y"),
-            "date_modif": datetime.strptime(self.update_date, '%Y-%m-%d %H:%M:%S.%f').date().strftime("%d/%m/%Y"),
+            "date": self.create_date,
+            "date_modif": self.update_date,
             # "organism": DB.session.query(Organisme).filter(Organisme.id_organisme == self.id_organisme).one().nom_organisme
             "organism": self.__temporary_get_organism(self.id_organisme)
         }
