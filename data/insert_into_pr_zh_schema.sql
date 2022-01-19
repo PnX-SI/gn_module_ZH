@@ -867,7 +867,7 @@ INSERT INTO pr_zh.bib_hier_subcategories VALUES
 (9, 'production'),
 (10, 'statut'),
 (11, 'gestion conservatoire'),
-(12, 'hydrolgique / biogéochimique'),
+(12, 'hydrologique / biogéochimique'),
 (13, 'biologique / écologique');
 
 

@@ -72,9 +72,9 @@ INSERT INTO ref_nomenclatures.t_nomenclatures(id_type, cd_nomenclature, mnemoniq
 ((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'fort', 'Fort (réglementaire / maîtrise foncière)', 'Fort (réglementaire / maîtrise foncière)', 'Fort (réglementaire / maîtrise foncière)', 'ZONES_HUMIDES', 'Non validé'),
 ((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'OUI', 'OUI', 'OUI', 'OUI', 'ZONES_HUMIDES', 'Non validé'),
 ((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'NON', 'NON', 'NON', 'NON', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'bon', 'Non dégradée (bon)', 'Non dégradée (bon)', 'Non dégradée (bon)', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'mauvais', 'Très fortement dégradée (mauvais)', 'Très fortement dégradée (mauvais)', 'Très fortement dégradée (mauvais)', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'moyen', 'Partiellement dégradée (moyen)', 'Partiellement dégradée (moyen)', 'Partiellement dégradée (moyen)', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'bon', 'Non dégradée', 'Non dégradée', 'Non dégradée', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'mauvais', 'Très fortement dégradée', 'Très fortement dégradée', 'Très fortement dégradée', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'moyen', 'Partiellement dégradée', 'Partiellement dégradée', 'Partiellement dégradée', 'ZONES_HUMIDES', 'Non validé'),
 ((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'NE', 'Non évalué', 'Non évalué', 'Non évalué', 'ZONES_HUMIDES', 'Non validé')
 ;
 
@@ -199,15 +199,15 @@ INSERT INTO pr_zh.t_items VALUES
 (79, 13, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = 'OUI' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 0, 1),
 (80, 13, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = 'NON' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 50, 1),
 
-(81, 14, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = 'Non dégradée (bon)' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 0, 1),
-(82, 14, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = 'Partiellement dégradée (moyen)' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 25, 1),
-(83, 14, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = 'Très fortement dégradée (mauvais)' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 50, 1),
+(81, 14, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = 'Non dégradée' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 0, 1),
+(82, 14, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = 'Partiellement dégradée' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 25, 1),
+(83, 14, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = 'Très fortement dégradée' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 50, 1),
 (84, 14, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = 'Non évalué' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 10, 1),
 
 (85, 15, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = 'Non dégradée' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 0, 1),
 (86, 15, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = 'Partiellement dégradée' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 25, 1),
 (87, 15, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = 'Très fortement dégradée' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 50, 1),
-(88, 15, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = 'Non évaluée' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 10, 1),
+(88, 15, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = 'Non évalué' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 10, 1),
 
 (89, 16, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE label_default = 'Pas ou peu menacée'  and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'EVAL_GLOB_MENACES')), 0, 1),
 (90, 16, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE label_default = 'Modérément menacée'  and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'EVAL_GLOB_MENACES')), 50, 1),
