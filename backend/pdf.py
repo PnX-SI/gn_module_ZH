@@ -1,6 +1,7 @@
 from pathlib import Path
 from io import BytesIO
 import base64
+
 from flask import current_app, render_template
 from weasyprint import HTML
 
@@ -8,9 +9,6 @@ try:
     from staticmap import StaticMap, Line
 except ImportError:
     print('cannot import staticmap, map generation in pdf will be unavailable')
-
-# Filemanager
-import geonature.utils.filemanager as fm
 
 from .utils import get_main_picture_id, get_file_path
 
@@ -25,9 +23,11 @@ def get_main_picture(id_zh: int):
     return None
 
 
-def gen_map(coordinates):
+def gen_map(coordinates, url_template=None):
+    if url_template is None:
+        url_template = 'http://c.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png'
     if coordinates:
-        m = StaticMap(width=600, height=300)
+        m = StaticMap(width=600, height=300, url_template=url_template)
         for coord in coordinates:
             poly = Line(coord, 'blue', 4)
             m.add_line(poly)
@@ -55,6 +55,9 @@ def gen_pdf(id_zh, dataset, filename = "rapport.pdf"):
         else:
             coordinates = multi_to_polys(coordinates)
     try:
+        # For now, the url_template cannot be taken from the config since
+        # StaticMap does not support urls like : 
+        # {s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png with the "{s}"
         dataset['map'] = gen_map(coordinates)
     except Exception as e:
         print('Cannot generate the map inside the pdf... Continuing')
