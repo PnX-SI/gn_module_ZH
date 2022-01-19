@@ -452,8 +452,8 @@ class Item:
             DB.session.close()
 
     def __get_id_plan(self):
-        q_plans = DB.session.query(TManagementStructures, TManagementPlans).join(TManagementPlans, TManagementStructures.id_structure ==
-                                                                                 TManagementPlans.id_structure).filter(and_(TManagementStructures.id_zh == self.id_zh, TManagementPlans.id_nature == 2)).all()
+        q_plans = DB.session.query(TManagementStructures, TManagementPlans).join(TManagementPlans, TManagementStructures.id_structure == TManagementPlans.id_structure).join(
+            TNomenclatures, TNomenclatures.id_nomenclature == TManagementPlans.id_nature).filter(and_(TManagementStructures.id_zh == self.id_zh, TNomenclatures.mnemonique == "Naturaliste")).all()
         if q_plans:
             return True
         return False
