@@ -65,11 +65,13 @@
       </div>
       <div class="fieldset">
         <label>Date d'établissement</label>
-        <span>{{ data['renseignements']['auteur']['date'] }}</span>
+        {# Hack that keep the dd/MM/yy of the date, not to implement a custom formatter... #}
+        <span>{{ data['renseignements']['auteur']['date'].split()[0] }}</span>
       </div>
       <div class="fieldset">
         <label>Date de modification</label>
-        <span>{{ data['renseignements']['auteur']['date_modif'] }}</span>
+        {# Hack that keep the dd/MM/yy of the date, not to implement a custom formatter... #}
+        <span>{{ data['renseignements']['auteur']['date_modif'].split()[0] }}</span>
       </div>
     </section>
   </div>
