@@ -40,7 +40,6 @@
           </div>
         </div>
       </div>
-      <br>
       <div class="fieldset">
         <label>Communes [couverture]</label>
         {% for com in data['renseignements']['localisation']['commune'] %}
@@ -72,6 +71,14 @@
         <label>Date de modification</label>
         {# Hack that keep the dd/MM/yy of the date, not to implement a custom formatter... #}
         <span>{{ data['renseignements']['auteur']['date_modif'].split()[0] }}</span>
+      </div>
+      <div class="fieldset">
+        <label>Typologie SDAGE</label>
+        <span>{{ data['description']['presentation']['sdage'] }}</span>
+      </div>
+      <div class="fieldset">
+        <label>Bassin versant</label>
+        <span>TODO</span>
       </div>
     </section>
   </div>
