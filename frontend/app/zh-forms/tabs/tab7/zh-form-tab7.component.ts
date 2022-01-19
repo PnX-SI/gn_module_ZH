@@ -71,7 +71,7 @@ export class ZhFormTab7Component implements OnInit {
   ];
 
   public socEcoTableCol = [
-    { name: "function", label: "Principales valeurs socio-economiques" },
+    { name: "function", label: "Principales valeurs socio-économiques" },
     { name: "qualification", label: "Qualifications" },
     { name: "knowledge", label: "Connaissance" },
   ];
