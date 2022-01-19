@@ -511,7 +511,7 @@ class Use:
         return {
             "activities": [activity.__str__() for activity in self.activities],
             "evaluation_menaces": Utils.get_mnemo(self.id_thread),
-            "Remarques": Utils.get_string(self.remark_activity)
+            "remarques": Utils.get_string(self.remark_activity)
         }
 
 
