@@ -811,7 +811,7 @@ def post_file_info(id_zh, title, author, description, extension):
             meta_create_date=str(post_date),
             meta_update_date=str(post_date)
         ))
-        DB.session.flush()
+        DB.session.commit()
         id_media = DB.session.query(TMedias).filter(
             TMedias.uuid_attached_row == uuid_attached_row).one().id_media
         return id_media

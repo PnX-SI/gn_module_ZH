@@ -2,8 +2,13 @@ import os
 import pdb
 import sys
 
+from sqlalchemy.orm import Query
+
 from geonature.utils.env import ROOT_DIR, DB
 from geonature.core.gn_commons.models import TMedias
+from pypnnomenclature.models import (
+    TNomenclatures
+)
 
 from .api_error import ZHApiError
 
@@ -12,6 +17,18 @@ from .model.zh_schema import BibAreasTypes, LAreas, TZH
 
 def get_main_picture_id(id_zh):
     return DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().main_pict_id
+
+
+def get_last_pdf_export(id_zh, last_date) -> Query:
+    """
+    Get all the pdf more recent than last_date
+
+    last_date(datetime.date): date
+    """
+    # TODO: Add with entities ?
+    # Need to have do a separate query instead of reusing get_medias...
+    query = DB.session.query(TZH, TMedias, TNomenclatures).with_entities(TMedias.id_media).filter(TZH.id_zh == id_zh).filter(TZH.zh_uuid == TMedias.unique_id_media).filter(TMedias.id_nomenclature_media_type == TNomenclatures.id_nomenclature).filter(TNomenclatures.mnemonique == 'PDF').filter(TMedias.meta_update_date > last_date).filter(TMedias.title_fr.like(f'{id_zh}_fiche%.pdf'))
+    return query.first()
 
 
 def get_file_path(id_media):
