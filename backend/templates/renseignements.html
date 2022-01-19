@@ -41,7 +41,7 @@
         </div>
       </div>
       <div class="fieldset">
-        <label>Communes [couverture]</label>
+        <label>Commune [surface ZH/surface commune]</label>
         {% for com in data['renseignements']['localisation']['commune'] %}
           <span>{{ com['nom'] }} ({{ com['insee'] }}) [{{ com['couverture'] }}%]</span><br>
         {% endfor %}
@@ -59,7 +59,7 @@
         <span>{{ data['renseignements']['auteur']['auteur'] }}</span>
       </div>
       <div class="fieldset">
-        <label>Auteur des modifications</label>
+        <label>Auteur des dernières modifications</label>
         <span>{{ data['renseignements']['auteur']['auteur_modif'] }}</span>
       </div>
       <div class="fieldset">
@@ -67,7 +67,7 @@
         <span>{{ data['renseignements']['auteur']['date'] | datetime_format }}</span>
       </div>
       <div class="fieldset">
-        <label>Date de modification</label>
+        <label>Date des dernières modifications</label>
         {# Hack to keep only seconds and no microseconds: split('.')[0] #}
         <span>{{ data['renseignements']['auteur']['date_modif'].split('.')[0] | datetime_format }}</span>
       </div>
