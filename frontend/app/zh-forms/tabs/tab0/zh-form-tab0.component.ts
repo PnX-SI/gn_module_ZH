@@ -236,7 +236,7 @@ export class ZhFormTab0Component implements OnInit {
               if (data.is_intersected) {
                 timeOut = 10000; // stay a little bit longer
                 msg +=
-                  "</br>La géométrie a été découpée car elle intersectait une autre zone humide";
+                  "<br>La géométrie a été découpée car elle intersectait une autre zone humide";
               }
               this._toastr.success(msg, "", {
                 enableHtml: true,
