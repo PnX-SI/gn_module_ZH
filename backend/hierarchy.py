@@ -172,14 +172,18 @@ class Item:
             if not q_status:
                 return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), '0')
 
-            # get qualif_id
+            # get qualif_id :
+
+            # if 'nothing' cd in values -> return 0
+            for cd in q_status:
+                if cd in self.nomenc_ids['nothing']:
+                    return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), '0')
+            # if one 'high' cd is part of the cds -> return 'fort'
             for cd in q_status:
                 if cd in self.nomenc_ids['high']:
                     return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), 'fort')
-                elif cd in self.nomenc_ids['nothing']:
-                    return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), '0')
-                else:
-                    return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), 'faible')
+            # if no 'high' cd and no 'nothing' cd in values -> return 'faible'
+            return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), 'faible')
 
         except ZHApiError as e:
             raise ZHApiError(
