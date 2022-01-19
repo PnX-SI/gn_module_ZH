@@ -933,27 +933,26 @@ def download(id_zh: int):
     """
     Downloads the report in pdf format
     """
-    dataset = get_complete_card(id_zh)
-    author = dataset.get('renseignements', {}).get('auteur', {})
-    last_date = author.get('date_modif', dt.now())
+    zh = ZH(id_zh=id_zh).zh
+    author_role =  zh.authors
+    author = f'{author_role.prenom_role} {author_role.nom_role.upper()}'
+    last_date = zh.update_date
     media = get_last_pdf_export(id_zh=id_zh, last_date=last_date)
     if media is None:
+        dataset = get_complete_card(id_zh)
         module_name = blueprint.config['MODULE_CODE'].lower()
         upload_path = blueprint.config['file_path']
         filename = f'{id_zh}_fiche_{dt.now().strftime("%Y-%m-%d")}.pdf'
         media_path = Path(ROOT_DIR, 'external_modules', module_name, upload_path, filename)
         pdf_file = gen_pdf(id_zh=id_zh, dataset=dataset, filename=media_path)
-        id_media = post_file_info(
-                    id_zh,
-                    filename,
-                    author.get('auteur', ""),
-                    'Fiche de synthèse de la zone humide',
-                    '.pdf')
+        post_file_info(
+            id_zh=id_zh,
+            title=filename,
+            author=author,
+            description='Fiche de synthèse de la zone humide',
+            extension='.pdf',
+            media_path=str(media_path))
         
-        DB.session.query(TMedias)\
-        .filter(TMedias.id_media == id_media)\
-        .update({'media_path': str(media_path)})
-        DB.session.commit()
         return send_file(pdf_file, as_attachment=True)
     else:
         return send_file(get_file_path(media.id_media), as_attachment=True)
