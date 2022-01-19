@@ -104,7 +104,7 @@
       <table class="custom-table">
         <thead>
             <tr>
-              <th>Valeurs socio-économiques</th>
+              <th>Principales valeurs socio-économiques</th>
               <th>Justifications</th>
               <th>Qualifications</th>
               <th>Connaissance</th>
@@ -132,23 +132,25 @@
     <h5 class="subtitle">
       Bilan des menaces potentielles influençant la zone humide
     </h5>
-    <div class="flex-container-col">
-      <div class="fieldset">
-        <label>Evaluation globales des menaces potentielles ou avérées</label>
-        <span>{{ data['evaluation']['bilan']['menaces'] }}</span>
-      </div>
-      <div class="fieldset">
-        <label>Fonctionnalité hydrologique / biogéochimique</label>
-        <span>{{ data['evaluation']['bilan']['hydrologique'] }}</span>
-      </div>
-      <div class="fieldset">
-        <label>Fonctionnalité hydrologique / écologique (habitats / faune /flore) :</label>
-        <span>{{ data['evaluation']['bilan']['biologique'] }}</span>
-      </div>
-      <div class="fieldset">
-        <label>Commentaires</label>
-        <span>{{ data['evaluation']['bilan']['Commentaire'] or '' }}</span>
-      </div>
+    <table class="custom-table">
+      <thead>
+          <tr>
+            <th>Évaluation globale des menaces potentielles ou avérées</th>
+            <th>Fonctionnalité hydrologique / biogéochimique</th>
+            <th>Fonctionnalité biologique / écologique</th>
+          </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ data['evaluation']['bilan']['menaces'] }}</td>
+          <td>{{ data['evaluation']['bilan']['hydrologique'] }}</td>
+          <td>{{ data['evaluation']['bilan']['biologique'] }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="fieldset">
+      <label>Commentaires</label>
+      <span>{{ data['evaluation']['bilan']['Commentaire'] or '' }}</span>
     </div>
   </section>
   <section class="content col">
