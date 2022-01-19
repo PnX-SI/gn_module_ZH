@@ -15,7 +15,6 @@ export class ZhSearchInputComponent implements OnInit {
 
   public dropdownSettings = {
     enableSearchFilter: true,
-    addNewItemOnFilter: true,
     singleSelection: true,
     text: "",
     labelKey: "name",

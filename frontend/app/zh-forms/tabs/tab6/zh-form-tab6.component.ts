@@ -101,7 +101,6 @@ export class ZhFormTab6Component implements OnInit {
   public multiselectTypeClassement: any;
   public organismDropdownSettings: {
     enableSearchFilter: boolean;
-    addNewItemOnFilter: boolean;
     singleSelection: boolean;
     text: string;
     labelKey: string;
@@ -137,7 +136,6 @@ export class ZhFormTab6Component implements OnInit {
     };
     this.organismDropdownSettings = {
       enableSearchFilter: true,
-      addNewItemOnFilter: true,
       singleSelection: true,
       text: "Sélectionner un organisme",
       labelKey: "name",
