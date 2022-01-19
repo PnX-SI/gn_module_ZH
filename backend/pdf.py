@@ -1,6 +1,9 @@
 from pathlib import Path
 from io import BytesIO
 import base64
+from flask import current_app, render_template
+from weasyprint import HTML
+
 try:
     from staticmap import StaticMap, Line
 except ImportError:
@@ -61,6 +64,12 @@ def gen_pdf(id_zh, dataset, filename = "rapport.pdf"):
     except Exception as e:
         print('Cannot find image')
 
-    pdf_file = fm.generate_pdf("fiche_template_pdf.html", dataset, filename)
+    pdf_file = generate_pdf_from_template("fiche_template_pdf.html", dataset, filename)
     return Path(pdf_file)
-  
+
+
+def generate_pdf_from_template(template, data, filename):
+    template_rendered = render_template(template, data=data)
+    html_file = HTML(string=template_rendered, base_url=current_app.config['API_ENDPOINT'], encoding="utf-8")
+    html_file.write_pdf(filename)
+    return filename
