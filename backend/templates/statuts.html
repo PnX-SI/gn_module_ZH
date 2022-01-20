@@ -1,138 +1,113 @@
-<div class="flex-container">
-  <div class="flex-container-col">
-    <div class="flex-container">
-      <div class="left">
-        <section class="content col">
-          <h5 class="subtitle">
-            Régime foncier - Statut de propriété
-          </h5>
-          <div class="flex-container-col">
-            <table class="custom-table">
-              <thead>
-                  <tr>
-                    <th>Statut</th>
-                    <th>Remarques</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  {% for regime in data['statuts']['regime'] %}
-                  <tr>
-                    <td>{{ regime['status'] }}</td>
-                    <td>{{ regime['remarques'] }}</td>
-                  </tr>
-                  {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-      <div class="right">
-        <section class="content col">
-          <h5 class="subtitle">
-            Structure de gestion
-          </h5>
-            {% for structure in data['statuts']['structure'] %}
-              <span class="small-title"><b>{{ structure['structure'] }} : </b></span>
-              {% if structure['plans'] %}
-              <table class="custom-table">
-                <thead>
-                    <tr>
-                      <th>Plan</th>
-                      <th>Date</th>
-                      <th>Durée</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for plan in structure['plans'] %}
-                    <tr>
-                      <td>{{ plan['plan'] }} </td>
-                      <td>{{ plan['date'] }} </td>
-                      <td>{{ plan['duree'] }} </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-              </table>
-              {% endif %}
+<div>
+  <section class="content col">
+    <h5 class="subtitle">
+      Régime foncier - Statut de propriété
+    </h5>
+    <table class="custom-table">
+      <thead>
+          <tr>
+            <th>Statut</th>
+            <th>Remarques</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for regime in data['statuts']['regime'] %}
+          <tr>
+            <td>{{ regime['status'] }}</td>
+            <td>{{ regime['remarques'] }}</td>
+          </tr>
           {% endfor %}
-          <br>
-          <h5 class="subtitle">
-            Instruments contractuels et financiers
-          </h5>
-          <div class="flex-container">
-            <table class="custom-table">
-              <thead>
-                  <tr>
-                    <th>Instruments contractuels et financiers</th>
-                    <th>Date de mise en oeuvre</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  {% for instru in data['statuts']['instruments'] %}
-                  <tr>
-                    <td>{{ instru['instrument'] }}</td>
-                    <td>{{ instru['date'] }}</td>
-                  </tr>
-                  {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-    </div>
-    <br>
-    <section class="content col">
-      <h5 class="subtitle">
-        Principaux statuts
-      </h5>
-      <div class="flex-container-col">
-        {% for status in data['statuts']['statuts'] %}
-          <span class="small-title">{{ status }}</span>
-        {% endfor %}
-      </div>
-    </section>
-    <br>
-    <div class="flex-container">
-      <section class="content col">
-        <h5 class="subtitle">
-          Autres inventaires
-        </h5>
-        <div class="flex-container-col">
-          {% for autre in data['statuts']['autre_inventaire'] %}
-            <span class="small-title">{{ autre['zh_type_name'] }} - {{ autre['area_code'] }} - <a href="{{ autre['url']}}">{{ autre['area_name'] }}</a></span>
+      </tbody>
+    </table>
+  </section>
+  <section class="content col">
+    <h5 class="subtitle">
+      Structure de gestion
+    </h5>
+      {% for structure in data['statuts']['structure'] %}
+        <span class="small-title"><b>{{ structure['structure'] }} : </b></span>
+        {% if structure['plans'] %}
+        <table class="custom-table">
+          <thead>
+              <tr>
+                <th>Nature du plan</th>
+                <th>Date de réalisation</th>
+                <th>Durée (années)</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for plan in structure['plans'] %}
+              <tr>
+                <td>{{ plan['plan'] }} </td>
+                <td>{{ plan['date'] }} </td>
+                <td>{{ plan['duree'] }} </td>
+              </tr>
+              {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+    {% endfor %}
+  </section>
+  <section class="content col">
+    <h5 class="subtitle">
+      Instruments contractuels et financiers
+    </h5>
+    <table class="custom-table">
+      <thead>
+          <tr>
+            <th>Instruments contractuels et financiers</th>
+            <th>Date de mise en oeuvre</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for instru in data['statuts']['instruments'] %}
+          <tr>
+            <td>{{ instru['instrument'] }}</td>
+            <td>{{ instru['date'] }}</td>
+          </tr>
           {% endfor %}
-        </div>
-      </section>
-    </div>
-    <div class="flex-container-col">
-      <div class="flex-container">
-        <section class="content col">
-          <h5 class="subtitle">
-            Zonage des documents d'urbanisme
-          </h5>
-          <div class="flex-container">
-            <table class="custom-table">
-              <thead>
-                  <tr>
-                    <th>Commune</th>
-                    <th>Type de document communal</th>
-                    <th>Type de classement</th>
-                    <th>Remarques</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  {% for zonage in data['statuts']['zonage'] %}
-                  <tr>
-                    <td>{{ zonage['commune'] }}</td>
-                    <td>{{ zonage['type_doc'] }}</td>
-                    <td>{{ zonage['type_classement'] }}</td>
-                    <td>{{ zonage['remarque']}}</td>
-                  </tr>
-                  {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-    </div>
-  </div>
+      </tbody>
+    </table>
+  </section>
+  <section class="content col">
+    <h5 class="subtitle">
+      Principaux statuts
+    </h5>
+    {% for status in data['statuts']['statuts'] %}
+      <span class="small-title">{{ status }}</span>
+    {% endfor %}
+  </section>
+  <section class="content col">
+    <h5 class="subtitle">
+      Autres inventaires
+    </h5>
+    {% for autre in data['statuts']['autre_inventaire'] %}
+      <span class="small-title">{{ autre['zh_type_name'] }} - {{ autre['area_code'] }} - <a href="{{ autre['url']}}">{{ autre['area_name'] }}</a></span>
+    {% endfor %}
+  </section>
+  <section class="content col">
+    <h5 class="subtitle">
+      Zonage des documents d'urbanisme
+    </h5>
+    <table class="custom-table">
+      <thead>
+          <tr>
+            <th>Commune</th>
+            <th>Type de document communal</th>
+            <th>Type de classement</th>
+            <th>Remarques</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for zonage in data['statuts']['zonage'] %}
+          <tr>
+            <td>{{ zonage['commune'] }}</td>
+            <td>{{ zonage['type_doc'] }}</td>
+            <td>{{ zonage['type_classement'] }}</td>
+            <td>{{ zonage['remarque']}}</td>
+          </tr>
+          {% endfor %}
+      </tbody>
+    </table>
+  </section>
 </div>
