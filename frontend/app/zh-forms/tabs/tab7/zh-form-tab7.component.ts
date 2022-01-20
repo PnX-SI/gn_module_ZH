@@ -103,6 +103,7 @@ export class ZhFormTab7Component implements OnInit {
       }
     });
     this.dropdownSettings = {
+      enableFilterSelectAll: false,
       enableCheckAll: false,
       text: "Selectionner",
       labelKey: "name",
