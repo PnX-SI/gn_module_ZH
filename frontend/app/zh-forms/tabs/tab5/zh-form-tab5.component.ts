@@ -723,8 +723,9 @@ export class ZhFormTab5Component implements OnInit {
         if (res.file_names.length == 0) {
           const msg =
             "Aucun fichier n'a été généré car aucune espèce n'a été trouvée dans la zone humide";
+          const timeOut: number = 10000;
           this._toastr.error(msg, "", {
-            disableTimeOut: true, // to be sure the user sees the toast
+            timeOut: timeOut, // to be sure the user sees the toast
             closeButton: true,
           });
         } else {
@@ -734,8 +735,9 @@ export class ZhFormTab5Component implements OnInit {
           const msg = `Les fichiers suivants ont été générés </br> ${files.join(
             "</br>"
           )}`;
+          const timeOut: number = 10000;
           this._toastr.success(msg, "", {
-            disableTimeOut: true, // to be sure the user sees the toast
+            timeOut: timeOut, // to be sure the user sees the toast
             closeButton: true,
             enableHtml: true,
           });
