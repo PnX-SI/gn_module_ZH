@@ -993,7 +993,7 @@ CREATE OR REPLACE VIEW pr_zh.flora AS
 CREATE  TABLE pr_zh.bib_hier_categories ( 
 	cat_id               integer  NOT NULL ,
 	abbreviation		 varchar(4)  NOT NULL,
-	label                varchar(50)  NOT NULL ,
+	label                varchar(100)  NOT NULL ,
 	CONSTRAINT pk_bib_hier_categories_cat_id PRIMARY KEY ( cat_id )
  );
 
@@ -1009,7 +1009,7 @@ COMMENT ON TABLE pr_zh.bib_hier_panes IS 'liste des volets';
 
 CREATE  TABLE pr_zh.bib_hier_subcategories ( 
 	subcat_id            integer  NOT NULL ,
-	label                varchar(50)  NOT NULL ,
+	label                varchar(100)  NOT NULL ,
 	CONSTRAINT pk_bib_subcategories_id_subcat PRIMARY KEY ( subcat_id )
  );
 
