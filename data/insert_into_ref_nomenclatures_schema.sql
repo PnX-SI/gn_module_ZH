@@ -188,6 +188,7 @@ INSERT INTO ref_nomenclatures.t_nomenclatures(id_type,cd_nomenclature,mnemonique
     ((select ref_nomenclatures.get_id_nomenclature_type('ENTREE_EAU')),'6','Plans d’eau','Plans d’eau','Plans d’eau','Plans d’eau','Plans d’eau','ZONES_HUMIDES','non validé','4.1'),
     ((select ref_nomenclatures.get_id_nomenclature_type('ENTREE_EAU')),'7','Précipitations','Précipitations','Précipitations','Précipitations','Précipitations','ZONES_HUMIDES','non validé','4.1'),
     ((select ref_nomenclatures.get_id_nomenclature_type('ENTREE_EAU')),'8','Ruissellement diffus','Ruissellement diffus','Ruissellement diffus','Ruissellement diffus','Ruissellement diffus','ZONES_HUMIDES','non validé','4.1'),
+    ((select ref_nomenclatures.get_id_nomenclature_type('ENTREE_EAU')),'9','Sources','Sources','Sources','Sources','Sources','ZONES_HUMIDES','non validé','4.1'),
     ((select ref_nomenclatures.get_id_nomenclature_type('PERMANENCE_ENTREE')),'1','Permanent','Permanent','Permanent','Permanent','Permanent','ZONES_HUMIDES','non validé','4.1'),
     ((select ref_nomenclatures.get_id_nomenclature_type('PERMANENCE_ENTREE')),'2','Saisonnier','Saisonnier','Saisonnier','Saisonnier','Saisonnier','ZONES_HUMIDES','non validé','4.1'),
     ((select ref_nomenclatures.get_id_nomenclature_type('PERMANENCE_ENTREE')),'3','Temporaire','Temporaire','Temporaire','Temporaire','Temporaire','ZONES_HUMIDES','non validé','4.1'),
