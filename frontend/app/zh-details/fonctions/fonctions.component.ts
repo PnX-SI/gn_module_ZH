@@ -29,8 +29,8 @@ export class FonctionsComponent {
 
   public corineTableCol = [
     { name: "biotope", label: "Corine Biotope" },
-    { name: "etat", label: "État de conservation" },
     { name: "cahier", label: "Cahier Habitats" },
+    { name: "etat", label: "État de conservation" },
     { name: "recouvrement", label: "Recouvrement de la ZH (%)" },
   ];
 

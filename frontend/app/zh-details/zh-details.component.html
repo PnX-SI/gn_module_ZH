@@ -1,7 +1,7 @@
 <div *ngIf="zhDetails" class="container-fluid">
   <zh-details-header [zhId]="id_zh" [zhCode]="zhDetails?.renseignements?.identification?.code"></zh-details-header>
-  <pnx-map height="40vh" searchBar="false">
-    <pnx-geojson [geojson]="this.validBbox" [zoomOnFirstTime]="true">
+  <pnx-map height="40vh" [searchBar]="true">
+    <pnx-geojson [geojson]="zhDetails.geometry" [zoomOnFirstTime]="true">
     </pnx-geojson>
   </pnx-map>
   <div class="wrapup">

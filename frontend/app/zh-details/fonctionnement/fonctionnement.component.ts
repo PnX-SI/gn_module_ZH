@@ -12,7 +12,7 @@ export class FonctionnementComponent {
 
   public readonly imgPath = "external_assets/zones_humides";
   public readonly corConnectionType = {
-    "Aucune Connexion": "aucune_connexion.svg",
+    "Aucune connexion": "aucune_connexion.svg",
     "Entrée et sortie": "entree_sortie.svg",
     Entrée: "entree.svg",
     Sortie: "sortie.svg",

@@ -92,7 +92,7 @@ export class ZhFormTab6Component implements OnInit {
     { name: "remark", label: "Remarques" },
   ];
   public planTableCol = [
-    { name: "plan", label: "Nature du plan" },
+    { name: "plan", label: "Nature du plan de gestion" },
     { name: "plan_date", label: "Date de réalisation" },
     { name: "duration", label: "Durée (années)" },
   ];
@@ -101,7 +101,6 @@ export class ZhFormTab6Component implements OnInit {
   public multiselectTypeClassement: any;
   public organismDropdownSettings: {
     enableSearchFilter: boolean;
-    addNewItemOnFilter: boolean;
     singleSelection: boolean;
     text: string;
     labelKey: string;
@@ -137,7 +136,6 @@ export class ZhFormTab6Component implements OnInit {
     };
     this.organismDropdownSettings = {
       enableSearchFilter: true,
-      addNewItemOnFilter: true,
       singleSelection: true,
       text: "Sélectionner un organisme",
       labelKey: "name",
@@ -153,8 +151,6 @@ export class ZhFormTab6Component implements OnInit {
       searchPlaceholderText: "Rechercher",
       enableSearchFilter: true,
       groupBy: "category",
-      position: "bottom",
-      autoPosition: false,
     };
 
     this.getMetaData();
@@ -941,6 +937,10 @@ export class ZhFormTab6Component implements OnInit {
 
   onMoreDetails(status: boolean) {
     this.moreDetails = status;
+  }
+
+  onDeSelectAll() {
+    this.formTab6.get("protections").reset();
   }
 
   onFormSubmit() {
