@@ -232,7 +232,7 @@
           >
             <mat-icon>add_box</mat-icon>
             <mat-spinner *ngIf="taxaLoading" color="warn" diameter="25"></mat-spinner>
-            Générer la liste des espèces
+            Générer la liste des espèces <span *ngIf="config?.species_source_name">depuis {{ config?.species_source_name }}</span>
           </button>
           <mat-icon
             class="info-icon"
