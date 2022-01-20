@@ -26,6 +26,20 @@ class Utils(ZH):
         return []
 
     @staticmethod
+    def get_cd_and_mnemo(ids):
+        if ids:
+            if type(ids) is int:
+                result = DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == ids).one()
+                return (result.cd_nomenclature, result.label_default)
+            
+            results = []
+            for id in ids:
+                res = DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == id).one()
+                results.append((res.cd_nomenclature, res.label_default))
+            return results
+        return []
+
+    @staticmethod
     def get_bool(bool):
         if bool:
             return 'Oui'
@@ -461,7 +475,7 @@ class Description:
     def __str__(self):
         return {
             "presentation": self.presentation.__str__(),
-            "espace": Utils.get_mnemo(self.id_corine_landcovers),
+            "espace": [f"{cd} - {label}" for cd, label in Utils.get_cd_and_mnemo(self.id_corine_landcovers)],
             "usage": self.use.__str__()
         }
 
