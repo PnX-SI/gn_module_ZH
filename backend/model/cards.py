@@ -482,7 +482,8 @@ class Description:
 
 class Presentation:
 
-    def __init__(self, id_sdage, id_sage, cb_codes_corine_biotope, remark_pres):
+    def __init__(self, area, id_sdage, id_sage, cb_codes_corine_biotope, remark_pres):
+        self.area: float = area
         self.id_sdage: int = id_sdage
         self.id_sage: int = id_sage
         self.cb_codes_corine_biotope: list(
@@ -491,6 +492,7 @@ class Presentation:
 
     def __str__(self):
         return {
+            "area": self.area,
             "sdage": Utils.get_mnemo(self.id_sdage),
             "typologie_locale": Utils.get_mnemo(self.id_sage),
             "corine_biotope": [cb.__str__() for cb in self.cb_codes_corine_biotope],
@@ -1113,6 +1115,7 @@ class Card(ZH):
 
     def __set_description(self):
         self.description.presentation = Presentation(
+            self.properties['area'],
             self.properties['id_sdage'],
             self.properties['id_sage'],
             self.__get_cb(),
