@@ -563,10 +563,11 @@ def get_tab_data(id_tab, info_role):
     """Post zh data
     """
     form_data = request.json
+    form_data['update_author'] = info_role.id_role
+    form_data['update_date'] = dt.now()
+    
     try:
         if id_tab == 0:
-            # set date
-            zh_date = dt.now()
             # set name
             if form_data['main_name'] == "":
                 raise ZHApiError(
@@ -582,7 +583,7 @@ def get_tab_data(id_tab, info_role):
                 # geom area
                 area = set_area(geom)
                 # create_zh
-                zh = create_zh(form_data, info_role, zh_date,
+                zh = create_zh(form_data, info_role, form_data['update_date'],
                                geom['polygon'], area, active_geo_refs)
                 intersection = geom['is_intersected']
             else:
@@ -593,7 +594,7 @@ def get_tab_data(id_tab, info_role):
                 area = set_area(geom)
                 # edit zh
                 zh = update_zh_tab0(form_data, geom['polygon'], area,
-                                    info_role, zh_date, active_geo_refs)
+                                    info_role, form_data['update_date'], active_geo_refs)
                 intersection = geom['is_intersected']
 
             DB.session.commit()

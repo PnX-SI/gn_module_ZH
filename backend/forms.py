@@ -701,6 +701,8 @@ def update_zh_tab6(data):
     try:
         is_other_inventory = data['is_other_inventory']
         DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
+            TZH.update_author: data['update_author'],
+            TZH.update_date: data['update_date'],
             TZH.is_other_inventory: is_other_inventory,
             TZH.remark_is_other_inventory: data['remark_is_other_inventory'] if is_other_inventory else None
         })
