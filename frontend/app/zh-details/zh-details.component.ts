@@ -95,6 +95,6 @@ export class ZhDetailsComponent implements OnInit, AfterViewInit {
   }
 
   onWrapAll() {
-    this.expanded ? (this.expanded = false) : (this.expanded = true);
+    this.expanded = !this.expanded;
   }
 }
