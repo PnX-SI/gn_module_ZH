@@ -10,21 +10,31 @@
     <h1 class="main-title">Fiche de synthèse de la zone humide</h1>
     <h1 class="title">Renseignements généraux</h1>
     {% include 'renseignements.html' %}
-    <h1 class="title">Délimitation de la zone humide et de son espace de fonctionnalité</h1>
-    {% include 'delimitation.html' %}
+    <div class="new-page">
+      <h1 class="title">Délimitation de la zone humide et de son espace de fonctionnalité</h1>
+      {% include 'delimitation.html' %}
     <h1 class="title">Principaux types de milieux humides (H) ou potentiellement humides (P)</h1>
     {% include 'milieux.html' %}
+    </div>
     <h1 class="title">Fonctionnement de la zone humide</h1>
     {% include 'fonctionnement.html' %}
     <h1 class="title">Statuts et gestion de la zone humide</h1>
     {% include 'statuts.html' %}
-    <h1 class="title">Évaluation générale du site</h1>
-    {% include 'evaluation.html' %}
+    <div class="new-page">
+      <h1 class="title">Évaluation générale du site</h1>
+      {% include 'evaluation.html' %}
+    </div>
   </body>
 <style>
   /* Puts style here since I cannot make blueprint static files work...*/
 * {
   font-family: Roboto;
+}
+
+@media print {
+  .new-page {
+    page-break-before: always;
+  }
 }
 
 .main-title {
@@ -65,19 +75,7 @@
 }
 
 section {
-  display: flex;
-  flex-direction: row;
-  background: #FFFFFF;
-  border: 2px solid #D8E0CE;
-  box-sizing: border-box;
-  border-radius: 4px;
-  margin: 5px 5px 5px 5px;
-  padding: 5px 5px 5px 5px;
-  min-width: 610px;
-}
-
-section.content {
-  flex:1;
+  width: 100%;
 }
 
 .col {
@@ -89,26 +87,9 @@ section.content {
   margin: 5px 5px 5px 5px;
 }
 
-.label {
-  border: 1px solid rgba(0, 0, 0, 0.23);
-  box-sizing: border-box;
-  border-radius: 4px;
-}
-
-.label-title {
-    color: rgba(0, 0, 0, 0.54);
-    padding: 0 8px;
-    margin-top: 8px;
-    font-size: 11px;
-}
-
 .subtitle {
   font-size: 13px;
   margin: 5px 5px 5px 5px;
-}
-
-.center {
-  text-align: center;
 }
 
 .flex-container {
@@ -168,6 +149,7 @@ p {
   border-radius: 4px;
   background: #FFFFFF;
   width: 100%;
+  margin-bottom: 5px;
 }
 
 .custom-table th {
@@ -180,9 +162,11 @@ tr {
 }
 
 .image {
-  width: 300px;
+  width: 600px;
   margin-left: 5px;
   margin-right: 5px;
+  margin-top: 5px;
 }
+
 </style>
 </html>

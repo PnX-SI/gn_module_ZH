@@ -39,12 +39,21 @@ export class ZhFormTab4Component implements OnInit {
 
   private tempId: number;
 
+  readonly flowSize: string = "15%";
+  readonly permaSize: string = "15%";
+
   public inflowTableCol = [
-    { name: "inflow", label: "Entrée d'eau", subcell: { name: "mnemonique" } },
+    {
+      name: "inflow",
+      label: "Entrée d'eau",
+      subcell: { name: "mnemonique" },
+      size: this.flowSize,
+    },
     {
       name: "permanance",
       label: "Permanence",
       subcell: { name: "mnemonique" },
+      size: this.permaSize,
     },
     {
       name: "topo",
@@ -53,11 +62,17 @@ export class ZhFormTab4Component implements OnInit {
   ];
 
   public outflowTableCol = [
-    { name: "outflow", label: "Sortie d'eau", subcell: { name: "mnemonique" } },
+    {
+      name: "outflow",
+      label: "Sortie d'eau",
+      subcell: { name: "mnemonique" },
+      size: this.flowSize,
+    },
     {
       name: "permanance",
       label: "Permanence",
       subcell: { name: "mnemonique" },
+      size: this.permaSize,
     },
     {
       name: "topo",

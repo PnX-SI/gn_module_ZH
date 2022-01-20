@@ -30,7 +30,7 @@ from sqlalchemy import func, text, desc, and_, inspect
 from sqlalchemy.orm.exc import NoResultFound
 
 import geoalchemy2
-from datetime import datetime as dt, timezone
+from datetime import datetime as dt
 
 from pypn_habref_api.models import (
     Habref,
@@ -79,7 +79,8 @@ from .utils import (
     get_file_path,
     delete_file,
     check_ref_geo_schema,
-    get_main_picture_id
+    get_main_picture_id,
+    get_last_pdf_export
 )
 
 from .model.repositories import (
@@ -485,7 +486,7 @@ def get_file_list(id_zh, info_role):
         zh_uuid = DB.session.query(TZH).filter(
             TZH.id_zh == id_zh).one().zh_uuid
         q_medias = DB.session.query(TMedias).filter(
-            TMedias.unique_id_media == zh_uuid).all()
+            TMedias.unique_id_media == zh_uuid).order_by(TMedias.meta_update_date.desc()).all()
         return {
             "media_data": [media.as_dict() for media in q_medias],
             "main_pict_id": get_main_picture_id(id_zh)
@@ -563,10 +564,11 @@ def get_tab_data(id_tab, info_role):
     """Post zh data
     """
     form_data = request.json
+    form_data['update_author'] = info_role.id_role
+    form_data['update_date'] = dt.now()
+    
     try:
         if id_tab == 0:
-            # set date
-            zh_date = dt.now(timezone.utc)
             # set name
             if form_data['main_name'] == "":
                 raise ZHApiError(
@@ -582,7 +584,7 @@ def get_tab_data(id_tab, info_role):
                 # geom area
                 area = set_area(geom)
                 # create_zh
-                zh = create_zh(form_data, info_role, zh_date,
+                zh = create_zh(form_data, info_role, form_data['update_date'],
                                geom['polygon'], area, active_geo_refs)
                 intersection = geom['is_intersected']
             else:
@@ -593,7 +595,7 @@ def get_tab_data(id_tab, info_role):
                 area = set_area(geom)
                 # edit zh
                 zh = update_zh_tab0(form_data, geom['polygon'], area,
-                                    info_role, zh_date, active_geo_refs)
+                                    info_role, form_data['update_date'], active_geo_refs)
                 intersection = geom['is_intersected']
 
             DB.session.commit()
@@ -851,7 +853,7 @@ def write_csv(id_zh, info_role):
                 blueprint.config[i]['schema_name']
             )
             query = DB.session.query(model).filter(model.id_zh == id_zh).all()
-            current_date = dt.now(timezone.utc)
+            current_date = dt.now()
             if query:
                 rows = [
                     {
@@ -885,7 +887,7 @@ def write_csv(id_zh, info_role):
                     blueprint.config[i]['category'] + "_" +
                     current_date.strftime("%Y-%m-%d_%H:%M:%S"),
                     author,
-                    'liste des taxons générée sur demande de l''utilisateur dans l''onglet 5',
+                    'Liste des taxons générée sur demande de l\'utilisateur dans l\'onglet 5',
                     '.csv')
 
                 DB.session.flush()
@@ -932,9 +934,29 @@ def download(id_zh: int):
     """
     Downloads the report in pdf format
     """
-    dataset = get_complete_card(id_zh)
-    pdf_file = gen_pdf(id_zh=id_zh, dataset=dataset)
-    return send_file(pdf_file, as_attachment=True)
+    zh = ZH(id_zh=id_zh).zh
+    author_role =  zh.authors
+    author = f'{author_role.prenom_role} {author_role.nom_role.upper()}'
+    last_date = zh.update_date
+    media = get_last_pdf_export(id_zh=id_zh, last_date=last_date)
+    if media is None:
+        dataset = get_complete_card(id_zh)
+        module_name = blueprint.config['MODULE_CODE'].lower()
+        upload_path = blueprint.config['file_path']
+        filename = f'{id_zh}_fiche_{dt.now().strftime("%Y-%m-%d")}.pdf'
+        media_path = Path(ROOT_DIR, 'external_modules', module_name, upload_path, filename)
+        pdf_file = gen_pdf(id_zh=id_zh, dataset=dataset, filename=media_path)
+        post_file_info(
+            id_zh=id_zh,
+            title=filename,
+            author=author,
+            description='Fiche de synthèse de la zone humide',
+            extension='.pdf',
+            media_path=str(media_path))
+        
+        return send_file(pdf_file, as_attachment=True)
+    else:
+        return send_file(get_file_path(media.id_media), as_attachment=True)
 
 
 @blueprint.route("/departments", methods=['GET'])
