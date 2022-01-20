@@ -61,6 +61,7 @@ export class ZhFormTab6Component implements OnInit {
   public plans: any[] = [];
   private tempID: any;
   private $_currentZhSub: Subscription;
+  private $_fromChangeSub: Subscription;
   public selectedItems = [];
 
   readonly urbanColSize: string = "15%";
@@ -106,7 +107,7 @@ export class ZhFormTab6Component implements OnInit {
     { name: "remark", label: "Remarques" },
   ];
   public planTableCol = [
-    { name: "plan", label: "Nature du plan" },
+    { name: "plan", label: "Nature du plan de gestion" },
     { name: "plan_date", label: "Date de réalisation" },
     { name: "duration", label: "Durée (années)" },
   ];
@@ -115,7 +116,6 @@ export class ZhFormTab6Component implements OnInit {
   public multiselectTypeClassement: any;
   public organismDropdownSettings: {
     enableSearchFilter: boolean;
-    addNewItemOnFilter: boolean;
     singleSelection: boolean;
     text: string;
     labelKey: string;
@@ -128,7 +128,6 @@ export class ZhFormTab6Component implements OnInit {
   moreDetails: boolean = true;
   posted: boolean;
   submitted: boolean;
-  $_fromChangeSub: any;
 
   constructor(
     private fb: FormBuilder,
@@ -151,7 +150,6 @@ export class ZhFormTab6Component implements OnInit {
     };
     this.organismDropdownSettings = {
       enableSearchFilter: true,
-      addNewItemOnFilter: true,
       singleSelection: true,
       text: "Sélectionner un organisme",
       labelKey: "name",
@@ -167,18 +165,17 @@ export class ZhFormTab6Component implements OnInit {
       searchPlaceholderText: "Rechercher",
       enableSearchFilter: true,
       groupBy: "category",
-      position: "bottom",
-      autoPosition: false,
     };
 
     this.getMetaData();
     this.initForms();
 
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
-      if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
-      if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
       if (tabPosition == 6) {
         this.getCurrentZh();
+        if (this.$_fromChangeSub != undefined)
+          this.$_fromChangeSub.unsubscribe();
+        if (this.$_currentZhSub != undefined) this.$_currentZhSub.unsubscribe();
       }
     });
   }
@@ -367,10 +364,10 @@ export class ZhFormTab6Component implements OnInit {
                 });
               });
             }
-            this.$_fromChangeSub = this.formTab6.valueChanges.subscribe(() => {
-              this.canChangeTab.emit(false);
-            });
           });
+        this.$_fromChangeSub = this.formTab6.valueChanges.subscribe(() => {
+          this.canChangeTab.emit(false);
+        });
       }
     });
   }
@@ -955,6 +952,10 @@ export class ZhFormTab6Component implements OnInit {
 
   onMoreDetails(status: boolean) {
     this.moreDetails = status;
+  }
+
+  onDeSelectAll() {
+    this.formTab6.get("protections").reset();
   }
 
   onFormSubmit() {

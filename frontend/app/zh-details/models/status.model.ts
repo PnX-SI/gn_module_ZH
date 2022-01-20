@@ -2,9 +2,17 @@ export interface StatutsModel {
   regime: Regime[];
   structure: Structure[];
   instruments: Instrument[];
-  autre_invetaire: string; //boolean
+  autre_inventaire: AutreInventaires[]; //boolean
   statuts: string[];
   zonage: Zonage[];
+}
+
+interface AutreInventaires {
+  area_name: string;
+  area_code: string;
+  url: string;
+  type_code: string;
+  zh_type_name: string;
 }
 
 interface Regime {

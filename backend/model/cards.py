@@ -26,6 +26,20 @@ class Utils(ZH):
         return []
 
     @staticmethod
+    def get_cd_and_mnemo(ids):
+        if ids:
+            if type(ids) is int:
+                result = DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == ids).one()
+                return (result.cd_nomenclature, result.label_default)
+            
+            results = []
+            for id in ids:
+                res = DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == id).one()
+                results.append((res.cd_nomenclature, res.label_default))
+            return results
+        return []
+
+    @staticmethod
     def get_bool(bool):
         if bool:
             return 'Oui'
@@ -461,14 +475,15 @@ class Description:
     def __str__(self):
         return {
             "presentation": self.presentation.__str__(),
-            "espace": Utils.get_mnemo(self.id_corine_landcovers),
+            "espace": [f"{cd} - {label}" for cd, label in Utils.get_cd_and_mnemo(self.id_corine_landcovers)],
             "usage": self.use.__str__()
         }
 
 
 class Presentation:
 
-    def __init__(self, id_sdage, id_sage, cb_codes_corine_biotope, remark_pres):
+    def __init__(self, area, id_sdage, id_sage, cb_codes_corine_biotope, remark_pres):
+        self.area: float = area
         self.id_sdage: int = id_sdage
         self.id_sage: int = id_sage
         self.cb_codes_corine_biotope: list(
@@ -477,6 +492,7 @@ class Presentation:
 
     def __str__(self):
         return {
+            "area": self.area,
             "sdage": Utils.get_mnemo(self.id_sdage),
             "typologie_locale": Utils.get_mnemo(self.id_sage),
             "corine_biotope": [cb.__str__() for cb in self.cb_codes_corine_biotope],
@@ -511,7 +527,7 @@ class Use:
         return {
             "activities": [activity.__str__() for activity in self.activities],
             "evaluation_menaces": Utils.get_mnemo(self.id_thread),
-            "Remarques": Utils.get_string(self.remark_activity)
+            "remarques": Utils.get_string(self.remark_activity)
         }
 
 
@@ -1099,6 +1115,7 @@ class Card(ZH):
 
     def __set_description(self):
         self.description.presentation = Presentation(
+            self.properties['area'],
             self.properties['id_sdage'],
             self.properties['id_sage'],
             self.__get_cb(),

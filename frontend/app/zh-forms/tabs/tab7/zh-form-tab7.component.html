@@ -103,10 +103,10 @@
     <fieldset>
       <legend>
         <h5 class="section-title">
-          Bilan des menaces et facteurs influençant la zone humide
+          Bilan des menaces et de l’état fonctionnel de la zone humide
           <mat-icon
           class="info-icon"
-          ngbTooltip="Cette rubrique met en avant les principales menaces liées à la zone humide en récupérant automatiquement les informations précédemment renseignées"
+          ngbTooltip="Cette rubrique met en avant les menaces et l’état fonctionnel de la zone humide en récupérant automatiquement les informations précédemment renseignées"
           placement="top"
           >info
         </mat-icon>
@@ -198,7 +198,7 @@
       >
         <mat-icon *ngIf="!posted">save_outline</mat-icon>
         <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
-        Enregister
+        Enregistrer
       </button>
     </div>
   </form>
@@ -213,64 +213,57 @@
     </button>
   </div>
   <div class="modal-body">
-    <form [formGroup]="actionForm">
-      <div class="form-row">
-        <div class="form-group col-md-6">
-          <small class="required">Propositions d'actions</small>
-          <select
-            class="form-control custom-select"
-            ngbAutofocus
-            [formControl]="actionForm.controls.action"
-          >
-            <option
-              *ngFor="let item of actionInput"
-              [ngValue]="item"
-              [disabled]="item.disabled"
-            >
-              {{ item.name }}
-            </option>
-          </select>
-          <small
-            *ngIf="
-              (actionForm.controls.action.touched || modalFormSubmitted) &&
-              actionForm.controls.action.errors?.required
-            "
-            class="error-msg"
-            >Champ requis</small
-          >
-        </div>
-        <div class="form-group col-md-6">
-          <small class="required">Niveau de priorité</small>
-          <select
-            class="form-control"
-            [formControl]="actionForm.controls.priority"
-          >
-            <option
-              *ngFor="let qualif of formMetaData.NIVEAU_PRIORITE"
-              [ngValue]="qualif"
-            >
-              {{ qualif.mnemonique }}
-            </option>
-          </select>
-          <small
-            *ngIf="
-              (actionForm.controls.priority.touched || modalFormSubmitted) &&
-              actionForm.controls.priority.errors?.required
-            "
-            class="error-msg"
-            >Champ requis</small
-          >
-        </div>
-        <div class="form-group col-md-12">
-          <small>Remarques</small>
-          <textarea
-            class="form-control"
-            [formControl]="actionForm.controls.remark"
-            rows="3"
-          ></textarea>
-        </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <small class="required">Propositions d'actions</small>
+        <angular2-multiselect
+          [settings]="dropdownSettings"
+          [data]="actionInput"
+          [(ngModel)]="selectedAction"
+          [formControl]="actionForm.controls.action"
+          (onDeSelectAll)="onDeSelectAllActions()"
+        >
+        </angular2-multiselect>
+        <small
+          *ngIf="
+            (actionForm.controls.action.touched || modalFormSubmitted) &&
+            actionForm.controls.action.errors?.required
+          "
+          class="error-msg"
+          >Champ requis</small
+        >
       </div>
-    </form>
+      <div class="form-group col-md-6">
+        <small class="required">Niveau de priorité</small>
+        <select
+          class="form-control"
+          [formControl]="actionForm.controls.priority"
+        >
+          <option
+            *ngFor="let qualif of formMetaData.NIVEAU_PRIORITE"
+            [ngValue]="qualif"
+          >
+            {{ qualif.mnemonique }}
+          </option>
+        </select>
+        <small
+          *ngIf="
+            (actionForm.controls.priority.touched || modalFormSubmitted) &&
+            actionForm.controls.priority.errors?.required
+          "
+          class="error-msg"
+          >Champ requis</small
+        >
+      </div>
+      <div class="form-group col-md-12">
+        <small>Remarques</small>
+        <textarea
+          class="form-control"
+          [formControl]="actionForm.controls.remark"
+          rows="3"
+        ></textarea>
+      </div>
+    </div>
   </div>
   <div class="modal-footer">
     <button

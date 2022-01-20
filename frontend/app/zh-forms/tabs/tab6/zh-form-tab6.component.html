@@ -116,7 +116,6 @@
                   *ngIf="moreDetails && item.plans && item.plans.length > 0"
                 >
                   <td colspan="3" class="tr-plans">
-                    <p>Plans de gestion :</p>
                     <table class="table subtable">
                       <thead class="thead-inverse table-header">
                         <tr>
@@ -233,7 +232,7 @@
             [(ngModel)]="selectedItems"
             [formControl]="formTab6.controls.protections"
             [settings]="dropdownSettings"
-            (onDeSelectAll)="onDeSelectAll($event)"
+            (onDeSelectAll)="onDeSelectAll()"
           >
           </angular2-multiselect>
         </div>
@@ -283,7 +282,7 @@
       >
         <mat-icon *ngIf="!posted">save_outline</mat-icon>
         <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
-        Enregister
+        Enregistrer
       </button>
     </div>
   </form>

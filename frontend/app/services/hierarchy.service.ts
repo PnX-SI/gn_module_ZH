@@ -44,10 +44,11 @@ export class HierarchyService {
           const frontError: string = this._error.getFrontError(
             error.error.message
           );
+          const timeOut: number = 10000;
           this._toastr.error(frontError, "", {
             positionClass: "toast-top-right",
-            disableTimeOut: true,
             closeButton: true,
+            timeOut: timeOut,
           });
         }
       }

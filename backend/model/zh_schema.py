@@ -1007,7 +1007,7 @@ class BibActions(DB.Model):
         primary_key=True
     )
     name = DB.Column(
-        DB.Unicode(length=100),
+        DB.Unicode(length=255),
         nullable=False
     )
 
