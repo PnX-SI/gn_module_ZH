@@ -131,7 +131,8 @@ class ZH(TZH):
                     plans.append({
                         "id_nature": plan.id_nature,
                         "plan_date": plan.plan_date.date().strftime('%d/%m/%Y'),
-                        "duration": plan.duration
+                        "duration": plan.duration,
+                        "remark": plan.remark
                     })
             managements.append({
                 "structure": management.id_org,

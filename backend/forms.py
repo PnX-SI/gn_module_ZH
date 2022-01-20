@@ -638,7 +638,8 @@ def post_managements(id_zh, managements):
                         id_structure=DB.session.query(TManagementStructures).filter(and_(
                             TManagementStructures.id_zh == id_zh, TManagementStructures.id_org == management["structure"])).one().id_structure,
                         plan_date=plan["plan_date"],
-                        duration=plan["duration"]
+                        duration=plan["duration"],
+                        remark=plan["remark"]
                     )
                 )
                 DB.session.flush()

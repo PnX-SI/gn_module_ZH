@@ -538,6 +538,7 @@ CREATE  TABLE pr_zh.t_management_plans (
 	id_structure         integer  NOT NULL ,
 	plan_date            timestamp  NOT NULL ,
 	duration             integer  NOT NULL ,
+	remark               varchar(2000)   ,
 	CONSTRAINT pk_t_management_plan_id_plan PRIMARY KEY ( id_plan )
  );
 

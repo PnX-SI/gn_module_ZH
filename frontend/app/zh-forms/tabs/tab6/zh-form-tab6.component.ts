@@ -110,6 +110,7 @@ export class ZhFormTab6Component implements OnInit {
     { name: "plan", label: "Nature du plan de gestion" },
     { name: "plan_date", label: "Date de réalisation" },
     { name: "duration", label: "Durée (années)" },
+    { name: "remark", label: "Remarques" },
   ];
 
   public dropdownSettings: any;
@@ -212,6 +213,7 @@ export class ZhFormTab6Component implements OnInit {
         null,
         Validators.compose([Validators.required, Validators.min(0)]),
       ],
+      remark: null,
     });
   }
 
@@ -318,6 +320,7 @@ export class ZhFormTab6Component implements OnInit {
                         ),
                         plan_date: plan.plan_date,
                         duration: plan.duration,
+                        remark: plan.remark,
                       });
                     });
                   }
@@ -907,6 +910,7 @@ export class ZhFormTab6Component implements OnInit {
       plan: selectedPlan,
       plan_date: this.dateParser.parse(plan.plan_date),
       duration: plan.duration,
+      remark: plan.remark,
     });
 
     let $_planInputSub = this.planForm
@@ -983,6 +987,7 @@ export class ZhFormTab6Component implements OnInit {
                 id_nature: item.plan.id_nomenclature,
                 plan_date: item.plan_date,
                 duration: item.duration,
+                remark: item.remark,
               });
             });
           }
