@@ -788,7 +788,7 @@ def post_actions(id_zh, actions):
 # tab 8
 
 
-def post_file_info(id_zh, title, author, description, extension):
+def post_file_info(id_zh, title, author, description, extension, media_path=None):
     try:
         unique_id_media = DB.session.query(TZH).filter(
             TZH.id_zh == int(id_zh)).one().zh_uuid
@@ -813,10 +813,11 @@ def post_file_info(id_zh, title, author, description, extension):
             author=author,
             description_fr=description,
             is_public=True,
+            media_path=media_path,
             meta_create_date=str(post_date),
             meta_update_date=str(post_date)
         ))
-        DB.session.flush()
+        DB.session.commit()
         id_media = DB.session.query(TMedias).filter(
             TMedias.uuid_attached_row == uuid_attached_row).one().id_media
         return id_media
