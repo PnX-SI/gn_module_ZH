@@ -35,9 +35,9 @@ def gnmodule_install_app(gn_db, gn_app):
             gn_db.session.execute(
                 open(str(ROOT_DIR / "data/insert_into_pr_zh_schema.sql"), "r").read()
             )
-            # gn_db.session.execute(
-            #    open(str(ROOT_DIR / "data/insert_into_fake_data.sql"), "r").read()
-            # )
+            gn_db.session.execute(
+                open(str(ROOT_DIR / "data/insert_into_fake_data.sql"), "r").read()
+            )
             gn_db.session.execute(
                 open(str(ROOT_DIR / "data/insert_into_atlas_vm.sql"), "r").read()
             )
