@@ -10,9 +10,12 @@ import { FonctionnementModel } from "../models/fonctionnement.model";
 export class FonctionnementComponent {
   @Input() data: FonctionnementModel;
 
+  readonly flowSize: string = "15%";
+  readonly permaSize: string = "15%";
+
   public readonly imgPath = "external_assets/zones_humides";
   public readonly corConnectionType = {
-    "Aucune Connexion": "aucune_connexion.svg",
+    "Aucune connexion": "aucune_connexion.svg",
     "Entrée et sortie": "entree_sortie.svg",
     Entrée: "entree.svg",
     Sortie: "sortie.svg",
@@ -22,14 +25,14 @@ export class FonctionnementComponent {
   public connectionImg: string = "";
 
   public entryTableCols: TableColumn[] = [
-    { name: "type", label: "Entrée d'eau" },
-    { name: "permanence", label: "Permanence" },
+    { name: "type", label: "Entrée d'eau", size: this.flowSize },
+    { name: "permanence", label: "Permanence", size: this.permaSize },
     { name: "toponymie", label: "Toponymie et compléments d'information" },
   ];
 
   public exitTableCols: TableColumn[] = [
-    { name: "type", label: "Sortie d'eau" },
-    { name: "permanence", label: "Permanence" },
+    { name: "type", label: "Sortie d'eau", size: this.flowSize },
+    { name: "permanence", label: "Permanence", size: this.permaSize },
     { name: "toponymie", label: "Toponymie et compléments d'information" },
   ];
   ngOnInit() {

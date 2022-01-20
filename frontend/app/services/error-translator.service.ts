@@ -27,7 +27,7 @@ export class ErrorTranslatorService {
     {
       api: "wrong_qualif", // error returned by backend
       front:
-        "Le SDAGE selectionné ne fait pas partie des règles définies pour le bassin versant", //error to show to the user
+        "La typologie SDAGE selectionnée ne fait pas partie des règles définies pour ce bassin versant", //error to show to the user
       id: 3,
     },
     {

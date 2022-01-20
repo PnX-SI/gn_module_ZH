@@ -170,10 +170,13 @@ small.required::after {
 }
 
 .footer-btn {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 16px;
-  overflow: hidden;
+  position: fixed;
+  right: 0;
+  bottom: 26px;
+  left: 0%;
+  z-index: 1030;
+  text-align: right;
+  margin-right: 65px;
 }
 
 .error-msg {
@@ -298,18 +301,6 @@ form.ng-invalid {
 }
 button:focus {
   outline: 0;
-}
-
-.footer-btn {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 36px;
-  margin-bottom: 36px;
-}
-
-.toast-top-center {
-  top: 12px;
-  width: 18%;
 }
 
 /* .footer-btn {
