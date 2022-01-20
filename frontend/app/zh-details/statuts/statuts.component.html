@@ -47,14 +47,23 @@
         <legend>
           <h5 class="section-title">Inventaires</h5>
         </legend>
-        <zh-label label="">
-          <ul>
-            <li class="label-item" *ngFor="let ref of data.autre_inventaire">
-              {{ ref.zh_type_name }} - {{ ref.area_code }} - 
-              <a href="{{ ref.url }}" target="_blank">{{ ref.area_name }}</a>
-            </li>
-          </ul>
-        </zh-label>
+        <table class="table mb-4">
+          <tbody>
+            <ng-container *ngFor="let geo of config?.ref_geo_referentiels">
+              <tr *ngIf="geo.active">
+                <td>{{ geo.zh_name }} </td>
+                <td>
+                  <ul>
+                    <li class="label-item" *ngFor="let ref of table[geo.type_code_ref_geo]">
+                      {{ ref.area_code }} - 
+                      <a href="{{ ref.url }}" target="_blank">{{ ref.area_name }}</a>
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
         <div class="row">
           <div class="col-12 col-lg-4">
             <zh-label label="Autres études / inventaires naturalistes : ">

@@ -1,48 +1,73 @@
 <div *ngIf="zhDetails" class="container-fluid">
   <zh-details-header [zhId]="id_zh" [zhCode]="zhDetails?.renseignements?.identification?.code"></zh-details-header>
-  <pnx-map height="40vh" searchBar="false">
-    <pnx-geojson [geojson]="this.validBbox" [zoomOnFirstTime]="true">
+  <pnx-map height="40vh" [searchBar]="true">
+    <pnx-geojson [geojson]="zhDetails.geometry" [zoomOnFirstTime]="true">
     </pnx-geojson>
   </pnx-map>
-  <!-- Attention : bien mettre entre crochet title et les strings entre '' 
-    sinon génère un tooltip native (title) dans le collapse -->
-  <collapse [title]="'1. Renseignements généraux'"
-    ><zh-details-renseignements
-      [data]="zhDetails.renseignements"
-    ></zh-details-renseignements
-  ></collapse>
-  <collapse
-    [title]="
-      '2. Délimitation de la zone humide et de l’espace de fonctionnalité'
-    "
-    ><zh-details-delimitation
-      [data]="zhDetails.delimitation"
-    ></zh-details-delimitation
-  ></collapse>
-  <collapse [title]="'3. Description du bassin versant et de la zone humide'"
-    ><zh-details-description
-      [data]="zhDetails.description"
-    ></zh-details-description
-  ></collapse>
-  <collapse [title]="'4. Fonctionnement de la zone humide'"
-    ><zh-details-fonctionnement
-      [data]="zhDetails.fonctionnement"
-    ></zh-details-fonctionnement
-  ></collapse>
-  <collapse [title]="'5. Fonctions et valeurs de la zone humide'"
-    ><zh-details-fonctions [data]="zhDetails.fonctions"></zh-details-fonctions
-  ></collapse>
-  <collapse [title]="'6. Statuts et gestion de la zone humide'"
-    ><zh-details-statuts [data]="zhDetails.statuts"></zh-details-statuts
-  ></collapse>
-  <collapse [title]="'7. Évaluation générale du site'"
-    ><zh-details-evaluation
-      [data]="zhDetails.evaluation"
-    ></zh-details-evaluation
-  ></collapse>
-  <collapse [title]="'9. Hiérarchie'"
-    ><zh-details-hierarchy
-      [data]="zhDetails.hierarchy"
-    ></zh-details-hierarchy
-  ></collapse>
+  <div class="wrapup">
+    <button 
+      color="primary" 
+      mat-mini-fab (click)="onWrapAll()">
+      <mat-icon>{{ expanded ? 'unfold_less' : 'unfold_more' }}
+      </mat-icon>
+    </button>
+  </div>
+  <mat-accordion #accordion="matAccordion" [multi]="true">
+    <!-- Attention : bien mettre entre crochet title et les strings entre '' 
+      sinon génère un tooltip native (title) dans le collapse -->
+    <collapse 
+      [title]="'1. Renseignements généraux'"
+      [expanded]="expanded"
+      ><zh-details-renseignements
+        [data]="zhDetails.renseignements"
+      ></zh-details-renseignements
+    ></collapse>
+    <collapse
+      [title]="
+        '2. Délimitation de la zone humide et de l’espace de fonctionnalité'
+      "
+      [expanded]="expanded"
+      ><zh-details-delimitation
+        [data]="zhDetails.delimitation"
+      ></zh-details-delimitation
+    ></collapse>
+    <collapse 
+      [title]="'3. Description du bassin versant et de la zone humide'"
+      [expanded]="expanded"
+      ><zh-details-description
+        [data]="zhDetails.description"
+      ></zh-details-description
+    ></collapse>
+    <collapse 
+      [title]="'4. Fonctionnement de la zone humide'"
+      [expanded]="expanded"
+      ><zh-details-fonctionnement
+        [data]="zhDetails.fonctionnement"
+      ></zh-details-fonctionnement
+    ></collapse>
+    <collapse 
+      [title]="'5. Fonctions et valeurs de la zone humide'"
+      [expanded]="expanded"
+      ><zh-details-fonctions [data]="zhDetails.fonctions"></zh-details-fonctions
+    ></collapse>
+    <collapse 
+      [title]="'6. Statuts et gestion de la zone humide'"
+      [expanded]="expanded"
+      ><zh-details-statuts [data]="zhDetails.statuts"></zh-details-statuts
+    ></collapse>
+    <collapse 
+      [title]="'7. Évaluation générale du site'"
+      [expanded]="expanded"
+      ><zh-details-evaluation
+        [data]="zhDetails.evaluation"
+      ></zh-details-evaluation
+    ></collapse>
+    <collapse 
+      [title]="'9. Hiérarchie'"
+      [expanded]="expanded"
+      ><zh-details-hierarchy
+        [data]="zhDetails.hierarchy"
+      ></zh-details-hierarchy
+    ></collapse>
+  </mat-accordion>
 </div>

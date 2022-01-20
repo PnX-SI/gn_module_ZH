@@ -1,13 +1,18 @@
-import { Component, Input } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { StatutsModel } from "../models/status.model";
+import { ModuleConfig } from "../../module.config";
 
 @Component({
   selector: "zh-details-statuts",
   templateUrl: "./statuts.component.html",
   styleUrls: ["./statuts.component.scss"],
 })
-export class StatutsComponent {
+export class StatutsComponent implements OnInit {
   @Input() data: StatutsModel;
+  public config = ModuleConfig;
+  public table: any;
+
+  readonly urbanColSize: string = "15%";
 
   public regimeTableCol = [
     { name: "status", label: "Statut" },
@@ -15,9 +20,17 @@ export class StatutsComponent {
   ];
 
   public zonageTableCol = [
-    { name: "commune", label: "Commune" },
-    { name: "type_doc", label: "Type de document communal" },
-    { name: "type_classement", label: "Type de classement" },
+    { name: "commune", label: "Commune", size: this.urbanColSize },
+    {
+      name: "type_doc",
+      label: "Type de document communal",
+      size: this.urbanColSize,
+    },
+    {
+      name: "type_classement",
+      label: "Type de classement",
+      size: this.urbanColSize,
+    },
     { name: "remarque", label: "Remarques" },
   ];
 
@@ -27,8 +40,19 @@ export class StatutsComponent {
   ];
 
   public plansTableCol = [
-    { name: "plan", label: "Nature du plan" },
+    { name: "plan", label: "Nature du plan de gestion" },
     { name: "date", label: "Date de réalisation" },
     { name: "duree", label: "Durée (années)" },
   ];
+
+  ngOnInit() {
+    var groupBy = function (xs, key) {
+      return xs.reduce(function (rv, x) {
+        (rv[x[key]] = rv[x[key]] || []).push(x);
+        return rv;
+      }, {});
+    };
+
+    this.table = groupBy(this.data.autre_inventaire, "type_code");
+  }
 }

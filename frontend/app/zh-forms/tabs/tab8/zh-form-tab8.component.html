@@ -34,7 +34,7 @@
             [tableCols]="fileTableCol" 
             [data]="item.files"
             [deletable]="true"
-            [editable]="true"
+            [editable]="item.editable"
             [downloadable]="true"
             (onDelete)="onDeleteFile($event)"
             (onEdit)="onEditFile($event, fileModal)"
@@ -62,6 +62,28 @@
     </button>
   </div>
   <div class="modal-body">
+    <div *ngIf="config?.filename_validated || 
+                config?.filename_validated || 
+                config?.max_pdf_size || 
+                config?.max_jpg_size"
+          class="flex-container alert alert-info">
+      <ng-container *ngIf="config?.fileformat_validated">
+        <span>Seules les extensions suivantes sont acceptées : 
+          <b *ngFor="let item of fileTypeAccepted; let isLast=last">
+            {{ item.split('/')[1] }}{{isLast ? '' : ', '}}
+          </b>
+        </span><br>
+      </ng-container>
+      <ng-container *ngIf="config?.filename_validated">
+        <span>Pour les images, le format doit être le suivant : <b>{{ zh.properties.code }}_#.jpeg</b> (avec # un nombre)</span><br>
+      </ng-container>
+      <ng-container *ngIf="config?.max_pdf_size">
+        <span>La taille maximale des fichers pdf est de <b>{{ config.max_pdf_size }}Mo</b></span><br>
+      </ng-container>
+      <ng-container *ngIf="config?.max_jpg_size">
+        <span>La taille maximale des fichers jpeg est de <b>{{ config.max_jpg_size }}Mo</b></span><br>
+      </ng-container>
+    </div>
     <form [formGroup]="fileForm">
       <div class="form-row">
         <div class="form-group col-md-12">
@@ -88,7 +110,7 @@
               fileForm.controls.file.errors?.fileNameValidator
             "
             class="error-msg"
-            >Le fichier ne respecte pas le format suivant : &lt;ZHCODE&gt;_&lt;nombre&gt;. Pour cette zone humide, un nom correct serait : {{ zh.properties.code }}_3.jpg<br></small>
+            >Le fichier ne respecte pas le format suivant : &lt;ZHCODE&gt;_&lt;nombre&gt;. Pour cette zone humide, un nom correct serait : {{ zh.properties.code }}_3.jpeg<br></small>
           <small
           *ngIf="
             fileForm.controls.file.errors?.fileFormatValidator
