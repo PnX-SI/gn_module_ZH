@@ -64,8 +64,15 @@ export class ZhFormTab6Component implements OnInit {
   private $_fromChangeSub: Subscription;
   public selectedItems = [];
 
+  readonly urbanColSize: string = "15%";
+
   public statusTableCol = [
-    { name: "status", label: "Statut", subcell: { name: "mnemonique" } },
+    {
+      name: "status",
+      label: "Statut",
+      subcell: { name: "mnemonique" },
+      size: "45%",
+    },
     { name: "remark", label: "Remarques" },
   ];
 
@@ -79,16 +86,23 @@ export class ZhFormTab6Component implements OnInit {
   ];
 
   public urbanDocTableCol = [
-    { name: "area", label: "Commune", subcell: { name: "municipality_name" } },
+    {
+      name: "area",
+      label: "Commune",
+      subcell: { name: "municipality_name" },
+      size: this.urbanColSize,
+    },
     {
       name: "urbanType",
       label: "Type de document communal",
       subcell: { name: "mnemonique" },
+      size: this.urbanColSize,
     },
     {
       name: "typeClassement",
       label: "Type de classement",
       subcell: { name: "mnemonique" },
+      size: this.urbanColSize,
     },
     { name: "remark", label: "Remarques" },
   ];

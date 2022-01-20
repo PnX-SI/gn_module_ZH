@@ -12,15 +12,25 @@ export class StatutsComponent implements OnInit {
   public config = ModuleConfig;
   public table: any;
 
+  readonly urbanColSize: string = "15%";
+
   public regimeTableCol = [
     { name: "status", label: "Statut" },
     { name: "remarques", label: "Remarques" },
   ];
 
   public zonageTableCol = [
-    { name: "commune", label: "Commune" },
-    { name: "type_doc", label: "Type de document communal" },
-    { name: "type_classement", label: "Type de classement" },
+    { name: "commune", label: "Commune", size: this.urbanColSize },
+    {
+      name: "type_doc",
+      label: "Type de document communal",
+      size: this.urbanColSize,
+    },
+    {
+      name: "type_classement",
+      label: "Type de classement",
+      size: this.urbanColSize,
+    },
     { name: "remarque", label: "Remarques" },
   ];
 

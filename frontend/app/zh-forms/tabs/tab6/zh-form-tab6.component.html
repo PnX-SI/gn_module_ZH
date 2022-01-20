@@ -99,8 +99,9 @@
                       plan de gestion
                     </button>
                   </td>
-                  <td>
+                  <td class="tab-buttons">
                     <button
+                      class="mr-2"
                       mat-icon-button
                       placement="top"
                       ngbTooltip="Supprimer"
@@ -129,7 +130,7 @@
                           <td *ngFor="let col of planTableCol">
                             {{ plan[col.name]?.mnemonique || plan[col.name] }}
                           </td>
-                          <td>
+                          <td class="tab-buttons">
                             <div>
                               <button
                                 mat-icon-button
@@ -141,6 +142,7 @@
                                 <mat-icon class="edit-icon">edit</mat-icon>
                               </button>
                               <button
+                                class="mr-2"
                                 mat-icon-button
                                 placement="top"
                                 ngbTooltip="Supprimer"

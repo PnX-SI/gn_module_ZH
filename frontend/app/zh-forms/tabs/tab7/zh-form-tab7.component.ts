@@ -34,28 +34,67 @@ export class ZhFormTab7Component implements OnInit {
   public actionTable: any[] = [];
   public currentZh: any;
 
+  readonly qualifSize: string = "10%";
+  readonly knowledgeSize: string = "15%";
+
   public hydroFctTableCol = [
     {
       name: "function",
       label: "Principales fonctions hydrologiques / biogéochimiques",
+      subcell: { name: "mnemonique" },
     },
-    { name: "qualification", label: "Qualifications" },
-    { name: "knowledge", label: "Connaissance" },
+    {
+      name: "qualification",
+      label: "Qualifications",
+      subcell: { name: "mnemonique" },
+      size: this.qualifSize,
+    },
+    {
+      name: "knowledge",
+      label: "Connaissance",
+      subcell: { name: "mnemonique" },
+      size: this.knowledgeSize,
+    },
   ];
 
   public bioFctTableCol = [
     {
       name: "function",
       label: "Principales fonctions biologiques / écologiques",
+      subcell: { name: "mnemonique" },
     },
-    { name: "qualification", label: "Qualifications" },
-    { name: "knowledge", label: "Connaissance" },
+    {
+      name: "qualification",
+      label: "Qualifications",
+      subcell: { name: "mnemonique" },
+      size: this.qualifSize,
+    },
+    {
+      name: "knowledge",
+      label: "Connaissance",
+      subcell: { name: "mnemonique" },
+      size: this.knowledgeSize,
+    },
   ];
 
   public patrimTableCol = [
-    { name: "function", label: "Principaux intérêts patrimoniaux" },
-    { name: "qualification", label: "Qualifications" },
-    { name: "knowledge", label: "Connaissance" },
+    {
+      name: "function",
+      label: "Principaux intérêts patrimoniaux",
+      subcell: { name: "mnemonique" },
+    },
+    {
+      name: "qualification",
+      label: "Qualifications",
+      subcell: { name: "mnemonique" },
+      size: this.qualifSize,
+    },
+    {
+      name: "knowledge",
+      label: "Connaissance",
+      subcell: { name: "mnemonique" },
+      size: this.knowledgeSize,
+    },
   ];
 
   public actionTableCol = [
@@ -73,9 +112,23 @@ export class ZhFormTab7Component implements OnInit {
   ];
 
   public socEcoTableCol = [
-    { name: "function", label: "Principales valeurs socio-économiques" },
-    { name: "qualification", label: "Qualifications" },
-    { name: "knowledge", label: "Connaissance" },
+    {
+      name: "function",
+      label: "Principales valeurs socio-economiques",
+      subcell: { name: "mnemonique" },
+    },
+    {
+      name: "qualification",
+      label: "Qualifications",
+      subcell: { name: "mnemonique" },
+      size: this.qualifSize,
+    },
+    {
+      name: "knowledge",
+      label: "Connaissance",
+      subcell: { name: "mnemonique" },
+      size: this.knowledgeSize,
+    },
   ];
 
   private tempID: any;

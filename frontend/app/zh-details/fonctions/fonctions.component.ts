@@ -8,36 +8,44 @@ import { Component, Input } from "@angular/core";
 export class FonctionsComponent {
   @Input() data;
 
+  readonly functionSize: string = "30%";
+  readonly qualifSize: string = "10%";
+  readonly knowledgeSize: string = "10%";
+
   public hydroFctTableCol = [
-    { name: "type", label: "Fonctions hydrologiques" },
-    { name: "qualification", label: "Qualifications" },
-    { name: "connaissance", label: "Connaissance" },
+    { name: "type", label: "Fonctions hydrologiques", size: this.functionSize },
+    { name: "qualification", label: "Qualifications", size: this.qualifSize },
+    { name: "connaissance", label: "Connaissance", size: this.knowledgeSize },
     { name: "justification", label: "Justifications" },
   ];
   public bioFctTableCol = [
-    { name: "type", label: "Fonctions biologiques" },
-    { name: "qualification", label: "Qualifications" },
-    { name: "connaissance", label: "Connaissance" },
+    { name: "type", label: "Fonctions biologiques", size: this.functionSize },
+    { name: "qualification", label: "Qualifications", size: this.qualifSize },
+    { name: "connaissance", label: "Connaissance", size: this.knowledgeSize },
     { name: "justification", label: "Justifications" },
   ];
   public intertesTableCol = [
-    { name: "type", label: "Intérêts patrimoniaux" },
-    { name: "qualification", label: "Qualifications" },
-    { name: "connaissance", label: "Connaissance" },
+    { name: "type", label: "Intérêts patrimoniaux", size: this.functionSize },
+    { name: "qualification", label: "Qualifications", size: this.qualifSize },
+    { name: "connaissance", label: "Connaissance", size: this.knowledgeSize },
     { name: "justification", label: "Justifications" },
   ];
 
   public corineTableCol = [
-    { name: "biotope", label: "Corine Biotope" },
+    { name: "biotope", label: "Corine Biotope", size: this.functionSize },
+    { name: "etat", label: "État de conservation", size: this.qualifSize },
     { name: "cahier", label: "Cahier Habitats" },
-    { name: "etat", label: "État de conservation" },
-    { name: "recouvrement", label: "Recouvrement de la ZH (%)" },
+    { name: "recouvrement", label: "Recouvrement de la ZH (%)", size: "5%" },
   ];
 
   public socioEcoTableCol = [
-    { name: "type", label: "Valeurs socio-économiques" },
-    { name: "qualification", label: "Qualifications" },
-    { name: "connaissance", label: "Connaissance" },
+    {
+      name: "type",
+      label: "Valeurs socio-économiques",
+      size: this.functionSize,
+    },
+    { name: "qualification", label: "Qualifications", size: this.qualifSize },
+    { name: "connaissance", label: "Connaissance", size: this.knowledgeSize },
     { name: "justification", label: "Justifications" },
   ];
 }
