@@ -77,15 +77,15 @@
                   <td>
                     <i
                       *ngIf="
-                        !moreDetails && item.plans && item.plans.length > 0
+                        !item.moreDetails && item.plans && item.plans.length > 0
                       "
                       class="fa fa-angle-down morePlan"
-                      (click)="onMoreDetails(true)"
+                      (click)="onMoreDetails(item)"
                     ></i>
                     <i
-                      *ngIf="moreDetails && item.plans && item.plans.length > 0"
+                      *ngIf="item.moreDetails && item.plans && item.plans.length > 0"
                       class="fa fa-angle-up morePlan"
-                      (click)="onMoreDetails(false)"
+                      (click)="onMoreDetails(item)"
                     ></i
                     >{{ item.name }}
                   </td>
@@ -99,8 +99,9 @@
                       plan de gestion
                     </button>
                   </td>
-                  <td>
+                  <td class="tab-buttons">
                     <button
+                      class="mr-2"
                       mat-icon-button
                       placement="top"
                       ngbTooltip="Supprimer"
@@ -112,7 +113,7 @@
                 </tr>
                 <tr
                   class="tr-plans"
-                  *ngIf="moreDetails && item.plans && item.plans.length > 0"
+                  *ngIf="item.moreDetails && item.plans && item.plans.length > 0"
                 >
                   <td colspan="3" class="tr-plans">
                     <table class="table subtable">
@@ -129,7 +130,7 @@
                           <td *ngFor="let col of planTableCol">
                             {{ plan[col.name]?.mnemonique || plan[col.name] }}
                           </td>
-                          <td>
+                          <td class="tab-buttons">
                             <div>
                               <button
                                 mat-icon-button
@@ -141,6 +142,7 @@
                                 <mat-icon class="edit-icon">edit</mat-icon>
                               </button>
                               <button
+                                class="mr-2"
                                 mat-icon-button
                                 placement="top"
                                 ngbTooltip="Supprimer"
@@ -211,10 +213,20 @@
           <small style="display: block; margin-bottom: 8px"
             >Autres études / inventaires naturalistes </small
           >
-          <mat-label ngClass="labelBeforeSlide">Non</mat-label>
-          <mat-slide-toggle [formControl]="formTab6.controls.is_other_inventory"
-            ></mat-slide-toggle>
-          <mat-label ngClass="labelBeforeSlide">Oui</mat-label>
+          <div class="ml-3">
+            <mat-label ngClass="labelBeforeSlide">Non</mat-label>
+            <mat-slide-toggle [formControl]="formTab6.controls.is_other_inventory"
+              ></mat-slide-toggle>
+            <mat-label ngClass="labelBeforeSlide">Oui</mat-label>
+            
+            <!-- DO NOT FORGET formControl [formControl]="formTab4.controls.remark_diag" -->
+            <textarea
+              *ngIf="formTab6.controls.is_other_inventory.value"
+              [formControl]="formTab6.controls.remark_is_other_inventory"
+              class="form-control mt-3"
+              placeholder="Commentaires"
+          ></textarea>
+        </div>
         </div>
       </div>
     </fieldset>
@@ -618,6 +630,14 @@
             class="error-msg"
             >Champ requis</small
           >
+        </div>
+        <div class="form-group col-md-12">
+          <small>Remarques</small>
+          <textarea
+            class="form-control"
+            [formControl]="planForm.controls.remark"
+            rows="3"
+          ></textarea>
         </div>
       </div>
     </form>

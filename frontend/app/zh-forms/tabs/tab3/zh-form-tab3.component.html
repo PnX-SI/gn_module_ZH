@@ -30,7 +30,6 @@
         <div class="form-group col-md-6">
           <small>Sous-type SAGE</small>
           <select class="form-control" [formControl]="form.controls.id_sage">
-            <option></option>
             <option *ngFor="let sg of sage" [ngValue]="sg.id_nomenclature">
               {{ sg.mnemonique }}
             </option>
@@ -39,7 +38,7 @@
       </div>
       <div class="form-row">
         <div class="form-group col-md-6">
-          <small>Types d’habitats Corine Biotopes humides (H) ou potentiellement humides (P)</small>
+          <small>Types d’habitats Corine biotopes humides (H) ou potentiellement humides (P)</small>
           <input
             id="typeahead-basic"
             type="text"
@@ -126,7 +125,6 @@
         <div class="form-group col-md-12">
           <small>Évaluation globale des menaces potentielles ou avérées</small>
           <select class="form-control" [formControl]="form.controls.id_thread">
-            <option></option>
             <option
               *ngFor="let menace of formMetaData.EVAL_GLOB_MENACES"
               [ngValue]="menace.id_nomenclature"

@@ -8,6 +8,11 @@
           </h5>
         </legend>
         <div class="row">
+          <div class="col-12">
+            <zh-label label="Superficie de la zone humide (ha) :">
+              <span>{{ data.presentation.area }}</span>
+            </zh-label>
+          </div>
           <div class="col-12 col-xl-6">
             <zh-label label="Typologie SDAGE :">
               <span>{{ data.presentation.sdage }}</span>
@@ -19,21 +24,16 @@
             </zh-label>
           </div>
         </div>
-        <zh-label label="Remarques :">
-          <span>{{ data.presentation.remarques }}</span>
-        </zh-label>
-        <p class="section-label">Corine Biotope :</p>
-        <mat-icon
-          class="info-icon"
-          ngbTooltip="Types de milieux Corine Biotope humides (H) ou potentiellement humides (P)"
-          >info</mat-icon
-        >
+        <p class="section-label">Types d’habitats Corine biotopes humides (H) ou potentiellement humides (P) :</p>
         <div class="mx-2">
           <zh-table
             [tableCols]="corineTableCols"
             [data]="data.presentation.corine_biotope"
           ></zh-table>
         </div>
+        <zh-label label="Remarques :">
+          <span>{{ data.presentation.remarques }}</span>
+        </zh-label>
       </fieldset>
     </div>
     <div class="col-12 h-100">
