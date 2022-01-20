@@ -11,25 +11,28 @@ import { EvaluationModel } from "../models/evaluations.model";
 export class EvaluationComponent {
   @Input() data: EvaluationModel;
 
+  readonly qualifSize: string = "10%";
+  readonly knowledgeSize: string = "15%";
+
   public hydroFunctionsCols: TableColumn[] = [
     {
       name: "type",
       label: "Principales fonctions hydrologiques / biogéochimiques",
     },
-    { name: "qualification", label: "Qualifications" },
-    { name: "connaissance", label: "Connaissance" },
+    { name: "qualification", label: "Qualifications", size: this.qualifSize},
+    { name: "connaissance", label: "Connaissance", size: this.knowledgeSize },
   ];
 
   public bioFunctionsCols: TableColumn[] = [
     { name: "type", label: "Principales fonctions biologiques / écologiques" },
-    { name: "qualification", label: "Qualifications" },
-    { name: "connaissance", label: "Connaissance" },
+    { name: "qualification", label: "Qualifications", size: this.qualifSize },
+    { name: "connaissance", label: "Connaissance", size: this.knowledgeSize },
   ];
 
   public patrimonialInterestsCols: TableColumn[] = [
     { name: "type", label: "Intérêts patrimoniaux" },
-    { name: "qualification", label: "Qualifications" },
-    { name: "connaissance", label: "Connaissance" },
+    { name: "qualification", label: "Qualifications", size: this.qualifSize },
+    { name: "connaissance", label: "Connaissance", size: this.knowledgeSize },
   ];
 
   public nbFauneFloreCols: TableColumn[] = [
@@ -53,8 +56,8 @@ export class EvaluationComponent {
 
   public valCols: TableColumn[] = [
     { name: "type", label: "Principales values socio-économiques" },
-    { name: "qualification", label: "Qualifications" },
-    { name: "connaissance", label: "Connaissance" },
+    { name: "qualification", label: "Qualifications", size: this.qualifSize },
+    { name: "connaissance", label: "Connaissance", size: this.knowledgeSize },
   ];
 
   public propositionsCol: TableColumn[] = [

@@ -843,12 +843,12 @@ INSERT INTO pr_zh.bib_hier_panes VALUES
 (1, 'valeur patrimoniale'),
 (2, 'priorité d''invervention');
  
- 
+
 INSERT INTO pr_zh.bib_hier_categories VALUES
 (1, 'cat1', 'type de zone humide'),
 (2, 'cat2', 'interêt patrimonial'),
-(3, 'cat3', 'fonctions écologiques'),
-(4, 'cat4', 'fonctions hydrologiques'),
+(3, 'cat3', 'fonctions écologiques (connectivité / corridor écologique)'),
+(4, 'cat4', 'fonctions hydrologiques / biogéochimiques'),
 (5, 'cat5', 'valeurs socio-économiques'),
 (6, 'cat6', 'statut et gestion'),
 (7, 'cat7', 'état fonctionnel'),
@@ -856,19 +856,19 @@ INSERT INTO pr_zh.bib_hier_categories VALUES
 
 
 INSERT INTO pr_zh.bib_hier_subcategories VALUES
-(1, 'habitats patrimoniaux humides'),
-(2, 'flore patrimoniale'),
-(3, 'faune patrimoniale - vertébrés'),
-(4, 'faune patrimoniale - invertébrés'),
-(5, 'protection du milieu physique'),
-(6, 'épuration'),
-(7, 'soutient naturel d''étiage'),
+(1, 'habitats humides'),
+(2, 'flore'),
+(3, 'faune - vertébrés'),
+(4, 'faune - invertébrés'),
+(5, 'stockage / rétention (protection crue, ruissellement, érosion)'),
+(6, 'filtration des flux de matières (épuration de l''eau)'),
+(7, 'soutien d''étiage (recharge nappe et cours d''eau)'),
 (8, 'loisirs et pédagogie'),
 (9, 'production'),
 (10, 'statut'),
 (11, 'gestion conservatoire'),
-(12, 'hydrolgique'),
-(13, 'biologique');
+(12, 'hydrologique / biogéochimique'),
+(13, 'biologique / écologique');
 
 
 INSERT INTO pr_zh.bib_note_types VALUES

@@ -16,9 +16,6 @@ from .model.zh_schema import (
 )
 from .api_error import ZHApiError
 
-# Convert m² to ha
-M_HA = 10000
-
 
 def main_search(query, json):
     sdage = json.get("sdage")
@@ -104,12 +101,13 @@ def filter_area_size(query, json: dict):
     if symbol is None or ha is None:
         return query
 
+    # TZH.area is already in ha
     if symbol == "=":
-        query = query.filter(func.ST_Area(TZH.geom) / M_HA == ha)
+        query = query.filter(TZH.area == ha)
     elif symbol == "≥":
-        query = query.filter(func.ST_Area(TZH.geom) / M_HA >= ha)
+        query = query.filter(TZH.area >= ha)
     elif symbol == "≤":
-        query = query.filter(func.ST_Area(TZH.geom) / M_HA <= ha)
+        query = query.filter(TZH.area <= ha)
 
     return query
 
