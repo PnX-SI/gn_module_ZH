@@ -27,7 +27,7 @@ export class StatutsComponent {
   ];
 
   public plansTableCol = [
-    { name: "plan", label: "Nature du plan" },
+    { name: "plan", label: "Nature du plan de gestion" },
     { name: "date", label: "Date de réalisation" },
     { name: "duree", label: "Durée (années)" },
   ];

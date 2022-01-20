@@ -1,7 +1,7 @@
 <div *ngIf="zhDetails" class="container-fluid">
   <zh-details-header [zhId]="id_zh" [zhCode]="zhDetails?.renseignements?.identification?.code"></zh-details-header>
-  <pnx-map height="40vh" searchBar="false">
-    <pnx-geojson [geojson]="this.validBbox" [zoomOnFirstTime]="true">
+  <pnx-map height="40vh" [searchBar]="true">
+    <pnx-geojson [geojson]="zhDetails.geometry" [zoomOnFirstTime]="true">
     </pnx-geojson>
   </pnx-map>
   <!-- Attention : bien mettre entre crochet title et les strings entre '' 
@@ -40,7 +40,7 @@
       [data]="zhDetails.evaluation"
     ></zh-details-evaluation
   ></collapse>
-  <collapse [title]="'9. Hiérarchie'"
+  <collapse [title]="'9. Hiérarchisation'"
     ><zh-details-hierarchy
       [data]="zhDetails.hierarchy"
     ></zh-details-hierarchy

@@ -105,11 +105,20 @@ export class ZhFormTab8Component implements OnInit {
     const EXT_CSV = this._filesService.EXT_CSV;
     this.handleImages();
     this.corFilesExt = [
-      { name: "Fichiers pdf", files: this.getFilesByExtensions(EXT_PDF) },
-      { name: "Fichiers CSV", files: this.getFilesByExtensions(EXT_CSV) },
+      {
+        name: "Fichiers pdf",
+        files: this.getFilesByExtensions(EXT_PDF),
+        editable: true,
+      },
+      {
+        name: "Fichiers CSV",
+        files: this.getFilesByExtensions(EXT_CSV),
+        editable: false,
+      },
       {
         name: "Autres fichiers",
         files: this.getOtherFiles(EXT_PDF.concat(EXT_IMAGES, EXT_CSV)),
+        editable: false,
       },
     ];
   }
