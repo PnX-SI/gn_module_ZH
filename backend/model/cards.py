@@ -560,6 +560,7 @@ class Status:
         self.instruments: list(Instrument)
         self.other_ref_geo: list(dict)
         self.is_other_inventory: bool
+        self.remark_is_other_inventory: str
         self.protections: list(int)
         self.urban_docs: list(UrbanDoc)
 
@@ -586,6 +587,10 @@ class Status:
     @property
     def is_other_inventory(self):
         return self.__is_other_inventory
+
+    @property
+    def remark_is_other_inventory(self):
+        return self.__remark_is_other_inventory
 
     @property
     def protections(self):
@@ -656,6 +661,10 @@ class Status:
     def is_other_inventory(self, value):
         self.__is_other_inventory = value
 
+    @remark_is_other_inventory.setter
+    def remark_is_other_inventory(self, value):
+        self.__remark_is_other_inventory = value
+
     @urban_docs.setter
     def urban_docs(self, urban_docs):
         self.__urban_docs = [
@@ -687,6 +696,7 @@ class Status:
             "instruments": [instrument.__str__() for instrument in self.instruments],
             "autre_inventaire": self.__other_ref_geo,
             "autre_etude": Utils.get_bool(self.is_other_inventory),
+            "autre_etude_commentaire": self.remark_is_other_inventory,
             "statuts": self.__str_protections(),
             "zonage": [urban_doc.__str__() for urban_doc in self.urban_docs]
         }
@@ -1150,6 +1160,7 @@ class Card(ZH):
         self.status.instruments = self.properties['instruments']
         self.status.other_ref_geo = self.ref_geo_config
         self.status.is_other_inventory = self.properties['is_other_inventory']
+        self.status.remark_is_other_inventory = self.properties['remark_is_other_inventory']
         self.status.protections = self.properties['protections']
         self.status.urban_docs = self.properties['urban_docs']
         return self.status.__str__()
