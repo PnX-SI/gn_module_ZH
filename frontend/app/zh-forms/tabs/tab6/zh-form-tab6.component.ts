@@ -125,7 +125,6 @@ export class ZhFormTab6Component implements OnInit {
   };
   public currentZh: any;
   selectedManagement: any;
-  moreDetails: boolean = true;
   posted: boolean;
   submitted: boolean;
 
@@ -308,7 +307,6 @@ export class ZhFormTab6Component implements OnInit {
                     "BIB_MANAGEMENT_STRUCTURES"
                   ].find((item: any) => item.id_org == management.structure);
                   let plans = [];
-
                   if (management.plans && management.plans.length > 0) {
                     management.plans.forEach((plan) => {
                       plans.push({
@@ -321,6 +319,10 @@ export class ZhFormTab6Component implements OnInit {
                     });
                   }
                   structure.plans = plans;
+
+                  // moreDetails enable to expand the table to show the plans
+                  // set it to true by default
+                  structure.moreDetails = true;
 
                   this.managements.push(structure);
                 }
@@ -813,10 +815,12 @@ export class ZhFormTab6Component implements OnInit {
     if (this.planForm.valid) {
       let formValues = this.planForm.value;
       this.managements.map((item: any) => {
+        // moreDetails enable to expand the table to show the plans
+        // set it to true here enable to expand when plan is added
+        item.moreDetails = true;
         if (item.id_org == this.selectedManagement.id_org) {
           if (!item.plans || item.plans.length == 0) {
             formValues.plan_date = this.dateParser.format(formValues.plan_date);
-            this.moreDetails = true;
             item.plans = [formValues];
           } else if (item.plans && item.plans.length > 0) {
             let palnExist = item.plans.some(
@@ -828,7 +832,6 @@ export class ZhFormTab6Component implements OnInit {
                 formValues.plan_date
               );
               item.plans.push(formValues);
-              this.moreDetails = true;
             }
           }
         }
@@ -950,8 +953,8 @@ export class ZhFormTab6Component implements OnInit {
     }
   }
 
-  onMoreDetails(status: boolean) {
-    this.moreDetails = status;
+  onMoreDetails(item) {
+    item.moreDetails = !item.moreDetails;
   }
 
   onDeSelectAll() {
