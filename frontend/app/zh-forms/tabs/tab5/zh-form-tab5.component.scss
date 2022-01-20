@@ -19,3 +19,13 @@ select.custom-select option:disabled {
   font-weight: 5;
   margin-bottom: 20px;
 }
+
+.info-icon {
+  padding-left: 6px;
+  padding-top: 6px;
+  cursor: help;
+}
+
+::ng-deep .wide-tooltip .tooltip-inner {
+  max-width: 600px;
+}
