@@ -62,12 +62,20 @@
                 </td>
               </tr>
             </ng-container>
-              <tr>
-                <td>Autres études / inventaires naturalistes</td>
-                <td>{{ data.autre_etude }}</td>
-              </tr>
           </tbody>
         </table>
+        <div class="row">
+          <div class="col-12 col-lg-4">
+            <zh-label label="Autres études / inventaires naturalistes : ">
+              <span>{{ data.autre_etude }}</span>
+            </zh-label>
+          </div>
+          <div class="col-12 col-lg-8">
+            <zh-label *ngIf="data?.autre_etude == 'Oui'" label="Commentaires : ">
+              <span>{{ data?.autre_etude_commentaire }}</span>
+            </zh-label>
+          </div>
+        </div>
       </fieldset>
     </div>
     <div class="col-12 h-100">
