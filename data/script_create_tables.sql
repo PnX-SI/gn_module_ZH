@@ -2,11 +2,17 @@ CREATE SCHEMA IF NOT EXISTS pr_zh;
 
 CREATE SEQUENCE pr_zh.bib_actions_id_action_seq START WITH 1 INCREMENT BY 1;
 
+CREATE SEQUENCE pr_zh.bib_site_space_id_bib_seq START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE pr_zh.bib_organismes_id_org_seq START WITH 1 INCREMENT BY 1;
+
 CREATE SEQUENCE pr_zh.cor_lim_list_seq START WITH 1 INCREMENT BY 1;
 
 CREATE SEQUENCE pr_zh.cor_main_fct_seq START WITH 1 INCREMENT BY 1;
 
 CREATE SEQUENCE pr_zh.t_activity_id_activity_seq START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE pr_zh.t_hydro_area_id_hydro_seq START WITH 1 INCREMENT BY 1;
 
 CREATE SEQUENCE pr_zh.t_management_plans_id_plan_seq START WITH 1 INCREMENT BY 1;
 
@@ -18,7 +24,7 @@ CREATE SEQUENCE pr_zh.t_zh_id_zh_seq START WITH 1 INCREMENT BY 1;
 
 CREATE  TABLE pr_zh.bib_actions ( 
 	id_action            integer DEFAULT nextval('pr_zh.bib_actions_id_action_seq'::regclass) NOT NULL ,
-	name                 varchar(100)  NOT NULL ,
+	name                 varchar(255)  NOT NULL ,
 	CONSTRAINT pk_bib_actions_id_action PRIMARY KEY ( id_action )
  );
 
@@ -36,8 +42,8 @@ COMMENT ON COLUMN pr_zh.bib_cb.humidity IS 'H = humide ou P = potentiellement hu
 COMMENT ON COLUMN pr_zh.bib_cb.is_ch IS 'true si le Corine Biotope est utilisé pour la liste des cahiers habitats des zones humides';
 
 CREATE  TABLE pr_zh.bib_organismes ( 
-	id_org               integer  NOT NULL ,
-	name                 varchar(100)  NOT NULL ,
+	id_org               integer DEFAULT nextval('pr_zh.bib_organismes_id_org_seq'::regclass) NOT NULL ,
+	name                 varchar(255)  NOT NULL ,
 	abbrevation          varchar(6) DEFAULT 'XXXXXX' NOT NULL ,
 	is_op_org            boolean DEFAULT true NOT NULL ,
 	CONSTRAINT pk_t_organismes_id_org PRIMARY KEY ( id_org )
@@ -50,7 +56,7 @@ COMMENT ON COLUMN pr_zh.bib_organismes.abbrevation IS 'abbreviation used for cre
 COMMENT ON COLUMN pr_zh.bib_organismes.is_op_org IS 'is it an operator organism (not management structure)';
 
 CREATE  TABLE pr_zh.bib_site_space ( 
-	id_site_space        integer  NOT NULL ,
+	id_site_space        integer DEFAULT nextval('pr_zh.bib_site_space_id_bib_seq'::regclass) NOT NULL ,
 	name                 varchar(255)  NOT NULL ,
 	CONSTRAINT pk_bib_site_space_id_site_space PRIMARY KEY ( id_site_space )
  );
@@ -144,7 +150,7 @@ CREATE  TABLE pr_zh.cor_zh_cb (
 COMMENT ON TABLE pr_zh.cor_zh_cb IS 'Correspondance zh et corine biotope';
 
 CREATE  TABLE pr_zh.t_hydro_area ( 
-	id_hydro             integer  NOT NULL ,
+	id_hydro             integer  DEFAULT nextval('pr_zh.t_hydro_area_id_hydro_seq'::regclass) NOT NULL ,
 	name                 varchar(100)  NOT NULL ,
 	geom                 geometry  NOT NULL ,
 	CONSTRAINT pk_t_hydro_area_id_hydro PRIMARY KEY ( id_hydro )
@@ -158,15 +164,18 @@ COMMENT ON COLUMN pr_zh.t_hydro_area.geom IS 'emprise geographique de la zone hy
 
 CREATE  TABLE pr_zh.t_references ( 
 	id_reference         integer DEFAULT nextval('pr_zh.t_references_id_reference_seq'::regclass) NOT NULL ,
+	ref_number			 varchar(20)   ,
+	reference			 varchar(1000)   ,
 	authors              varchar(100)   ,
 	pub_year             integer   ,
 	title                varchar(1000)  NOT NULL ,
 	editor               varchar(100)   ,
 	editor_location      varchar(50)   ,
-	CONSTRAINT pk_t_references_id_reference PRIMARY KEY ( id_reference )
+	CONSTRAINT pk_t_references_id_reference PRIMARY KEY ( id_reference ) ,
+	CONSTRAINT unq_t_references_ref_number UNIQUE ( ref_number )
  );
 
-COMMENT ON TABLE pr_zh.t_references IS 'Liste des références bibliographiques par bassin versant';
+COMMENT ON TABLE pr_zh.t_references IS 'Liste des références bibliographiques';
 
 COMMENT ON COLUMN pr_zh.t_references.pub_year IS 'published_year';
 
@@ -228,6 +237,7 @@ CREATE  TABLE pr_zh.t_zh (
 	remark_eval_heritage varchar(2000)   ,
 	remark_eval_thread   varchar(2000)   ,
 	remark_eval_actions  varchar(2000)   ,
+	remark_is_other_inventory  varchar(2000)   ,
 	main_pict_id         integer   ,
 	area				 real	,
 	CONSTRAINT pk_t_zh_zh_id PRIMARY KEY ( id_zh ),
@@ -311,6 +321,8 @@ COMMENT ON COLUMN pr_zh.t_zh.remark_eval_heritage IS 'remarque sur interet patri
 COMMENT ON COLUMN pr_zh.t_zh.remark_eval_thread IS 'remarque sur les menaces et facteurs influancant la zh dans l''evaluation generale du site. 7.3';
 
 COMMENT ON COLUMN pr_zh.t_zh.remark_eval_actions IS 'remarque sur les orientations d''actions de la zh dans l''evaluation generale du site. 7.4';
+
+COMMENT ON COLUMN pr_zh.t_zh.remark_is_other_inventory IS 'remarque pour préciser les autres études / inventaires naturalistes';
 
 CREATE  TABLE pr_zh.cor_impact_list ( 
 	id_impact_list       uuid NOT NULL ,

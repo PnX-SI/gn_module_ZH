@@ -42,22 +42,29 @@ export class ZhFormTab5Component implements OnInit {
   public valSocEcoTable: any[] = [];
   public corineBioTable: any[] = [];
 
+  readonly functionSize: string = "30%";
+  readonly qualifSize: string = "10%";
+  readonly knowledgeSize: string = "10%";
+
   public hydroFctTableCol = [
     {
       name: "function",
       label: "Fonctions hydrologiques / biogéochimiques",
       subcell: { name: "mnemonique" },
+      size: this.functionSize,
     },
     { name: "justification", label: "Justifications" },
     {
       name: "qualification",
       label: "Qualifications",
       subcell: { name: "mnemonique" },
+      size: this.qualifSize,
     },
     {
       name: "knowledge",
       label: "Connaissance",
       subcell: { name: "mnemonique" },
+      size: this.knowledgeSize,
     },
   ];
   public bioFctTableCol = [
@@ -65,17 +72,20 @@ export class ZhFormTab5Component implements OnInit {
       name: "function",
       label: "Fonctions biologiques / écologiques",
       subcell: { name: "mnemonique" },
+      size: this.functionSize,
     },
     { name: "justification", label: "Justifications" },
     {
       name: "qualification",
       label: "Qualifications",
       subcell: { name: "mnemonique" },
+      size: this.qualifSize,
     },
     {
       name: "knowledge",
       label: "Connaissance",
       subcell: { name: "mnemonique" },
+      size: this.knowledgeSize,
     },
   ];
 
@@ -84,17 +94,20 @@ export class ZhFormTab5Component implements OnInit {
       name: "function",
       label: "Intérêts patrimoniaux",
       subcell: { name: "mnemonique" },
+      size: this.functionSize,
     },
     { name: "justification", label: "Justifications" },
     {
       name: "qualification",
       label: "Qualifications",
       subcell: { name: "mnemonique" },
+      size: this.qualifSize,
     },
     {
       name: "knowledge",
       label: "Connaissance",
       subcell: { name: "mnemonique" },
+      size: this.knowledgeSize,
     },
   ];
 
@@ -103,6 +116,7 @@ export class ZhFormTab5Component implements OnInit {
       name: "corinBio",
       label: "Corine biotopes",
       subcell: { name: "CB_label" },
+      size: this.functionSize,
     },
     {
       name: "cahierHab",
@@ -113,8 +127,9 @@ export class ZhFormTab5Component implements OnInit {
       name: "preservationState",
       label: "État de conservation",
       subcell: { name: "mnemonique" },
+      size: this.qualifSize,
     },
-    { name: "habCover", label: "Recouvrement sur la ZH (%)" },
+    { name: "habCover", label: "Recouvrement sur la ZH (%)", size: "5%" },
   ];
 
   public socioEcoTableCol = [
@@ -122,17 +137,20 @@ export class ZhFormTab5Component implements OnInit {
       name: "function",
       label: "Valeurs socio-économiques",
       subcell: { name: "mnemonique" },
+      size: this.functionSize,
     },
     { name: "justification", label: "Justifications" },
     {
       name: "qualification",
       label: "Qualifications",
       subcell: { name: "mnemonique" },
+      size: this.qualifSize,
     },
     {
       name: "knowledge",
       label: "Connaissance",
       subcell: { name: "mnemonique" },
+      size: this.knowledgeSize,
     },
   ];
 
@@ -723,8 +741,9 @@ export class ZhFormTab5Component implements OnInit {
         if (res.file_names.length == 0) {
           const msg =
             "Aucun fichier n'a été généré car aucune espèce n'a été trouvée dans la zone humide";
+          const timeOut: number = 10000;
           this._toastr.error(msg, "", {
-            disableTimeOut: true, // to be sure the user sees the toast
+            timeOut: timeOut, // to be sure the user sees the toast
             closeButton: true,
           });
         } else {
@@ -734,8 +753,9 @@ export class ZhFormTab5Component implements OnInit {
           const msg = `Les fichiers suivants ont été générés </br> ${files.join(
             "</br>"
           )}`;
+          const timeOut: number = 10000;
           this._toastr.success(msg, "", {
-            disableTimeOut: true, // to be sure the user sees the toast
+            timeOut: timeOut, // to be sure the user sees the toast
             closeButton: true,
             enableHtml: true,
           });
