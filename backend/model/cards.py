@@ -26,6 +26,20 @@ class Utils(ZH):
         return []
 
     @staticmethod
+    def get_cd_and_mnemo(ids):
+        if ids:
+            if type(ids) is int:
+                result = DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == ids).one()
+                return (result.cd_nomenclature, result.label_default)
+            
+            results = []
+            for id in ids:
+                res = DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == id).one()
+                results.append((res.cd_nomenclature, res.label_default))
+            return results
+        return []
+
+    @staticmethod
     def get_bool(bool):
         if bool:
             return 'Oui'
@@ -461,14 +475,15 @@ class Description:
     def __str__(self):
         return {
             "presentation": self.presentation.__str__(),
-            "espace": Utils.get_mnemo(self.id_corine_landcovers),
+            "espace": [f"{cd} - {label}" for cd, label in Utils.get_cd_and_mnemo(self.id_corine_landcovers)],
             "usage": self.use.__str__()
         }
 
 
 class Presentation:
 
-    def __init__(self, id_sdage, id_sage, cb_codes_corine_biotope, remark_pres):
+    def __init__(self, area, id_sdage, id_sage, cb_codes_corine_biotope, remark_pres):
+        self.area: float = area
         self.id_sdage: int = id_sdage
         self.id_sage: int = id_sage
         self.cb_codes_corine_biotope: list(
@@ -477,6 +492,7 @@ class Presentation:
 
     def __str__(self):
         return {
+            "area": self.area,
             "sdage": Utils.get_mnemo(self.id_sdage),
             "typologie_locale": Utils.get_mnemo(self.id_sage),
             "corine_biotope": [cb.__str__() for cb in self.cb_codes_corine_biotope],
@@ -511,7 +527,7 @@ class Use:
         return {
             "activities": [activity.__str__() for activity in self.activities],
             "evaluation_menaces": Utils.get_mnemo(self.id_thread),
-            "Remarques": Utils.get_string(self.remark_activity)
+            "remarques": Utils.get_string(self.remark_activity)
         }
 
 
@@ -544,6 +560,7 @@ class Status:
         self.instruments: list(Instrument)
         self.other_ref_geo: list(dict)
         self.is_other_inventory: bool
+        self.remark_is_other_inventory: str
         self.protections: list(int)
         self.urban_docs: list(UrbanDoc)
 
@@ -570,6 +587,10 @@ class Status:
     @property
     def is_other_inventory(self):
         return self.__is_other_inventory
+
+    @property
+    def remark_is_other_inventory(self):
+        return self.__remark_is_other_inventory
 
     @property
     def protections(self):
@@ -640,6 +661,10 @@ class Status:
     def is_other_inventory(self, value):
         self.__is_other_inventory = value
 
+    @remark_is_other_inventory.setter
+    def remark_is_other_inventory(self, value):
+        self.__remark_is_other_inventory = value
+
     @urban_docs.setter
     def urban_docs(self, urban_docs):
         self.__urban_docs = [
@@ -671,6 +696,7 @@ class Status:
             "instruments": [instrument.__str__() for instrument in self.instruments],
             "autre_inventaire": self.__other_ref_geo,
             "autre_etude": Utils.get_bool(self.is_other_inventory),
+            "autre_etude_commentaire": self.remark_is_other_inventory,
             "statuts": self.__str_protections(),
             "zonage": [urban_doc.__str__() for urban_doc in self.urban_docs]
         }
@@ -1099,6 +1125,7 @@ class Card(ZH):
 
     def __set_description(self):
         self.description.presentation = Presentation(
+            self.properties['area'],
             self.properties['id_sdage'],
             self.properties['id_sage'],
             self.__get_cb(),
@@ -1133,6 +1160,7 @@ class Card(ZH):
         self.status.instruments = self.properties['instruments']
         self.status.other_ref_geo = self.ref_geo_config
         self.status.is_other_inventory = self.properties['is_other_inventory']
+        self.status.remark_is_other_inventory = self.properties['remark_is_other_inventory']
         self.status.protections = self.properties['protections']
         self.status.urban_docs = self.properties['urban_docs']
         return self.status.__str__()
