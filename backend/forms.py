@@ -638,7 +638,8 @@ def post_managements(id_zh, managements):
                         id_structure=DB.session.query(TManagementStructures).filter(and_(
                             TManagementStructures.id_zh == id_zh, TManagementStructures.id_org == management["structure"])).one().id_structure,
                         plan_date=plan["plan_date"],
-                        duration=plan["duration"]
+                        duration=plan["duration"],
+                        remark=plan["remark"]
                     )
                 )
                 DB.session.flush()
@@ -698,10 +699,12 @@ def post_protections(id_zh, protections):
 
 def update_zh_tab6(data):
     try:
+        is_other_inventory = data['is_other_inventory']
         DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
-            TZH.is_other_inventory: data['is_other_inventory'],
             TZH.update_author: data['update_author'],
-            TZH.update_date: data['update_date']
+            TZH.update_date: data['update_date'],
+            TZH.is_other_inventory: is_other_inventory,
+            TZH.remark_is_other_inventory: data['remark_is_other_inventory'] if is_other_inventory else None
         })
         DB.session.flush()
     except Exception as e:

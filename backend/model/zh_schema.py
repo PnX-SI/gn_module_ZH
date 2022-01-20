@@ -282,6 +282,7 @@ class TZH(ZhModel):
     remark_eval_heritage = DB.Column(DB.Unicode)
     remark_eval_thread = DB.Column(DB.Unicode)
     remark_eval_actions = DB.Column(DB.Unicode)
+    remark_is_other_inventory = DB.Column(DB.Unicode)
     main_pict_id = DB.Column(DB.Integer)
     area = DB.Column(DB.Float)
 
@@ -1007,7 +1008,7 @@ class BibActions(DB.Model):
         primary_key=True
     )
     name = DB.Column(
-        DB.Unicode(length=100),
+        DB.Unicode(length=255),
         nullable=False
     )
 
@@ -1144,6 +1145,9 @@ class TManagementPlans(DB.Model):
     )
     duration = DB.Column(
         DB.Integer
+    )
+    remark = DB.Column(
+        DB.Unicode(length=2000)
     )
 
 

@@ -23,7 +23,6 @@ export class ZhSearchDependantComponent implements OnInit {
   public dataForm: FormGroup;
   public dropdownSettings = {
     enableSearchFilter: true,
-    addNewItemOnFilter: true,
     text: "",
     labelKey: "name",
     primaryKey: "code",
@@ -53,7 +52,6 @@ export class ZhSearchDependantComponent implements OnInit {
   disable() {
     this.dropdownSettings = {
       enableSearchFilter: true,
-      addNewItemOnFilter: true,
       text: "",
       labelKey: "name",
       primaryKey: "code",
@@ -64,7 +62,6 @@ export class ZhSearchDependantComponent implements OnInit {
   enable() {
     this.dropdownSettings = {
       enableSearchFilter: true,
-      addNewItemOnFilter: true,
       text: "",
       labelKey: "name",
       primaryKey: "code",

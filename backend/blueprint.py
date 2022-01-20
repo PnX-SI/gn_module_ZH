@@ -30,7 +30,7 @@ from sqlalchemy import func, text, desc, and_, inspect
 from sqlalchemy.orm.exc import NoResultFound
 
 import geoalchemy2
-from datetime import datetime as dt, timezone
+from datetime import datetime as dt
 
 from pypn_habref_api.models import (
     Habref,
@@ -485,7 +485,7 @@ def get_file_list(id_zh, info_role):
         zh_uuid = DB.session.query(TZH).filter(
             TZH.id_zh == id_zh).one().zh_uuid
         q_medias = DB.session.query(TMedias).filter(
-            TMedias.unique_id_media == zh_uuid).all()
+            TMedias.unique_id_media == zh_uuid).order_by(TMedias.meta_update_date.desc()).all()
         return {
             "media_data": [media.as_dict() for media in q_medias],
             "main_pict_id": get_main_picture_id(id_zh)
@@ -852,7 +852,7 @@ def write_csv(id_zh, info_role):
                 blueprint.config[i]['schema_name']
             )
             query = DB.session.query(model).filter(model.id_zh == id_zh).all()
-            current_date = dt.now(timezone.utc)
+            current_date = dt.now()
             if query:
                 rows = [
                     {
@@ -886,7 +886,7 @@ def write_csv(id_zh, info_role):
                     blueprint.config[i]['category'] + "_" +
                     current_date.strftime("%Y-%m-%d_%H:%M:%S"),
                     author,
-                    'liste des taxons générée sur demande de l''utilisateur dans l''onglet 5',
+                    'Liste des taxons générée sur demande de l\'utilisateur dans l\'onglet 5',
                     '.csv')
 
                 DB.session.flush()
