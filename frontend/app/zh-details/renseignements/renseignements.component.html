@@ -3,7 +3,7 @@
     <div class="col-12 col-xl-4 col-lg-4 col-md-6">
       <fieldset>
         <legend>
-          <h5 class="section-title">Identification de la zone Humide</h5>
+          <h5 class="section-title">Identification de la zone humide</h5>
         </legend>
         <zh-label label="Nom usuel de la zone humide :"
           ><span>{{ data.identification?.nom }}</span>
@@ -39,10 +39,10 @@
           <span>{{ data.auteur?.auteur_modif }}</span>
         </zh-label>
         <zh-label label="Date d’établissement :">
-          <span>{{ data.auteur?.date }}</span>
+          <span>{{ data.auteur?.date | date:'dd/MM/yy' }}</span>
         </zh-label>
         <zh-label label="Date des dernières modifications :">
-          <span>{{ data.auteur?.date_modif }}</span>
+          <span>{{ data.auteur?.date_modif | date:'dd/MM/yy' }}</span>
         </zh-label>
       </fieldset>
     </div>

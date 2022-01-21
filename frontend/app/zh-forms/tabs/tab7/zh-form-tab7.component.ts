@@ -16,12 +16,14 @@ export class ZhFormTab7Component implements OnInit {
   @Input() public formMetaData: any;
   @Output() public canChangeTab = new EventEmitter<boolean>();
   @Output() nextTab = new EventEmitter<number>();
+  public dropdownSettings;
   public formTab7: FormGroup;
   public patchModal: boolean;
   public modalFormSubmitted: boolean;
   public modalTitle: string;
   public addModalBtnLabel: string;
   public actionForm: FormGroup;
+  public selectedAction: [any];
   public hydroFctData: any;
   public bioFctData: any;
   public patrimData: any;
@@ -33,28 +35,67 @@ export class ZhFormTab7Component implements OnInit {
   public actionTable: any[] = [];
   public currentZh: any;
 
+  readonly qualifSize: string = "10%";
+  readonly knowledgeSize: string = "15%";
+
   public hydroFctTableCol = [
     {
       name: "function",
       label: "Principales fonctions hydrologiques / biogéochimiques",
+      subcell: { name: "mnemonique" },
     },
-    { name: "qualification", label: "Qualifications" },
-    { name: "knowledge", label: "Connaissance" },
+    {
+      name: "qualification",
+      label: "Qualifications",
+      subcell: { name: "mnemonique" },
+      size: this.qualifSize,
+    },
+    {
+      name: "knowledge",
+      label: "Connaissance",
+      subcell: { name: "mnemonique" },
+      size: this.knowledgeSize,
+    },
   ];
 
   public bioFctTableCol = [
     {
       name: "function",
       label: "Principales fonctions biologiques / écologiques",
+      subcell: { name: "mnemonique" },
     },
-    { name: "qualification", label: "Qualifications" },
-    { name: "knowledge", label: "Connaissance" },
+    {
+      name: "qualification",
+      label: "Qualifications",
+      subcell: { name: "mnemonique" },
+      size: this.qualifSize,
+    },
+    {
+      name: "knowledge",
+      label: "Connaissance",
+      subcell: { name: "mnemonique" },
+      size: this.knowledgeSize,
+    },
   ];
 
   public patrimTableCol = [
-    { name: "function", label: "Principaux intérêts patrimoniaux" },
-    { name: "qualification", label: "Qualifications" },
-    { name: "knowledge", label: "Connaissance" },
+    {
+      name: "function",
+      label: "Principaux intérêts patrimoniaux",
+      subcell: { name: "mnemonique" },
+    },
+    {
+      name: "qualification",
+      label: "Qualifications",
+      subcell: { name: "mnemonique" },
+      size: this.qualifSize,
+    },
+    {
+      name: "knowledge",
+      label: "Connaissance",
+      subcell: { name: "mnemonique" },
+      size: this.knowledgeSize,
+    },
   ];
 
   public actionTableCol = [
@@ -72,9 +113,23 @@ export class ZhFormTab7Component implements OnInit {
   ];
 
   public socEcoTableCol = [
-    { name: "function", label: "Principales valeurs socio-economiques" },
-    { name: "qualification", label: "Qualifications" },
-    { name: "knowledge", label: "Connaissance" },
+    {
+      name: "function",
+      label: "Principales valeurs socio-economiques",
+      subcell: { name: "mnemonique" },
+    },
+    {
+      name: "qualification",
+      label: "Qualifications",
+      subcell: { name: "mnemonique" },
+      size: this.qualifSize,
+    },
+    {
+      name: "knowledge",
+      label: "Connaissance",
+      subcell: { name: "mnemonique" },
+      size: this.knowledgeSize,
+    },
   ];
 
   private tempID: any;
@@ -93,7 +148,6 @@ export class ZhFormTab7Component implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.getMetaData();
     this.initForms();
     this.getCurrentZh();
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
@@ -103,14 +157,40 @@ export class ZhFormTab7Component implements OnInit {
         this.getCurrentZh();
       }
     });
+    this.dropdownSettings = {
+      enableFilterSelectAll: false,
+      enableCheckAll: false,
+      text: "Selectionner",
+      labelKey: "name",
+      primaryKey: "id_action",
+      searchPlaceholderText: "Rechercher",
+      enableSearchFilter: true,
+      singleSelection: true,
+      noDataLabel:
+        "Toutes les propositions disponibles ont déjà été renseignées dans le tableau",
+    };
+  }
+
+  initActionInput() {
+    this.actionInput = [...this.formMetaData.BIB_ACTIONS];
   }
 
   // get metaData forms
-  getMetaData() {
-    this.actionInput = [...this.formMetaData.BIB_ACTIONS];
-    this.actionInput.map((item: any) => {
-      item.disabled = false;
-    });
+  getMetaData(action?) {
+    this.initActionInput();
+    this.actionInput = this.actionInput.filter(
+      (item) =>
+        !this.actionTable
+          .map((m) => m.action.id_action)
+          .includes(item.id_action)
+    );
+    this.selectedAction = null;
+    if (action != null) {
+      const actionTmp = action.action;
+      // push back the action to edit it
+      this.actionInput.push(actionTmp);
+      this.selectedAction = [actionTmp];
+    }
   }
 
   // initialize forms
@@ -246,9 +326,10 @@ export class ZhFormTab7Component implements OnInit {
           this.currentZh.properties.actions &&
           this.currentZh.properties.actions.length > 0
         ) {
-          this.actionTable = [];
+          this.initActionInput();
+          const actionTable = [];
           this.currentZh.properties.actions.forEach((action: any) => {
-            this.actionTable.push({
+            actionTable.push({
               action: this.actionInput.find(
                 (item: any) => item.id_action == action.id_action
               ),
@@ -257,12 +338,8 @@ export class ZhFormTab7Component implements OnInit {
               ),
               remark: action.remark,
             });
-            this.actionInput.map((item: any) => {
-              if (item.id_action == action.id_action) {
-                item.disabled = true;
-              }
-            });
           });
+          this.actionTable = actionTable;
           this.sortAction(this.actionTable);
         }
       }
@@ -274,6 +351,7 @@ export class ZhFormTab7Component implements OnInit {
 
   // open the add action modal
   onAddAction(event: any, modal: any) {
+    this.getMetaData();
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'une proposition d'action";
@@ -288,11 +366,16 @@ export class ZhFormTab7Component implements OnInit {
     });
   }
 
+  onDeSelectAllActions() {
+    this.actionForm.get("action").reset();
+  }
+
   // add a new action to action array
   onPostAction() {
     this.modalFormSubmitted = true;
     if (this.actionForm.valid) {
       let formValues = this.actionForm.value;
+      formValues.action = formValues.action[0];
       // check if the action to add is already added
       let itemExist = this.actionTable.some(
         (item: any) => item.action.id_action == formValues.action.id_action
@@ -300,12 +383,6 @@ export class ZhFormTab7Component implements OnInit {
       if (!itemExist) {
         this.actionTable.push(formValues);
       }
-      // disable the added action on the select input list
-      this.actionInput.map((item: any) => {
-        if (item.id_action == formValues.action.id_action) {
-          item.disabled = true;
-        }
-      });
 
       this.ngbModal.dismissAll();
       this.actionForm.reset();
@@ -320,51 +397,34 @@ export class ZhFormTab7Component implements OnInit {
     this.actionTable = this.actionTable.filter((item: any) => {
       return item.action.id_action != action.action.id_action;
     });
-    this.actionInput.map((item: any) => {
-      if (item.id_action == action.action.id_action) {
-        item.disabled = false;
-      }
-    });
     this.canChangeTab.emit(false);
   }
 
   // open the edit action modal
   onEditAction(modal: any, action: any) {
+    this.getMetaData(action);
     this.patchModal = true;
     this.addModalBtnLabel = "Modifier";
     this.modalTitle = "Modifier la proposition d'action";
 
     // init inputs object type
-    const selectedAction = this.actionInput.find(
-      (item: any) => item.id_action == action.action.id_action
-    );
     const selectedPriority = this.formMetaData["NIVEAU_PRIORITE"].find(
       (item: any) => item.id_nomenclature == action.priority.id_nomenclature
     );
     // patch form values
     this.actionForm.patchValue({
-      action: selectedAction,
+      action: action.action,
       priority: selectedPriority,
       remark: action.remark,
     });
     this.tempID = action.action.id_action;
 
-    const $_hydroFctInputSub = this.actionForm
-      .get("action")
-      .valueChanges.subscribe(() => {
-        this.actionInput.map((item: any) => {
-          if (item.id_action == action.action.id_action) {
-            item.disabled = false;
-          }
-        });
-      });
     const modalRef = this.ngbModal.open(modal, {
       centered: true,
       size: "lg",
       windowClass: "bib-modal",
     });
     modalRef.result.then().finally(() => {
-      $_hydroFctInputSub.unsubscribe();
       this.actionForm.reset();
     });
   }
@@ -375,15 +435,11 @@ export class ZhFormTab7Component implements OnInit {
     this.modalFormSubmitted = true;
     if (this.actionForm.valid) {
       let formValues = this.actionForm.value;
+      formValues.action = formValues.action[0];
       this.actionTable = this.actionTable.map((item: any) =>
         item.action.id_action != this.tempID ? item : formValues
       );
 
-      this.actionInput.map((item: any) => {
-        if (item.id_action == formValues.action.id_action) {
-          item.disabled = true;
-        }
-      });
       this.tempID = null;
       this.ngbModal.dismissAll();
       this.actionForm.reset();
@@ -429,6 +485,7 @@ export class ZhFormTab7Component implements OnInit {
               this._toastr.success("Vos données sont bien enregistrées", "", {
                 positionClass: "toast-top-right",
               });
+              this.nextTab.emit(8);
             });
         },
         (error) => {

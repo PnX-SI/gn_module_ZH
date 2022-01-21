@@ -19,9 +19,9 @@ export class ErrorTranslatorService {
       id: 1,
     },
     {
-      api: "ZH_main_name_already_exists", // error returned by backend
+      api: "ZH_main_name_already_exists",
       front:
-        "Impossible de créer un identifiant unique avec les informations entrées. Le nom est peut-être déjà pris ?", //error to show to the user
+        "Impossible de créer un identifiant unique avec les informations entrées. Le nom est peut-être déjà pris ?",
       id: 2,
     },
     {
@@ -30,9 +30,9 @@ export class ErrorTranslatorService {
       id: 3,
     },
     {
-      api: "wrong_qualif", // error returned by backend
+      api: "wrong_qualif",
       front:
-        "Le SDAGE selectionné ne fait pas partie des règles définies pour le bassin versant", //error to show to the user
+        "La typologie SDAGE selectionnée ne fait pas partie des règles définies pour ce bassin versant",
       id: 4,
     },
     {
@@ -47,25 +47,25 @@ export class ErrorTranslatorService {
       id: 6,
     },
     {
-      api: "csv_taxa_error", // error returned by backend
-      front: "Impossible de générer le csv des espèces", //error to show to the user
-      id: 4,
+      api: "csv_taxa_error",
+      front: "Impossible de générer le csv des espèces",
+      id: 7,
     },
     {
       api: "no_rb_rules",
       front: "Il n'existe pas de règle pour ce bassin versant",
-      id: 5,
+      id: 8,
     },
     {
       api: "no_river_basin",
       front: "Cette zone humide n'intersecte aucun bassin versant",
-      id: 6,
+      id: 9,
     },
     {
       api: "user_not_allowed",
       front:
         "Vous n'avez pas les droits pour supprimer/modifier/lire cette zone humide",
-      id: 7,
+      id: 10,
     },
   ];
 

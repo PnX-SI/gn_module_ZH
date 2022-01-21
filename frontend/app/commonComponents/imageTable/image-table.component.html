@@ -5,7 +5,7 @@
       <th class="image">Photo</th>
       <!-- size can be provided in the columns object -->
       <th *ngFor="let col of tableCols"  [style.width]="col.size" >{{ col.label }}</th>
-      <th *ngIf="editable || deletable"></th>
+      <th *ngIf="editable || deletable || downloadable"></th>
     </tr>
   </thead>
   <tbody>
@@ -19,7 +19,7 @@
                [(ngModel)]="value"
                [value]="item.main_pict_id"
                /> -->
-               <mat-radio-button [checked]="item.mainPictureId == item.id_media" (change)="onRadioChangedItem(item)"></mat-radio-button>
+               <mat-radio-button [disabled]="!editable" [checked]="item.mainPictureId == item.id_media" (change)="onRadioChangedItem(item)"></mat-radio-button>
             <!-- <input type="radio" id='regular' name="optradio" [(ngModel)]="mainPhoto" (change)="onRadioChangedItem($event, item.id)"> -->
           </div>
         </td>

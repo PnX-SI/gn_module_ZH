@@ -172,14 +172,18 @@ class Item:
             if not q_status:
                 return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), '0')
 
-            # get qualif_id
+            # get qualif_id :
+
+            # if 'nothing' cd in values -> return 0
+            for cd in q_status:
+                if cd in self.nomenc_ids['nothing']:
+                    return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), '0')
+            # if one 'high' cd is part of the cds -> return 'fort'
             for cd in q_status:
                 if cd in self.nomenc_ids['high']:
                     return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), 'fort')
-                elif cd in self.nomenc_ids['nothing']:
-                    return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), '0')
-                else:
-                    return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), 'faible')
+            # if no 'high' cd and no 'nothing' cd in values -> return 'faible'
+            return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), 'faible')
 
         except ZHApiError as e:
             raise ZHApiError(
@@ -452,8 +456,8 @@ class Item:
             DB.session.close()
 
     def __get_id_plan(self):
-        q_plans = DB.session.query(TManagementStructures, TManagementPlans).join(TManagementPlans, TManagementStructures.id_structure ==
-                                                                                 TManagementPlans.id_structure).filter(and_(TManagementStructures.id_zh == self.id_zh, TManagementPlans.id_nature == 2)).all()
+        q_plans = DB.session.query(TManagementStructures, TManagementPlans).join(TManagementPlans, TManagementStructures.id_structure == TManagementPlans.id_structure).join(
+            TNomenclatures, TNomenclatures.id_nomenclature == TManagementPlans.id_nature).filter(and_(TManagementStructures.id_zh == self.id_zh, TNomenclatures.mnemonique == "Naturaliste")).all()
         if q_plans:
             return True
         return False
@@ -501,11 +505,11 @@ class Item:
     def __get_rule_name(self):
         try:
             return DB.session.query(TRules, BibHierSubcategories).join(TRules).filter(
-                TRules.rule_id == self.rule_id).one().BibHierSubcategories.label
+                TRules.rule_id == self.rule_id).one().BibHierSubcategories.label.capitalize()
         except NoResultFound:
             pass
         return DB.session.query(TRules, BibHierCategories).join(TRules).filter(
-            TRules.rule_id == self.rule_id).one().BibHierCategories.label
+            TRules.rule_id == self.rule_id).one().BibHierCategories.label.capitalize()
 
     def __get_knowledge_mnemo(self):
         try:

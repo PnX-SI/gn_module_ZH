@@ -117,7 +117,7 @@
           </small>
         </div>
         <div class="form-group col-md-4">
-          <small>Recouvrement total sur ZH (%)</small>
+          <small>Recouvrement total sur la ZH (%)</small>
           <input
             class="form-control"
             [formControl]="formTab5.controls.total_hab_cover"
@@ -167,12 +167,57 @@
       </div>
       <h3 class="sub-title">Faune et flore patrimoniale</h3>
       <div class="form-row">
+        <div class="mb-1 col-12">
+          <small>Liste des espèces à statut de protection et/ou de conservation</small>
+        </div>
+        <div class="mb-2 col-12">
+          <button
+            mat-raised-button
+            class="mb-3"
+            color="primary"
+            (click)="onGenerateTaxa()"
+          >
+            <mat-icon>add_box</mat-icon>
+            <mat-spinner *ngIf="taxaLoading" color="warn" diameter="25"></mat-spinner>
+            Générer la liste des espèces <span *ngIf="config?.species_source_name">depuis {{ config?.species_source_name }}</span>
+          </button>
+          <mat-icon
+            class="info-icon"
+            color="primary"
+            [ngbTooltip]="htmlContent"
+            tooltipClass="wide-tooltip"
+            placement="right"
+            triggers="click:blur">
+            help
+          </mat-icon>
+          <ng-template #htmlContent>
+            <p>Sont concernées les espèces observées :</p>
+              <ul>
+                <li>rattachées à un pointage précis avec des coordonnées géographiques</li>
+                <li>ayant au moins un statut d’évaluation et/ou de protection et/ou de menace (au minimum de vulnérable)</li>
+                <li>depuis moins de 20 ans</li>
+                <li>dans le périmètre strict de la zone humide cartographiée</li>
+                <li>Dans le cas d'absence d'observation répondant à ces critères, aucun fichier ne sera généré</li>
+              </ul>
+          </ng-template>
+          <zh-table
+          *ngIf="_filesService.filterByExtension('csv').length > 0"
+          [tableCols]="fileTableCol" 
+          [data]="_filesService.filterByExtension('csv')"
+          [downloadable]="true"
+          (onDownload)="_filesService.downloadFile($event)"
+          ></zh-table>
+          <p class="hint">
+            Vous pouvez retrouver ces fichiers dans l'onglet des ressources documentaires (<a [routerLink]="" (click)="nextTab.emit(8)">onglet 8</a>)
+          </p>
+        </div>
         <div class="form-group col-md-4">
           <small>Flore - nombre d'espèces</small>
           <input
             class="form-control"
             [formControl]="formTab5.controls.nb_flora_sp"
             type="number"
+            min="0"
           />
           <small
             *ngIf="
@@ -189,6 +234,7 @@
             class="form-control"
             [formControl]="formTab5.controls.nb_vertebrate_sp"
             type="number"
+            min="0"
           />
           <small
             *ngIf="
@@ -205,6 +251,7 @@
             class="form-control"
             [formControl]="formTab5.controls.nb_invertebrate_sp"
             type="number"
+            min="0"
           />
           <small
             *ngIf="
@@ -216,35 +263,7 @@
           </small>
         </div>
       </div>
-      <fieldset>
-        <legend>
-          <h5 class="section-title">Liste des espèces à statut de protection</h5>
-        </legend>
-        <button
-          mat-raised-button
-          class="mb-3"
-          color="primary"
-          (click)="onGenerateTaxa()"
-        >
-          <mat-icon>add_box</mat-icon>
-          <mat-spinner *ngIf="taxaLoading" color="warn" diameter="25"></mat-spinner>
-          Générer la liste des espèces
-        </button>
-        <br>
-        <small>Fichiers d'espèces présents sur cette zone humide :</small>
-        <zh-table
-          *ngIf="_filesService.filterByExtension('csv').length > 0"
-          [tableCols]="fileTableCol" 
-          [data]="_filesService.filterByExtension('csv')"
-          [downloadable]="true"
-          (onDownload)="_filesService.downloadFile($event)"
-        ></zh-table>
-        <small>
-          Vous pouvez retrouver ces fichiers dans l'onglet des ressources documentaires (onglet 8)
-        </small>
-      </fieldset>
     </fieldset>
-
     <fieldset>
       <legend>
         <h5 class="section-title">Valeurs socio-économiques</h5>
@@ -289,7 +308,7 @@
       >
         <mat-icon *ngIf="!posted">save_outline</mat-icon>
         <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
-        Enregister
+        Enregistrer
       </button>
     </div>
   </form>
@@ -772,7 +791,6 @@
             class="form-control"
             [formControl]="corineBioForm.controls.cahierHab"
           >
-            <option></option>
             <option *ngFor="let habitat of cahierHabInput" [ngValue]="habitat"
             [attr.disabled]="habitat?.disabled ? '' : null">
               {{ habitat.lb_code }} - {{ habitat.lb_hab_fr }}
