@@ -64,6 +64,17 @@ export class FilesService {
       map((res: ZhFiles) => {
         this.files = res.media_data;
         this.files.map((item) => (item.mainPictureId = res.main_pict_id));
+        // Handle images: download each of them
+        const files = this.filterByExtension(this.EXT_IMAGES);
+        files.map((item) => {
+          this.downloadFilePromise(item.id_media).then((res) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(res);
+            reader.onloadend = () => {
+              item.image = reader.result;
+            };
+          });
+        })
         return this.files;
       }),
       catchError((error) => {
