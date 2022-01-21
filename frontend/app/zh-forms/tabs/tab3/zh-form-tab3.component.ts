@@ -27,7 +27,7 @@ export class ZhFormTab3Component implements OnInit {
   corinTableCol = [
     { name: "CB_code", label: "Code Corine biotopes" },
     { name: "CB_label", label: "Libellé Corine biotopes" },
-    { name: "CB_humidity", label: "Humidité" },
+    { name: "CB_humidity", label: "Humidité", size: "5%" },
   ];
   // subcell : if the data contain a list inside the data list
   //   example use : consider this
@@ -47,21 +47,26 @@ export class ZhFormTab3Component implements OnInit {
   // then use name for human_activity with name="mnemonique"
   // use key and name for impacts with key="impacts"; name="mnemonique"
 
+  readonly activityColSize: string = "20%";
+
   activityTableCol = [
     {
       name: "human_activity",
       label: "Activités humaines",
       subcell: { name: "mnemonique" },
+      size: this.activityColSize,
     },
     {
       name: "localisation",
       label: "Localisation",
       subcell: { name: "mnemonique" },
+      size: this.activityColSize,
     },
     {
       name: "impacts",
       label: "Impacts (facteurs influençant l'évolution de la zone)",
       subcell: { key: "impacts", name: "mnemonique" },
+      size: this.activityColSize,
     },
     { name: "remark_activity", label: "Remarques" },
   ];
