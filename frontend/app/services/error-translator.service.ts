@@ -40,6 +40,11 @@ export class ErrorTranslatorService {
       front: "Il n'existe pas de règle pour ce bassin versant",
       id: 5,
     },
+    {
+      api: "empty_geometry",
+      front: "Veuillez tracer une geométrie",
+      id: 6,
+    }
   ];
 
   getError(errorMsg: string): error {
