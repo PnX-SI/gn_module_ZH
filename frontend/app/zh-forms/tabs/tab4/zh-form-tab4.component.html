@@ -60,7 +60,6 @@
             class="form-control"
             [formControl]="formTab4.controls.frequency"
           >
-            <option></option>
             <option
               *ngFor="let freq of formMetaData.SUBMERSION_FREQ"
               [ngValue]="freq"
@@ -72,7 +71,6 @@
         <div class="form-group col-md-4">
           <small>Submersion étendue</small>
           <select class="form-control" [formControl]="formTab4.controls.spread">
-            <option></option>
             <option
               *ngFor="let spread of formMetaData.SUBMERSION_ETENDUE"
               [ngValue]="spread"
@@ -124,7 +122,6 @@
             class="form-control"
             [formControl]="formTab4.controls.diag_hydro"
           >
-            <option></option>
             <option
               *ngFor="let fct_hydro of formMetaData.FONCTIONNALITE_HYDRO"
               [ngValue]="fct_hydro"
@@ -139,7 +136,6 @@
             class="form-control"
             [formControl]="formTab4.controls.diag_bio"
           >
-            <option></option>
             <option
               *ngFor="let fct_bio of formMetaData.FONCTIONNALITE_BIO"
               [ngValue]="fct_bio"
@@ -174,7 +170,7 @@
       >
         <mat-icon *ngIf="!posted">save_outline</mat-icon>
         <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
-        Enregister
+        Enregistrer
       </button>
     </div>
   </form>
