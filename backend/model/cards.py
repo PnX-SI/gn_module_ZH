@@ -487,18 +487,20 @@ class Basin:
         }
 
     def __get_river_basins(self):
-        return [
-            DB.session.query(TRiverBasin)
-            .filter(TRiverBasin.id_rb == id).one().name
-            for id in [rb.id_rb for rb in DB.session.query(CorZhRb).filter(CorZhRb.id_zh == self.id_zh).all()]
-        ]
+        return (
+            DB.session.query(TRiverBasin.name)
+            .filter(TRiverBasin.id_rb == CorZhRb.id_rb)
+            .filter(CorZhRb.id_zh == self.id_zh)
+            .all()
+        )
     
     def __get_hydro_zones(self):
-        return [
-            DB.session.query(THydroArea)
-            .filter(THydroArea.id_hydro == id).one().name
-            for id in [rb.id_hydro for rb in DB.session.query(CorZhHydro).filter(CorZhHydro.id_zh == self.id_zh).all()]
-        ]
+        return (
+            DB.session.query(THydroArea.name)
+            .filter(THydroArea.id_hydro == CorZhHydro.id_hydro)
+            .filter(CorZhHydro.id_zh == self.id_zh)
+            .all()
+        )
 
 
 class Presentation:
