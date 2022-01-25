@@ -141,15 +141,12 @@ def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
 
         if orderby in TZH.__table__.columns:
             col = getattr(TZH, orderby, None)
-            print(col)
             if col is not None:
                 if order == 'desc':
                     col = col.desc()
                 query = query.order_by(col)
 
         data = query.limit(limit).offset(page * limit).all()
-
-                    
 
         # check if municipalities and dep in ref_geo
         is_ref_geo = check_ref_geo_schema()
