@@ -574,7 +574,7 @@ def post_main_pict(id_zh, id_media, info_role):
 def get_tab_data(id_tab, info_role):
     """Post zh data
     """
-    form_data = request.json
+    form_data = request.json or {}
     form_data['update_author'] = info_role.id_role
     form_data['update_date'] = dt.now()
     
