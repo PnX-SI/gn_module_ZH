@@ -15,7 +15,7 @@ class MapListConfig(Schema):
 default_map_list_conf = [
     {"prop": "main_name", "name": "Nom principal"},
     {"prop": "code", "name": "Code"},
-    {"prop": "sdage", "name": "Typologie SDAGE"},
+    {"prop": "sdage", "name": "Typologie SDAGE", "sortable": False},
     {"prop": "bassin_versant", "name": "Bassin versant"}
 ]
 
