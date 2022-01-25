@@ -13,6 +13,7 @@ import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { ZhDataService } from "../../../services/zh-data.service";
 import { AppConfig } from "@geonature_config/app.config";
 import { TabsService } from "../../../services/tabs.service";
+import { ErrorTranslatorService } from "../../../services/error-translator.service";
 
 @Component({
   selector: "zh-form-tab1",
@@ -50,6 +51,7 @@ export class ZhFormTab1Component implements OnInit {
     private _dataService: ZhDataService,
     private _toastr: ToastrService,
     private _tabService: TabsService,
+    private _error: ErrorTranslatorService,
     public ngbModal: NgbModal
   ) {}
 
@@ -174,7 +176,10 @@ export class ZhFormTab1Component implements OnInit {
         },
         (error) => {
           this.posted = false;
-          this._toastr.error(error.error, "", {
+          const frontMsg: string = this._error.getFrontError(
+            error.error.message
+          );
+          this._toastr.error(frontMsg, "", {
             positionClass: "toast-top-right",
           });
         }
@@ -219,7 +224,10 @@ export class ZhFormTab1Component implements OnInit {
         },
         (error) => {
           this.postedBib = false;
-          this._toastr.error(error.error, "", {
+          const frontMsg: string = this._error.getFrontError(
+            error.error.message
+          );
+          this._toastr.error(frontMsg, "", {
             positionClass: "toast-top-right",
           });
         }
@@ -261,7 +269,10 @@ export class ZhFormTab1Component implements OnInit {
         },
         (error) => {
           this.postedBib = false;
-          this._toastr.error(error.error, "", {
+          const frontMsg: string = this._error.getFrontError(
+            error.error.message
+          );
+          this._toastr.error(frontMsg, "", {
             positionClass: "toast-top-right",
           });
         }

@@ -30,7 +30,7 @@ export class EvaluationComponent {
   ];
 
   public patrimonialInterestsCols: TableColumn[] = [
-    { name: "type", label: "Intérêts patrimoniaux" },
+    { name: "type", label: "Principaux intérêts patrimoniaux" },
     { name: "qualification", label: "Qualifications", size: this.qualifSize },
     { name: "connaissance", label: "Connaissance", size: this.knowledgeSize },
   ];
@@ -55,7 +55,7 @@ export class EvaluationComponent {
   ];
 
   public valCols: TableColumn[] = [
-    { name: "type", label: "Principales values socio-économiques" },
+    { name: "type", label: "Principales valeurs socio-économiques" },
     { name: "qualification", label: "Qualifications", size: this.qualifSize },
     { name: "connaissance", label: "Connaissance", size: this.knowledgeSize },
   ];

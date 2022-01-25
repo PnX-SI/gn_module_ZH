@@ -6,6 +6,7 @@ import { Subscription } from "rxjs";
 import { ZhDataService } from "../../../services/zh-data.service";
 import { TabsService } from "../../../services/tabs.service";
 import { ModalService } from "../../../services/modal.service";
+import { ErrorTranslatorService } from "../../../services/error-translator.service";
 @Component({
   selector: "zh-form-tab4",
   templateUrl: "./zh-form-tab4.component.html",
@@ -96,6 +97,7 @@ export class ZhFormTab4Component implements OnInit {
     private _toastr: ToastrService,
     private _dataService: ZhDataService,
     private _modalService: ModalService,
+    private _error: ErrorTranslatorService,
     private _tabService: TabsService
   ) {}
 
@@ -465,7 +467,10 @@ export class ZhFormTab4Component implements OnInit {
         },
         (error) => {
           this.posted = false;
-          this._toastr.error(error.error, "", {
+          const frontMsg: string = this._error.getFrontError(
+            error.error.message
+          );
+          this._toastr.error(frontMsg, "", {
             positionClass: "toast-top-right",
           });
         }

@@ -77,7 +77,9 @@
       </div>
       <div class="fieldset">
         <label>Bassin versant</label>
-        <span>TODO</span>
+        {% for basin in data['description']['basin']['basins'] %}
+          <span>{{ basin }}</span><br>
+        {% endfor %}
       </div>
     </section>
   </div>
