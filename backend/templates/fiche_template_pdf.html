@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8" />
+    <title>Export rapport d'import</title>
+  </head>
+
+  <body>
+    <h1 class="main-title">Fiche de synthèse de la zone humide</h1>
+    <h1 class="title">Renseignements généraux</h1>
+    {% include 'renseignements.html' %}
+    <div class="new-page">
+      <h1 class="title">Délimitation de la zone humide et de son espace de fonctionnalité</h1>
+      {% include 'delimitation.html' %}
+    <h1 class="title">Principaux types de milieux humides (H) ou potentiellement humides (P)</h1>
+    {% include 'milieux.html' %}
+    </div>
+    <h1 class="title">Fonctionnement de la zone humide</h1>
+    {% include 'fonctionnement.html' %}
+    <h1 class="title">Statuts et gestion de la zone humide</h1>
+    {% include 'statuts.html' %}
+    <div class="new-page">
+      <h1 class="title">Évaluation générale du site</h1>
+      {% include 'evaluation.html' %}
+    </div>
+  </body>
+<style>
+  /* Puts style here since I cannot make blueprint static files work...*/
+* {
+  font-family: Roboto;
+}
+
+@media print {
+  .new-page {
+    page-break-before: always;
+  }
+}
+
+.main-title {
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 24px;
+  line-height: 143%;
+
+  text-align: center;
+  letter-spacing: 0.15px;
+  text-transform: uppercase;
+  border: 4px solid rgba(144, 204, 197, 0.7);
+  box-sizing: border-box;
+  border-radius: 10px;
+  color: #90CCC5;
+}
+
+.title {
+  /* Auto Layout */
+  display: flex;
+  padding: 7px 20px 7px 10px;
+  margin-top: 20px;
+  background: #ACBDA3;
+  border-radius: 11px;
+
+  font-style: normal;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 143%;
+  /* or 37px */
+  letter-spacing: 0.15px;
+  text-transform: uppercase;
+
+  color: #000000;
+/* 
+  width: 250px; */
+}
+
+section {
+  width: 100%;
+}
+
+.col {
+  flex-direction: column;
+}
+
+.small-title {
+  font-size: 9px;
+  margin: 5px 5px 5px 5px;
+}
+
+.subtitle {
+  font-size: 13px;
+  margin: 5px 5px 5px 5px;
+}
+
+.flex-container {
+  display: flex;
+  flex-direction: row;
+}
+.flex-container-col {
+  display: flex;
+  flex-direction: column;
+}
+
+p {
+  font-size: 10px;
+}
+
+/* fieldset { 
+  display: block;
+  margin-bottom: 5px;
+  max-width: 618px;
+} */
+
+.fieldset {
+  border: solid 1px grey;
+  border-radius: 5px;
+  position: relative;
+  margin: 10px 5px 5px 5px;
+  min-height: 10px;
+  padding: 5px;
+}
+
+.fieldset label{
+  position: absolute;
+  font-size: 12px;
+  color: gray;
+  background: white;
+  top: -8px;
+  left: 10px;
+  padding: 0px 5px;
+}
+
+.fieldset span {
+  font-size: 10px;
+  width: 100%;
+} 
+
+.left {
+  width: 50%;
+  float: left;
+}
+.right {
+  width: 50%;
+  float: right;
+}
+
+.custom-table {
+  border: solid 1px;
+  border-radius: 4px;
+  background: #FFFFFF;
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+.custom-table th {
+  border-bottom: solid 1px black;
+}
+
+tr {
+  font-size: 10px;
+  text-align: center;
+}
+
+.image {
+  width: 600px;
+  margin-left: 5px;
+  margin-right: 5px;
+  margin-top: 5px;
+}
+
+</style>
+</html>

@@ -1,0 +1,18 @@
+<div>
+  <section class="content col">
+    <h5 class="subtitle">Critères de délimitation de la zone humide</h5>
+      <span class="small-title"><b>Critères utilisés :</b></span><br>
+      {% for critere in data['delimitation']['delimitation_zone']['critere'] %}
+        <span class="small-title">{{ critere }}</span><br>
+      {% endfor %}
+      <span class="small-title"><b>Remarques : </b>{{ data['delimitation']['delimitation_zone']['remark'] or 'Aucune' }}</span>
+  </section>
+  <section class="content col">
+    <h5 class="subtitle">Critères de délimitation de l'espace de fonctionalité</h5>
+    <span class="small-title"><b>Critères utilisés : </b><span><br>
+    {% for critere in data['delimitation']['delimitation_fonctions']['critere'] %}
+      <span class="small-title">{{ critere }}</span><br>
+    {% endfor %}
+    <span class="small-title"><b>Remarques : </b>{{ data['delimitation']['delimitation_fonctions']['remark'] or 'Aucune' }}</span>
+  </section>
+</div>

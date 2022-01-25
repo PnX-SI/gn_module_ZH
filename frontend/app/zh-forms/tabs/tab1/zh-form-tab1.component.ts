@@ -5,14 +5,15 @@ import {
   debounceTime,
   distinctUntilChanged,
   switchMap,
-  tap,
   catchError,
+  map,
 } from "rxjs/operators";
 import { ToastrService } from "ngx-toastr";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { ZhDataService } from "../../../services/zh-data.service";
 import { AppConfig } from "@geonature_config/app.config";
 import { TabsService } from "../../../services/tabs.service";
+import { ErrorTranslatorService } from "../../../services/error-translator.service";
 
 @Component({
   selector: "zh-form-tab1",
@@ -50,6 +51,7 @@ export class ZhFormTab1Component implements OnInit {
     private _dataService: ZhDataService,
     private _toastr: ToastrService,
     private _tabService: TabsService,
+    private _error: ErrorTranslatorService,
     public ngbModal: NgbModal
   ) {}
 
@@ -174,94 +176,10 @@ export class ZhFormTab1Component implements OnInit {
         },
         (error) => {
           this.posted = false;
-          this._toastr.error(error.error, "", {
-            positionClass: "toast-top-right",
-          });
-        }
-      );
-    }
-  }
-
-  onCreateBib(event, modal) {
-    this.patchBib = false;
-    this.modalBibButtonLabel = "Créer";
-    this.modalBibTitle = "Ajout d'une référence bibliographique";
-    this.bibForm = this.fb.group({
-      title: [null, Validators.required],
-      authors: null,
-      pub_year: null,
-      editor: null,
-      editor_location: null,
-    });
-    event.stopPropagation();
-    this.ngbModal.open(modal, {
-      centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
-    });
-  }
-
-  onAddBib() {
-    if (this.bibForm.valid) {
-      this.postedBib = true;
-      this._dataService.postBib(this.bibForm.value).subscribe(
-        (bib) => {
-          this.bibForm.reset();
-          this.postedBib = false;
-          let itemExist = this.listBib.some(
-            (item) => item.id_reference == bib.id_reference
+          const frontMsg: string = this._error.getFrontError(
+            error.error.message
           );
-          if (!itemExist) {
-            this.listBib.push(bib);
-            this.canChangeTab.emit(false);
-          }
-          this.ngbModal.dismissAll();
-        },
-        (error) => {
-          this.postedBib = false;
-          this._toastr.error(error.error, "", {
-            positionClass: "toast-top-right",
-          });
-        }
-      );
-    }
-  }
-
-  onEditBib(modal: any, bib: any) {
-    this.patchBib = true;
-    this.modalBibButtonLabel = "Modifier";
-    this.modalBibTitle = "Modifier la référence bibliographique";
-    this.bibForm = this.fb.group({
-      id_reference: [bib.id_reference, Validators.required],
-      title: [bib.title, Validators.required],
-      authors: bib.authors,
-      pub_year: bib.pub_year,
-      editor: bib.editor,
-      editor_location: bib.editor_location,
-    });
-    this.ngbModal.open(modal, {
-      centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
-    });
-  }
-
-  onPatchBib() {
-    if (this.bibForm.valid) {
-      this._dataService.patchBib(this.bibForm.value).subscribe(
-        (bib) => {
-          this.bibForm.reset();
-          this.postedBib = false;
-          const index = this.listBib.findIndex(
-            (item) => item.id_reference == bib.id_reference
-          );
-          if (index > -1) this.listBib.splice(index, 1, bib);
-          this.canChangeTab.emit(false);
-          this.ngbModal.dismissAll();
-        },
-        (error) => {
-          this.postedBib = false;
-          this._toastr.error(error.error, "", {
+          this._toastr.error(frontMsg, "", {
             positionClass: "toast-top-right",
           });
         }
@@ -275,6 +193,13 @@ export class ZhFormTab1Component implements OnInit {
       distinctUntilChanged(),
       switchMap((searchText: string) =>
         this._dataService.autocompletBib(searchText).pipe(
+          map((res: any) =>
+            res.filter((r) => {
+              return !this.listBib
+                .map((bib) => bib.id_reference)
+                .includes(r.id_reference);
+            })
+          ),
           catchError(() => {
             return of([]);
           })

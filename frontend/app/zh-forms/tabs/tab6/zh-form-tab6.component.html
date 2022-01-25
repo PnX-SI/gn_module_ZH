@@ -19,42 +19,14 @@
           *ngIf="statusTable && statusTable.length > 0"
           class="table-responsive"
         >
-          <table class="table">
-            <thead class="thead-inverse table-header">
-              <tr>
-                <th *ngFor="let col of statusTableCol">{{ col.label }}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of statusTable">
-                <td *ngFor="let col of statusTableCol">
-                  {{ item[col.name]?.mnemonique || item[col.name] }}
-                </td>
-                <td>
-                  <div>
-                    <button
-                      mat-icon-button
-                      class="mr-2"
-                      placement="top"
-                      ngbTooltip="Editer"
-                      (click)="onEditStatus(statusModal, item)"
-                    >
-                      <mat-icon class="edit-icon">edit</mat-icon>
-                    </button>
-                    <button
-                      mat-icon-button
-                      placement="top"
-                      ngbTooltip="Supprimer"
-                      (click)="onDeleteStatus(item)"
-                    >
-                      <mat-icon class="delete-icon">close</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <zh-table
+          [tableCols]="statusTableCol"
+          [data]="statusTable"
+          [deletable]="true"
+          [editable]="true"
+          (onDelete)="onDeleteStatus($event)"
+          (onEdit)="onEditStatus(statusModal, $event)"
+        ></zh-table>
         </div>
       </div>
     </fieldset>
@@ -67,17 +39,21 @@
         <div class="form-group col-md-6">
           <angular2-multiselect
             [settings]="organismDropdownSettings"
-            [data]="formMetaData.BIB_MANAGEMENT_STRUCTURES"
+            [data]="structures"
             [formControl]="formTab6.controls.structure"
+            (onOpen)="onStructureOpened()"
+            (onDeSelectAll)="onAllStructuresDeselected()"
           >
           </angular2-multiselect>
         </div>
         <div class="form-group d-flex align-items-end col-md-6">
           <button
+            [disabled]="!this.formTab6.value.structure"
             mat-raised-button
             class="mb-3"
             color="primary"
             (click)="onAddStructure()"
+            [ngbTooltip]="this.formTab6.value.structure ? '' : 'Veuillez d\'abord sélectionner un organisme dans le menu ci-contre'"
           >
             <mat-icon>add_box</mat-icon>
             Ajouter
@@ -101,15 +77,15 @@
                   <td>
                     <i
                       *ngIf="
-                        !moreDetails && item.plans && item.plans.length > 0
+                        !item.moreDetails && item.plans && item.plans.length > 0
                       "
                       class="fa fa-angle-down morePlan"
-                      (click)="onMoreDetails(true)"
+                      (click)="onMoreDetails(item)"
                     ></i>
                     <i
-                      *ngIf="moreDetails && item.plans && item.plans.length > 0"
+                      *ngIf="item.moreDetails && item.plans && item.plans.length > 0"
                       class="fa fa-angle-up morePlan"
-                      (click)="onMoreDetails(false)"
+                      (click)="onMoreDetails(item)"
                     ></i
                     >{{ item.name }}
                   </td>
@@ -123,12 +99,13 @@
                       plan de gestion
                     </button>
                   </td>
-                  <td>
+                  <td class="tab-buttons">
                     <button
+                      class="mr-2"
                       mat-icon-button
                       placement="top"
                       ngbTooltip="Supprimer"
-                      (click)="onDeleteStructure(item)"
+                      (click)="onDeleteStrutureModal(content, item)"
                     >
                       <mat-icon class="delete-icon">close</mat-icon>
                     </button>
@@ -136,10 +113,9 @@
                 </tr>
                 <tr
                   class="tr-plans"
-                  *ngIf="moreDetails && item.plans && item.plans.length > 0"
+                  *ngIf="item.moreDetails && item.plans && item.plans.length > 0"
                 >
                   <td colspan="3" class="tr-plans">
-                    <p>Plans de gestion :</p>
                     <table class="table subtable">
                       <thead class="thead-inverse table-header">
                         <tr>
@@ -154,7 +130,7 @@
                           <td *ngFor="let col of planTableCol">
                             {{ plan[col.name]?.mnemonique || plan[col.name] }}
                           </td>
-                          <td>
+                          <td class="tab-buttons">
                             <div>
                               <button
                                 mat-icon-button
@@ -166,10 +142,11 @@
                                 <mat-icon class="edit-icon">edit</mat-icon>
                               </button>
                               <button
+                                class="mr-2"
                                 mat-icon-button
                                 placement="top"
                                 ngbTooltip="Supprimer"
-                                (click)="onDeletePlan(plan, item)"
+                                (click)="onDeletePlanModal(content, plan, item)"
                               >
                                 <mat-icon class="delete-icon">close</mat-icon>
                               </button>
@@ -205,58 +182,51 @@
           *ngIf="instrumentTable && instrumentTable.length > 0"
           class="table-responsive"
         >
-          <table class="table">
-            <thead class="thead-inverse table-header">
-              <tr>
-                <th *ngFor="let col of instrumentTableCol">{{ col.label }}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of instrumentTable">
-                <td *ngFor="let col of instrumentTableCol">
-                  {{ item[col.name]?.mnemonique || item[col.name] }}
-                </td>
-                <td>
-                  <div>
-                    <button
-                      mat-icon-button
-                      class="mr-2"
-                      placement="top"
-                      ngbTooltip="Editer"
-                      (click)="onEditInstrument(instrumentModal, item)"
-                    >
-                      <mat-icon class="edit-icon">edit</mat-icon>
-                    </button>
-                    <button
-                      mat-icon-button
-                      placement="top"
-                      ngbTooltip="Supprimer"
-                      (click)="onDeleteInstrument(item)"
-                    >
-                      <mat-icon class="delete-icon">close</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <zh-table
+            [tableCols]="instrumentTableCol"
+            [data]="instrumentTable"
+            [deletable]="true"
+            [editable]="true"
+            (onDelete)="onDeleteInstrument($event)"
+            (onEdit)="onEditInstrument(instrumentModal, $event)"
+          ></zh-table>
         </div>
       </div>
     </fieldset>
     <fieldset>
       <legend>
-        <h5 class="section-title">Autres inventaires</h5>
+        <h5 class="section-title">Inventaires</h5>
       </legend>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <small>Les inventaires sont disponibles dans 
+            <a 
+              routerLink="{{ config.MODULE_URL }}/zhDetails/{{ currentZh?.properties.id_zh }}"
+              target="_blank">
+              la fiche complete
+            </a>
+          </small>
+        </div>
+      </div>
       <div class="form-row">
         <div class="form-group col-md-6">
           <small style="display: block; margin-bottom: 8px"
             >Autres études / inventaires naturalistes </small
           >
-          <mat-label ngClass="labelBeforeSlide">Non</mat-label>
-          <mat-slide-toggle [formControl]="formTab6.controls.is_other_inventory"
-            ></mat-slide-toggle>
-          <mat-label ngClass="labelBeforeSlide">Oui</mat-label>
+          <div class="ml-3">
+            <mat-label ngClass="labelBeforeSlide">Non</mat-label>
+            <mat-slide-toggle [formControl]="formTab6.controls.is_other_inventory"
+              ></mat-slide-toggle>
+            <mat-label ngClass="labelBeforeSlide">Oui</mat-label>
+            
+            <!-- DO NOT FORGET formControl [formControl]="formTab4.controls.remark_diag" -->
+            <textarea
+              *ngIf="formTab6.controls.is_other_inventory.value"
+              [formControl]="formTab6.controls.remark_is_other_inventory"
+              class="form-control mt-3"
+              placeholder="Commentaires"
+          ></textarea>
+        </div>
         </div>
       </div>
     </fieldset>
@@ -272,7 +242,7 @@
             [(ngModel)]="selectedItems"
             [formControl]="formTab6.controls.protections"
             [settings]="dropdownSettings"
-            (onDeSelectAll)="onDeSelectAll($event)"
+            (onDeSelectAll)="onDeSelectAll()"
           >
           </angular2-multiselect>
         </div>
@@ -296,46 +266,14 @@
           *ngIf="urbanDocTable && urbanDocTable.length > 0"
           class="table-responsive"
         >
-          <table class="table">
-            <thead class="thead-inverse table-header">
-              <tr>
-                <th *ngFor="let col of urbanDocTableCol">{{ col.label }}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of urbanDocTable">
-                <td class="backToLigne" *ngFor="let col of urbanDocTableCol">
-                  {{
-                    item[col.name]?.mnemonique ||
-                      item[col.name]?.municipality_name ||
-                      item[col.name]
-                  }}
-                </td>
-                <td>
-                  <div>
-                    <button
-                      mat-icon-button
-                      class="mr-2"
-                      placement="top"
-                      ngbTooltip="Editer"
-                      (click)="onEditUrbanDoc(urbanDocModal, item)"
-                    >
-                      <mat-icon class="edit-icon">edit</mat-icon>
-                    </button>
-                    <button
-                      mat-icon-button
-                      placement="top"
-                      ngbTooltip="Supprimer"
-                      (click)="onDeleteUrbanDoc(item)"
-                    >
-                      <mat-icon class="delete-icon">close</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <zh-table
+            [tableCols]="urbanDocTableCol"
+            [data]="urbanDocTable"
+            [deletable]="true"
+            [editable]="true"
+            (onDelete)="onDeleteUrbanDoc($event)"
+            (onEdit)="onEditUrbanDoc(urbanDocModal, $event)"
+          ></zh-table>
         </div>
       </div>
     </fieldset>
@@ -354,7 +292,7 @@
       >
         <mat-icon *ngIf="!posted">save_outline</mat-icon>
         <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
-        Enregister
+        Enregistrer
       </button>
     </div>
   </form>
@@ -456,7 +394,7 @@
           >
         </div>
         <div class="form-group col-md-6">
-          <small class="required">Date de mise en oeuvre</small>
+          <small>Date de mise en oeuvre</small>
           <div class="input-group">
             <input
               class="form-control"
@@ -693,6 +631,14 @@
             >Champ requis</small
           >
         </div>
+        <div class="form-group col-md-12">
+          <small>Remarques</small>
+          <textarea
+            class="form-control"
+            [formControl]="planForm.controls.remark"
+            rows="3"
+          ></textarea>
+        </div>
       </div>
     </form>
   </div>
@@ -707,4 +653,9 @@
       {{ addModalBtnLabel }}
     </button>
   </div>
+</ng-template>
+<ng-template #content let-c="close" let-d="dismiss">
+  <zh-delete-modal (onCancel)="d()" (onDelete)=c()>
+    <p>Etes-vous sûr de vouloir supprimer cette ligne ?</p>
+  </zh-delete-modal>
 </ng-template>

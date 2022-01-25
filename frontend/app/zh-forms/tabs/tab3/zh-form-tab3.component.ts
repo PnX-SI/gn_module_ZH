@@ -7,6 +7,7 @@ import { debounceTime, distinctUntilChanged, map } from "rxjs/operators";
 import { ToastrService } from "ngx-toastr";
 import { TabsService } from "../../../services/tabs.service";
 import { ModalService } from "../../../services/modal.service";
+import { ErrorTranslatorService } from "../../../services/error-translator.service";
 
 @Component({
   selector: "zh-form-tab3",
@@ -27,14 +28,46 @@ export class ZhFormTab3Component implements OnInit {
   corinTableCol = [
     { name: "CB_code", label: "Code Corine biotopes" },
     { name: "CB_label", label: "Libellé Corine biotopes" },
-    { name: "CB_humidity", label: "Humidité" },
+    { name: "CB_humidity", label: "Humidité", size: "5%" },
   ];
+  // subcell : if the data contain a list inside the data list
+  //   example use : consider this
+  // {
+  //   "human_activity": {
+  //     "id_nomenclature": 604,
+  //     "mnemonique": "02 - sylviculture"
+  //   },
+  //   "impacts": {
+  //     "impacts": [
+  //       {
+  //         "mnemonique": "12.0- 12.0- zone industrielle ou commerciale",
+  //       }
+  //     ],
+  //   }
+  // }
+  // then use name for human_activity with name="mnemonique"
+  // use key and name for impacts with key="impacts"; name="mnemonique"
+
+  readonly activityColSize: string = "20%";
+
   activityTableCol = [
-    { name: "human_activity", label: "Activités humaines" },
-    { name: "localisation", label: "Localisation" },
+    {
+      name: "human_activity",
+      label: "Activités humaines",
+      subcell: { name: "mnemonique" },
+      size: this.activityColSize,
+    },
+    {
+      name: "localisation",
+      label: "Localisation",
+      subcell: { name: "mnemonique" },
+      size: this.activityColSize,
+    },
     {
       name: "impacts",
       label: "Impacts (facteurs influençant l'évolution de la zone)",
+      subcell: { key: "impacts", name: "mnemonique" },
+      size: this.activityColSize,
     },
     { name: "remark_activity", label: "Remarques" },
   ];
@@ -59,6 +92,7 @@ export class ZhFormTab3Component implements OnInit {
     private _tabService: TabsService,
     public ngbModal: NgbModal,
     private _modalService: ModalService,
+    private _error: ErrorTranslatorService,
     private _toastr: ToastrService
   ) {}
 
@@ -163,6 +197,7 @@ export class ZhFormTab3Component implements OnInit {
               mnemonique: impactNames.join("\r\n"),
             },
           });
+          console.log(this.listActivity);
           this.sortHumanActivities();
           this.activitiesInput.map((item) => {
             if (item.id_nomenclature == activity.id_human_activity) {
@@ -234,6 +269,12 @@ export class ZhFormTab3Component implements OnInit {
                   v.CB_code.toLowerCase().indexOf(term.toLowerCase()) > -1
               )
               .slice(0, 10)
+      ),
+      // Not to display a Corine that is already in the table
+      map((term) =>
+        term.filter(
+          (t) => !this.listCorinBio.map((c) => c.CB_code).includes(t.CB_code)
+        )
       )
     );
 
@@ -421,7 +462,10 @@ export class ZhFormTab3Component implements OnInit {
         },
         (error) => {
           this.posted = false;
-          this._toastr.error(error.error, "", {
+          const frontMsg: string = this._error.getFrontError(
+            error.error.message
+          );
+          this._toastr.error(frontMsg, "", {
             positionClass: "toast-top-right",
           });
         }

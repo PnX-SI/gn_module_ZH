@@ -13,20 +13,23 @@ class MapListConfig(Schema):
 
 
 default_map_list_conf = [
-    {"prop": "code", "name": "Code"},
     {"prop": "main_name", "name": "Nom principal"},
-    {"prop": "author", "name": "Auteur"},
-    {"prop": "create_date", "name": "Date de creation"}
+    {"prop": "code", "name": "Code"},
+    {"prop": "sdage", "name": "Typologie SDAGE", "sortable": False},
+    {"prop": "bassin_versant", "name": "Bassin versant"}
 ]
 
 
 available_maplist_column = [
-    {"prop": "id_zh", "name": "Id"},
-    {"prop": "code", "name": "Code"},
     {"prop": "main_name", "name": "Nom principal"},
+    {"prop": "code", "name": "Code"},
+    {"prop": "sdage", "name": "Typologie SDAGE"},
+    {"prop": "bassin_versant", "name": "Bassin versant"},
     {"prop": "author", "name": "Auteur"},
-    {"prop": "update_author", "name": "Auteur derniere modification"},
-    {"prop": "create_date", "name": "Date de creation"},
+    {"prop": "organism", "name": "Organisme"},
+    {"prop": "update_author", "name": "Auteur dernière modification"},
+    {"prop": "update_organism", "name": "Organisme de dernière modification"},
+    {"prop": "create_date", "name": "Date de création"},
     {"prop": "update_date", "name": "Date de modification"}
 ]
 
@@ -107,9 +110,16 @@ max_pdf_size = 1.5  # Mo
 
 max_jpg_size = 0.5  # Mo
 
+filename_validated = True
+
+fileformat_validated = True
+
 file_path = "static"
 
 module_dir_name = 'gn_module_zones_humides'
+
+# Name of the source of species data (tab5)
+species_source_name = 'GeoNature'
 
 
 class GnModuleSchemaConf(Schema):
@@ -128,5 +138,8 @@ class GnModuleSchemaConf(Schema):
     allowed_extensions = fields.List(fields.String, load_default=allowed_extensions)
     max_pdf_size = fields.Float(load_default=max_pdf_size)
     max_jpg_size = fields.Float(load_default=max_jpg_size)
+    fileformat_validated = fields.Boolean(load_default=fileformat_validated)
+    filename_validated = fields.Boolean(load_default=filename_validated)
     file_path = fields.String(load_default=file_path)
     module_dir_name = fields.String(load_default=module_dir_name)
+    species_source_name = fields.String(load_default=species_source_name)

@@ -5,6 +5,9 @@
     color: #333;
   }
 
+  .selected-list .c-list {
+    padding-right: 10px;
+  }
   .selected-list .c-list .c-token {
     background: #219653;
   }
@@ -167,10 +170,13 @@ small.required::after {
 }
 
 .footer-btn {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 16px;
-  overflow: hidden;
+  position: fixed;
+  right: 0;
+  bottom: 26px;
+  left: 0%;
+  z-index: 1030;
+  text-align: right;
+  margin-right: 65px;
 }
 
 .error-msg {
@@ -297,13 +303,6 @@ button:focus {
   outline: 0;
 }
 
-.footer-btn {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 36px;
-  margin-bottom: 36px;
-}
-
 /* .footer-btn {
   position: fixed;
   width: 100%;
@@ -323,4 +322,11 @@ button:focus {
 
 small {
   font-weight: 600;
+}
+
+.tabsSubtitle {
+  margin: 16px 0;
+  font-size: 1.5rem;
+  font-style: italic;
+  color: #219653;
 }

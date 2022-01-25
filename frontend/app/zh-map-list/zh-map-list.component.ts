@@ -31,7 +31,7 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
   public rowPerPage: number;
   public cardContentHeight: number;
   public moduleSub: Subscription;
-  private metaData: any;
+  private metaData: any = [];
 
   constructor(
     public mapListService: MapListService,
@@ -89,6 +89,8 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
         [{ param: "limit", value: this.rowPerPage }],
         this.zhCustomCallBack.bind(this)
       );
+      // Filter without data = get all ZH
+      //this.filterZh({});
     });
 
     // end OnInit
@@ -158,10 +160,18 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     return sdage.mnemonique;
   }
 
+  displayOrganism(authors): string {
+    return authors.organisme.nom_organisme;
+  }
+
   zhCustomCallBack(feature): any {
     // set Author name
     feature["properties"]["author"] = this.displayAuthorName(
       feature["properties"]["authors"]
+    );
+    // set Change Author name
+    feature["properties"]["update_author"] = this.displayAuthorName(
+      feature["properties"]["coauthors"]
     );
     // format Date
     feature["properties"]["create_date"] = this.displayDate(
@@ -171,6 +181,15 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     feature["properties"]["sdage"] = this.displaySdageName(
       feature["properties"]["id_sdage"]
     );
+
+    feature["properties"]["organism"] = this.displayOrganism(
+      feature["properties"]["authors"]
+    );
+
+    feature["properties"]["update_organism"] = this.displayOrganism(
+      feature["properties"]["coauthors"]
+    );
+
     return feature;
   }
 
@@ -193,6 +212,36 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     );
   }
 
+  openModalCol(event, modal) {
+    this.ngbModal.open(modal);
+  }
+
+  isChecked(col) {
+    let i = 0;
+    while (
+      i < this.mapListService.displayColumns.length &&
+      this.mapListService.displayColumns[i].prop !== col.prop
+    ) {
+      i = i + 1;
+    }
+    return i === this.mapListService.displayColumns.length ? false : true;
+  }
+
+  toggle(col) {
+    const isChecked = this.isChecked(col);
+    if (isChecked) {
+      this.mapListService.displayColumns =
+        this.mapListService.displayColumns.filter((c) => {
+          return c.prop !== col.prop;
+        });
+    } else {
+      this.mapListService.displayColumns = [
+        ...this.mapListService.displayColumns,
+        col,
+      ];
+    }
+  }
+
   openDeleteModal(event, modal, iElement, row) {
     this.mapListService.urlQuery;
     this.mapListService.selectedRow = [];
@@ -206,6 +255,23 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.ngbModal.open(modal, {
       centered: true,
     });
+  }
+
+  filterZh(filtered) {
+    const ms = this.mapListService;
+    ms.isLoading = true;
+    this._zhService
+      .search(filtered, { limit: this.rowPerPage })
+      .toPromise()
+      .then((res: any) => {
+        ms.page.totalElements = res.total;
+        ms.page.itemPerPage = this.rowPerPage;
+        ms.page.pageNumber = res.page;
+        ms.geojsonData = res.items;
+        ms.loadTableData(res.items, this.zhCustomCallBack.bind(this));
+      })
+      .catch((error) => console.log(error))
+      .finally(() => (ms.isLoading = false));
   }
 
   ngOnDestroy() {

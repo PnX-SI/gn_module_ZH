@@ -1,69 +1,47 @@
 <div *ngIf="evalZh" class="container-fluid">
   <h2 class="tabsTitle">Evaluation génerale du site                
-    <mat-icon
-    class="info-icon"
-    ngbTooltip="Cette rubrique met en avant les principaux enjeux liés à la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
-    >info</mat-icon>
 </h2>
   <form>
     <fieldset>
       <legend>
-        <h5 class="section-title">Fonctions et valeurs majeures</h5>
+        <h5 class="section-title">
+          Fonctions et valeurs majeures
+          <mat-icon
+          class="info-icon"
+          ngbTooltip="Cette rubrique met en avant les principaux enjeux liés à la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
+          placement="right"
+          >info
+        </mat-icon>
+      </h5>
+
       </legend>
       <div
         *ngIf="hydroFctData && hydroFctData.length > 0"
         class="table-responsive"
       >
-        <table class="table eval-table fct-table mb-4">
-          <thead class="thead-inverse table-header">
-            <tr>
-              <th *ngFor="let col of hydroFctTableCol">{{ col.label }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of hydroFctData">
-              <td *ngFor="let col of hydroFctTableCol">
-                {{ item[col.name]?.mnemonique || item[col.name] }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <zh-table
+      class="eval-table"
+      [tableCols]="hydroFctTableCol"
+      [data]="hydroFctData"
+      ></zh-table>
       </div>
       <div *ngIf="bioFctData && bioFctData.length > 0" class="table-responsive">
-        <table class="table eval-table fct-table mb-4">
-          <thead class="thead-inverse table-header">
-            <tr>
-              <th *ngFor="let col of bioFctTableCol">{{ col.label }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of bioFctData">
-              <td *ngFor="let col of bioFctTableCol">
-                {{ item[col.name]?.mnemonique || item[col.name] }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <zh-table
+          class="eval-table fct-table"
+          [tableCols]="bioFctTableCol"
+          [data]="bioFctData"
+        ></zh-table>
       </div>
       <div *ngIf="patrimData && patrimData.length > 0" class="table-responsive">
-        <table class="table eval-table fct-table mb-4">
-          <thead class="thead-inverse table-header">
-            <tr>
-              <th *ngFor="let col of patrimTableCol">{{ col.label }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of patrimData">
-              <td *ngFor="let col of patrimTableCol">
-                {{ item[col.name]?.mnemonique || item[col.name] }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <zh-table
+          class="eval-table fct-table"
+          [tableCols]="patrimTableCol"
+          [data]="patrimData"
+        ></zh-table>
       </div>
       <div class="row">
         <div class="col-sm">
-          <table class="table eval-table mb-4">
+          <table class="table white-table mb-4">
             <thead class="thead-inverse table-header">
               <tr>
                 <th>
@@ -85,7 +63,7 @@
           </table>
         </div>
         <div class="col-sm">
-          <table class="table eval-table mb-4">
+          <table class="table white-table mb-4">
             <thead class="thead-inverse table-header">
               <tr>
                 <th>Nombre d'habitats naturels humides patrimoniaux</th>
@@ -106,20 +84,11 @@
         </div>
       </div>
       <div *ngIf="socEcoData && socEcoData.length > 0" class="table-responsive">
-        <table class="table eval-table fct-table mb-4">
-          <thead class="thead-inverse table-header">
-            <tr>
-              <th *ngFor="let col of socEcoTableCol">{{ col.label }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of socEcoData">
-              <td *ngFor="let col of socEcoTableCol">
-                {{ item[col.name]?.mnemonique || item[col.name] }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <zh-table
+          class="eval-table fct-table"
+          [tableCols]="socEcoTableCol"
+          [data]="socEcoData"
+        ></zh-table>
       </div>
       <div class="form-group col-md-12">
         <small>Commentaires</small>
@@ -134,11 +103,17 @@
     <fieldset>
       <legend>
         <h5 class="section-title">
-          Bilan des menaces et facteurs influençant la zone humide
+          Bilan des menaces et de l’état fonctionnel de la zone humide
+          <mat-icon
+          class="info-icon"
+          ngbTooltip="Cette rubrique met en avant les menaces et l’état fonctionnel de la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
+          placement="right"
+          >info
+        </mat-icon>
         </h5>
       </legend>
       <div class="col-sm">
-        <table class="table eval-table mb-4">
+        <table class="table white-table mb-4">
           <thead class="thead-inverse table-header">
             <tr>
               <th>Évaluation globale des menaces potentielles ou avérées</th>
@@ -188,49 +163,14 @@
           *ngIf="actionTable && actionTable.length > 0"
           class="table-responsive"
         >
-          <table class="table mb-4">
-            <thead class="thead-inverse table-header">
-              <tr>
-                <th *ngFor="let col of actionTableCol">{{ col.label }}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of actionTable">
-                <td *ngFor="let col of actionTableCol">
-                  {{
-                    item[col.name]?.mnemonique ||
-                      item[col.name]?.name ||
-                      item[col.name]
-                  }}
-                </td>
-                <td>
-                  <div>
-                    <button
-                      mat-icon-button
-                      class="mr-2"
-                      placement="top"
-                      ngbTooltip="Editer"
-                    >
-                      <mat-icon
-                        class="edit-icon"
-                        (click)="onEditAction(actionModal, item)"
-                        >edit</mat-icon
-                      >
-                    </button>
-                    <button
-                      mat-icon-button
-                      placement="top"
-                      ngbTooltip="Supprimer"
-                      (click)="onDeleteAction(item)"
-                    >
-                      <mat-icon class="delete-icon">close</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <zh-table
+          [tableCols]="actionTableCol"
+          [data]="actionTable"
+          [deletable]="true"
+          [editable]="true"
+          (onDelete)="onDeleteAction($event)"
+          (onEdit)="onEditAction(actionModal, $event)"
+        ></zh-table>
         </div>
       </div>
       <div class="form-group col-md-12">
@@ -258,7 +198,7 @@
       >
         <mat-icon *ngIf="!posted">save_outline</mat-icon>
         <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
-        Enregister
+        Enregistrer
       </button>
     </div>
   </form>
@@ -273,64 +213,57 @@
     </button>
   </div>
   <div class="modal-body">
-    <form [formGroup]="actionForm">
-      <div class="form-row">
-        <div class="form-group col-md-6">
-          <small class="required">Propositions d'actions</small>
-          <select
-            class="form-control custom-select"
-            ngbAutofocus
-            [formControl]="actionForm.controls.action"
-          >
-            <option
-              *ngFor="let item of actionInput"
-              [ngValue]="item"
-              [disabled]="item.disabled"
-            >
-              {{ item.name }}
-            </option>
-          </select>
-          <small
-            *ngIf="
-              (actionForm.controls.action.touched || modalFormSubmitted) &&
-              actionForm.controls.action.errors?.required
-            "
-            class="error-msg"
-            >Champ requis</small
-          >
-        </div>
-        <div class="form-group col-md-6">
-          <small class="required">Niveau de priorité</small>
-          <select
-            class="form-control"
-            [formControl]="actionForm.controls.priority"
-          >
-            <option
-              *ngFor="let qualif of formMetaData.NIVEAU_PRIORITE"
-              [ngValue]="qualif"
-            >
-              {{ qualif.mnemonique }}
-            </option>
-          </select>
-          <small
-            *ngIf="
-              (actionForm.controls.priority.touched || modalFormSubmitted) &&
-              actionForm.controls.priority.errors?.required
-            "
-            class="error-msg"
-            >Champ requis</small
-          >
-        </div>
-        <div class="form-group col-md-12">
-          <small>Remarques</small>
-          <textarea
-            class="form-control"
-            [formControl]="actionForm.controls.remark"
-            rows="3"
-          ></textarea>
-        </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <small class="required">Propositions d'actions</small>
+        <angular2-multiselect
+          [settings]="dropdownSettings"
+          [data]="actionInput"
+          [(ngModel)]="selectedAction"
+          [formControl]="actionForm.controls.action"
+          (onDeSelectAll)="onDeSelectAllActions()"
+        >
+        </angular2-multiselect>
+        <small
+          *ngIf="
+            (actionForm.controls.action.touched || modalFormSubmitted) &&
+            actionForm.controls.action.errors?.required
+          "
+          class="error-msg"
+          >Champ requis</small
+        >
       </div>
-    </form>
+      <div class="form-group col-md-6">
+        <small class="required">Niveau de priorité</small>
+        <select
+          class="form-control"
+          [formControl]="actionForm.controls.priority"
+        >
+          <option
+            *ngFor="let qualif of formMetaData.NIVEAU_PRIORITE"
+            [ngValue]="qualif"
+          >
+            {{ qualif.mnemonique }}
+          </option>
+        </select>
+        <small
+          *ngIf="
+            (actionForm.controls.priority.touched || modalFormSubmitted) &&
+            actionForm.controls.priority.errors?.required
+          "
+          class="error-msg"
+          >Champ requis</small
+        >
+      </div>
+      <div class="form-group col-md-12">
+        <small>Remarques</small>
+        <textarea
+          class="form-control"
+          [formControl]="actionForm.controls.remark"
+          rows="3"
+        ></textarea>
+      </div>
+    </div>
   </div>
   <div class="modal-footer">
     <button

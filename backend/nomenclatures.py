@@ -33,7 +33,7 @@ def get_sage_list():
     try:
         return [
             {
-                float(sdage_id): [
+                int(sdage_id): [
                     {
                         "id_nomenclature": sage.CorSdageSage.id_sage,
                         "mnemonique": sage.TNomenclatures.mnemonique
@@ -170,7 +170,7 @@ def get_protections():
                     TNomenclatures.id_nomenclature == protection.id_protection_level).one().mnemonique,
                 "category": get_protection_category(protection),
                 "category_id": protection.id_protection_type
-            } for protection in DB.session.query(CorProtectionLevelType).all()
+            } for protection in DB.session.query(CorProtectionLevelType).order_by(CorProtectionLevelType.id_protection).all()
         ]
     except Exception as e:
         exc_type, value, tb = sys.exc_info()

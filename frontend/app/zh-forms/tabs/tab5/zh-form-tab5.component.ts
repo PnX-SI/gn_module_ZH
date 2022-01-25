@@ -8,6 +8,9 @@ import { ZhDataService } from "../../../services/zh-data.service";
 import { TabsService } from "../../../services/tabs.service";
 import { ModalService } from "../../../services/modal.service";
 import { TaxaFile } from "./zh-form-tab5.models";
+import { ErrorTranslatorService } from "../../../services/error-translator.service";
+import { FilesService } from "../../../services/files.service";
+import { ModuleConfig } from "../../../module.config";
 
 @Component({
   selector: "zh-form-tab5",
@@ -39,39 +42,127 @@ export class ZhFormTab5Component implements OnInit {
   public interetPatTable: any[] = [];
   public valSocEcoTable: any[] = [];
   public corineBioTable: any[] = [];
+  public config = ModuleConfig;
+
+  readonly functionSize: string = "30%";
+  readonly qualifSize: string = "10%";
+  readonly knowledgeSize: string = "10%";
 
   public hydroFctTableCol = [
-    { name: "function", label: "Fonctions hydrologiques / biogéochimiques" },
+    {
+      name: "function",
+      label: "Fonctions hydrologiques / biogéochimiques",
+      subcell: { name: "mnemonique" },
+      size: this.functionSize,
+    },
     { name: "justification", label: "Justifications" },
-    { name: "qualification", label: "Qualifications" },
-    { name: "knowledge", label: "Connaissance" },
+    {
+      name: "qualification",
+      label: "Qualifications",
+      subcell: { name: "mnemonique" },
+      size: this.qualifSize,
+    },
+    {
+      name: "knowledge",
+      label: "Connaissance",
+      subcell: { name: "mnemonique" },
+      size: this.knowledgeSize,
+    },
   ];
   public bioFctTableCol = [
-    { name: "function", label: "Fonctions biologiques / écologiques" },
+    {
+      name: "function",
+      label: "Fonctions biologiques / écologiques",
+      subcell: { name: "mnemonique" },
+      size: this.functionSize,
+    },
     { name: "justification", label: "Justifications" },
-    { name: "qualification", label: "Qualifications" },
-    { name: "knowledge", label: "Connaissance" },
+    {
+      name: "qualification",
+      label: "Qualifications",
+      subcell: { name: "mnemonique" },
+      size: this.qualifSize,
+    },
+    {
+      name: "knowledge",
+      label: "Connaissance",
+      subcell: { name: "mnemonique" },
+      size: this.knowledgeSize,
+    },
   ];
 
   public interetsTableCol = [
-    { name: "function", label: "Intérêts patrimoniaux" },
+    {
+      name: "function",
+      label: "Intérêts patrimoniaux",
+      subcell: { name: "mnemonique" },
+      size: this.functionSize,
+    },
     { name: "justification", label: "Justifications" },
-    { name: "qualification", label: "Qualifications" },
-    { name: "knowledge", label: "Connaissance" },
+    {
+      name: "qualification",
+      label: "Qualifications",
+      subcell: { name: "mnemonique" },
+      size: this.qualifSize,
+    },
+    {
+      name: "knowledge",
+      label: "Connaissance",
+      subcell: { name: "mnemonique" },
+      size: this.knowledgeSize,
+    },
   ];
 
   public corineTableCol = [
-    { name: "corinBio", label: "Corine biotopes" },
-    { name: "cahierHab", label: "Cahier d'habitats" },
-    { name: "preservationState", label: "État de conservation" },
-    { name: "habCover", label: "Recouvrement sur la ZH (%)" },
+    {
+      name: "corinBio",
+      label: "Corine biotopes",
+      subcell: { name: "CB_label" },
+      size: this.functionSize,
+    },
+    {
+      name: "cahierHab",
+      label: "Cahier d'habitats",
+      subcell: { name: "lb_hab_fr" },
+    },
+    {
+      name: "preservationState",
+      label: "État de conservation",
+      subcell: { name: "mnemonique" },
+      size: this.qualifSize,
+    },
+    { name: "habCover", label: "Recouvrement sur la ZH (%)", size: "5%" },
   ];
 
   public socioEcoTableCol = [
-    { name: "function", label: "Valeurs socio-économiques" },
+    {
+      name: "function",
+      label: "Valeurs socio-économiques",
+      subcell: { name: "mnemonique" },
+      size: this.functionSize,
+    },
     { name: "justification", label: "Justifications" },
-    { name: "qualification", label: "Qualifications" },
-    { name: "knowledge", label: "Connaissance" },
+    {
+      name: "qualification",
+      label: "Qualifications",
+      subcell: { name: "mnemonique" },
+      size: this.qualifSize,
+    },
+    {
+      name: "knowledge",
+      label: "Connaissance",
+      subcell: { name: "mnemonique" },
+      size: this.knowledgeSize,
+    },
+  ];
+
+  public fileTableCol = [
+    {
+      name: "title_fr",
+      label: "Titre du document",
+    },
+    { name: "author", label: "Auteur" },
+    { name: "description_fr", label: "Résumé" },
   ];
 
   private tempID: any;
@@ -89,7 +180,9 @@ export class ZhFormTab5Component implements OnInit {
     private _toastr: ToastrService,
     private _dataService: ZhDataService,
     private _modalService: ModalService,
-    private _tabService: TabsService
+    private _error: ErrorTranslatorService,
+    private _tabService: TabsService,
+    private _filesService: FilesService
   ) {}
 
   ngOnInit() {
@@ -191,11 +284,6 @@ export class ZhFormTab5Component implements OnInit {
       async (zh: any) => {
         if (zh) {
           this.currentZh = zh;
-          this.fctHydroTable = [];
-          this.bioFctTable = [];
-          this.interetPatTable = [];
-          this.valSocEcoTable = [];
-          this.corineBioTable = [];
           //patch forms values
           this.formTab5.patchValue({
             is_carto_hab: this.currentZh.properties.is_carto_hab,
@@ -244,6 +332,7 @@ export class ZhFormTab5Component implements OnInit {
   }
 
   getInteretPatrim(fonctions) {
+    this.interetPatTable = [];
     fonctions.forEach((pat: any) => {
       this.interetPatTable.push({
         function: this.interetPatInput
@@ -261,6 +350,7 @@ export class ZhFormTab5Component implements OnInit {
   }
 
   getValSocEco(fonctions) {
+    this.valSocEcoTable = [];
     fonctions.forEach((valSoc: any) => {
       this.valSocEcoTable.push({
         function: this.valSocEcoInput
@@ -278,6 +368,7 @@ export class ZhFormTab5Component implements OnInit {
   }
 
   getBio(fonctions) {
+    this.bioFctTable = [];
     fonctions.forEach((bioFct: any) => {
       this.bioFctTable.push({
         function: this.bioFctInput
@@ -295,6 +386,7 @@ export class ZhFormTab5Component implements OnInit {
   }
 
   getHydro(fonctions) {
+    this.fctHydroTable = [];
     fonctions.forEach((hydroFct: any) => {
       this.fctHydroTable.push({
         function: this.fctHydroInput
@@ -312,6 +404,10 @@ export class ZhFormTab5Component implements OnInit {
   }
 
   async getCorineBio(habitats) {
+    // Since it is async, need to set a temporary
+    //   table. This prevents duplicate pushes on
+    //   this.corineBioTable
+    const tempCorineTable: any[] = [];
     habitats.forEach(async (corineBio: any) => {
       let selectedCahierHab;
       await this._dataService
@@ -322,7 +418,7 @@ export class ZhFormTab5Component implements OnInit {
           selectedCahierHab = this.cahierHabInput.find(
             (item: any) => item.cd_hab == Number(corineBio.id_cahier_hab)
           );
-          this.corineBioTable.push({
+          tempCorineTable.push({
             corinBio: this.corinBioMetaData.find(
               (item: any) => item.CB_code == corineBio.id_corine_bio
             ),
@@ -333,8 +429,10 @@ export class ZhFormTab5Component implements OnInit {
             cahierHab: selectedCahierHab,
             habCover: corineBio.hab_cover,
           });
+          this.sortCorineBio();
         });
     });
+    this.corineBioTable = tempCorineTable;
   }
 
   // open the add fonction hydrologique modal
@@ -645,8 +743,9 @@ export class ZhFormTab5Component implements OnInit {
         if (res.file_names.length == 0) {
           const msg =
             "Aucun fichier n'a été généré car aucune espèce n'a été trouvée dans la zone humide";
+          const timeOut: number = 10000;
           this._toastr.error(msg, "", {
-            disableTimeOut: true, // to be sure the user sees the toast
+            timeOut: timeOut, // to be sure the user sees the toast
             closeButton: true,
           });
         } else {
@@ -656,15 +755,33 @@ export class ZhFormTab5Component implements OnInit {
           const msg = `Les fichiers suivants ont été générés </br> ${files.join(
             "</br>"
           )}`;
+          const timeOut: number = 10000;
           this._toastr.success(msg, "", {
-            disableTimeOut: true, // to be sure the user sees the toast
+            timeOut: timeOut, // to be sure the user sees the toast
             closeButton: true,
             enableHtml: true,
           });
         }
       })
+      .catch((error) => {
+        let frontError: string = "";
+        if (error.status === 404) {
+          frontError = "Erreur 404 : URL non trouvé";
+        } else {
+          frontError = this._error.getFrontError(
+            error ? error.error.message : null
+          );
+        }
+        this._toastr.error(frontError, "", {
+          positionClass: "toast-top-right",
+        });
+      })
       .finally(() => {
         this.taxaLoading = false;
+        this._filesService
+          .loadFiles(this.currentZh.properties.id_zh)
+          .toPromise()
+          .then(() => {});
       });
   }
 
@@ -787,14 +904,8 @@ export class ZhFormTab5Component implements OnInit {
   onPostCorineBio() {
     this.modalFormSubmitted = true;
     if (this.corineBioForm.valid) {
-      let formValues = this.corineBioForm.value;
-      // check if the corineBio to add is already added
-      let itemExist = this.corineBioTable.some(
-        (item: any) => item.corinBio.CB_code == formValues.corinBio.CB_code
-      );
-      if (!itemExist) {
-        this.corineBioTable.push(formValues);
-      }
+      this.corineBioTable.push(this.corineBioForm.value);
+      this.sortCorineBio();
       this.ngbModal.dismissAll();
       this.corineBioForm.reset();
       this.corineBioForm.get("cahierHab").disable();
@@ -805,9 +916,9 @@ export class ZhFormTab5Component implements OnInit {
 
   //delete corineBio from the corineBio array
   onDeleteCorineBio(corineBio: any) {
-    this.corineBioTable = this.corineBioTable.filter((item: any) => {
-      return item.corinBio.CB_code != corineBio.corinBio.CB_code;
-    });
+    this.corineBioTable = this.corineBioTable.filter(
+      (item: any) => item != corineBio
+    );
     this.canChangeTab.emit(false);
   }
 
@@ -857,6 +968,7 @@ export class ZhFormTab5Component implements OnInit {
       this.corineBioTable = this.corineBioTable.map((item: any) =>
         item.corinBio.CB_code != this.tempID ? item : formValues
       );
+      this.sortCorineBio();
       this.tempID = null;
       this.ngbModal.dismissAll();
       this.corineBioForm.reset();
@@ -889,7 +1001,12 @@ export class ZhFormTab5Component implements OnInit {
     this._dataService
       .getHabitatByCorine(corineBio.CB_code)
       .subscribe((habitats: any) => {
-        this.cahierHabInput = habitats;
+        this.cahierHabInput = habitats.map((item) => {
+          item.disabled = this.corineBioTable
+            .map((cor) => cor.cahierHab)
+            .some((e) => e.cd_hab === item.cd_hab);
+          return item;
+        });
         this.corineBioForm.get("cahierHab").enable();
       });
   }
@@ -990,7 +1107,10 @@ export class ZhFormTab5Component implements OnInit {
         },
         (error) => {
           this.posted = false;
-          this._toastr.error(error.error, "", {
+          const frontMsg: string = this._error.getFrontError(
+            error.error.message
+          );
+          this._toastr.error(frontMsg, "", {
             positionClass: "toast-top-right",
           });
         }
@@ -1003,6 +1123,16 @@ export class ZhFormTab5Component implements OnInit {
       a.function.mnemonique.slice(0, 2) > b.function.mnemonique.slice(0, 2)
         ? 1
         : b.function.mnemonique.slice(0, 2) > a.function.mnemonique.slice(0, 2)
+        ? -1
+        : 0
+    );
+  }
+
+  sortCorineBio() {
+    this.corineBioTable.sort((a, b) =>
+      a.corinBio.CB_label > b.corinBio.CB_label
+        ? 1
+        : b.corinBio.CB_label > a.corinBio.CB_label
         ? -1
         : 0
     );

@@ -13,8 +13,8 @@
     <div class="col-xl-6 col-lg-5 col-sm-6">
       <div class="d-flex mt-3">
         <mat-slide-toggle
-          [checked]="toggleChecked"
-          (change)="slideToggleChanged($event)"
+          [(ngModel)]="toggleChecked"
+          (change)="slideToggleChanged()"
           >Afficher toutes les zones humides sur la carte</mat-slide-toggle
         >
       </div>
@@ -47,7 +47,7 @@
           </div>
           <div class="form-row">
             <div class="form-group col-md-6">
-              <small class="required">Nom Usuel</small>
+              <small class="required">Nom usuel de la zone humide</small>
               <input
                 class="form-control"
                 type="text"
@@ -60,6 +60,14 @@
                 "
                 class="error-msg"
                 >Champ requis</small
+              >
+              <small
+                *ngIf="
+                  (form.controls.main_name.touched || submitted) &&
+                  form.controls.main_name.errors?.zh_exists
+                "
+                class="error-msg"
+                >Ce nom est déjà pris. Veuillez entrer un autre nom</small
               >
             </div>
           </div>

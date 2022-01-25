@@ -20,45 +20,14 @@
         *ngIf="fctHydroTable && fctHydroTable.length > 0"
         class="table-responsive"
       >
-        <table class="table">
-          <thead class="thead-inverse table-header">
-            <tr>
-              <th *ngFor="let col of hydroFctTableCol">{{ col.label }}</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of fctHydroTable">
-              <td *ngFor="let col of hydroFctTableCol">
-                {{ item[col.name]?.mnemonique || item[col.name] }}
-              </td>
-              <td>
-                <div>
-                  <button
-                    mat-icon-button
-                    class="mr-2"
-                    placement="top"
-                    ngbTooltip="Editer"
-                  >
-                    <mat-icon
-                      class="edit-icon"
-                      (click)="onEditHydroFct(hydroFctModal, item)"
-                      >edit</mat-icon
-                    >
-                  </button>
-                  <button
-                    mat-icon-button
-                    placement="top"
-                    ngbTooltip="Supprimer"
-                    (click)="onDeleteHydroFct(item)"
-                  >
-                    <mat-icon class="delete-icon">close</mat-icon>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <zh-table
+          [tableCols]="hydroFctTableCol"
+          [data]="fctHydroTable"
+          [deletable]="true"
+          [editable]="true"
+          (onDelete)="onDeleteHydroFct($event)"
+          (onEdit)="onEditHydroFct(hydroFctModal, $event)"
+        ></zh-table>
       </div>
     </fieldset>
     <fieldset>
@@ -80,45 +49,14 @@
         *ngIf="bioFctTable && bioFctTable.length > 0"
         class="table-responsive"
       >
-        <table class="table">
-          <thead class="thead-inverse table-header">
-            <tr>
-              <th *ngFor="let col of bioFctTableCol">{{ col.label }}</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of bioFctTable">
-              <td *ngFor="let col of bioFctTableCol">
-                {{ item[col.name]?.mnemonique || item[col.name] }}
-              </td>
-              <td>
-                <div>
-                  <button
-                    mat-icon-button
-                    class="mr-2"
-                    placement="top"
-                    ngbTooltip="Editer"
-                  >
-                    <mat-icon
-                      class="edit-icon"
-                      (click)="onEditBioFct(bioFctModal, item)"
-                      >edit</mat-icon
-                    >
-                  </button>
-                  <button
-                    mat-icon-button
-                    placement="top"
-                    ngbTooltip="Supprimer"
-                    (click)="onDeleteBioFct(item)"
-                  >
-                    <mat-icon class="delete-icon">close</mat-icon>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <zh-table
+          [tableCols]="bioFctTableCol"
+          [data]="bioFctTable"
+          [deletable]="true"
+          [editable]="true"
+          (onDelete)="onDeleteBioFct($event)"
+          (onEdit)="onEditBioFct(bioFctModal, $event)"
+        ></zh-table>
       </div>
     </fieldset>
     <fieldset>
@@ -139,45 +77,14 @@
           *ngIf="interetPatTable && interetPatTable.length > 0"
           class="table-responsive"
         >
-          <table class="table">
-            <thead class="thead-inverse table-header">
-              <tr>
-                <th *ngFor="let col of interetsTableCol">{{ col.label }}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of interetPatTable">
-                <td *ngFor="let col of interetsTableCol">
-                  {{ item[col.name]?.mnemonique || item[col.name] }}
-                </td>
-                <td>
-                  <div>
-                    <button
-                      mat-icon-button
-                      class="mr-2"
-                      placement="top"
-                      ngbTooltip="Editer"
-                    >
-                      <mat-icon
-                        class="edit-icon"
-                        (click)="onEditInteretPat(interetPatModal, item)"
-                        >edit</mat-icon
-                      >
-                    </button>
-                    <button
-                      mat-icon-button
-                      placement="top"
-                      ngbTooltip="Supprimer"
-                      (click)="onDeleteInteretPat(item)"
-                    >
-                      <mat-icon class="delete-icon">close</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <zh-table
+          [tableCols]="interetsTableCol"
+          [data]="interetPatTable"
+          [deletable]="true"
+          [editable]="true"
+          (onDelete)="onDeleteInteretPat($event)"
+          (onEdit)="onEditInteretPat(interetPatModal, $event)"
+        ></zh-table>
         </div>
       </div>
       <h3 class="sub-title">Habitats naturels humides patrimoniaux</h3>
@@ -210,7 +117,7 @@
           </small>
         </div>
         <div class="form-group col-md-4">
-          <small>Recouvrement total sur ZH (%)</small>
+          <small>Recouvrement total sur la ZH (%)</small>
           <input
             class="form-control"
             [formControl]="formTab5.controls.total_hab_cover"
@@ -248,60 +155,71 @@
           *ngIf="corineBioTable && corineBioTable.length > 0"
           class="table-responsive"
         >
-          <table class="table">
-            <thead class="thead-inverse table-header">
-              <tr>
-                <th *ngFor="let col of corineTableCol">{{ col.label }}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of corineBioTable">
-                <td *ngFor="let col of corineTableCol">
-                  {{
-                    item[col.name]?.mnemonique ||
-                      item[col.name]?.CB_label ||
-                      item[col.name]?.lb_hab_fr ||
-                      item[col.name]
-                  }}
-                </td>
-                <td>
-                  <div>
-                    <button
-                      mat-icon-button
-                      class="mr-2"
-                      placement="top"
-                      ngbTooltip="Editer"
-                    >
-                      <mat-icon
-                        class="edit-icon"
-                        (click)="onEditCorineBio(corineBioModal, item)"
-                        >edit</mat-icon
-                      >
-                    </button>
-                    <button
-                      mat-icon-button
-                      placement="top"
-                      ngbTooltip="Supprimer"
-                      (click)="onDeleteCorineBio(item)"
-                    >
-                      <mat-icon class="delete-icon">close</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <zh-table
+            [tableCols]="corineTableCol"
+            [data]="corineBioTable"
+            [deletable]="true"
+            [editable]="true"
+            (onDelete)="onDeleteCorineBio($event)"
+            (onEdit)="onEditCorineBio(corineBioModal, $event)"
+        ></zh-table>
         </div>
       </div>
       <h3 class="sub-title">Faune et flore patrimoniale</h3>
       <div class="form-row">
+        <div class="mb-1 col-12">
+          <small>Liste des espèces à statut de protection et/ou de conservation</small>
+        </div>
+        <div class="mb-2 col-12">
+          <button
+            mat-raised-button
+            class="mb-3"
+            color="primary"
+            (click)="onGenerateTaxa()"
+          >
+            <mat-icon>add_box</mat-icon>
+            <mat-spinner *ngIf="taxaLoading" color="warn" diameter="25"></mat-spinner>
+            Générer la liste des espèces <span *ngIf="config?.species_source_name">depuis {{ config?.species_source_name }}</span>
+          </button>
+          <mat-icon
+            class="info-icon"
+            color="primary"
+            [ngbTooltip]="htmlContent"
+            tooltipClass="wide-tooltip"
+            placement="right"
+            triggers="click:blur">
+            help
+          </mat-icon>
+          <ng-template #htmlContent>
+            <p>Sont concernées les espèces observées :</p>
+              <ul>
+                <li>rattachées à un pointage précis avec des coordonnées géographiques</li>
+                <li>ayant au moins un statut d’évaluation et/ou de protection et/ou de menace (au minimum de vulnérable)</li>
+                <li>depuis moins de 20 ans</li>
+                <li>dans le périmètre strict de la zone humide cartographiée</li>
+                <li>Dans le cas d'absence d'observation répondant à ces critères, aucun fichier ne sera généré</li>
+              </ul>
+          </ng-template>
+          <ng-container *ngIf="_filesService.filterByExtension('csv').length > 0">
+            <zh-table
+            
+            [tableCols]="fileTableCol" 
+            [data]="_filesService.filterByExtension('csv')"
+            [downloadable]="true"
+            (onDownload)="_filesService.downloadFile($event)"
+            ></zh-table>
+            <p class="hint">
+              Vous pouvez retrouver ces fichiers dans l'onglet des ressources documentaires (<a [routerLink]="" (click)="nextTab.emit(8)">onglet 8</a>)
+            </p>
+          </ng-container>
+        </div>
         <div class="form-group col-md-4">
           <small>Flore - nombre d'espèces</small>
           <input
             class="form-control"
             [formControl]="formTab5.controls.nb_flora_sp"
             type="number"
+            min="0"
           />
           <small
             *ngIf="
@@ -318,6 +236,7 @@
             class="form-control"
             [formControl]="formTab5.controls.nb_vertebrate_sp"
             type="number"
+            min="0"
           />
           <small
             *ngIf="
@@ -334,6 +253,7 @@
             class="form-control"
             [formControl]="formTab5.controls.nb_invertebrate_sp"
             type="number"
+            min="0"
           />
           <small
             *ngIf="
@@ -345,23 +265,7 @@
           </small>
         </div>
       </div>
-      <fieldset>
-        <legend>
-          <h5 class="section-title">Liste des espèces à statut de protection</h5>
-        </legend>
-        <button
-          mat-raised-button
-          class="mb-3"
-          color="primary"
-          (click)="onGenerateTaxa()"
-        >
-          <mat-icon>add_box</mat-icon>
-          <mat-spinner *ngIf="taxaLoading" color="warn" diameter="25"></mat-spinner>
-          Générer la liste des espèces
-        </button>
-      </fieldset>
     </fieldset>
-
     <fieldset>
       <legend>
         <h5 class="section-title">Valeurs socio-économiques</h5>
@@ -380,45 +284,14 @@
           *ngIf="valSocEcoTable && valSocEcoTable.length > 0"
           class="table-responsive"
         >
-          <table class="table">
-            <thead class="thead-inverse table-header">
-              <tr>
-                <th *ngFor="let col of socioEcoTableCol">{{ col.label }}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of valSocEcoTable">
-                <td *ngFor="let col of socioEcoTableCol">
-                  {{ item[col.name]?.mnemonique || item[col.name] }}
-                </td>
-                <td>
-                  <div>
-                    <button
-                      mat-icon-button
-                      class="mr-2"
-                      placement="top"
-                      ngbTooltip="Editer"
-                    >
-                      <mat-icon
-                        class="edit-icon"
-                        (click)="onEditValSocEco(valSocEcoModal, item)"
-                        >edit</mat-icon
-                      >
-                    </button>
-                    <button
-                      mat-icon-button
-                      placement="top"
-                      ngbTooltip="Supprimer"
-                      (click)="onDeleteValSocEco(item)"
-                    >
-                      <mat-icon class="delete-icon">close</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <zh-table
+          [tableCols]="socioEcoTableCol"
+          [data]="valSocEcoTable"
+          [deletable]="true"
+          [editable]="true"
+          (onDelete)="onDeleteValSocEco($event)"
+          (onEdit)="onEditValSocEco(valSocEcoModal, $event)"
+        ></zh-table>
         </div>
       </div>
     </fieldset>
@@ -437,7 +310,7 @@
       >
         <mat-icon *ngIf="!posted">save_outline</mat-icon>
         <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
-        Enregister
+        Enregistrer
       </button>
     </div>
   </form>
@@ -920,8 +793,8 @@
             class="form-control"
             [formControl]="corineBioForm.controls.cahierHab"
           >
-            <option></option>
-            <option *ngFor="let habitat of cahierHabInput" [ngValue]="habitat">
+            <option *ngFor="let habitat of cahierHabInput" [ngValue]="habitat"
+            [attr.disabled]="habitat?.disabled ? '' : null">
               {{ habitat.lb_code }} - {{ habitat.lb_hab_fr }}
             </option>
           </select>

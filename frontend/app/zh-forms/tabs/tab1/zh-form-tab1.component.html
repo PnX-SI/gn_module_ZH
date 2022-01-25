@@ -7,7 +7,7 @@
       </legend>
       <div class="form-row">
         <div class="form-group col-md-6">
-          <small class="required">Nom Usuel</small>
+          <small class="required">Nom usuel de la zone humide</small>
           <input
             class="form-control"
             type="text"
@@ -50,7 +50,6 @@
             class="form-control"
             [formControl]="generalInfoForm.controls.id_site_space"
           >
-            <option [ngValue]="null"></option>
             <option
               *ngFor="let siteSpace of siteSpaceList"
               [ngValue]="siteSpace.id_site_space"
@@ -81,51 +80,18 @@
             (selectItem)="onSelectBib($event)"
           />
         </div>
-        <div class="form-group d-flex align-items-end col-md-6">
-          <button
-            mat-raised-button
-            color="primary"
-            (click)="onCreateBib($event, bibModal)"
-          >
-            <mat-icon>add_box</mat-icon>
-            Créer
-          </button>
-        </div>
       </div>
+      <span class="form-row" class="bib-hint">Si vous ne trouvez pas la bibliographie que vous cherchez, veuillez contacter l'administrateur</span>
       <div
         *ngIf="listBib && listBib.length > 0"
         class="card-body table-responsive"
       >
-        <table class="table">
-          <thead class="thead-inverse table-header">
-            <tr>
-              <th *ngFor="let col of cols">{{ col.label }}</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let bib of listBib">
-              <td *ngFor="let col of cols">{{ bib[col.name] }}</td>
-              <td>
-                <div>
-                  <button mat-icon-button class="mr-2">
-                    <mat-icon
-                      class="edit-icon"
-                      (click)="onEditBib(bibModal, bib)"
-                      >edit</mat-icon
-                    >
-                  </button>
-                  <button
-                    mat-icon-button
-                    (click)="onDeleteBib(bib.id_reference)"
-                  >
-                    <mat-icon class="delete-icon">close</mat-icon>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <zh-table
+        [tableCols]="cols"
+        [data]="listBib"
+        [deletable]="true"
+        (onDelete)="onDeleteBib($event?.id_reference)"
+        ></zh-table>
       </div>
     </fieldset>
   </form>
@@ -148,80 +114,3 @@
     </button>
   </div>
 </div>
-<!-- MODAL bib -->
-<ng-template #bibModal let-c="close" let-d="dismiss">
-  <div class="modal-header">
-    <h6>{{ modalBibTitle }}</h6>
-    <button mat-icon-button class="closeModalBtn" (click)="c()">
-      <mat-icon class="cancel-icon">cancel</mat-icon>
-    </button>
-  </div>
-  <div class="modal-body">
-    <form [formGroup]="bibForm">
-      <div class="form-row">
-        <div class="form-group col-md-6">
-          <small class="required">Titre du document</small>
-          <input
-            ngbAutofocus
-            [formControl]="bibForm.controls.title"
-            class="form-control"
-            type="text"
-          />
-          <small
-            *ngIf="
-              (bibForm.controls.title.touched || submitted) &&
-              bibForm.controls.title.errors?.required
-            "
-            class="error-msg"
-            >Champ requis</small
-          >
-        </div>
-        <div class="form-group col-md-6">
-          <small>Auteurs</small>
-          <input
-            [formControl]="bibForm.controls.authors"
-            class="form-control"
-            type="text"
-          />
-        </div>
-        <div class="form-group col-md-6">
-          <small>Année de parution</small>
-          <input
-            [formControl]="bibForm.controls.pub_year"
-            class="form-control"
-            type="text"
-          />
-        </div>
-        <div class="form-group col-md-6">
-          <small>Editeur</small>
-          <input
-            [formControl]="bibForm.controls.editor"
-            class="form-control"
-            type="text"
-          />
-        </div>
-        <div class="form-group col-md-6">
-          <small>Lieu</small>
-          <input
-            [formControl]="bibForm.controls.editor_location"
-            class="form-control"
-            type="text"
-          />
-        </div>
-      </div>
-    </form>
-  </div>
-  <div class="modal-footer">
-    <button
-      type="button"
-      mat-raised-button
-      color="primary"
-      class="uppercase"
-      (click)="patchBib ? onPatchBib() : onAddBib()"
-      [disabled]="postedBib"
-    >
-      <mat-spinner *ngIf="postedBib" [diameter]="20"></mat-spinner>
-      {{ modalBibButtonLabel }}
-    </button>
-  </div>
-</ng-template>

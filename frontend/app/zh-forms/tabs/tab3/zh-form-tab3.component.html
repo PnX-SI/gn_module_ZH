@@ -30,7 +30,6 @@
         <div class="form-group col-md-6">
           <small>Sous-type SAGE</small>
           <select class="form-control" [formControl]="form.controls.id_sage">
-            <option></option>
             <option *ngFor="let sg of sage" [ngValue]="sg.id_nomenclature">
               {{ sg.mnemonique }}
             </option>
@@ -39,7 +38,7 @@
       </div>
       <div class="form-row">
         <div class="form-group col-md-6">
-          <small>Types d’habitats Corine Biotopes humides (H) ou potentiellement humides (P)</small>
+          <small>Types d’habitats Corine biotopes humides (H) ou potentiellement humides (P)</small>
           <input
             id="typeahead-basic"
             type="text"
@@ -62,33 +61,12 @@
         *ngIf="listCorinBio && listCorinBio.length > 0"
         class="table-responsive"
       >
-        <table class="table">
-          <thead class="thead-inverse table-header">
-            <tr>
-              <th *ngFor="let col of corinTableCol">
-                {{ col.label }}
-              </th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let corin of listCorinBio">
-              <td *ngFor="let col of corinTableCol">{{ corin[col.name] }}</td>
-              <td>
-                <div>
-                  <button
-                    mat-icon-button
-                    placement="top"
-                    ngbTooltip="Supprimer"
-                    (click)="onDeleteCorin(corin.CB_code)"
-                  >
-                    <mat-icon class="delete-icon">close</mat-icon>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <zh-table
+          [tableCols]="corinTableCol"
+          [data]="listCorinBio"
+          [deletable]="true"
+          (onDelete)="onDeleteCorin($event?.CB_code)"
+        ></zh-table>
       </div>
       <div class="form-row">
         <div class="form-group col-md-12">
@@ -134,51 +112,19 @@
         *ngIf="listActivity && listActivity.length > 0"
         class="table-responsive"
       >
-        <table class="table">
-          <thead class="thead-inverse table-header">
-            <tr>
-              <th *ngFor="let col of activityTableCol">{{ col.label }}</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let activity of listActivity">
-              <td class="backToLigne" *ngFor="let col of activityTableCol">
-                {{ activity[col.name]?.mnemonique || activity[col.name] }}
-              </td>
-              <td>
-                <div>
-                  <button
-                    mat-icon-button
-                    class="mr-2"
-                    placement="top"
-                    ngbTooltip="Editer"
-                  >
-                    <mat-icon
-                      class="edit-icon"
-                      (click)="onEditActivity(activityModal, activity)"
-                      >edit</mat-icon
-                    >
-                  </button>
-                  <button
-                    mat-icon-button
-                    placement="top"
-                    ngbTooltip="Supprimer"
-                    (click)="onDeleteActivity(activity)"
-                  >
-                    <mat-icon class="delete-icon">close</mat-icon>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <zh-table
+          [tableCols]="activityTableCol"
+          [data]="listActivity"
+          [deletable]="true"
+          [editable]="true"
+          (onEdit)="onEditActivity(activityModal, $event)"
+          (onDelete)="onDeleteActivity($event)"
+      ></zh-table>
       </div>
       <div class="form-row">
         <div class="form-group col-md-12">
           <small>Évaluation globale des menaces potentielles ou avérées</small>
           <select class="form-control" [formControl]="form.controls.id_thread">
-            <option></option>
             <option
               *ngFor="let menace of formMetaData.EVAL_GLOB_MENACES"
               [ngValue]="menace.id_nomenclature"
@@ -213,7 +159,7 @@
     >
       <mat-icon *ngIf="!posted">save_outline</mat-icon>
       <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
-      Enregister
+      Enregistrer
     </button>
   </div>
 </div>

@@ -30,7 +30,7 @@ from sqlalchemy import func, text, desc, and_, inspect
 from sqlalchemy.orm.exc import NoResultFound
 
 import geoalchemy2
-from datetime import datetime as dt, timezone
+from datetime import datetime as dt
 
 from pypn_habref_api.models import (
     Habref,
@@ -69,29 +69,37 @@ from .nomenclatures import (
 
 from .forms import *
 
-from .geometry import set_geom
+from .geometry import set_geom, set_area
 
-from .upload import upload
+from .upload import upload_process
+
+from .hierarchy import *
 
 from .utils import (
     get_file_path,
     delete_file,
-    check_ref_geo_schema
+    check_ref_geo_schema,
+    get_main_picture_id,
+    get_last_pdf_export
 )
 
 from .model.repositories import (
     ZhRepository
 )
 
+from .pdf import gen_pdf
+
 from .api_error import ZHApiError
+
+from .search import main_search
 
 import pdb
 
-blueprint = Blueprint("pr_zh", __name__)
+blueprint = Blueprint("pr_zh", __name__, template_folder='templates')
 
 
 # Route pour afficher liste des zones humides
-@blueprint.route("", methods=["GET"])
+@blueprint.route("", methods=["GET", "POST"])
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @json_resp
 def get_zh(info_role):
@@ -99,19 +107,46 @@ def get_zh(info_role):
         q = DB.session.query(TZH)
 
         parameters = request.args
-
         limit = int(parameters.get("limit", 100))
         page = int(parameters.get("offset", 0))
+        orderby = str(parameters.get("orderby", None))
+        order = str(parameters.get("order", "asc"))
 
+        payload = request.json or None
+
+        if payload is not None:
+            q = main_search(q, payload)
+
+        return get_all_zh(info_role=info_role,
+                          query=q,
+                          limit=limit,
+                          page=page,
+                          orderby=orderby,
+                          order=order)
+    except Exception as e:
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(message="filter_zh_error", details=str(
+            exc_type) + ': ' + str(e.with_traceback(tb)))
+
+
+def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
+    try:
         # Pour obtenir le nombre de résultat de la requete sans le LIMIT
-        nb_results_without_limit = q.count()
+        nb_results_without_limit = query.count()
 
         user = info_role
         user_cruved = get_or_fetch_user_cruved(
             session=session, id_role=info_role.id_role, module_code="ZONES_HUMIDES"
         )
 
-        data = q.limit(limit).offset(page * limit).all()
+        if orderby in TZH.__table__.columns:
+            col = getattr(TZH, orderby, None)
+            if col is not None:
+                if order == 'desc':
+                    col = col.desc()
+                query = query.order_by(col)
+
+        data = query.limit(limit).offset(page * limit).all()
 
         # check if municipalities and dep in ref_geo
         is_ref_geo = check_ref_geo_schema()
@@ -197,9 +232,7 @@ def get_complete_info(id_zh, info_role):
     """
     try:
         # get other referentials needed for the module from the config file
-        ref_geo_config = [
-            ref for ref in blueprint.config['ref_geo_referentiels'] if ref['active']]
-        return Card(id_zh, "full", ref_geo_config).__repr__()
+        return get_complete_card(id_zh)
     except Exception as e:
         exc_type, value, tb = sys.exc_info()
         if e.__class__.__name__ == 'NoResultFound':
@@ -215,6 +248,12 @@ def get_complete_info(id_zh, info_role):
             message="get_complete_info_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
     finally:
         DB.session.close()
+
+
+def get_complete_card(id_zh: int) -> Card:
+    ref_geo_config = [
+        ref for ref in blueprint.config['ref_geo_referentiels'] if ref['active']]
+    return Card(id_zh, "full", ref_geo_config).__repr__()
 
 
 @blueprint.route("/eval/<int:id_zh>", methods=["GET"])
@@ -388,65 +427,6 @@ def get_ref_autocomplete(info_role):
         DB.session.close()
 
 
-@ blueprint.route("/references", methods=["POST"])
-@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
-@ json_resp
-def post_reference(info_role):
-    """create reference
-    """
-    try:
-        form_data = request.json
-        new_ref = TReferences(
-            authors=form_data["authors"],
-            pub_year=form_data["pub_year"],
-            title=form_data["title"],
-            editor=form_data["editor"],
-            editor_location=form_data["editor_location"]
-        )
-        DB.session.add(new_ref)
-        DB.session.commit()
-        return new_ref.as_dict()
-    except Exception as e:
-        DB.session.rollback()
-        if e.__class__.__name__ == 'DataError':
-            raise ZHApiError(
-                message="post_reference_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="post_reference_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
-    finally:
-        DB.session.close()
-
-
-@ blueprint.route("/references", methods=["PATCH"])
-@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
-@ json_resp
-def patch_reference(info_role):
-    """edit reference
-    """
-    try:
-        form_data = request.json
-        DB.session.query(TReferences).filter(TReferences.id_reference == form_data['id_reference']).update({
-            TReferences.authors: form_data["authors"],
-            TReferences.pub_year: form_data["pub_year"],
-            TReferences.title: form_data["title"],
-            TReferences.editor: form_data["editor"],
-            TReferences.editor_location: form_data["editor_location"]
-        })
-        DB.session.commit()
-        return form_data
-    except Exception as e:
-        DB.session.rollback()
-        if e.__class__.__name__ == 'DataError':
-            raise ZHApiError(
-                message="edit_reference_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="edit_reference_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
-    finally:
-        DB.session.close()
-
-
 @ blueprint.route("/<int:id_zh>/files", methods=["GET"])
 @ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
 @ json_resp_accept_empty_list
@@ -457,10 +437,10 @@ def get_file_list(id_zh, info_role):
         zh_uuid = DB.session.query(TZH).filter(
             TZH.id_zh == id_zh).one().zh_uuid
         q_medias = DB.session.query(TMedias).filter(
-            TMedias.unique_id_media == zh_uuid).all()
+            TMedias.unique_id_media == zh_uuid).order_by(TMedias.meta_update_date.desc()).all()
         return {
             "media_data": [media.as_dict() for media in q_medias],
-            "main_pict_id": DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().main_pict_id
+            "main_pict_id": get_main_picture_id(id_zh)
         }
     except Exception as e:
         exc_type, value, tb = sys.exc_info()
@@ -534,11 +514,12 @@ def post_main_pict(id_zh, id_media, info_role):
 def get_tab_data(id_tab, info_role):
     """Post zh data
     """
-    form_data = request.json
+    form_data = request.json or {}
+    form_data['update_author'] = info_role.id_role
+    form_data['update_date'] = dt.now()
+    
     try:
         if id_tab == 0:
-            # set date
-            zh_date = dt.now(timezone.utc)
             # set name
             if form_data['main_name'] == "":
                 raise ZHApiError(
@@ -551,17 +532,21 @@ def get_tab_data(id_tab, info_role):
             if 'id_zh' not in form_data.keys():
                 # set geometry from coordinates
                 geom = set_geom(form_data['geom']['geometry'])
+                # geom area
+                area = set_area(geom)
                 # create_zh
-                zh = create_zh(form_data, info_role, zh_date,
-                               geom['polygon'], active_geo_refs)
+                zh = create_zh(form_data, info_role, form_data['update_date'],
+                               geom['polygon'], area, active_geo_refs)
                 intersection = geom['is_intersected']
             else:
                 # edit geometry
                 geom = set_geom(
                     form_data['geom']['geometry'], form_data['id_zh'])
+                # geom area
+                area = set_area(geom)
                 # edit zh
-                zh = update_zh_tab0(form_data, geom['polygon'],
-                                    info_role, zh_date, active_geo_refs)
+                zh = update_zh_tab0(form_data, geom['polygon'], area,
+                                    info_role, form_data['update_date'], active_geo_refs)
                 intersection = geom['is_intersected']
 
             DB.session.commit()
@@ -637,71 +622,92 @@ def get_tab_data(id_tab, info_role):
             return {"id_zh": form_data['id_zh']}, 200
 
         if id_tab == 8:
-            # to do :
-            #   add main_picture attribute in pr_zh.t_zh when implemented in frontend (radio ?)
             try:
-                file_name = secure_filename(request.files["file"].filename)
-                temp = file_name.split(".")
-                extension = temp[len(temp) - 1]
+                ALLOWED_EXTENSIONS = blueprint.config['allowed_extensions']
+                MAX_PDF_SIZE = blueprint.config['max_pdf_size']
+                MAX_JPG_SIZE = blueprint.config['max_jpg_size']
+                FILE_PATH = blueprint.config['file_path']
+                MODULE_NAME = blueprint.config['MODULE_CODE'].lower()
+
+                upload_resp = upload_process(
+                    request,
+                    ALLOWED_EXTENSIONS,
+                    MAX_PDF_SIZE,
+                    MAX_JPG_SIZE,
+                    FILE_PATH,
+                    MODULE_NAME
+                )
+
+                DB.session.commit()
+
+                return {
+                    "media_path": upload_resp["media_path"],
+                    "secured_file_name": upload_resp['secured_file_name'],
+                    "id_media": upload_resp['id_media']
+                }, 200
             except Exception as e:
-                file_name = "Filename_error"
-                extension = "Extension_error"
-                raise
+                exc_type, value, tb = sys.exc_info()
+                raise ZHApiError(
+                    message="upload_file_post_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
-            ALLOWED_EXTENSIONS = blueprint.config['allowed_extensions']
-            MAX_PDF_SIZE = blueprint.config['max_pdf_size']
-            MAX_JPG_SIZE = blueprint.config['max_jpg_size']
-            FILE_PATH = blueprint.config['file_path']
-            MODULE_NAME = blueprint.config['MODULE_CODE'].lower()
-            uploaded_resp = upload(
-                request,
-                ALLOWED_EXTENSIONS,
-                MAX_PDF_SIZE,
-                MAX_JPG_SIZE,
-                FILE_PATH,
-                MODULE_NAME
-            )
-
-            # checks if error in user file or user http request:
-            if "error" in uploaded_resp:
-                return {"id_zh": request.form.to_dict['id_zh'], "errors": uploaded_resp["error"]}, 400
-
-            # save in db
-            id_media = post_file_info(
-                request.form.to_dict()['id_zh'],
-                request.form.to_dict()['title'],
-                request.form.to_dict()['author'],
-                request.form.to_dict()['summary'],
-                uploaded_resp['media_path'],
-                uploaded_resp['extension'])
-            DB.session.commit()
-
-            return {
-                "media_path": uploaded_resp["media_path"],
-                "secured_file_name": uploaded_resp['file_name'],
-                "original_file_name": request.files["file"].filename,
-                "id_media": id_media
-            }, 200
-
+    except KeyError or TypeError as e:
+        raise ZHApiError(
+            message='likely_empty_mandatory_field_error', details=str(e), status_code=400)
+    except exc.IntegrityError as e:
+        raise ZHApiError(
+            message='ZH_main_name_already_exists', details=str(e), status_code=400)
+    except exc.DataError as e:
+        raise ZHApiError(
+            message="post_tab_form_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+    except ZHApiError as e:
+        raise ZHApiError(
+            message=str(e.message), details=str(e.details))
     except Exception as e:
-        DB.session.rollback()
-        if e.__class__.__name__ == 'KeyError' or e.__class__.__name__ == 'TypeError':
-            raise ZHApiError(
-                message='likely_empty_mandatory_field_error', details=str(e), status_code=400)
-        if e.__class__.__name__ == 'IntegrityError':
-            raise ZHApiError(
-                message='ZH_main_name_already_exists', details=str(e), status_code=400)
-        if e.__class__.__name__ == 'DataError':
-            raise ZHApiError(
-                message="post_tab_form_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
-        if e.__class__.__name__ == 'ZHApiError':
-            raise ZHApiError(
-                message=str(e.message), details=str(e.details))
         exc_type, value, tb = sys.exc_info()
         raise ZHApiError(
             message="post_tab_form_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
     finally:
+        DB.session.rollback()
         DB.session.close()
+
+
+@ blueprint.route("files/<int:id_media>", methods=["PATCH"])
+@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
+@ json_resp
+def patch_file(id_media, info_role):
+    """edit file upload from tab8
+    """
+    try:
+        ALLOWED_EXTENSIONS = blueprint.config['allowed_extensions']
+        MAX_PDF_SIZE = blueprint.config['max_pdf_size']
+        MAX_JPG_SIZE = blueprint.config['max_jpg_size']
+        FILE_PATH = blueprint.config['file_path']
+        MODULE_NAME = blueprint.config['MODULE_CODE'].lower()
+
+        upload_resp = upload_process(
+            request,
+            ALLOWED_EXTENSIONS,
+            MAX_PDF_SIZE,
+            MAX_JPG_SIZE,
+            FILE_PATH,
+            MODULE_NAME,
+            id_media=id_media
+        )
+
+        DB.session.commit()
+
+        return {
+            "media_path": upload_resp["media_path"],
+            "secured_file_name": upload_resp['secured_file_name'],
+            "id_media": upload_resp['id_media']
+        }, 200
+    except ZHApiError as e:
+        raise ZHApiError(
+            message=str(e.message), details=str(e.details))
+    except Exception as e:
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="upload_file_patch_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
 @ blueprint.route("/<int:id_zh>", methods=["DELETE"])
@@ -798,15 +804,18 @@ def write_csv(id_zh, info_role):
                 blueprint.config[i]['schema_name']
             )
             query = DB.session.query(model).filter(model.id_zh == id_zh).all()
-            current_date = dt.now(timezone.utc)
+            current_date = dt.now()
             if query:
                 rows = [
                     {
-                        "Groupe d'étude": row.group,
+                        "Groupe d'étude - classe": row.group_class,
+                        "Groupe d'étude - ordre": row.group_order,
                         "Nom Scientifique": row.scientific_name,
                         "Nom vernaculaire": row.vernac_name,
-                        "Réglementation": row.reglementation,
+                        "Statut types": row.statut_type,
+                        "Statuts d’évaluation, de protection et de menace": row.statut,
                         "Article": row.article,
+                        "URL doc": row.doc_url,
                         "Nombre d'observations": row.obs_nb,
                         "Date de la dernière observation": row.last_date,
                         "Dernier observateur": row.observer,
@@ -824,14 +833,21 @@ def write_csv(id_zh, info_role):
                     writer.writeheader()
                     writer.writerows(rows)
 
-                post_file_info(
+                id_media = post_file_info(
                     id_zh,
                     blueprint.config[i]['category'] + "_" +
                     current_date.strftime("%Y-%m-%d_%H:%M:%S"),
                     author,
-                    'liste des taxons générée sur demande de l''utilisateur dans l''onglet 5',
-                    str(media_path),
+                    'Liste des taxons générée sur demande de l\'utilisateur dans l\'onglet 5',
                     '.csv')
+
+                DB.session.flush()
+
+                # update TMedias.media_path with media_filename
+                DB.session.query(TMedias)\
+                    .filter(TMedias.id_media == id_media)\
+                    .update({'media_path': str(media_path)})
+
                 DB.session.commit()
         return {"file_names": names}, 200
     except Exception as e:
@@ -861,3 +877,108 @@ def returnUserCruved(info_role):
         module_code=blueprint.config['MODULE_CODE']
     )
     return user_cruved
+
+
+@blueprint.route("/export_pdf/<int:id_zh>", methods=["GET"])
+@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
+def download(id_zh: int):
+    """
+    Downloads the report in pdf format
+    """
+    zh = ZH(id_zh=id_zh).zh
+    author_role =  zh.authors
+    author = f'{author_role.prenom_role} {author_role.nom_role.upper()}'
+    last_date = zh.update_date
+    media = get_last_pdf_export(id_zh=id_zh, last_date=last_date)
+    if media is None:
+        dataset = get_complete_card(id_zh)
+        module_name = blueprint.config['MODULE_CODE'].lower()
+        upload_path = blueprint.config['file_path']
+        filename = f'{id_zh}_fiche_{dt.now().strftime("%Y-%m-%d")}.pdf'
+        media_path = Path(ROOT_DIR, 'external_modules', module_name, upload_path, filename)
+        pdf_file = gen_pdf(id_zh=id_zh, dataset=dataset, filename=media_path)
+        post_file_info(
+            id_zh=id_zh,
+            title=filename,
+            author=author,
+            description='Fiche de synthèse de la zone humide',
+            extension='.pdf',
+            media_path=str(media_path))
+        
+        return send_file(pdf_file, as_attachment=True)
+    else:
+        return send_file(get_file_path(media.id_media), as_attachment=True)
+
+
+@blueprint.route("/departments", methods=['GET'])
+@json_resp
+def departments():
+    query = DB.session.query(LAreas).with_entities(LAreas.area_name, LAreas.area_code, LAreas.id_type,
+                                                   BibAreasTypes.type_code).join(BibAreasTypes, LAreas.id_type == BibAreasTypes.id_type)
+    query = query.filter(BibAreasTypes.type_code == 'DEP')
+    query = query.order_by(LAreas.area_code)
+    resp = query.all()
+    return [{"code": r.area_code, "name": r.area_name} for r in resp]
+
+
+@blueprint.route("/communes", methods=['POST'])
+@json_resp
+def get_area_from_department() -> dict:
+    code = request.json.get('code')
+    if code:
+        query = DB.session.query(LiMunicipalities).with_entities(LiMunicipalities.id_area, LAreas.area_name, LAreas.area_code)\
+            .join(LAreas, LiMunicipalities.id_area == LAreas.id_area)\
+            .filter(LiMunicipalities.insee_com.like('{}%'.format(code)))
+        query = query.order_by(LAreas.area_code)
+        resp = query.all()
+        return [{"code": r.area_code, "name": r.area_name} for r in resp]
+
+    return []
+
+
+@blueprint.route("/bassins", methods=['GET'])
+@json_resp
+def bassins():
+    query = DB.session.query(TRiverBasin).with_entities(
+        TRiverBasin.id_rb,
+        TRiverBasin.name)
+    resp = query.all()
+    return [{"code": r.id_rb, "name": r.name} for r in resp]
+
+
+@blueprint.route("/zones_hydro", methods=['POST'])
+@json_resp
+def get_hydro_zones_from_bassin() -> dict:
+    code = request.json.get('code')
+    if code:
+        query = DB.session.query(THydroArea).with_entities(
+            THydroArea.id_hydro,
+            THydroArea.name,
+            TRiverBasin.id_rb
+        ).filter(TRiverBasin.id_rb == code).join(TRiverBasin, TRiverBasin.geom.ST_Intersects(THydroArea.geom))
+
+        resp = query.all()
+        return [{"code": r.id_hydro, "name": r.name} for r in resp]
+
+    return []
+
+
+@blueprint.route("/<int:id_zh>/hierarchy", methods=["GET"])
+@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@json_resp
+def get_hierarchy(id_zh, info_role):
+    """Get zh note
+    """
+    try:
+        hierarchy = Hierarchy(id_zh).__str__()
+        return hierarchy
+    except ZHApiError as e:
+        raise ZHApiError(
+            message=str(e.message), details=str(e.details), status_code=e.status_code)
+    except Exception as e:
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="get_hierarchy_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+    finally:
+        DB.session.rollback()
+        DB.session.close()

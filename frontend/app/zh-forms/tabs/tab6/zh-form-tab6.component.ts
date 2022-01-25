@@ -6,6 +6,7 @@ import { NgbDatepickerI18n } from "@ng-bootstrap/ng-bootstrap";
 import { NgbDateFRParserFormatter } from "../../../services/dateFrFormatter";
 import { TabsService } from "../../../services/tabs.service";
 import { ModalService } from "../../../services/modal.service";
+import { ModuleConfig } from "../../../module.config";
 
 import { ToastrService } from "ngx-toastr";
 import { Subscription } from "rxjs";
@@ -15,6 +16,7 @@ import {
 } from "../../../services/datepicker-i18n.service";
 
 import { ZhDataService } from "../../../services/zh-data.service";
+import { ErrorTranslatorService } from "../../../services/error-translator.service";
 
 @Component({
   selector: "zh-form-tab6",
@@ -30,6 +32,8 @@ export class ZhFormTab6Component implements OnInit {
   @Input() public formMetaData: any;
   @Output() public canChangeTab = new EventEmitter<boolean>();
   @Output() nextTab = new EventEmitter<number>();
+  // FIXME: only used for URL path... Must be a better way to do this..
+  private config = ModuleConfig;
   public formTab6: FormGroup;
   public statusForm: FormGroup;
   public instrumentForm: FormGroup;
@@ -47,51 +51,84 @@ export class ZhFormTab6Component implements OnInit {
   public statusTable: any[] = [];
   public instrumentTable: any[] = [];
   public urbanDocTable: any[] = [];
+  public structures: {
+    id_org: number;
+    name: string;
+    abbreviation: string;
+    is_op_org: boolean;
+    plans: [];
+  }[] = [];
   public managements: any[] = [];
   public plans: any[] = [];
   private tempID: any;
   private $_currentZhSub: Subscription;
+  private $_fromChangeSub: Subscription;
   public selectedItems = [];
 
+  readonly urbanColSize: string = "15%";
+
   public statusTableCol = [
-    { name: "status", label: "Statut" },
+    {
+      name: "status",
+      label: "Statut",
+      subcell: { name: "mnemonique" },
+      size: "45%",
+    },
     { name: "remark", label: "Remarques" },
   ];
 
   public instrumentTableCol = [
-    { name: "instrument", label: "Instruments contractuels et financiers" },
+    {
+      name: "instrument",
+      label: "Instruments contractuels et financiers",
+      subcell: { name: "mnemonique" },
+    },
     { name: "instrument_date", label: "Date de mise en oeuvre" },
   ];
 
   public urbanDocTableCol = [
-    { name: "area", label: "Commune" },
-    { name: "urbanType", label: "Type de document communal" },
-    { name: "typeClassement", label: "Type de classement" },
+    {
+      name: "area",
+      label: "Commune",
+      subcell: { name: "municipality_name" },
+      size: this.urbanColSize,
+    },
+    {
+      name: "urbanType",
+      label: "Type de document communal",
+      subcell: { name: "mnemonique" },
+      size: this.urbanColSize,
+    },
+    {
+      name: "typeClassement",
+      label: "Type de classement",
+      subcell: { name: "mnemonique" },
+      size: this.urbanColSize,
+    },
     { name: "remark", label: "Remarques" },
   ];
   public planTableCol = [
-    { name: "plan", label: "Nature du plan" },
+    { name: "plan", label: "Nature du plan de gestion" },
     { name: "plan_date", label: "Date de réalisation" },
     { name: "duration", label: "Durée (années)" },
+    { name: "remark", label: "Remarques" },
   ];
 
   public dropdownSettings: any;
   public multiselectTypeClassement: any;
   public organismDropdownSettings: {
     enableSearchFilter: boolean;
-    addNewItemOnFilter: boolean;
     singleSelection: boolean;
     text: string;
     labelKey: string;
     primaryKey: string;
     enableFilterSelectAll: boolean;
+    noDataLabel: string;
   };
   public currentZh: any;
   selectedManagement: any;
-  moreDetails: boolean = true;
   posted: boolean;
   submitted: boolean;
-  $_fromChangeSub: any;
 
   constructor(
     private fb: FormBuilder,
@@ -100,6 +137,7 @@ export class ZhFormTab6Component implements OnInit {
     private _dataService: ZhDataService,
     private _toastr: ToastrService,
     private _modalService: ModalService,
+    private _error: ErrorTranslatorService,
     private _tabService: TabsService
   ) {}
 
@@ -114,12 +152,12 @@ export class ZhFormTab6Component implements OnInit {
     };
     this.organismDropdownSettings = {
       enableSearchFilter: true,
-      addNewItemOnFilter: true,
       singleSelection: true,
       text: "Sélectionner un organisme",
       labelKey: "name",
       primaryKey: "id_org",
       enableFilterSelectAll: false,
+      noDataLabel: "Aucun organisme disponible",
     };
     this.dropdownSettings = {
       enableCheckAll: false,
@@ -129,18 +167,17 @@ export class ZhFormTab6Component implements OnInit {
       searchPlaceholderText: "Rechercher",
       enableSearchFilter: true,
       groupBy: "category",
-      position: "bottom",
-      autoPosition: false,
     };
 
     this.getMetaData();
     this.initForms();
 
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
-      if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
-      if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
       if (tabPosition == 6) {
         this.getCurrentZh();
+        if (this.$_fromChangeSub != undefined)
+          this.$_fromChangeSub.unsubscribe();
+        if (this.$_currentZhSub != undefined) this.$_currentZhSub.unsubscribe();
       }
     });
   }
@@ -151,6 +188,7 @@ export class ZhFormTab6Component implements OnInit {
       protections: null,
       structure: null,
       is_other_inventory: false,
+      remark_is_other_inventory: null,
     });
 
     this.statusForm = this.fb.group({
@@ -160,7 +198,7 @@ export class ZhFormTab6Component implements OnInit {
 
     this.instrumentForm = this.fb.group({
       instrument: [null, Validators.required],
-      instrument_date: [null, Validators.required],
+      instrument_date: [null],
     });
 
     this.urbanDocForm = this.fb.group({
@@ -177,6 +215,7 @@ export class ZhFormTab6Component implements OnInit {
         null,
         Validators.compose([Validators.required, Validators.min(0)]),
       ],
+      remark: null,
     });
   }
 
@@ -223,6 +262,8 @@ export class ZhFormTab6Component implements OnInit {
             this.formTab6.patchValue({
               protections: protections,
               is_other_inventory: this.currentZh.properties.is_other_inventory,
+              remark_is_other_inventory:
+                this.currentZh.properties.remark_is_other_inventory,
             });
             if (
               this.currentZh.properties.ownerships &&
@@ -273,7 +314,6 @@ export class ZhFormTab6Component implements OnInit {
                     "BIB_MANAGEMENT_STRUCTURES"
                   ].find((item: any) => item.id_org == management.structure);
                   let plans = [];
-
                   if (management.plans && management.plans.length > 0) {
                     management.plans.forEach((plan) => {
                       plans.push({
@@ -282,10 +322,15 @@ export class ZhFormTab6Component implements OnInit {
                         ),
                         plan_date: plan.plan_date,
                         duration: plan.duration,
+                        remark: plan.remark,
                       });
                     });
                   }
                   structure.plans = plans;
+
+                  // moreDetails enable to expand the table to show the plans
+                  // set it to true by default
+                  structure.moreDetails = true;
 
                   this.managements.push(structure);
                 }
@@ -329,10 +374,10 @@ export class ZhFormTab6Component implements OnInit {
                 });
               });
             }
-            this.$_fromChangeSub = this.formTab6.valueChanges.subscribe(() => {
-              this.canChangeTab.emit(false);
-            });
           });
+        this.$_fromChangeSub = this.formTab6.valueChanges.subscribe(() => {
+          this.canChangeTab.emit(false);
+        });
       }
     });
   }
@@ -462,9 +507,9 @@ export class ZhFormTab6Component implements OnInit {
           item.instrument.id_nomenclature ==
           formValues.instrument.id_nomenclature
       );
-      formValues.instrument_date = this.dateParser.format(
-        formValues.instrument_date
-      );
+      formValues.instrument_date =
+        this.dateParser.format(formValues.instrument_date) || null;
+
       if (!itemExist) {
         this.instrumentTable.push(formValues);
       }
@@ -689,6 +734,14 @@ export class ZhFormTab6Component implements OnInit {
     }
   }
 
+  onStructureOpened() {
+    // When the multiselect is opened
+    // Filter the structure with the ones present in the table
+    this.structures = this.formMetaData.BIB_MANAGEMENT_STRUCTURES.filter(
+      (item) => !this.managements.map((m) => m.id_org).includes(item.id_org)
+    );
+  }
+
   onAddStructure() {
     // multi select : returns an Array...
     const structure = this.formTab6.value.structure[0];
@@ -702,6 +755,26 @@ export class ZhFormTab6Component implements OnInit {
       this.formTab6.get("structure").reset();
       this.canChangeTab.emit(false);
     }
+  }
+
+  onAllStructuresDeselected() {
+    this.formTab6.get("structure").reset();
+  }
+
+  onDeleteStrutureModal(modal, structure) {
+    this.ngbModal
+      .open(modal, {
+        centered: true,
+        size: "lg",
+        windowClass: "bib-modal",
+      })
+      .result.then(
+        () => {
+          //When suppr is clicked
+          this.onDeleteStructure(structure);
+        },
+        () => {}
+      );
   }
 
   //delete Structure from the StructureS array
@@ -750,10 +823,12 @@ export class ZhFormTab6Component implements OnInit {
     if (this.planForm.valid) {
       let formValues = this.planForm.value;
       this.managements.map((item: any) => {
+        // moreDetails enable to expand the table to show the plans
+        // set it to true here enable to expand when plan is added
+        item.moreDetails = true;
         if (item.id_org == this.selectedManagement.id_org) {
           if (!item.plans || item.plans.length == 0) {
             formValues.plan_date = this.dateParser.format(formValues.plan_date);
-            this.moreDetails = true;
             item.plans = [formValues];
           } else if (item.plans && item.plans.length > 0) {
             let palnExist = item.plans.some(
@@ -765,7 +840,6 @@ export class ZhFormTab6Component implements OnInit {
                 formValues.plan_date
               );
               item.plans.push(formValues);
-              this.moreDetails = true;
             }
           }
         }
@@ -776,6 +850,22 @@ export class ZhFormTab6Component implements OnInit {
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
     }
+  }
+
+  onDeletePlanModal(modal, plan, structure) {
+    this.ngbModal
+      .open(modal, {
+        centered: true,
+        size: "lg",
+        windowClass: "bib-modal",
+      })
+      .result.then(
+        () => {
+          //When suppr is clicked
+          this.onDeletePlan(plan, structure);
+        },
+        () => {}
+      );
   }
 
   //delete plan from the plan array
@@ -822,6 +912,7 @@ export class ZhFormTab6Component implements OnInit {
       plan: selectedPlan,
       plan_date: this.dateParser.parse(plan.plan_date),
       duration: plan.duration,
+      remark: plan.remark,
     });
 
     let $_planInputSub = this.planForm
@@ -871,8 +962,12 @@ export class ZhFormTab6Component implements OnInit {
     }
   }
 
-  onMoreDetails(status: boolean) {
-    this.moreDetails = status;
+  onMoreDetails(item) {
+    item.moreDetails = !item.moreDetails;
+  }
+
+  onDeSelectAll() {
+    this.formTab6.get("protections").reset();
   }
 
   onFormSubmit() {
@@ -894,6 +989,7 @@ export class ZhFormTab6Component implements OnInit {
                 id_nature: item.plan.id_nomenclature,
                 plan_date: item.plan_date,
                 duration: item.duration,
+                remark: item.remark,
               });
             });
           }
@@ -945,6 +1041,8 @@ export class ZhFormTab6Component implements OnInit {
         instruments: instruments,
         protections: protections,
         is_other_inventory: this.formTab6.value.is_other_inventory,
+        remark_is_other_inventory:
+          this.formTab6.value.remark_is_other_inventory,
         urban_docs: urban_docs,
       };
 
@@ -965,7 +1063,10 @@ export class ZhFormTab6Component implements OnInit {
         },
         (error) => {
           this.posted = false;
-          this._toastr.error(error.error, "", {
+          const frontMsg: string = this._error.getFrontError(
+            error.error.message
+          );
+          this._toastr.error(frontMsg, "", {
             positionClass: "toast-top-right",
           });
         }

@@ -131,7 +131,8 @@ class ZH(TZH):
                     plans.append({
                         "id_nature": plan.id_nature,
                         "plan_date": plan.plan_date.date().strftime('%d/%m/%Y'),
-                        "duration": plan.duration
+                        "duration": plan.duration,
+                        "remark": plan.remark
                     })
             managements.append({
                 "structure": management.id_org,
@@ -146,7 +147,7 @@ class ZH(TZH):
             "instruments": [
                 {
                     'id_instrument': instrument.id_instrument,
-                    'instrument_date': instrument.instrument_date.date().strftime('%d/%m/%Y')
+                    'instrument_date': instrument.instrument_date.date().strftime('%d/%m/%Y') if instrument.instrument_date else None
                 } for instrument in ZH.get_data_by_id(TInstruments, self.zh.id_zh)
             ]
         }
@@ -183,15 +184,20 @@ class ZH(TZH):
         }
 
     def get_fauna_nb(self):
+        vertebrates = self.zh.as_dict()['nb_vertebrate_sp']
+        invertebrates = self.zh.as_dict()['nb_invertebrate_sp']
+
+        if vertebrates is None and invertebrates is None:
+            return None
         try:
-            vertebrates = int(self.zh.as_dict()['nb_vertebrate_sp'])
+            vertebrates = int(vertebrates)
         except TypeError:
             vertebrates = 0
         try:
-            invertebrates = int(self.zh.as_dict()['nb_invertebrate_sp'])
+            invertebrates = int(invertebrates)
         except TypeError:
             invertebrates = 0
-        return vertebrates+invertebrates
+        return vertebrates + invertebrates
 
     def get_departments(self):
         return [
@@ -218,6 +224,9 @@ class ZH(TZH):
         regions = [region.region_name for region in q_region]
         return regions
 
+    def get_area(self):
+        return {"area": self.zh.area}
+
     def get_geo_info(self):
         departments = self.get_departments()
         q_municipalities = CorZhArea.get_municipalities_info(self.zh.id_zh)
@@ -236,7 +245,7 @@ class ZH(TZH):
         eval.update(self.get_functions('VAL_SOC_ECO', is_eval=True))
         eval.update({
             "nb_flora_sp": self.zh.as_dict()['nb_flora_sp'],
-            "nb_hab": self.zh.as_dict()['nb_flora_sp'],
+            "nb_hab": self.zh.as_dict()['nb_hab'],
             "nb_fauna_sp": self.get_fauna_nb(),
             "total_hab_cover": self.zh.as_dict()['total_hab_cover'],
             "id_thread": self.zh.as_dict()['id_thread'],
@@ -247,6 +256,7 @@ class ZH(TZH):
 
     def __repr__(self):
         zh = self.zh.get_geofeature()
+        zh.properties.update(self.get_area())
         zh.properties.update(self.get_geo_info())
         zh.properties.update(self.get_id_lims())
         zh.properties.update(self.get_id_lims_fs())

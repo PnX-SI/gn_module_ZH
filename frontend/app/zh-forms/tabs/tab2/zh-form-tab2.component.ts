@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
 import { Subscription } from "rxjs";
+import { ErrorTranslatorService } from "../../../services/error-translator.service";
 import { TabsService } from "../../../services/tabs.service";
 import { ZhDataService } from "../../../services/zh-data.service";
 
@@ -28,6 +29,7 @@ export class ZhFormTab2Component implements OnInit {
     private fb: FormBuilder,
     private _dataService: ZhDataService,
     private _toastr: ToastrService,
+    private _error: ErrorTranslatorService,
     private _tabService: TabsService
   ) {}
 
@@ -140,7 +142,10 @@ export class ZhFormTab2Component implements OnInit {
         },
         (error) => {
           this.posted = false;
-          this._toastr.error(error.error, "", {
+          const frontMsg: string = this._error.getFrontError(
+            error.error.message
+          );
+          this._toastr.error(frontMsg, "", {
             positionClass: "toast-top-right",
           });
         }
