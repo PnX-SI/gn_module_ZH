@@ -13,8 +13,8 @@ export class DescriptionComponent {
   readonly activityColSize: string = "20%";
 
   public corineTableCols: TableColumn[] = [
-    { name: "code", label: "Code corine Biotope" },
-    { name: "label", label: "Libellé corine biotope" },
+    { name: "code", label: "Code Corine biotopes" },
+    { name: "label", label: "Libellé Corine biotopes" },
     { name: "Humidité", label: "Humidité", size: "5%" },
   ];
   activitiesTableCols: TableColumn[] = [
