@@ -835,8 +835,8 @@ class EvalMainFunction:
         self.__hydro = [
             Function(
                 v['id_function'],
-                v['id_knowledge'],
                 v['id_qualification'],
+                v['id_knowledge'],
                 v['justification']
             ) for v in val
         ]
@@ -850,8 +850,8 @@ class EvalMainFunction:
         self.__bio = [
             Function(
                 v['id_function'],
-                v['id_knowledge'],
                 v['id_qualification'],
+                v['id_knowledge'],
                 v['justification']
             ) for v in value
         ]
@@ -883,8 +883,8 @@ class EvalInterest:
         self.__interet_patrim = [
             Function(
                 i['id_function'],
-                i['id_knowledge'],
                 i['id_qualification'],
+                i['id_knowledge'],
                 i['justification']
             ) for i in val
         ]
@@ -898,8 +898,8 @@ class EvalInterest:
         self.__val_soc_eco = [
             Function(
                 i['id_function'],
-                i['id_knowledge'],
                 i['id_qualification'],
+                i['id_knowledge'],
                 i['justification']
             ) for i in val
         ]
@@ -909,8 +909,8 @@ class EvalInterest:
         self.__interet_patrim = [
             Function(
                 i['id_function'],
-                i['id_knowledge'],
                 i['id_qualification'],
+                i['id_knowledge'],
                 i['justification']
             ) for i in val
         ]
