@@ -19,26 +19,53 @@ export class ErrorTranslatorService {
       id: 1,
     },
     {
-      api: "ZH_main_name_already_exists", // error returned by backend
+      api: "ZH_main_name_already_exists",
       front:
-        "Impossible de créer un identifiant unique avec les informations entrées. Le nom est peut-être déjà pris ?", //error to show to the user
+        "Impossible de créer un identifiant unique avec les informations entrées. Le nom est peut-être déjà pris ?",
       id: 2,
     },
     {
-      api: "wrong_qualif", // error returned by backend
-      front:
-        "Le SDAGE selectionné ne fait pas partie des règles définies pour le bassin versant", //error to show to the user
+      api: "set_geom_error",
+      front: "Impossible de créer la géométrie, elle ne semble pas appropriée",
       id: 3,
     },
     {
-      api: "csv_taxa_error", // error returned by backend
-      front: "Impossible de générer le csv des espèces", //error to show to the user
+      api: "wrong_qualif",
+      front:
+        "La typologie SDAGE selectionnée ne fait pas partie des règles définies pour ce bassin versant",
       id: 4,
+    },
+    {
+      api: "post_cor_zh_rb_db_error",
+      front: "Veuillez tracer une zone humide sur la carte",
+      id: 5,
+    },
+    {
+      api: "Hierarchy class: get_rb_error",
+      front:
+        "Impossible d'effectuer la hierarchisation car la zone humide ne se situe sur aucun bassin versant",
+      id: 6,
+    },
+    {
+      api: "csv_taxa_error",
+      front: "Impossible de générer le csv des espèces",
+      id: 7,
     },
     {
       api: "no_rb_rules",
       front: "Il n'existe pas de règle pour ce bassin versant",
-      id: 5,
+      id: 8,
+    },
+    {
+      api: "no_river_basin",
+      front: "Cette zone humide n'intersecte aucun bassin versant",
+      id: 9,
+    },
+    {
+      api: "user_not_allowed",
+      front:
+        "Vous n'avez pas les droits pour supprimer/modifier/lire cette zone humide",
+      id: 10,
     },
   ];
 

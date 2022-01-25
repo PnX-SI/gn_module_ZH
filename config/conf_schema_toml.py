@@ -15,18 +15,21 @@ class MapListConfig(Schema):
 default_map_list_conf = [
     {"prop": "main_name", "name": "Nom principal"},
     {"prop": "code", "name": "Code"},
-    {"prop": "sdage", "name": "Typologie SDAGE"},
+    {"prop": "sdage", "name": "Typologie SDAGE", "sortable": False},
     {"prop": "bassin_versant", "name": "Bassin versant"}
 ]
 
 
 available_maplist_column = [
-    {"prop": "id_zh", "name": "Id"},
-    {"prop": "code", "name": "Code"},
     {"prop": "main_name", "name": "Nom principal"},
+    {"prop": "code", "name": "Code"},
+    {"prop": "sdage", "name": "Typologie SDAGE"},
+    {"prop": "bassin_versant", "name": "Bassin versant"},
     {"prop": "author", "name": "Auteur"},
-    {"prop": "update_author", "name": "Auteur derniere modification"},
-    {"prop": "create_date", "name": "Date de creation"},
+    {"prop": "organism", "name": "Organisme"},
+    {"prop": "update_author", "name": "Auteur dernière modification"},
+    {"prop": "update_organism", "name": "Organisme de dernière modification"},
+    {"prop": "create_date", "name": "Date de création"},
     {"prop": "update_date", "name": "Date de modification"}
 ]
 
@@ -115,6 +118,9 @@ file_path = "static"
 
 module_dir_name = 'gn_module_zones_humides'
 
+# Name of the source of species data (tab5)
+species_source_name = 'GeoNature'
+
 
 class GnModuleSchemaConf(Schema):
     default_maplist_columns = fields.List(
@@ -136,3 +142,4 @@ class GnModuleSchemaConf(Schema):
     filename_validated = fields.Boolean(missing=filename_validated)
     file_path = fields.String(missing=file_path)
     module_dir_name = fields.String(missing=module_dir_name)
+    species_source_name = fields.String(missing=species_source_name)

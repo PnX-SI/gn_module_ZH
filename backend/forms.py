@@ -638,7 +638,8 @@ def post_managements(id_zh, managements):
                         id_structure=DB.session.query(TManagementStructures).filter(and_(
                             TManagementStructures.id_zh == id_zh, TManagementStructures.id_org == management["structure"])).one().id_structure,
                         plan_date=plan["plan_date"],
-                        duration=plan["duration"]
+                        duration=plan["duration"],
+                        remark=plan["remark"]
                     )
                 )
                 DB.session.flush()
@@ -698,8 +699,12 @@ def post_protections(id_zh, protections):
 
 def update_zh_tab6(data):
     try:
+        is_other_inventory = data['is_other_inventory']
         DB.session.query(TZH).filter(TZH.id_zh == data['id_zh']).update({
-            TZH.is_other_inventory: data['is_other_inventory']
+            TZH.update_author: data['update_author'],
+            TZH.update_date: data['update_date'],
+            TZH.is_other_inventory: is_other_inventory,
+            TZH.remark_is_other_inventory: data['remark_is_other_inventory'] if is_other_inventory else None
         })
         DB.session.flush()
     except Exception as e:
@@ -783,7 +788,7 @@ def post_actions(id_zh, actions):
 # tab 8
 
 
-def post_file_info(id_zh, title, author, description, extension):
+def post_file_info(id_zh, title, author, description, extension, media_path=None):
     try:
         unique_id_media = DB.session.query(TZH).filter(
             TZH.id_zh == int(id_zh)).one().zh_uuid
@@ -808,10 +813,11 @@ def post_file_info(id_zh, title, author, description, extension):
             author=author,
             description_fr=description,
             is_public=True,
+            media_path=media_path,
             meta_create_date=str(post_date),
             meta_update_date=str(post_date)
         ))
-        DB.session.flush()
+        DB.session.commit()
         id_media = DB.session.query(TMedias).filter(
             TMedias.uuid_attached_row == uuid_attached_row).one().id_media
         return id_media

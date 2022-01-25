@@ -89,7 +89,6 @@
                 <a
                   class="btn btn-outline-shadow btn-no-padding btn-ghost"
                   [routerLink]="['zhDetails', row.id_zh]"
-                  target="_blank"
                 >
                   <i
                     matTooltip="{{ 'Fiche complète de la zone humide' }}"
@@ -113,6 +112,18 @@
             </ng-template>
           </ngx-datatable-column>
           <ngx-datatable-column maxWidth="10">
+            <ng-template ngx-datatable-header-template>
+              <i
+                class="fa fa-cog clickable"
+                aria-hidden="true"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                matTooltip="{{'List.Columns' | translate}}"
+                (click)="openModalCol($event, modalCol)"
+              >
+              </i>
+            </ng-template>
             <ng-template let-row="row" ngx-datatable-cell-template>
               <button
                 class="btn btn-outline-shadow btn-no-padding btn-ghost"
@@ -136,7 +147,7 @@
                 [maxWidth]="col.max_width"
                 [prop]="col.prop"
                 [name]="col.name"
-                [sortable]="true"
+                [sortable]="col.sortable"
               >
               </ngx-datatable-column>
             </ng-container>
@@ -147,35 +158,68 @@
     </mat-drawer-content>
   </mat-drawer-container>
 </div>
+<!-- MODAL COLUMNS -->
+<ng-template
+#modalCol
+let-c="close"
+let-d="dismiss"
+>
+<div class="modal-header">
+  <h4> {{'List.DisplayColumns' | translate}} </h4>
+</div>
+<div class="modal-body">
+  <div class="d-flex p-2 justify-content-start"
+    *ngFor="let col of mapListService.availableColumns">
+    <input
+      type='checkbox'
+      [id]="col.name"
+      (click)='toggle(col)'
+      [checked]='isChecked(col)'
+    />
+    <label class="ml-1" [attr.for]="col.name">{{col.name | readablePropertie }}</label>
+  </div>
+  <div class="d-flex justify-content-end">
+    <button
+      type="button"
+      mat-raised-button
+      color="primary"
+      class="uppercase"
+      (click)="c()"
+    >
+      Fermer
+    </button>
+  </div>
+</div>
+</ng-template>
 
-    <!-- MODAL DELETE -->
-    <ng-template #modalConfirm let-c="close" let-d="dismiss">
-      <div class="modal-header">
-        <h5 class="modal-title"><i class="fa fa-trash"></i></h5>
-      </div>
-      <div class="modal-body">
-        Êtes-vous sûr de vouloir supprimer la
-        {{ mapListService.selectedRow[0].main_name }} ?
-        <br />
-        Sa suppression sera définitive
-      </div>
-      <div class="modal-footer">
-        <button
-          type="button"
-          mat-raised-button
-          class="mr-1 uppercase"
-          (click)="c()"
-        >
-          Annuler
-        </button>
-        <button
-          type="button"
-          mat-raised-button
-          color="warn"
-          class="uppercase"
-          (click)="c(); deleteOneZh(mapListService.selectedRow[0])"
-        >
-          Supprimer
-        </button>
-      </div>
+<!-- MODAL DELETE -->
+<ng-template #modalConfirm let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h5 class="modal-title"><i class="fa fa-trash"></i></h5>
+  </div>
+  <div class="modal-body">
+    Êtes-vous sûr de vouloir supprimer la
+    {{ mapListService.selectedRow[0].main_name }} ?
+    <br />
+    Sa suppression sera définitive
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      mat-raised-button
+      class="mr-1 uppercase"
+      (click)="c()"
+    >
+      Annuler
+    </button>
+    <button
+      type="button"
+      mat-raised-button
+      color="warn"
+      class="uppercase"
+      (click)="c(); deleteOneZh(mapListService.selectedRow[0])"
+    >
+      Supprimer
+    </button>
+  </div>
 </ng-template>

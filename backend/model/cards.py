@@ -26,6 +26,20 @@ class Utils(ZH):
         return []
 
     @staticmethod
+    def get_cd_and_mnemo(ids):
+        if ids:
+            if type(ids) is int:
+                result = DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == ids).one()
+                return (result.cd_nomenclature, result.label_default)
+            
+            results = []
+            for id in ids:
+                res = DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == id).one()
+                results.append((res.cd_nomenclature, res.label_default))
+            return results
+        return []
+
+    @staticmethod
     def get_bool(bool):
         if bool:
             return 'Oui'
@@ -126,22 +140,13 @@ class Localisation:
         self.regions = regions
         self.departments = departments
         self.municipalities = self.__get_municipalities_info()
-        self.river_basin = self.__get_river_basin()
 
     def __str__(self):
         return {
             "region": self.regions,
             "departement": self.departments,
             "commune": self.municipalities,
-            "bassin_versant": self.river_basin
         }
-
-    def __get_river_basin(self):
-        return [
-            DB.session.query(TRiverBasin)
-            .filter(TRiverBasin.id_rb == id).one().name
-            for id in [rb.id_rb for rb in DB.session.query(CorZhRb).filter(CorZhRb.id_zh == self.id_zh).all()]
-        ]
 
     def __get_municipalities_info(self):
         return [
@@ -168,8 +173,8 @@ class Author:
         return {
             "auteur": self.create_author,
             "auteur_modif": self.edit_author,
-            "date": datetime.strptime(self.create_date, '%Y-%m-%d %H:%M:%S').date().strftime("%d/%m/%Y"),
-            "date_modif": datetime.strptime(self.update_date, '%Y-%m-%d %H:%M:%S.%f').date().strftime("%d/%m/%Y"),
+            "date": self.create_date,
+            "date_modif": self.update_date,
             # "organism": DB.session.query(Organisme).filter(Organisme.id_organisme == self.id_organisme).one().nom_organisme
             "organism": self.__temporary_get_organism(self.id_organisme)
         }
@@ -457,18 +462,51 @@ class Description:
         self.presentation: Presentation
         self.id_corine_landcovers: list(int)
         self.use: Use
+        self.basin: Basin
 
     def __str__(self):
         return {
             "presentation": self.presentation.__str__(),
-            "espace": Utils.get_mnemo(self.id_corine_landcovers),
-            "usage": self.use.__str__()
+            "espace": [f"{cd} - {label}" for cd, label in Utils.get_cd_and_mnemo(self.id_corine_landcovers)],
+            "usage": self.use.__str__(),
+            "basin": self.basin.__str__()
         }
+
+
+class Basin:
+
+    def __init__(self, id_zh: int):
+        self.id_zh = id_zh
+        self.river_basins = self.__get_river_basins()
+        self.hydro_zones = self.__get_hydro_zones()
+
+    def __str__(self):
+        return {
+            "basins": self.river_basins,
+            "hydros": self.hydro_zones,
+        }
+
+    def __get_river_basins(self):
+        return (
+            DB.session.query(TRiverBasin.name)
+            .filter(TRiverBasin.id_rb == CorZhRb.id_rb)
+            .filter(CorZhRb.id_zh == self.id_zh)
+            .all()
+        )
+    
+    def __get_hydro_zones(self):
+        return (
+            DB.session.query(THydroArea.name)
+            .filter(THydroArea.id_hydro == CorZhHydro.id_hydro)
+            .filter(CorZhHydro.id_zh == self.id_zh)
+            .all()
+        )
 
 
 class Presentation:
 
-    def __init__(self, id_sdage, id_sage, cb_codes_corine_biotope, remark_pres):
+    def __init__(self, area, id_sdage, id_sage, cb_codes_corine_biotope, remark_pres):
+        self.area: float = area
         self.id_sdage: int = id_sdage
         self.id_sage: int = id_sage
         self.cb_codes_corine_biotope: list(
@@ -477,6 +515,7 @@ class Presentation:
 
     def __str__(self):
         return {
+            "area": self.area,
             "sdage": Utils.get_mnemo(self.id_sdage),
             "typologie_locale": Utils.get_mnemo(self.id_sage),
             "corine_biotope": [cb.__str__() for cb in self.cb_codes_corine_biotope],
@@ -511,7 +550,7 @@ class Use:
         return {
             "activities": [activity.__str__() for activity in self.activities],
             "evaluation_menaces": Utils.get_mnemo(self.id_thread),
-            "Remarques": Utils.get_string(self.remark_activity)
+            "remarques": Utils.get_string(self.remark_activity)
         }
 
 
@@ -544,6 +583,7 @@ class Status:
         self.instruments: list(Instrument)
         self.other_ref_geo: list(dict)
         self.is_other_inventory: bool
+        self.remark_is_other_inventory: str
         self.protections: list(int)
         self.urban_docs: list(UrbanDoc)
 
@@ -570,6 +610,10 @@ class Status:
     @property
     def is_other_inventory(self):
         return self.__is_other_inventory
+
+    @property
+    def remark_is_other_inventory(self):
+        return self.__remark_is_other_inventory
 
     @property
     def protections(self):
@@ -600,7 +644,8 @@ class Status:
                 Plan(
                     plan['id_nature'],
                     plan['plan_date'],
-                    plan['duration']
+                    plan['duration'],
+                    plan['remark']
                 ) for plan in management['plans']
             ]
             mng = Management()
@@ -640,6 +685,10 @@ class Status:
     def is_other_inventory(self, value):
         self.__is_other_inventory = value
 
+    @remark_is_other_inventory.setter
+    def remark_is_other_inventory(self, value):
+        self.__remark_is_other_inventory = value
+
     @urban_docs.setter
     def urban_docs(self, urban_docs):
         self.__urban_docs = [
@@ -671,6 +720,7 @@ class Status:
             "instruments": [instrument.__str__() for instrument in self.instruments],
             "autre_inventaire": self.__other_ref_geo,
             "autre_etude": Utils.get_bool(self.is_other_inventory),
+            "autre_etude_commentaire": self.remark_is_other_inventory,
             "statuts": self.__str_protections(),
             "zonage": [urban_doc.__str__() for urban_doc in self.urban_docs]
         }
@@ -708,16 +758,18 @@ class Management:
 
 class Plan:
 
-    def __init__(self, id_nature, plan_date, duration):
+    def __init__(self, id_nature, plan_date, duration, remark: str):
         self.id_nature: int = id_nature
         self.plan_date: str = plan_date
         self.duration: int = duration
+        self.remark: str = remark
 
     def __str__(self):
         return {
             "plan": Utils.get_mnemo(self.id_nature),
             "date": Utils.get_string(str(self.plan_date)),
-            "duree": self.duration
+            "duree": self.duration,
+            "remark": self.remark
         }
 
 
@@ -783,8 +835,8 @@ class EvalMainFunction:
         self.__hydro = [
             Function(
                 v['id_function'],
-                v['id_knowledge'],
                 v['id_qualification'],
+                v['id_knowledge'],
                 v['justification']
             ) for v in val
         ]
@@ -798,8 +850,8 @@ class EvalMainFunction:
         self.__bio = [
             Function(
                 v['id_function'],
-                v['id_knowledge'],
                 v['id_qualification'],
+                v['id_knowledge'],
                 v['justification']
             ) for v in value
         ]
@@ -831,8 +883,8 @@ class EvalInterest:
         self.__interet_patrim = [
             Function(
                 i['id_function'],
-                i['id_knowledge'],
                 i['id_qualification'],
+                i['id_knowledge'],
                 i['justification']
             ) for i in val
         ]
@@ -846,8 +898,8 @@ class EvalInterest:
         self.__val_soc_eco = [
             Function(
                 i['id_function'],
-                i['id_knowledge'],
                 i['id_qualification'],
+                i['id_knowledge'],
                 i['justification']
             ) for i in val
         ]
@@ -857,8 +909,8 @@ class EvalInterest:
         self.__interet_patrim = [
             Function(
                 i['id_function'],
-                i['id_knowledge'],
                 i['id_qualification'],
+                i['id_knowledge'],
                 i['justification']
             ) for i in val
         ]
@@ -1099,11 +1151,13 @@ class Card(ZH):
 
     def __set_description(self):
         self.description.presentation = Presentation(
+            self.properties['area'],
             self.properties['id_sdage'],
             self.properties['id_sage'],
             self.__get_cb(),
             self.properties['remark_pres']
         )
+        self.description.basin = Basin(self.id_zh)
         self.description.id_corine_landcovers = self.properties['id_corine_landcovers']
         self.__set_use()
         return self.description.__str__()
@@ -1133,6 +1187,7 @@ class Card(ZH):
         self.status.instruments = self.properties['instruments']
         self.status.other_ref_geo = self.ref_geo_config
         self.status.is_other_inventory = self.properties['is_other_inventory']
+        self.status.remark_is_other_inventory = self.properties['remark_is_other_inventory']
         self.status.protections = self.properties['protections']
         self.status.urban_docs = self.properties['urban_docs']
         return self.status.__str__()

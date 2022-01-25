@@ -50,7 +50,6 @@
             class="form-control"
             [formControl]="generalInfoForm.controls.id_site_space"
           >
-            <option [ngValue]="null"></option>
             <option
               *ngFor="let siteSpace of siteSpaceList"
               [ngValue]="siteSpace.id_site_space"

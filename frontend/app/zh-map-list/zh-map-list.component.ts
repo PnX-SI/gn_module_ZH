@@ -160,10 +160,18 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     return sdage.mnemonique;
   }
 
+  displayOrganism(authors): string {
+    return authors.organisme.nom_organisme;
+  }
+
   zhCustomCallBack(feature): any {
     // set Author name
     feature["properties"]["author"] = this.displayAuthorName(
       feature["properties"]["authors"]
+    );
+    // set Change Author name
+    feature["properties"]["update_author"] = this.displayAuthorName(
+      feature["properties"]["coauthors"]
     );
     // format Date
     feature["properties"]["create_date"] = this.displayDate(
@@ -173,6 +181,15 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     feature["properties"]["sdage"] = this.displaySdageName(
       feature["properties"]["id_sdage"]
     );
+
+    feature["properties"]["organism"] = this.displayOrganism(
+      feature["properties"]["authors"]
+    );
+
+    feature["properties"]["update_organism"] = this.displayOrganism(
+      feature["properties"]["coauthors"]
+    );
+
     return feature;
   }
 
@@ -193,6 +210,36 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       }
     );
+  }
+
+  openModalCol(event, modal) {
+    this.ngbModal.open(modal);
+  }
+
+  isChecked(col) {
+    let i = 0;
+    while (
+      i < this.mapListService.displayColumns.length &&
+      this.mapListService.displayColumns[i].prop !== col.prop
+    ) {
+      i = i + 1;
+    }
+    return i === this.mapListService.displayColumns.length ? false : true;
+  }
+
+  toggle(col) {
+    const isChecked = this.isChecked(col);
+    if (isChecked) {
+      this.mapListService.displayColumns =
+        this.mapListService.displayColumns.filter((c) => {
+          return c.prop !== col.prop;
+        });
+    } else {
+      this.mapListService.displayColumns = [
+        ...this.mapListService.displayColumns,
+        col,
+      ];
+    }
   }
 
   openDeleteModal(event, modal, iElement, row) {
