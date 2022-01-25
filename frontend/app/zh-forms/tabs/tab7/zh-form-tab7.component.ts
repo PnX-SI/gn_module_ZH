@@ -5,6 +5,7 @@ import { ToastrService } from "ngx-toastr";
 import { Subscription } from "rxjs";
 import { ZhDataService } from "../../../services/zh-data.service";
 import { TabsService } from "../../../services/tabs.service";
+import { ErrorTranslatorService } from "../../../services/error-translator.service";
 
 @Component({
   selector: "zh-form-tab7",
@@ -142,6 +143,7 @@ export class ZhFormTab7Component implements OnInit {
     private fb: FormBuilder,
     public ngbModal: NgbModal,
     private _dataService: ZhDataService,
+    private _error: ErrorTranslatorService,
     private _tabService: TabsService
   ) {}
 
@@ -488,7 +490,10 @@ export class ZhFormTab7Component implements OnInit {
         },
         (error) => {
           this.posted = false;
-          this._toastr.error(error.error, "", {
+          const frontMsg: string = this._error.getFrontError(
+            error.error.message
+          );
+          this._toastr.error(frontMsg, "", {
             positionClass: "toast-top-right",
           });
         }
