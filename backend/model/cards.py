@@ -487,20 +487,22 @@ class Basin:
         }
 
     def __get_river_basins(self):
-        return (
+        return [
+            name for (name, ) in
             DB.session.query(TRiverBasin.name)
             .filter(TRiverBasin.id_rb == CorZhRb.id_rb)
             .filter(CorZhRb.id_zh == self.id_zh)
             .all()
-        )
+        ]
     
     def __get_hydro_zones(self):
-        return (
+        return [
+            name for (name, ) in
             DB.session.query(THydroArea.name)
             .filter(THydroArea.id_hydro == CorZhHydro.id_hydro)
             .filter(CorZhHydro.id_zh == self.id_zh)
             .all()
-        )
+        ]
 
 
 class Presentation:
