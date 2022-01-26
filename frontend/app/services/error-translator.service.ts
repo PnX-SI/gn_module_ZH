@@ -67,6 +67,11 @@ export class ErrorTranslatorService {
         "Vous n'avez pas les droits pour supprimer/modifier/lire cette zone humide",
       id: 10,
     },
+    {
+      api: "empty_geometry",
+      front: "Veuillez tracer une geométrie",
+      id: 11,
+    }
   ];
 
   getError(errorMsg: string): error {
