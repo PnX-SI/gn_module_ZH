@@ -8,8 +8,8 @@ import { ZhDataService } from "../../../services/zh-data.service";
 import { TabsService } from "../../../services/tabs.service";
 import { ModalService } from "../../../services/modal.service";
 import { TaxaFile } from "./zh-form-tab5.models";
-import { FilesService } from "../../../services/files.service";
 import { ErrorTranslatorService } from "../../../services/error-translator.service";
+import { FilesService } from "../../../services/files.service";
 import { ModuleConfig } from "../../../module.config";
 
 @Component({
@@ -180,9 +180,9 @@ export class ZhFormTab5Component implements OnInit {
     private _toastr: ToastrService,
     private _dataService: ZhDataService,
     private _modalService: ModalService,
+    private _error: ErrorTranslatorService,
     private _tabService: TabsService,
-    private _filesService: FilesService,
-    private _error: ErrorTranslatorService
+    private _filesService: FilesService
   ) {}
 
   ngOnInit() {
@@ -1107,7 +1107,10 @@ export class ZhFormTab5Component implements OnInit {
         },
         (error) => {
           this.posted = false;
-          this._toastr.error(error.error, "", {
+          const frontMsg: string = this._error.getFrontError(
+            error.error.message
+          );
+          this._toastr.error(frontMsg, "", {
             positionClass: "toast-top-right",
           });
         }

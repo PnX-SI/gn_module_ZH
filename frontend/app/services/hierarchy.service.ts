@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, OnInit } from "@angular/core";
 import { ZhDataService } from "./zh-data.service";
 import { HierarchyModel } from "../zh-details/models/hierarchy.model";
 import { ItemModel } from "../zh-details/models/hierarchy.model";
@@ -25,6 +25,7 @@ export class HierarchyService {
   //public hierZh: HierarchyModel = null;
   public items: ItemModel[];
   public rb_name: string;
+  public isLoading: boolean = false;
 
   constructor(
     private _dataService: ZhDataService,
@@ -32,13 +33,19 @@ export class HierarchyService {
     private _toastr: ToastrService
   ) {}
 
+  ngOnInit(): void {
+    this.isLoading = false;
+  }
+
   // get current zone humides
   getHierarchy(zhId) {
+    this.isLoading = true;
     this._dataService.getHierZh(zhId).subscribe(
       (data: HierarchyModel) => {
         this.items = this.setItems(data);
       },
       (error) => {
+        this.isLoading = false;
         this.items = [];
         if (error.status === 400 || error.status === 500) {
           const frontError: string = this._error.getFrontError(
@@ -51,6 +58,9 @@ export class HierarchyService {
             timeOut: timeOut,
           });
         }
+      },
+      () => {
+        this.isLoading = false;
       }
     );
   }

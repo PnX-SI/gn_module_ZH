@@ -49,7 +49,7 @@ ngx-datatable {
 }
 
 .modal-body {
-  padding: 20px
+  padding: 20px;
 }
 
 .modal-header {
@@ -57,5 +57,9 @@ ngx-datatable {
   color: white;
   display: flex;
   justify-content: center;
-  background-color: #ff6666
+  background-color: #219653 !important;
+}
+
+label {
+  margin-bottom: 0;
 }

@@ -109,6 +109,8 @@ def get_zh(info_role):
         parameters = request.args
         limit = int(parameters.get("limit", 100))
         page = int(parameters.get("offset", 0))
+        orderby = str(parameters.get("orderby", None))
+        order = str(parameters.get("order", "asc"))
 
         payload = request.json or None
 
@@ -118,14 +120,16 @@ def get_zh(info_role):
         return get_all_zh(info_role=info_role,
                           query=q,
                           limit=limit,
-                          page=page)
+                          page=page,
+                          orderby=orderby,
+                          order=order)
     except Exception as e:
         exc_type, value, tb = sys.exc_info()
         raise ZHApiError(message="filter_zh_error", details=str(
             exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
-def get_all_zh(info_role, query, limit, page):
+def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
     try:
         # Pour obtenir le nombre de résultat de la requete sans le LIMIT
         nb_results_without_limit = query.count()
@@ -134,6 +138,13 @@ def get_all_zh(info_role, query, limit, page):
         user_cruved = get_or_fetch_user_cruved(
             session=session, id_role=info_role.id_role, module_code="ZONES_HUMIDES"
         )
+
+        if orderby in TZH.__table__.columns:
+            col = getattr(TZH, orderby, None)
+            if col is not None:
+                if order == 'desc':
+                    col = col.desc()
+                query = query.order_by(col)
 
         data = query.limit(limit).offset(page * limit).all()
 
@@ -147,6 +158,13 @@ def get_all_zh(info_role, query, limit, page):
                 relationships=()
             )
             feature["properties"]["rights"] = releve_cruved
+            rb_names = [
+                name for (name,) in DB.session.query(TRiverBasin.name)
+                    .filter(TRiverBasin.id_rb == CorZhRb.id_rb)
+                    .filter(CorZhRb.id_zh == feature.properties['id_zh'])
+                    .all()
+            ]
+            feature["properties"]["bassin_versant"] = rb_names
             featureCollection.append(feature)
         return {
             "total": nb_results_without_limit,
@@ -416,66 +434,6 @@ def get_ref_autocomplete(info_role):
         DB.session.close()
 
 
-@ blueprint.route("/references", methods=["POST"])
-@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
-@ json_resp
-def post_reference(info_role):
-    """create reference
-    """
-    try:
-        form_data = request.json
-        new_ref = TReferences(
-            authors=form_data["authors"],
-            pub_year=form_data["pub_year"],
-            title=form_data["title"],
-            editor=form_data["editor"],
-            editor_location=form_data["editor_location"]
-        )
-        DB.session.add(new_ref)
-        DB.session.commit()
-        return new_ref.as_dict()
-    except Exception as e:
-        DB.session.rollback()
-        if e.__class__.__name__ == 'DataError':
-            raise ZHApiError(
-                message="post_reference_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="post_reference_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
-    finally:
-        DB.session.close()
-
-
-@ blueprint.route("/references", methods=["PATCH"])
-@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
-@ json_resp
-def patch_reference(info_role):
-    """edit reference
-    """
-    try:
-        pdb.set_trace()
-        form_data = request.json
-        DB.session.query(TReferences).filter(TReferences.id_reference == form_data['id_reference']).update({
-            TReferences.authors: form_data["authors"],
-            TReferences.pub_year: form_data["pub_year"],
-            TReferences.title: form_data["title"],
-            TReferences.editor: form_data["editor"],
-            TReferences.editor_location: form_data["editor_location"]
-        })
-        DB.session.commit()
-        return form_data
-    except Exception as e:
-        DB.session.rollback()
-        if e.__class__.__name__ == 'DataError':
-            raise ZHApiError(
-                message="edit_reference_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="edit_reference_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
-    finally:
-        DB.session.close()
-
-
 @ blueprint.route("/<int:id_zh>/files", methods=["GET"])
 @ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
 @ json_resp_accept_empty_list
@@ -563,10 +521,10 @@ def post_main_pict(id_zh, id_media, info_role):
 def get_tab_data(id_tab, info_role):
     """Post zh data
     """
-    form_data = request.json
+    form_data = request.json or {}
     form_data['update_author'] = info_role.id_role
     form_data['update_date'] = dt.now()
-    
+
     try:
         if id_tab == 0:
             # set name
@@ -938,7 +896,7 @@ def download(id_zh: int):
     Downloads the report in pdf format
     """
     zh = ZH(id_zh=id_zh).zh
-    author_role =  zh.authors
+    author_role = zh.authors
     author = f'{author_role.prenom_role} {author_role.nom_role.upper()}'
     last_date = zh.update_date
     media = get_last_pdf_export(id_zh=id_zh, last_date=last_date)
@@ -947,7 +905,8 @@ def download(id_zh: int):
         module_name = blueprint.config['MODULE_CODE'].lower()
         upload_path = blueprint.config['file_path']
         filename = f'{id_zh}_fiche_{dt.now().strftime("%Y-%m-%d")}.pdf'
-        media_path = Path(ROOT_DIR, 'external_modules', module_name, upload_path, filename)
+        media_path = Path(ROOT_DIR, 'external_modules',
+                          module_name, upload_path, filename)
         pdf_file = gen_pdf(id_zh=id_zh, dataset=dataset, filename=media_path)
         post_file_info(
             id_zh=id_zh,
@@ -956,7 +915,7 @@ def download(id_zh: int):
             description='Fiche de synthèse de la zone humide',
             extension='.pdf',
             media_path=str(media_path))
-        
+
         return send_file(pdf_file, as_attachment=True)
     else:
         return send_file(get_file_path(media.id_media), as_attachment=True)

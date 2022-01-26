@@ -13,28 +13,28 @@ export class FonctionsComponent {
   readonly knowledgeSize: string = "10%";
 
   public hydroFctTableCol = [
-    { name: "type", label: "Fonctions hydrologiques", size: this.functionSize },
+    { name: "type", label: "Fonctions hydrologiques / biogéochimiques", size: this.functionSize },
+    { name: "justification", label: "Justifications" },
     { name: "qualification", label: "Qualifications", size: this.qualifSize },
     { name: "connaissance", label: "Connaissance", size: this.knowledgeSize },
-    { name: "justification", label: "Justifications" },
   ];
   public bioFctTableCol = [
-    { name: "type", label: "Fonctions biologiques", size: this.functionSize },
+    { name: "type", label: "Fonctions biologiques / écologiques", size: this.functionSize },
+    { name: "justification", label: "Justifications" },
     { name: "qualification", label: "Qualifications", size: this.qualifSize },
     { name: "connaissance", label: "Connaissance", size: this.knowledgeSize },
-    { name: "justification", label: "Justifications" },
   ];
   public intertesTableCol = [
     { name: "type", label: "Intérêts patrimoniaux", size: this.functionSize },
+    { name: "justification", label: "Justifications" },
     { name: "qualification", label: "Qualifications", size: this.qualifSize },
     { name: "connaissance", label: "Connaissance", size: this.knowledgeSize },
-    { name: "justification", label: "Justifications" },
   ];
 
   public corineTableCol = [
-    { name: "biotope", label: "Corine Biotope", size: this.functionSize },
+    { name: "biotope", label: "Corine biotopes", size: this.functionSize },
+    { name: "cahier", label: "Cahier d'habitats" },
     { name: "etat", label: "État de conservation", size: this.qualifSize },
-    { name: "cahier", label: "Cahier Habitats" },
     { name: "recouvrement", label: "Recouvrement de la ZH (%)", size: "5%" },
   ];
 
@@ -44,8 +44,8 @@ export class FonctionsComponent {
       label: "Valeurs socio-économiques",
       size: this.functionSize,
     },
+    { name: "justification", label: "Justifications" },
     { name: "qualification", label: "Qualifications", size: this.qualifSize },
     { name: "connaissance", label: "Connaissance", size: this.knowledgeSize },
-    { name: "justification", label: "Justifications" },
   ];
 }

@@ -4,6 +4,35 @@
       <fieldset>
         <legend>
           <h5 class="section-title">
+            Bassin versant de la zone humide
+          </h5>
+        </legend>
+        <div class="row">
+          <div class="col-12 col-xl-6">
+            <zh-label label=" Bassin versant :">
+              <ul>
+                <li *ngFor="let basin of data.basin?.basins">
+                  {{ basin }}
+                </li>
+              </ul>
+            </zh-label>
+          </div>
+          <div class="col-12 col-xl-6">
+            <zh-label label=" Zone hydrographique :">
+              <ul>
+                <li *ngFor="let hydro of data.basin?.hydros">
+                  {{ hydro }}
+                </li>
+              </ul>
+            </zh-label>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+    <div class="col-12 h-100">
+      <fieldset>
+        <legend>
+          <h5 class="section-title">
             Présentation de la zone humide et de ses milieux
           </h5>
         </legend>

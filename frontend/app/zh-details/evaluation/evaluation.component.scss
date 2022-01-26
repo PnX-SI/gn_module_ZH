@@ -1,1 +1,12 @@
 @import "../../../app.module";
+
+.info-icon {
+  background-repeat: no-repeat;
+  display: inline-block;
+  fill: currentColor;
+  height: 24px;
+  width: 24px;
+  vertical-align: middle;
+  margin-left: 6px;
+  cursor: pointer;
+}

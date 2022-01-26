@@ -140,22 +140,13 @@ class Localisation:
         self.regions = regions
         self.departments = departments
         self.municipalities = self.__get_municipalities_info()
-        self.river_basin = self.__get_river_basin()
 
     def __str__(self):
         return {
             "region": self.regions,
             "departement": self.departments,
             "commune": self.municipalities,
-            "bassin_versant": self.river_basin
         }
-
-    def __get_river_basin(self):
-        return [
-            DB.session.query(TRiverBasin)
-            .filter(TRiverBasin.id_rb == id).one().name
-            for id in [rb.id_rb for rb in DB.session.query(CorZhRb).filter(CorZhRb.id_zh == self.id_zh).all()]
-        ]
 
     def __get_municipalities_info(self):
         return [
@@ -471,13 +462,45 @@ class Description:
         self.presentation: Presentation
         self.id_corine_landcovers: list(int)
         self.use: Use
+        self.basin: Basin
 
     def __str__(self):
         return {
             "presentation": self.presentation.__str__(),
             "espace": [f"{cd} - {label}" for cd, label in Utils.get_cd_and_mnemo(self.id_corine_landcovers)],
-            "usage": self.use.__str__()
+            "usage": self.use.__str__(),
+            "basin": self.basin.__str__()
         }
+
+
+class Basin:
+
+    def __init__(self, id_zh: int):
+        self.id_zh = id_zh
+        self.river_basins = self.__get_river_basins()
+        self.hydro_zones = self.__get_hydro_zones()
+
+    def __str__(self):
+        return {
+            "basins": self.river_basins,
+            "hydros": self.hydro_zones,
+        }
+
+    def __get_river_basins(self):
+        return (
+            DB.session.query(TRiverBasin.name)
+            .filter(TRiverBasin.id_rb == CorZhRb.id_rb)
+            .filter(CorZhRb.id_zh == self.id_zh)
+            .all()
+        )
+    
+    def __get_hydro_zones(self):
+        return (
+            DB.session.query(THydroArea.name)
+            .filter(THydroArea.id_hydro == CorZhHydro.id_hydro)
+            .filter(CorZhHydro.id_zh == self.id_zh)
+            .all()
+        )
 
 
 class Presentation:
@@ -812,8 +835,8 @@ class EvalMainFunction:
         self.__hydro = [
             Function(
                 v['id_function'],
-                v['id_knowledge'],
                 v['id_qualification'],
+                v['id_knowledge'],
                 v['justification']
             ) for v in val
         ]
@@ -827,8 +850,8 @@ class EvalMainFunction:
         self.__bio = [
             Function(
                 v['id_function'],
-                v['id_knowledge'],
                 v['id_qualification'],
+                v['id_knowledge'],
                 v['justification']
             ) for v in value
         ]
@@ -860,8 +883,8 @@ class EvalInterest:
         self.__interet_patrim = [
             Function(
                 i['id_function'],
-                i['id_knowledge'],
                 i['id_qualification'],
+                i['id_knowledge'],
                 i['justification']
             ) for i in val
         ]
@@ -875,8 +898,8 @@ class EvalInterest:
         self.__val_soc_eco = [
             Function(
                 i['id_function'],
-                i['id_knowledge'],
                 i['id_qualification'],
+                i['id_knowledge'],
                 i['justification']
             ) for i in val
         ]
@@ -886,8 +909,8 @@ class EvalInterest:
         self.__interet_patrim = [
             Function(
                 i['id_function'],
-                i['id_knowledge'],
                 i['id_qualification'],
+                i['id_knowledge'],
                 i['justification']
             ) for i in val
         ]
@@ -1134,6 +1157,7 @@ class Card(ZH):
             self.__get_cb(),
             self.properties['remark_pres']
         )
+        self.description.basin = Basin(self.id_zh)
         self.description.id_corine_landcovers = self.properties['id_corine_landcovers']
         self.__set_use()
         return self.description.__str__()

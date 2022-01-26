@@ -200,16 +200,18 @@
                 <li>Dans le cas d'absence d'observation répondant à ces critères, aucun fichier ne sera généré</li>
               </ul>
           </ng-template>
-          <zh-table
-          *ngIf="_filesService.filterByExtension('csv').length > 0"
-          [tableCols]="fileTableCol" 
-          [data]="_filesService.filterByExtension('csv')"
-          [downloadable]="true"
-          (onDownload)="_filesService.downloadFile($event)"
-          ></zh-table>
-          <p class="hint">
-            Vous pouvez retrouver ces fichiers dans l'onglet des ressources documentaires (<a [routerLink]="" (click)="nextTab.emit(8)">onglet 8</a>)
-          </p>
+          <ng-container *ngIf="_filesService.filterByExtension('csv').length > 0">
+            <zh-table
+            
+            [tableCols]="fileTableCol" 
+            [data]="_filesService.filterByExtension('csv')"
+            [downloadable]="true"
+            (onDownload)="_filesService.downloadFile($event)"
+            ></zh-table>
+            <p class="hint">
+              Vous pouvez retrouver ces fichiers dans l'onglet des ressources documentaires (<a [routerLink]="" (click)="nextTab.emit(8)">onglet 8</a>)
+            </p>
+          </ng-container>
         </div>
         <div class="form-group col-md-4">
           <small>Flore - nombre d'espèces</small>
