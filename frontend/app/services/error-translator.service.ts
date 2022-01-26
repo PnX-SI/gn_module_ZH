@@ -70,7 +70,7 @@ export class ErrorTranslatorService {
     {
       api: "empty_geometry",
       front: "Veuillez tracer une geométrie",
-      id: 6,
+      id: 11,
     }
   ];
 
