@@ -158,8 +158,12 @@ def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
                 relationships=()
             )
             feature["properties"]["rights"] = releve_cruved
-            rb_names = [DB.session.query(TRiverBasin).filter(TRiverBasin.id_rb == id_rb).one().name for id_rb in [
-                q.id_rb for q in DB.session.query(CorZhRb.id_rb).filter(CorZhRb.id_zh == feature.properties['id_zh']).all()]]
+            rb_names = [
+                name for (name,) in DB.session.query(TRiverBasin.name)
+                    .filter(TRiverBasin.id_rb == CorZhRb.id_rb)
+                    .filter(CorZhRb.id_zh == feature.properties['id_zh'])
+                    .all()
+            ]
             feature["properties"]["bassin_versant"] = rb_names
             featureCollection.append(feature)
         return {
