@@ -1,7 +1,10 @@
 <div class="container-fluid">
   <h2 class="tabsTitle">Hiérarchisation</h2>
-  <h4 class="tabsSubtitle">Bassin versant : {{hierarchy.rb_name}}</h4>
 
+  <div *ngIf="!hierarchy.isLoading">
+    <h4 class="tabsSubtitle">Bassin versant : {{hierarchy.rb_name}}</h4>
+
+  
     <zh-table
             [tableCols]="hierarchy.hierTableCols"
             [data]="hierarchy.items"
@@ -10,5 +13,10 @@
             [color_col_name]="hierarchy.color_col_name"
             [color_value]="hierarchy.color_value"
     ></zh-table>
-  
   </div>
+
+  <div *ngIf="hierarchy.isLoading">
+    <div> Chargement de la hiérarchisation, veuillez patienter</div>
+    <mat-spinner color="warn" diameter="25"></mat-spinner>
+  </div>    
+</div>
