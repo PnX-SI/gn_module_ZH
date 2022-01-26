@@ -158,6 +158,9 @@ def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
                 relationships=()
             )
             feature["properties"]["rights"] = releve_cruved
+            rb_names = [DB.session.query(TRiverBasin).filter(TRiverBasin.id_rb == id_rb).one().name for id_rb in [
+                q.id_rb for q in DB.session.query(CorZhRb.id_rb).filter(CorZhRb.id_zh == feature.properties['id_zh']).all()]]
+            feature["properties"]["bassin_versant"] = rb_names
             featureCollection.append(feature)
         return {
             "total": nb_results_without_limit,
@@ -517,7 +520,7 @@ def get_tab_data(id_tab, info_role):
     form_data = request.json or {}
     form_data['update_author'] = info_role.id_role
     form_data['update_date'] = dt.now()
-    
+
     try:
         if id_tab == 0:
             # set name
@@ -886,7 +889,7 @@ def download(id_zh: int):
     Downloads the report in pdf format
     """
     zh = ZH(id_zh=id_zh).zh
-    author_role =  zh.authors
+    author_role = zh.authors
     author = f'{author_role.prenom_role} {author_role.nom_role.upper()}'
     last_date = zh.update_date
     media = get_last_pdf_export(id_zh=id_zh, last_date=last_date)
@@ -895,7 +898,8 @@ def download(id_zh: int):
         module_name = blueprint.config['MODULE_CODE'].lower()
         upload_path = blueprint.config['file_path']
         filename = f'{id_zh}_fiche_{dt.now().strftime("%Y-%m-%d")}.pdf'
-        media_path = Path(ROOT_DIR, 'external_modules', module_name, upload_path, filename)
+        media_path = Path(ROOT_DIR, 'external_modules',
+                          module_name, upload_path, filename)
         pdf_file = gen_pdf(id_zh=id_zh, dataset=dataset, filename=media_path)
         post_file_info(
             id_zh=id_zh,
@@ -904,7 +908,7 @@ def download(id_zh: int):
             description='Fiche de synthèse de la zone humide',
             extension='.pdf',
             media_path=str(media_path))
-        
+
         return send_file(pdf_file, as_attachment=True)
     else:
         return send_file(get_file_path(media.id_media), as_attachment=True)
