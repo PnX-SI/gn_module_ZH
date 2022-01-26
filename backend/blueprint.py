@@ -109,8 +109,8 @@ def get_zh(info_role):
         parameters = request.args
         limit = int(parameters.get("limit", 100))
         page = int(parameters.get("offset", 0))
-        orderby = str(parameters.get("orderby", None))
-        order = str(parameters.get("order", "asc"))
+        orderby = str(parameters.get("orderby", "update_date"))
+        order = str(parameters.get("order", "desc"))
 
         payload = request.json or None
 
