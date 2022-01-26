@@ -167,6 +167,7 @@ export class ZhFormTab6Component implements OnInit {
       searchPlaceholderText: "Rechercher",
       enableSearchFilter: true,
       groupBy: "category",
+      position: "top"
     };
 
     this.getMetaData();
