@@ -405,7 +405,9 @@ class Item:
                 elif self.abb in ['epuration', 'support']:
                     try:
                         # return id_knowledge if abb function selected
-                        return getattr(DB.session.query(TFunctions, BibNoteTypes).join(TFunctions, TFunctions.id_knowledge == BibNoteTypes.id_knowledge).filter(and_(TFunctions.id_zh == self.id_zh, TFunctions.id_qualification == self.qualif_id)).one().BibNoteTypes, 'note_id')
+                        knowledge_id = DB.session.query(TFunctions.id_knowledge).filter(and_(TFunctions.id_zh == self.id_zh, TFunctions.id_qualification == self.qualif_id)).filter(
+                            TFunctions.id_function == CorRuleNomenc.nomenc_id).filter(CorRuleNomenc.rule_id == self.rule_id).one().id_knowledge
+                        return DB.session.query(BibNoteTypes).filter(BibNoteTypes.id_knowledge == knowledge_id).one().note_id
                     except:
                         pass
                     # if no function selected, return lacunaire ou nulle
