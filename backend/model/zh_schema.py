@@ -1388,3 +1388,21 @@ class CorRuleNomenc(DB.Model):
     qualif_id = DB.Column(
         DB.Integer
     )
+
+
+class CorZhNotes(DB.Model):
+    __tablename__ = "cor_zh_notes"
+    __table_args__ = {"schema": "pr_zh"}
+    id_zh = DB.Column(
+        DB.Integer,
+        ForeignKey(TZH.id_zh),
+        primary_key=True
+    )
+    cor_rule_id = DB.Column(
+        DB.Integer,
+        ForeignKey(CorRbRules.cor_rule_id),
+        primary_key=True
+    )
+    note = DB.Column(
+        DB.Float
+    )

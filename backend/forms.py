@@ -873,3 +873,29 @@ def update_file_extension(id_media, extension):
             message="update_file_extension_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
     except Exception as e:
         raise ZHApiError(message="update_file_extension_error", details=str(e))
+
+
+def post_note(id_zh, cor_rule_id, note):
+    try:
+        element = DB.session.query(CorZhNotes).filter(CorZhNotes.id_zh == id_zh).filter(
+            CorZhNotes.cor_rule_id == cor_rule_id).first()
+        if element:
+            if element.note != note:
+                element.note = note
+                DB.session.flush()
+        else:
+            DB.session.add(
+                CorZhNotes(
+                    id_zh=id_zh,
+                    cor_rule_id=cor_rule_id,
+                    note=note
+                )
+            )
+            DB.session.flush()
+    except Exception as e:
+        if e.__class__.__name__ == 'DataError':
+            raise ZHApiError(
+                message="post_note_db_error", details=str(e.orig.diag.sqlstate + ': ' + e.orig.diag.message_primary), status_code=400)
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_note_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))

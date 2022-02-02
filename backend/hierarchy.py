@@ -18,6 +18,7 @@ from .api_error import ZHApiError
 from .model.zh_schema import *
 from .model.zh import ZH
 from .geometry import get_main_rb
+from .forms import post_note
 
 import pdb
 
@@ -34,7 +35,7 @@ class Item:
         self.nomenc_ids = self.__get_nomenc_ids()
         self.qualif_id = self.__check_qualif(self.__get_qualif())
         self.knowledge = self.__get_knowledge()
-        self.note = self.__get_note()
+        self.note = self.__set_note()
         self.denominator = self.__get_denominator()
 
     def __get_rule_id(self, abb):
@@ -483,17 +484,21 @@ class Item:
         finally:
             DB.session.close()
 
-    def __get_note(self):
+    def __set_note(self):
         try:
             if self.active:
-                return round(getattr(DB.session.query(TItems).filter(and_(TItems.attribute_id == self.qualif_id, TItems.cor_rule_id == self.cor_rule_id, TItems.note_type_id == self.knowledge)).one(), 'note'), 2)
+                note = round(getattr(DB.session.query(TItems).filter(and_(TItems.attribute_id == self.qualif_id,
+                             TItems.cor_rule_id == self.cor_rule_id, TItems.note_type_id == self.knowledge)).one(), 'note'), 2)
+                post_note(self.id_zh, self.cor_rule_id, note)
+                DB.session.commit()
+                return note
         except ZHApiError as e:
             raise ZHApiError(
                 message=str(e.message), details=str(e.details), status_code=e.status_code)
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
-                message="Item class: __get_note", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+                message="Item class: __set_note", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
     def __get_denominator(self):
         try:
