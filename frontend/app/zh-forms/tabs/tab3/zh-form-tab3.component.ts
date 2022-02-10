@@ -197,7 +197,6 @@ export class ZhFormTab3Component implements OnInit {
               mnemonique: impactNames.join("\r\n"),
             },
           });
-          console.log(this.listActivity);
           this.sortHumanActivities();
           this.activitiesInput.map((item) => {
             if (item.id_nomenclature == activity.id_human_activity) {

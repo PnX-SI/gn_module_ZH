@@ -5,6 +5,7 @@ import { ZhDataService } from "../../services/zh-data.service";
 import { CommonService } from "@geonature_common/service/common.service";
 import { Router } from "@angular/router";
 import { CruvedStoreService } from "@geonature_common/service/cruved-store.service";
+import { ErrorTranslatorService } from "../../services/error-translator.service";
 
 @Component({
   selector: "zh-details-header",
@@ -21,7 +22,8 @@ export class HeaderComponent {
     private ngModal: NgbModal,
     private router: Router,
     private _zhService: ZhDataService,
-    private _commonService: CommonService
+    private _commonService: CommonService,
+    private _error: ErrorTranslatorService
   ) {}
 
   onOpen(modal) {
@@ -71,7 +73,10 @@ export class HeaderComponent {
       },
       (error) => {
         this.loadingPdf = false;
-        console.log(error);
+        const frontMsg: string =
+          "Erreur de téléchargement du PDF " +
+          this._error.getFrontError(error.error.message);
+        this._commonService.translateToaster("error", frontMsg);
       },
       () => (this.loadingPdf = false)
     );

@@ -68,9 +68,34 @@ export class ErrorTranslatorService {
       id: 10,
     },
     {
+      api: "get_file_list_error",
+      front: "Impossible de récupérer la liste des fichiers sur cette zones humides, erreur serveur",
+      id: 11
+    },
+    {
+      api: "upload_file_patch_error",
+      front: "Impossible de mettre à jour ce fichier. Erreur serveur",
+      id: 12
+    },
+    {
+      api: "delete_one_file_error",
+      front: "Impossible de supprimer ce fichier. Erreur serveur",
+      id: 13
+    },
+    {
+      api: "download_file_error",
+      front: "Impossible de télécharger ce fichier. Erreur serveur",
+      id: 14
+    },
+    {
+      api: "filter_zh_error",
+      front: "Impossible de récupérer/filtrer les zones humides. Erreur serveur",
+      id: 15
+    },
+    {
       api: "empty_geometry",
       front: "Veuillez tracer une geométrie",
-      id: 11,
+      id: 16,
     }
   ];
 

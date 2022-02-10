@@ -6,6 +6,7 @@ import { ToastrService } from "ngx-toastr";
 
 import { ZhDataService } from "./zh-data.service";
 import { ZhFile, ZhFiles } from "../zh-forms/tabs/tab8/zh-form-tab8.models";
+import { ErrorTranslatorService } from "./error-translator.service";
 
 @Injectable({
   providedIn: "root",
@@ -30,7 +31,8 @@ export class FilesService {
   ];
   constructor(
     private _dataService: ZhDataService,
-    private _toastr: ToastrService
+    private _toastr: ToastrService,
+    private _error: ErrorTranslatorService
   ) {}
 
   // Enables to filter files from their extension
@@ -78,9 +80,8 @@ export class FilesService {
         return this.files;
       }),
       catchError((error) => {
-        console.log(
-          `Une erreur est survenue, impossible de récupérer les fichiers : <${error}>`
-        );
+        const frontMsg: string = this._error.getFrontError(error.error.message);
+          this.displayError(frontMsg);
         return throwError(error);
       })
     );
@@ -92,9 +93,8 @@ export class FilesService {
         this.displayInfo("Fichier supprimé avec succès");
       }),
       catchError((error) => {
-        this.displayError(
-          `Une erreur est survenue, impossible de supprimer ce fichier. Erreur : <${error.message}>`
-        );
+        const frontMsg: string = this._error.getFrontError(error.error.message);
+        this.displayError(frontMsg);
         return throwError(error);
       })
     );
@@ -106,9 +106,8 @@ export class FilesService {
         this.displayInfo("Photo principale changée avec succès");
       }),
       catchError((error) => {
-        this.displayError(
-          `Une erreur est survenue ! Impossible de changer la photo principale. Erreur : <${error.message}>`
-        );
+        const frontMsg: string = this._error.getFrontError(error.error.message);
+        this.displayError(frontMsg);
         return throwError(error);
       })
     );
@@ -125,9 +124,9 @@ export class FilesService {
       })
       // TODO: to remove !
       .catch((error) => {
-        this.displayError(
-          `Une erreur est survenue ! Impossible de télécharger ce fichier. Erreur : <${error.message}>`
-        );
+        const frontMsg: string = this._error.getFrontError(error.error.message);
+        this.displayError(frontMsg);
+        return throwError(error);
       });
   }
 
@@ -137,9 +136,8 @@ export class FilesService {
         this.displayInfo("Fichier téléversé avec succès !");
       }),
       catchError((error) => {
-        this.displayError(
-          `Une erreur est survenue, impossible de téléverser un fichier : <${error.message}>`
-        );
+        const frontMsg: string = this._error.getFrontError(error.error.message);
+        this.displayError(frontMsg);
         return throwError(error);
       })
     );
@@ -151,9 +149,8 @@ export class FilesService {
         this.displayInfo("Fichier téléversé avec succès !");
       }),
       catchError((error) => {
-        this.displayError(
-          `Une erreur est survenue, impossible de mettre à jour un fichier : <${error.message}>`
-        );
+        const frontMsg: string = this._error.getFrontError(error.error.message);
+        this.displayError(frontMsg);
         return throwError(error);
       })
     );

@@ -126,7 +126,7 @@ export class ZhFormTab8Component implements OnInit {
   handleImages() {
     this.imageFiles = {
       name: "Photos",
-      files: this.getFilesByExtensions(this._filesService.EXT_IMAGES)
+      files: this.getFilesByExtensions(this._filesService.EXT_IMAGES),
     };
   }
 
@@ -267,7 +267,8 @@ export class ZhFormTab8Component implements OnInit {
           this.activeModal.close();
           this.getFiles();
         })
-        .catch((err) => console.log(err))
+        // Error catching is treated by patchFile()
+        .catch(() => {})
         .finally(() => {
           this.loadingUpload = false;
         });
