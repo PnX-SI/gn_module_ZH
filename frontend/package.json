@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "angular2-multiselect-dropdown": "^4.6.5",
+    "leaflet-easybutton": "^2.4.0",
     "ng-multiselect-dropdown": "^0.3.4"
   }
 }
