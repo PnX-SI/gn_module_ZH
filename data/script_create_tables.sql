@@ -548,6 +548,15 @@ COMMENT ON COLUMN pr_zh.t_management_plans.plan_date IS 'date de resiliation';
 
 COMMENT ON COLUMN pr_zh.t_management_plans.duration IS 'en année';
 
+CREATE  TABLE pr_zh.cor_zh_notes ( 
+	id_zh                integer  NOT NULL ,
+	cor_rule_id          integer  NOT NULL ,
+	note                 real  NOT NULL ,
+	CONSTRAINT pk_cor_zh_note PRIMARY KEY ( id_zh, cor_rule_id )
+ );
+
+COMMENT ON TABLE pr_zh.cor_zh_notes IS 'Table correspondance entre une ZH, ses règles et ses notes';
+
 ALTER TABLE pr_zh.cor_impact_list ADD CONSTRAINT fk_cor_activity_id_impact FOREIGN KEY ( id_cor_impact_types ) REFERENCES pr_zh.cor_impact_types( id_cor_impact_types )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_impact_list ADD CONSTRAINT fk_id_impact_list FOREIGN KEY ( id_impact_list ) REFERENCES pr_zh.t_activity( id_impact_list )  ON UPDATE CASCADE ON DELETE CASCADE;
@@ -709,6 +718,10 @@ ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_sage_t_nomenclatures FOREIGN KEY (
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_id_org FOREIGN KEY ( id_org ) REFERENCES pr_zh.bib_organismes( id_org )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_id_media FOREIGN KEY ( main_pict_id ) REFERENCES gn_commons.t_medias( id_media )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.cor_zh_notes ADD CONSTRAINT fk_cor_zh_note_t_zh FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.cor_zh_notes ADD CONSTRAINT fk_cor_zh_note_cor_rb_rules FOREIGN KEY ( cor_rule_id ) REFERENCES pr_zh.cor_rb_rules( cor_rule_id )  ON UPDATE CASCADE;
 
 CREATE OR REPLACE VIEW pr_zh.vertebrates AS
 	WITH 
