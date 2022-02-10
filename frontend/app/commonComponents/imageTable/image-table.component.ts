@@ -27,7 +27,6 @@ export class ImageTableComponent {
   onEditItem(value: object) {
     // No modal to open, just an event with the object
     // to emit
-    console.log(value);
     this.onEdit.emit(value);
   }
 

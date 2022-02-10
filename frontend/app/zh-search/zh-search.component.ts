@@ -1,5 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { ToastrService } from "ngx-toastr";
+
+import { ErrorTranslatorService } from "../services/error-translator.service";
 
 import { ZhDataService } from "../services/zh-data.service";
 
@@ -20,7 +23,12 @@ export class ZhSearchComponent implements OnInit {
   public advancedForm: FormGroup;
   public searchForm: FormGroup;
 
-  constructor(private _dataService: ZhDataService, private _fb: FormBuilder) {}
+  constructor(
+    private _dataService: ZhDataService,
+    private _fb: FormBuilder,
+    private _toastr: ToastrService,
+    private _error: ErrorTranslatorService
+  ) {}
 
   ngOnInit() {
     this._dataService
@@ -29,7 +37,10 @@ export class ZhSearchComponent implements OnInit {
       .then((resp: any) => {
         this.departements = resp;
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        const frontMsg: string = this._error.getFrontError(error.error.message);
+        this.displayError(frontMsg);
+      });
 
     this._dataService
       .getBasins()
@@ -37,7 +48,10 @@ export class ZhSearchComponent implements OnInit {
       .then((resp: any) => {
         this.basins = resp;
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        const frontMsg: string = this._error.getFrontError(error.error.message);
+        this.displayError(frontMsg);
+      });
 
     this.initForm();
   }
@@ -171,5 +185,9 @@ export class ZhSearchComponent implements OnInit {
 
   onCloseClicked() {
     this.onClose.emit();
+  }
+
+  displayError(error: string) {
+    this._toastr.error(error);
   }
 }

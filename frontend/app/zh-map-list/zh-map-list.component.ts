@@ -17,6 +17,7 @@ import { CommonService } from "@geonature_common/service/common.service";
 import { Subscription } from "rxjs/Subscription";
 import { GlobalSubService } from "@geonature/services/global-sub.service";
 import { ToastrService } from "ngx-toastr";
+import { ErrorTranslatorService } from "../services/error-translator.service";
 
 @Component({
   selector: "zh-map-list",
@@ -42,7 +43,8 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     public ngbModal: NgbModal,
     public globalSub: GlobalSubService,
     private _commonService: CommonService,
-    private _toastr: ToastrService
+    private _toastr: ToastrService,
+    private _error: ErrorTranslatorService
   ) {}
 
   ngOnInit() {
@@ -278,7 +280,10 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
         ms.geojsonData = res.items;
         ms.loadTableData(res.items, this.zhCustomCallBack.bind(this));
       })
-      .catch((error) => console.log(error))
+      .catch((error) => {
+        const frontMsg: string = this._error.getFrontError(error.error.message);
+        this._toastr.error(frontMsg);
+      })
       .finally(() => (ms.isLoading = false));
   }
 
