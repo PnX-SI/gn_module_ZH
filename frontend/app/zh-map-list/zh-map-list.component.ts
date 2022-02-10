@@ -5,6 +5,8 @@ import {
   OnDestroy,
   AfterViewInit,
 } from "@angular/core";
+import "leaflet-easybutton";
+import * as L from "leaflet";
 import { MapListService } from "@geonature_common/map-list/map-list.service";
 import { MapService } from "@geonature_common/map/map.service";
 import { ModuleConfig } from "../module.config";
@@ -104,6 +106,12 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
         this._mapService.currentExtend.zoom
       );
     }
+    // Create Button
+    L.easyButton("fa fa-crosshairs fa-lg", () => {
+      this.resetMap();
+    })
+      .setPosition("topright")
+      .addTo(this._mapService.getMap());
   }
 
   @HostListener("window:resize", ["$event"])
@@ -272,6 +280,19 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .catch((error) => console.log(error))
       .finally(() => (ms.isLoading = false));
+  }
+
+  resetMap() {
+    this.mapListService.selectedRow = [];
+    const selectedLayer = this.mapListService.selectedLayer;
+    if (selectedLayer !== undefined) {
+      selectedLayer.setStyle(this.mapListService.originStyle);
+    }
+    const layers = Object.keys(this.mapListService.layerDict);
+    this.mapListService.zoomOnSeveralSelectedLayers(
+      this._mapService.getMap(),
+      layers
+    );
   }
 
   ngOnDestroy() {
