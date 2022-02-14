@@ -18,5 +18,11 @@
   <div *ngIf="hierarchy.isLoading">
     <div> Chargement de la hiérarchisation, veuillez patienter</div>
     <mat-spinner color="warn" diameter="25"></mat-spinner>
-  </div>    
+  </div>  
+  <div class="footer-btn">
+    <zh-cancelButton
+      *ngIf="currentZh"
+      [zhId]="currentZh.properties.id_zh"
+    ></zh-cancelButton>
+  </div>
 </div>
