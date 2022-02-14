@@ -824,9 +824,6 @@ export class ZhFormTab6Component implements OnInit {
     if (this.planForm.valid) {
       let formValues = this.planForm.value;
       this.managements.map((item: any) => {
-        // moreDetails enable to expand the table to show the plans
-        // set it to true here enable to expand when plan is added
-        item.moreDetails = true;
         if (item.id_org == this.selectedManagement.id_org) {
           if (!item.plans || item.plans.length == 0) {
             formValues.plan_date = this.dateParser.format(formValues.plan_date);
@@ -840,6 +837,9 @@ export class ZhFormTab6Component implements OnInit {
               formValues.plan_date = this.dateParser.format(
                 formValues.plan_date
               );
+              // moreDetails enable to expand the table to show the plans
+              // set it to true here enable to expand when plan is added
+              item.moreDetails = true;
               item.plans.push(formValues);
             }
           }
