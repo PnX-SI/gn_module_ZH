@@ -719,7 +719,7 @@ ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_id_org FOREIGN KEY ( id_org ) REFE
 
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_id_media FOREIGN KEY ( main_pict_id ) REFERENCES gn_commons.t_medias( id_media )  ON UPDATE CASCADE;
 
-ALTER TABLE pr_zh.cor_zh_notes ADD CONSTRAINT fk_cor_zh_note_t_zh FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh )  ON UPDATE CASCADE;
+ALTER TABLE pr_zh.cor_zh_notes ADD CONSTRAINT fk_cor_zh_note_t_zh FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh )  ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_zh_notes ADD CONSTRAINT fk_cor_zh_note_cor_rb_rules FOREIGN KEY ( cor_rule_id ) REFERENCES pr_zh.cor_rb_rules( cor_rule_id )  ON UPDATE CASCADE;
 
