@@ -117,7 +117,11 @@
           <tr>
             <td>{{ zonage['commune'] }}</td>
             <td>{{ zonage['type_doc'] }}</td>
-            <td>{{ zonage['type_classement'] }}</td>
+            <td>
+            {% for classement in zonage['type_classement'] %}
+            <span>{{ classement }}</span><br>
+            {% endfor %}
+            </td>
             <td>{{ zonage['remarque']}}</td>
           </tr>
           {% endfor %}
