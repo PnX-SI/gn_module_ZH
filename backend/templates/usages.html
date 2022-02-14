@@ -1,0 +1,27 @@
+<div>
+  <section class="content">
+    <table class="custom-table">
+      <thead>
+          <tr>
+            <th>Activité</th>
+            <th>Localisation</th>
+            <th>Impacts (facteurs influençant l'évolution de la zone)</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for activity in data['description']['usage']['activities'] %}
+          <tr>
+            <td>{{ activity['activite'] }}</td>
+            <td>{{ activity['localisation'] }}</td>
+            <td>
+              {% for impact in activity['impacts'] %}
+                <span>{{ impact }}</span><br>
+              {% endfor %}
+            </td>
+          </tr>
+          {% endfor %}
+      </tbody>
+    </table>
+    <span class="small-title"><b>Remarques : </b>{{ data['description']['usage']['remarques'] or 'Aucune' }}</span>
+  </section>
+</div>
