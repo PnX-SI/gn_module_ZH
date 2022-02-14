@@ -81,9 +81,23 @@
     <h5 class="subtitle">
       Autres inventaires
     </h5>
-    {% for autre in data['statuts']['autre_inventaire'] %}
-      <span class="small-title">{{ autre['zh_type_name'] }} - {{ autre['area_code'] }} - <a href="{{ autre['url']}}">{{ autre['area_name'] }}</a></span>
-    {% endfor %}
+    <table class="custom-table">
+      <tbody>
+        {% for type in data['statuts']['autres_inventaires'].keys() %}
+        <tr>
+          <td class="border-bottom">{{ type }}</td>
+          <td class="border-bottom">
+            {% for ref in data['statuts']['autres_inventaires'][type] %}
+            <span>
+              {{ ref.area_code }} - 
+              <a href="{{ ref.url }}">{{ ref.area_name }}</a>
+            </span><br>
+            {% endfor %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </section>
   <section class="content col">
     <h5 class="subtitle">

@@ -1,3 +1,4 @@
+from itertools import groupby
 from pathlib import Path
 from io import BytesIO
 import base64
@@ -68,6 +69,13 @@ def gen_pdf(id_zh, dataset, filename = "rapport.pdf"):
     except Exception as e:
         print('Cannot find image')
 
+    # Pre-treatment of other inventories:
+    others = {}
+    for k,v in groupby(dataset['statuts']['autre_inventaire'], key=lambda x:x['zh_type_name']):
+        others[k] = list(v)
+    dataset['statuts']['autres_inventaires'] = others
+    
+    # Generate pdf
     pdf_file = generate_pdf_from_template("fiche_template_pdf.html", dataset, filename)
     return Path(pdf_file)
 
