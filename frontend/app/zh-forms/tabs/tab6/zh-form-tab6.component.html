@@ -75,19 +75,16 @@
               <ng-container *ngFor="let item of managements">
                 <tr>
                   <td>
-                    <i
-                      *ngIf="
-                        !item.moreDetails && item.plans && item.plans.length > 0
-                      "
-                      class="fa fa-angle-down morePlan"
+                    <mat-icon
+                      *ngIf="item.plans && item.plans.length > 0"
+                      class="morePlan"
+                      [matBadge]="item.plans.length"
+                      matBadgePosition="above before"
                       (click)="onMoreDetails(item)"
-                    ></i>
-                    <i
-                      *ngIf="item.moreDetails && item.plans && item.plans.length > 0"
-                      class="fa fa-angle-up morePlan"
-                      (click)="onMoreDetails(item)"
-                    ></i
-                    >{{ item.name }}
+                    >
+                      {{ item.moreDetails ? "expand_more" : "expand_less" }}
+                    </mat-icon>
+                    {{ item.name }}
                   </td>
                   <td>
                     <button
