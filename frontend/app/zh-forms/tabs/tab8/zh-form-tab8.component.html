@@ -49,6 +49,14 @@
         *ngIf="zh"
         [zhId]="zh.properties.id_zh"
       ></zh-cancelButton>
+      <button
+        mat-raised-button
+        color="primary"
+        class="ml-3"
+        (click)="nextTab.emit(9)"
+      >
+        Suivant
+      </button>
     </div>
   </form>
 </div>
