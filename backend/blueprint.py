@@ -536,10 +536,12 @@ def get_tab_data(id_tab, info_role):
             active_geo_refs = [
                 ref for ref in blueprint.config['ref_geo_referentiels'] if ref['active']]
             intersection = None
+            # Check on geometry that should always exist (PATCH or POST)
+            if len(form_data['geom']['geometry']['coordinates']) == 0:
+                raise ZHApiError(message='empty_geometry',
+                                 details='You must provide a geometry when creating a zh')
+            # POST / PATCH
             if 'id_zh' not in form_data.keys():
-                if len(form_data['geom']['geometry']['coordinates']) == 0:
-                    raise ZHApiError(message='empty_geometry', 
-                                     details='You must provide a geometry when creating a zh')
                 # set geometry from coordinates
                 geom = set_geom(form_data['geom']['geometry'])
                 # geom area
