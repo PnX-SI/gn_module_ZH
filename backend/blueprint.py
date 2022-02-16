@@ -635,6 +635,9 @@ def get_tab_data(id_tab, info_role):
 
         if id_tab == 8:
             try:
+                # FIXME: temp fix
+                form_data['id_zh'] = request.form.to_dict()['id_zh']
+                update_tzh(form_data)
                 ALLOWED_EXTENSIONS = blueprint.config['allowed_extensions']
                 MAX_PDF_SIZE = blueprint.config['max_pdf_size']
                 MAX_JPG_SIZE = blueprint.config['max_jpg_size']
