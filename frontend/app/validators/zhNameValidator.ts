@@ -3,6 +3,7 @@ import { timer } from "rxjs";
 import { switchMap, map } from "rxjs/operators";
 import { ZhDataService } from "../services/zh-data.service";
 
+/*
 export function zhNameValidator(dataService: ZhDataService, time: number) {
   return function (control: FormControl) {
     const name: string = control.value;
@@ -22,3 +23,4 @@ export function zhNameValidator(dataService: ZhDataService, time: number) {
     );
   };
 }
+*/
