@@ -168,21 +168,21 @@ class Author:
         self.create_author = self.__get_author()
         self.edit_author = self.__get_author(type='coauthors')
         self.id_organisme = id_organisme
-
+        
     def __str__(self):
         return {
             "auteur": self.create_author,
             "auteur_modif": self.edit_author,
             "date": self.create_date,
             "date_modif": self.update_date,
-            # "organism": DB.session.query(Organisme).filter(Organisme.id_organisme == self.id_organisme).one().nom_organisme
+            #"organism": DB.session.query(Organisme).filter(Organisme.id_organisme == self.id_organisme).one().nom_organisme
             "organism": self.__temporary_get_organism(self.id_organisme)
         }
 
     def __get_author(self, type='authors'):
         zh = TZH.get_tzh_by_id(self.id_zh)
-        prenom = getattr(zh, type).prenom_role
-        nom = getattr(zh, type).nom_role
+        prenom = getattr(zh, type).prenom_role if getattr(zh, type).prenom_role is not None else ''
+        nom = getattr(zh, type).nom_role if getattr(zh, type).nom_role is not None else ''
         return prenom + ' ' + nom.upper()
 
     def __temporary_get_organism(self, id_organism):
