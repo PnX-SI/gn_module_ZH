@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import text
-#from pypnusershub.db.models import Organisme
+from pypnusershub.db.models import Organisme
 
 from geonature.utils.env import DB
 from geonature.core.ref_geo.models import LAreas
@@ -175,8 +175,7 @@ class Author:
             "auteur_modif": self.edit_author,
             "date": self.create_date,
             "date_modif": self.update_date,
-            # "organism": DB.session.query(Organisme).filter(Organisme.id_organisme == self.id_organisme).one().nom_organisme
-            "organism": self.__temporary_get_organism(self.id_organisme)
+            "organism": DB.session.query(Organisme).filter(Organisme.id_organisme == self.id_organisme).one().nom_organisme
         }
 
     def __get_author(self, type='authors'):
@@ -184,16 +183,6 @@ class Author:
         prenom = getattr(zh, type).prenom_role
         nom = getattr(zh, type).nom_role
         return prenom + ' ' + nom.upper()
-
-    def __temporary_get_organism(self, id_organism):
-        # waiting for update of pypnusershub with Organisme class
-        query = \
-            """
-                SELECT nom_organisme
-                FROM utilisateurs.bib_organismes
-                WHERE id_organisme = {id_organisme}
-            """.format(id_organisme=id_organism)
-        return DB.session.execute(text(query)).fetchone().nom_organisme
 
 
 class Municipalities:
