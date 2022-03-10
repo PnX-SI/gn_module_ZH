@@ -48,32 +48,7 @@ INSERT INTO pr_zh.t_references(id_reference,ref_number,reference,authors,pub_yea
 
 
 -- step 1 : insert qualifications which are not already in ref_nomenclatures.t_nomenclatures
-
-INSERT INTO ref_nomenclatures.t_nomenclatures(id_type, cd_nomenclature, mnemonique, label_default, label_fr, source, statut) VALUES
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'iso', 'ZH isolée', 'ZH isolée', 'ZH isolée', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'res', 'ZH participant d''un réseau ou continuum', 'ZH participant d''un réseau ou continuum', 'ZH participant d''un réseau ou continuum', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '0', 'Aucun', 'Aucun', 'Aucun', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '1 ou 2', '1 ou 2', '1 ou 2', '1 ou 2', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '3 à 5', '3 à 5', '3 à 5', '3 à 5', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '>5', '>5', '>5', '>5', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '1 à 4', '1 à 4', '1 à 4', '1 à 4', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '5 à 7', '5 à 7', '5 à 7', '5 à 7', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '8 ou 9', '8 ou 9', '8 ou 9', '8 ou 9', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '>9', '>9', '>9', '>9', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '1', '1', '1', '1', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '2', '2', '2', '2', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '3', '3', '3', '3', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '>3', '>3', '>3', '>3', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'faible', 'Faible (conventionnel / contractuel / inventaire)', 'Faible (conventionnel / contractuel / inventaire)', 'Faible (conventionnel / contractuel / inventaire)', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'fort', 'Fort (réglementaire / maîtrise foncière)', 'Fort (réglementaire / maîtrise foncière)', 'Fort (réglementaire / maîtrise foncière)', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'OUI', 'OUI', 'OUI', 'OUI', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'NON', 'NON', 'NON', 'NON', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'bon', 'Non dégradée', 'Non dégradée', 'Non dégradée', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'mauvais', 'Très fortement dégradée', 'Très fortement dégradée', 'Très fortement dégradée', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'moyen', 'Partiellement dégradée', 'Partiellement dégradée', 'Partiellement dégradée', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'NE', 'Non évalué', 'Non évalué', 'Non évalué', 'ZONES_HUMIDES', 'Non validé')
-;
-
+-- step included in 'insert_into_ref_nomenclatures_schema.sql'
 
 -- step 2 : insert list of rules of Calavon river basin
 
