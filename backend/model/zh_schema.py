@@ -299,7 +299,7 @@ class TZH(ZhModel):
     )
 
     def get_geofeature(self, recursif=True, relationships=()):
-        return self.as_geofeature("geom", "id_zh", recursif, relationships=relationships)
+        return self.as_geofeature("geom", "id_zh", fields=['authors', 'coauthors', 'authors.organisme', 'coauthors.organisme'])
 
     @staticmethod
     def get_site_space_name(id):
