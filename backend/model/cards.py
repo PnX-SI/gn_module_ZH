@@ -565,7 +565,7 @@ class Activity:
         self.remark_activity: str = remark_activity
 
     def __str_impact(self):
-        return [cor.TNomenclatures.mnemonique for cor in CorImpactTypes.get_impacts() if cor.CorImpactTypes.id_cor_impact_types in self.ids_impact]
+        return [cor.TNomenclatures.label_fr for cor in CorImpactTypes.get_impacts() if cor.CorImpactTypes.id_cor_impact_types in self.ids_impact]
 
     def __str__(self):
         return {
