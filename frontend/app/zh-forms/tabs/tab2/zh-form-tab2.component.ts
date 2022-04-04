@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  AfterViewInit,
+  Output,
+} from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
 import { Subscription } from "rxjs";
@@ -11,7 +18,7 @@ import { ZhDataService } from "../../../services/zh-data.service";
   templateUrl: "./zh-form-tab2.component.html",
   styleUrls: ["./zh-form-tab2.component.scss"],
 })
-export class ZhFormTab2Component implements OnInit {
+export class ZhFormTab2Component implements OnInit, AfterViewInit {
   @Input() formMetaData;
   @Output() canChangeTab = new EventEmitter<boolean>();
   @Output() nextTab = new EventEmitter<number>();
@@ -46,7 +53,11 @@ export class ZhFormTab2Component implements OnInit {
     this.getMetaData();
     this.createForm();
     this.initTab();
+  }
 
+  ngAfterViewInit() {
+    //FIXME: Try to find a way to remove this double this.initTab()
+    this.initTab();
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
       if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
       this.$_currentZhSub.unsubscribe();

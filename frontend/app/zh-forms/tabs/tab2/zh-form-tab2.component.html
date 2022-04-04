@@ -1,5 +1,5 @@
 <div>
-  <form>
+  <form [formGroup]="formTab2">
     <h2 class="tabsTitle">
       Délimitation de la zone humide et de l'espace de fonctionnalité
     </h2>
@@ -15,8 +15,8 @@
           <ng-multiselect-dropdown
             [placeholder]="'Critères utilisés'"
             [settings]="dropdownSettings"
-            [data]="critDelim"
-            [formControl]="formTab2.controls.critere_delim"
+            [data]="formMetaData.CRIT_DELIM"
+            formControlName="critere_delim"
           >
           </ng-multiselect-dropdown>
         </div>
@@ -25,7 +25,7 @@
           <textarea
             class="form-control form-control-sm"
             rows="3"
-            [formControl]="formTab2.controls.remark_lim"
+            formControlName="remark_lim"
           >
           </textarea>
         </div>
@@ -44,7 +44,7 @@
             [placeholder]="'Critères utilisés'"
             [settings]="dropdownSettings"
             [data]="critDelimFct"
-            [formControl]="formTab2.controls.critere_delim_fs"
+            formControlName="critere_delim_fs"
           >
           </ng-multiselect-dropdown>
         </div>
@@ -53,7 +53,7 @@
           <textarea
             class="form-control form-control-sm"
             rows="3"
-            [formControl]="formTab2.controls.remark_lim_fs"
+            formControlName="remark_lim_fs"
           >
           </textarea>
         </div>
