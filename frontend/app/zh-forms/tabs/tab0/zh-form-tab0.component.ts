@@ -177,9 +177,7 @@ export class ZhFormTab0Component implements OnInit {
   createForm(): void {
     this.form = this.fb.group({
       id_org: [null, Validators.required],
-      main_name: [
-        null
-      ],
+      main_name: [null, Validators.required],
       critere_delim: [null, Validators.required],
       sdage: ["", Validators.required],
     });
