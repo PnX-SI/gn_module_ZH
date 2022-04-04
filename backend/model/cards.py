@@ -168,7 +168,7 @@ class Author:
         self.create_author = self.__get_author()
         self.edit_author = self.__get_author(type='coauthors')
         self.id_organisme = id_organisme
-
+        
     def __str__(self):
         return {
             "auteur": self.create_author,
@@ -180,8 +180,8 @@ class Author:
 
     def __get_author(self, type='authors'):
         zh = TZH.get_tzh_by_id(self.id_zh)
-        prenom = getattr(zh, type).prenom_role
-        nom = getattr(zh, type).nom_role
+        prenom = getattr(zh, type).prenom_role if getattr(zh, type).prenom_role is not None else ''
+        nom = getattr(zh, type).nom_role if getattr(zh, type).nom_role is not None else ''
         return prenom + ' ' + nom.upper()
 
 
@@ -554,7 +554,7 @@ class Activity:
         self.remark_activity: str = remark_activity
 
     def __str_impact(self):
-        return [cor.TNomenclatures.mnemonique for cor in CorImpactTypes.get_impacts() if cor.CorImpactTypes.id_cor_impact_types in self.ids_impact]
+        return [cor.TNomenclatures.label_fr for cor in CorImpactTypes.get_impacts() if cor.CorImpactTypes.id_cor_impact_types in self.ids_impact]
 
     def __str__(self):
         return {

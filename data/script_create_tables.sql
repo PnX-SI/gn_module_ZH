@@ -242,7 +242,6 @@ CREATE  TABLE pr_zh.t_zh (
 	area				 real	,
 	CONSTRAINT pk_t_zh_zh_id PRIMARY KEY ( id_zh ),
 	CONSTRAINT unq_t_zh_code UNIQUE ( code ) ,
-	CONSTRAINT unq_t_zh_name UNIQUE ( main_name ) ,
 	CONSTRAINT unq_t_zh UNIQUE ( zh_uuid ) 
  );
 

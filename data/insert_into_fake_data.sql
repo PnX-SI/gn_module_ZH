@@ -211,10 +211,7 @@ INSERT INTO pr_zh.t_items VALUES
 (89, 16, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE label_default = 'Pas ou peu menacée'  and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'EVAL_GLOB_MENACES')), 0, 1),
 (90, 16, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE label_default = 'Modérément menacée'  and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'EVAL_GLOB_MENACES')), 50, 1),
 (91, 16, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE label_default = 'Fortement menacée'  and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'EVAL_GLOB_MENACES')), 100, 1),
-(92, 16, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE label_default = 'Non évaluée'  and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'EVAL_GLOB_MENACES')), 25, 1),
-
-(93, 17, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE label_default = '07 - zones humides de bas fonds en tête de bassin'), 110, 1),
-(94, 17, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE label_default = '11 - zones humides ponctuelles'), 20, 1);
+(92, 16, (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE label_default = 'Non évaluée'  and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'EVAL_GLOB_MENACES')), 25, 1);
 
 
 -- step 4 : insert min and max values for rules which need quantifications
