@@ -124,22 +124,22 @@ species_source_name = 'GeoNature'
 
 class GnModuleSchemaConf(Schema):
     default_maplist_columns = fields.List(
-        fields.Dict(), missing=default_map_list_conf)
+        fields.Dict(), load_default=default_map_list_conf)
     available_maplist_column = fields.List(
-        fields.Dict(), missing=available_maplist_column
+        fields.Dict(), load_default=available_maplist_column
     )
-    nomenclatures = fields.List(fields.String, missing=nomenclatures)
+    nomenclatures = fields.List(fields.String, load_default=nomenclatures)
     ref_geo_referentiels = fields.List(
-        fields.Dict(), missing=ref_geo_referentiels
+        fields.Dict(), load_default=ref_geo_referentiels
     )
-    vertebrates_view_name = fields.Dict(missing=vertebrates_view_name)
-    invertebrates_view_name = fields.Dict(missing=invertebrates_view_name)
-    flora_view_name = fields.Dict(missing=flora_view_name)
-    allowed_extensions = fields.List(fields.String, missing=allowed_extensions)
-    max_pdf_size = fields.Float(missing=max_pdf_size)
-    max_jpg_size = fields.Float(missing=max_jpg_size)
-    fileformat_validated = fields.Boolean(missing=fileformat_validated)
-    filename_validated = fields.Boolean(missing=filename_validated)
-    file_path = fields.String(missing=file_path)
-    module_dir_name = fields.String(missing=module_dir_name)
-    species_source_name = fields.String(missing=species_source_name)
+    vertebrates_view_name = fields.Dict(load_default=vertebrates_view_name)
+    invertebrates_view_name = fields.Dict(load_default=invertebrates_view_name)
+    flora_view_name = fields.Dict(load_default=flora_view_name)
+    allowed_extensions = fields.List(fields.String, load_default=allowed_extensions)
+    max_pdf_size = fields.Float(load_default=max_pdf_size)
+    max_jpg_size = fields.Float(load_default=max_jpg_size)
+    fileformat_validated = fields.Boolean(load_default=fileformat_validated)
+    filename_validated = fields.Boolean(load_default=filename_validated)
+    file_path = fields.String(load_default=file_path)
+    module_dir_name = fields.String(load_default=module_dir_name)
+    species_source_name = fields.String(load_default=species_source_name)
