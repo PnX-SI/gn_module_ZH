@@ -367,7 +367,7 @@ export class ZhFormTab0Component implements OnInit {
     let features = [];
     // We can have a multipolygon and a polygon here.
     // It can be checked with their coordinates
-    if (geometry.coordinates.length > 1) {
+    if (geometry.coordinates.length > 1 && geometry.type !== 'Polygon') {
       geometry.coordinates.forEach((coord) =>
         features.push(this.getPolygonFeature(coord))
       );
