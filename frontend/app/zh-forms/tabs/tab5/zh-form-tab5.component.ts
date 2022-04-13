@@ -117,13 +117,13 @@ export class ZhFormTab5Component implements OnInit {
     {
       name: "corinBio",
       label: "Corine biotopes",
-      subcell: { name: "CB_label" },
+      subcell: { name: "front_name" },
       size: this.functionSize,
     },
     {
       name: "cahierHab",
       label: "Cahier d'habitats",
-      subcell: { name: "lb_hab_fr" },
+      subcell: { name: "front_name" },
     },
     {
       name: "preservationState",
@@ -404,6 +404,7 @@ export class ZhFormTab5Component implements OnInit {
   }
 
   async getCorineBio(habitats) {
+    console.log(habitats);
     // Since it is async, need to set a temporary
     //   table. This prevents duplicate pushes on
     //   this.corineBioTable
