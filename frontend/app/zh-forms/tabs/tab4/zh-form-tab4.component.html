@@ -218,6 +218,7 @@
           >
             <option
               *ngFor="let permanance of formMetaData.PERMANENCE_ENTREE"
+              [selected]="permanance.mnemonique === default_permanance"
               [ngValue]="permanance"
             >
               {{ permanance.mnemonique }}
@@ -299,6 +300,7 @@
           >
             <option
               *ngFor="let permanance of formMetaData.PERMANENCE_SORTIE"
+              [selected]="permanance.mnemonique === default_permanance"
               [ngValue]="permanance"
             >
               {{ permanance.mnemonique }}

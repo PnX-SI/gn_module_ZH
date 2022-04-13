@@ -37,6 +37,7 @@ export class ZhFormTab4Component implements OnInit {
   private $_currentZhSub: Subscription;
   private $_fromChangeSub: Subscription;
   public currentZh: any;
+  default_permanance: string = 'Non déterminé';
 
   private tempId: number;
 
@@ -230,6 +231,13 @@ export class ZhFormTab4Component implements OnInit {
   // open the add inFlow modal
   onAddInflow(event: any, modal: any) {
     this.inflowForm.reset();
+    this.inflowForm.controls['permanance'].setValue(this.formMetaData["PERMANENCE_ENTREE"].find(
+      (item) => {
+        if (item.mnemonique == this.default_permanance) {
+          return item;
+        }
+      }
+    ), {onlySelf: true});
     this.patchInflow = false;
     this.inflowModalBtnLabel = "Ajouter";
     this.inflowModalTitle = "Ajout d'une entrée d'eau";
@@ -320,6 +328,14 @@ export class ZhFormTab4Component implements OnInit {
   // open the add outFlow modal
   onAddOutflow(event: any, modal: any) {
     this.outflowForm.reset();
+    this.outflowForm.controls['permanance'].setValue(this.formMetaData["PERMANENCE_SORTIE"].find(
+      (item) => {
+        if (item.mnemonique == this.default_permanance) {
+          return item;
+        }
+      }
+    ), {onlySelf: true});
+    this.patchInflow = false;
     this.patchOutflow = false;
     this.outflowModalBtnLabel = "Ajouter";
     this.outflowModalTitle = "Ajout d'une sortie d'eau";
