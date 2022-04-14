@@ -45,6 +45,7 @@ export class ZhFormTab5Component implements OnInit {
   public config = ModuleConfig;
   default_qualification: string = 'Non évaluée';
   default_knowledge: string = 'Lacunaire ou nulle';
+  default_preservation_state: string = 'Non évaluée';
 
 
   readonly functionSize: string = "30%";
@@ -948,6 +949,13 @@ export class ZhFormTab5Component implements OnInit {
   // open the add CorineBio modal
   onAddCorineBio(event: any, modal: any) {
     this.corineBioForm.reset();
+    this.corineBioForm.controls['preservationState'].setValue(this.formMetaData["ETAT_CONSERVATION"].find(
+      (item) => {
+        if (item.mnemonique == this.default_preservation_state) {
+          return item;
+        }
+      }
+    ), {onlySelf: true});
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'un habitat humide patrimonial";
