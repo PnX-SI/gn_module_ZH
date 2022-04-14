@@ -43,6 +43,9 @@ export class ZhFormTab5Component implements OnInit {
   public valSocEcoTable: any[] = [];
   public corineBioTable: any[] = [];
   public config = ModuleConfig;
+  default_qualification: string = 'Non évaluée';
+  default_knowledge: string = 'Lacunaire ou nulle';
+
 
   readonly functionSize: string = "30%";
   readonly qualifSize: string = "10%";
@@ -438,6 +441,20 @@ export class ZhFormTab5Component implements OnInit {
   // open the add fonction hydrologique modal
   onAddHydroFct(event: any, modal: any) {
     this.hydroFctForm.reset();
+    this.hydroFctForm.controls['qualification'].setValue(this.formMetaData["FONCTIONS_QUALIF"].find(
+      (item) => {
+        if (item.mnemonique == this.default_qualification) {
+          return item;
+        }
+      }
+    ), {onlySelf: true});
+    this.hydroFctForm.controls['knowledge'].setValue(this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+      (item) => {
+        if (item.mnemonique == this.default_knowledge) {
+          return item;
+        }
+      }
+    ), {onlySelf: true});
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'une fonction hydrologique / biogéochimique";
@@ -537,6 +554,20 @@ export class ZhFormTab5Component implements OnInit {
   // open the add fonction biologique modal
   onAddBioFct(event: any, modal: any) {
     this.bioFctForm.reset();
+    this.bioFctForm.controls['qualification'].setValue(this.formMetaData["FONCTIONS_QUALIF"].find(
+      (item) => {
+        if (item.mnemonique == this.default_qualification) {
+          return item;
+        }
+      }
+    ), {onlySelf: true});
+    this.bioFctForm.controls['knowledge'].setValue(this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+      (item) => {
+        if (item.mnemonique == this.default_knowledge) {
+          return item;
+        }
+      }
+    ), {onlySelf: true});
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'une fonction biologique / écologique";
@@ -634,6 +665,20 @@ export class ZhFormTab5Component implements OnInit {
   // open the add fonction intérêt patrimonal modal
   onAddInteretPat(event: any, modal: any) {
     this.interetPatForm.reset();
+    this.interetPatForm.controls['qualification'].setValue(this.formMetaData["FONCTIONS_QUALIF"].find(
+      (item) => {
+        if (item.mnemonique == this.default_qualification) {
+          return item;
+        }
+      }
+    ), {onlySelf: true});
+    this.interetPatForm.controls['knowledge'].setValue(this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+      (item) => {
+        if (item.mnemonique == this.default_knowledge) {
+          return item;
+        }
+      }
+    ), {onlySelf: true});
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'un intérêt patrimonal";
@@ -787,6 +832,20 @@ export class ZhFormTab5Component implements OnInit {
 
   onAddValSocEco(event: any, modal: any) {
     this.valSocEcoForm.reset();
+    this.valSocEcoForm.controls['qualification'].setValue(this.formMetaData["FONCTIONS_QUALIF"].find(
+      (item) => {
+        if (item.mnemonique == this.default_qualification) {
+          return item;
+        }
+      }
+    ), {onlySelf: true});
+    this.valSocEcoForm.controls['knowledge'].setValue(this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+      (item) => {
+        if (item.mnemonique == this.default_knowledge) {
+          return item;
+        }
+      }
+    ), {onlySelf: true});
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'une valeur socio-économique";

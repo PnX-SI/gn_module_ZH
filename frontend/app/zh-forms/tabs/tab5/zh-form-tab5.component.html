@@ -363,6 +363,7 @@
           >
             <option
               *ngFor="let qualif of formMetaData.FONCTIONS_QUALIF"
+              [selected]="qualif.mnemonique === default_qualification"
               [ngValue]="qualif"
             >
               {{ qualif.mnemonique }}
@@ -386,6 +387,7 @@
           >
             <option
               *ngFor="let knowledge of formMetaData.FONCTIONS_CONNAISSANCE"
+              [selected]="knowledge.mnemonique === default_knowledge"
               [ngValue]="knowledge"
             >
               {{ knowledge.mnemonique }}
@@ -474,6 +476,7 @@
           >
             <option
               *ngFor="let qualif of formMetaData.FONCTIONS_QUALIF"
+              [selected]="qualif.mnemonique === default_qualification"
               [ngValue]="qualif"
             >
               {{ qualif.mnemonique }}
@@ -497,6 +500,7 @@
           >
             <option
               *ngFor="let knowledge of formMetaData.FONCTIONS_CONNAISSANCE"
+              [selected]="knowledge.mnemonique === default_knowledge"
               [ngValue]="knowledge"
             >
               {{ knowledge.mnemonique }}
@@ -585,6 +589,7 @@
           >
             <option
               *ngFor="let qualif of formMetaData.FONCTIONS_QUALIF"
+              [selected]="qualif.mnemonique === default_qualification"
               [ngValue]="qualif"
             >
               {{ qualif.mnemonique }}
@@ -608,6 +613,7 @@
           >
             <option
               *ngFor="let knowledge of formMetaData.FONCTIONS_CONNAISSANCE"
+              [selected]="knowledge.mnemonique === default_knowledge"
               [ngValue]="knowledge"
             >
               {{ knowledge.mnemonique }}
@@ -691,6 +697,7 @@
           >
             <option
               *ngFor="let qualif of formMetaData.FONCTIONS_QUALIF"
+              [selected]="qualif.mnemonique === default_qualification"
               [ngValue]="qualif"
             >
               {{ qualif.mnemonique }}
@@ -714,6 +721,7 @@
           >
             <option
               *ngFor="let knowledge of formMetaData.FONCTIONS_CONNAISSANCE"
+              [selected]="knowledge.knowledge === default_knowledge"
               [ngValue]="knowledge"
             >
               {{ knowledge.mnemonique }}
