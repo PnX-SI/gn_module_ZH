@@ -101,7 +101,7 @@
               Présentation de la zone humide et de ses milieux
             </h3> -->
             <div class="form-group col-md-12">
-              <small class="required">Type de zone humide SDAGE</small>
+              <small class="required">Typologie SDAGE</small>
               <select class="form-control" [formControl]="form.controls.sdage">
                 <option *ngFor="let sd of sdage" [ngValue]="sd.id_nomenclature">
                   {{ sd.mnemonique }}
