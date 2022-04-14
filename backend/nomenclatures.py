@@ -182,7 +182,7 @@ def get_protection_category(protection):
     if protection.id_protection_type is not None:
         return DB.session.query(TNomenclatures).filter(
             TNomenclatures.id_nomenclature == protection.id_protection_type).one().mnemonique
-    return "Aucun"
+    return "Autre"
 
 
 def get_nomenc(config):
