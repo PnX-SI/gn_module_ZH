@@ -971,6 +971,10 @@ export class ZhFormTab6Component implements OnInit {
     this.formTab6.get("protections").reset();
   }
 
+  handleEnterKeyPress() {
+    return false;
+  }
+
   onFormSubmit() {
     if (this.formTab6.valid) {
       this.submitted = true;
