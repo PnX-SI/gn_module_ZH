@@ -34,6 +34,7 @@ export class ZhFormTab7Component implements OnInit {
   private $_currentZhSub: Subscription;
   public actionTable: any[] = [];
   public currentZh: any;
+  default_prio_level: string = 'Non définie';
 
   readonly qualifSize: string = "10%";
   readonly knowledgeSize: string = "15%";
@@ -352,6 +353,13 @@ export class ZhFormTab7Component implements OnInit {
   // open the add action modal
   onAddAction(event: any, modal: any) {
     this.getMetaData();
+    this.actionForm.controls['priority'].setValue(this.formMetaData["NIVEAU_PRIORITE"].find(
+      (item) => {
+        if (item.mnemonique == this.default_prio_level) {
+          return item;
+        }
+      }
+    ), {onlySelf: true});
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'une proposition d'action";
