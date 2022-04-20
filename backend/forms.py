@@ -107,6 +107,10 @@ def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referenti
         code = Code(new_zh.id_zh, new_zh.id_org, new_zh.geom)
         new_zh.code = code.__repr__()
 
+        # set default values
+        fct_delim_default_id = DB.session.query(DefaultsNomenclaturesValues).filter(DefaultsNomenclaturesValues.mnemonique_type == 'CRIT_DEF_ESP_FCT').one().id_nomenclature
+        post_fct_delim(new_zh.id_zh, [fct_delim_default_id])
+
         DB.session.flush()
         return new_zh.id_zh
     except ZHApiError:

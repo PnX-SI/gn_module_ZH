@@ -64,6 +64,7 @@ export class ZhFormTab6Component implements OnInit {
   private $_currentZhSub: Subscription;
   private $_fromChangeSub: Subscription;
   public selectedItems = [];
+  default_status: string = "Indéterminé";
 
   readonly urbanColSize: string = "15%";
 
@@ -167,7 +168,7 @@ export class ZhFormTab6Component implements OnInit {
       searchPlaceholderText: "Rechercher",
       enableSearchFilter: true,
       groupBy: "category",
-      position: "top"
+      position: "top",
     };
 
     this.getMetaData();
@@ -386,6 +387,13 @@ export class ZhFormTab6Component implements OnInit {
   // open the add status modal
   onAddStatus(event: any, modal: any) {
     this.statusForm.reset();
+    this.statusForm.controls["status"].setValue(
+      this.formMetaData["STATUT_PROPRIETE"].find((item) => {
+        if (item.mnemonique == this.default_status) {
+          return item;
+        }
+      })
+    );
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'un statut de propriété";

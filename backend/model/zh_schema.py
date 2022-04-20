@@ -10,7 +10,8 @@ from sqlalchemy.ext.declarative import declarative_base
 
 
 from pypnnomenclature.models import (
-    TNomenclatures
+    TNomenclatures,
+    BibNomenclaturesTypes
 )
 
 from pypn_habref_api.models import (
@@ -133,6 +134,27 @@ class Nomenclatures(TNomenclatures):
                 [func.ref_nomenclatures.get_id_nomenclature_type(bib_mnemo)])
         ).all()
         return q
+
+
+@serializable
+class DefaultsNomenclaturesValues(DB.Model):
+    __tablename__ = "defaults_nomenclatures_value"
+    __table_args__ = {"schema": "ref_nomenclatures"}
+    mnemonique_type = DB.Column(
+        DB.Unicode(length=255), 
+        ForeignKey(BibNomenclaturesTypes.mnemonique),
+        primary_key=True
+    )
+    id_organism = DB.Column(
+        DB.Integer, 
+        ForeignKey("utilisateurs.bib_organismes.id_organisme"),
+        primary_key=True
+    )
+    id_nomenclature = DB.Column(
+        DB.Integer, 
+        ForeignKey(TNomenclatures.id_nomenclature),
+        nullable=False
+    )
 
 
 @serializable
