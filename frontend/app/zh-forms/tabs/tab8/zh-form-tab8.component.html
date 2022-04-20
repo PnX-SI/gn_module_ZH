@@ -76,22 +76,37 @@
                 config?.max_pdf_size || 
                 config?.max_jpg_size"
           class="flex-container alert alert-info">
-      <ng-container *ngIf="config?.fileformat_validated">
-        <span>Seules les extensions suivantes sont acceptées : 
-          <b *ngFor="let item of fileTypeAccepted; let isLast=last">
-            {{ item.split('/')[1] }}{{isLast ? '' : ', '}}
-          </b>
-        </span><br>
-      </ng-container>
-      <ng-container *ngIf="config?.filename_validated">
-        <span>Pour les images, le format doit être le suivant : <b>{{ zh.properties.code }}_#.jpeg</b> (avec # un nombre)</span><br>
-      </ng-container>
-      <ng-container *ngIf="config?.max_pdf_size">
-        <span>La taille maximale des fichers pdf est de <b>{{ config.max_pdf_size }}Mo</b></span><br>
-      </ng-container>
-      <ng-container *ngIf="config?.max_jpg_size">
-        <span>La taille maximale des fichers jpeg est de <b>{{ config.max_jpg_size }}Mo</b></span><br>
-      </ng-container>
+      <ul>
+        <li>
+          <ng-container *ngIf="config?.fileformat_validated">
+            <span>Seules les extensions suivantes sont acceptées : 
+              <b *ngFor="let item of fileTypeAccepted; let isLast=last">
+              {{ item.split('/')[1] }}{{isLast ? '' : ', '}}
+              </b>
+             </span><br>
+          </ng-container>
+        </li>
+        <li>
+          <ng-container *ngIf="config?.filename_validated">
+            <span>Pour les images, le format doit être le suivant : <b>{{ zh.properties.code }}_#.jpeg</b> (avec # un nombre)</span><br>
+          </ng-container>
+        </li>
+        <li>
+          <ng-container *ngIf="config?.max_pdf_size">
+            <span>La taille maximale des fichers pdf est de <b>{{ config.max_pdf_size }}Mo</b></span><br>
+          </ng-container>
+        </li>
+        <li>
+          <ng-container *ngIf="config?.max_jpg_size">
+            <span>La taille maximale des fichers jpeg est de <b>{{ config.max_jpg_size }}Mo</b></span><br>
+          </ng-container>
+        </li>
+        <li>
+          <ng-container *ngIf="config?.fileformat_validated">
+            Apposer une signature numérique visible sur la photographie indiquant : © / Année de prise de vue / Sigle de l'organisme / 1er lettre du prénom de l'auteur / Nom de l'auteur (exemple : © 2022 - ABCD -N. DUPOND).
+          </ng-container>
+        </li>
+      </ul>
     </div>
     <form [formGroup]="fileForm">
       <div class="form-row">
