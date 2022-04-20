@@ -515,10 +515,10 @@ INSERT INTO ref_nomenclatures.t_nomenclatures(id_type, cd_nomenclature, mnemoniq
 ((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'fort', 'Fort (réglementaire / maîtrise foncière)', 'Fort (réglementaire / maîtrise foncière)', 'Fort (réglementaire / maîtrise foncière)', 'ZONES_HUMIDES', 'Non validé'),
 ((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'OUI', 'OUI', 'OUI', 'OUI', 'ZONES_HUMIDES', 'Non validé'),
 ((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'NON', 'NON', 'NON', 'NON', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'bon', 'Non dégradée', 'Non dégradée', 'Non dégradée', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'mauvais', 'Très fortement dégradée', 'Très fortement dégradée', 'Très fortement dégradée', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'bon', 'Pas ou peu dégradée', 'Pas ou peu dégradée', 'Pas ou peu dégradée', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'mauvais', 'Fortement dégradée', 'Fortement dégradée', 'Fortement dégradée', 'ZONES_HUMIDES', 'Non validé'),
 ((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'moyen', 'Partiellement dégradée', 'Partiellement dégradée', 'Partiellement dégradée', 'ZONES_HUMIDES', 'Non validé'),
-((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'NE', 'Non évalué', 'Non évalué', 'Non évalué', 'ZONES_HUMIDES', 'Non validé')
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'NE', 'Non évaluée', 'Non évaluée', 'Non évaluée', 'ZONES_HUMIDES', 'Non validé')
 ;
 
 
