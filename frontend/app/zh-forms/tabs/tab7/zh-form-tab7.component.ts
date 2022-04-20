@@ -359,7 +359,7 @@ export class ZhFormTab7Component implements OnInit {
           return item;
         }
       }
-    ), {onlySelf: true});
+    ));
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'une proposition d'action";
