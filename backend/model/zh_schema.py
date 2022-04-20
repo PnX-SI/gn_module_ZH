@@ -183,7 +183,7 @@ class BibOrganismes(DB.Model):
     def get_bib_organisms(org_type):
         bib_organismes = DB.session.query(BibOrganismes).all()
         if org_type == "operator":
-            return [bib_org.as_dict() for bib_org in bib_organismes if bib_org.is_op_org == True]
+            return [bib_org.as_dict() for bib_org in bib_organismes if bib_org.is_op_org]
         elif org_type == "management_structure":
             return [bib_org.as_dict() for bib_org in bib_organismes]
         else:
