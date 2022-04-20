@@ -43,6 +43,7 @@
             [formControl]="formTab6.controls.structure"
             (onOpen)="onStructureOpened()"
             (onDeSelectAll)="onAllStructuresDeselected()"
+            (keydown.enter)="handleEnterKeyPress()"
           >
           </angular2-multiselect>
         </div>
@@ -240,6 +241,7 @@
             [formControl]="formTab6.controls.protections"
             [settings]="dropdownSettings"
             (onDeSelectAll)="onDeSelectAll()"
+            (keydown.enter)="handleEnterKeyPress()"
           >
           </angular2-multiselect>
         </div>
