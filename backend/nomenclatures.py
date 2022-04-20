@@ -53,6 +53,7 @@ def get_corine_biotope():
             {
                 "CB_code": cb.BibCb.lb_code,
                 "CB_label": cb.Habref.lb_hab_fr,
+                "front_name": cb.BibCb.lb_code + ' - ' + cb.Habref.lb_hab_fr,
                 "CB_humidity": cb.BibCb.humidity,
                 "CB_is_ch": cb.BibCb.is_ch
             } for cb in BibCb.get_label()
@@ -80,6 +81,7 @@ def get_ch(lb_code):
         for q in q_cd_hab_entre:
             ch.append({
                 "cd_hab": q.cd_hab_entre,
+                "front_name": DB.session.query(Habref).filter(Habref.cd_hab == q.cd_hab_entre).one().lb_code + ' - ' + DB.session.query(Habref).filter(Habref.cd_hab == q.cd_hab_entre).one().lb_hab_fr,
                 "lb_code": DB.session.query(Habref).filter(Habref.cd_hab == q.cd_hab_entre).one().lb_code,
                 "lb_hab_fr": DB.session.query(Habref).filter(Habref.cd_hab == q.cd_hab_entre).one().lb_hab_fr
             })

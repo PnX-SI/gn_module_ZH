@@ -371,10 +371,14 @@ class HabHeritage:
         self.hab_cover: int = hab_cover
 
     def __str__(self):
+        biotope_lb_hab_fr = DB.session.query(Habref).filter(Habref.lb_code == self.id_corine_bio).filter(Habref.cd_typo == 22).one().lb_hab_fr
+        biotope_lb_code = DB.session.query(Habref).filter(Habref.lb_code == self.id_corine_bio).filter(Habref.cd_typo == 22).one().lb_code
+        cahier_lb_hab_fr = DB.session.query(Habref).filter(Habref.cd_hab == self.id_cahier_hab).one().lb_hab_fr
+        cahier_lb_code = DB.session.query(Habref).filter(Habref.cd_hab == self.id_cahier_hab).one().lb_code
         return {
-            "biotope": DB.session.query(Habref).filter(Habref.lb_code == self.id_corine_bio).filter(Habref.cd_typo == 22).one().lb_hab_fr,
+            "biotope": biotope_lb_code + ' - ' + biotope_lb_hab_fr,
             "etat": Utils.get_mnemo(self.id_preservation_state),
-            "cahier": DB.session.query(Habref).filter(Habref.cd_hab == self.id_cahier_hab).one().lb_hab_fr,
+            "cahier": cahier_lb_code + ' - ' + cahier_lb_hab_fr,
             "recouvrement": self.hab_cover
         }
 
