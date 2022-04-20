@@ -404,7 +404,6 @@ export class ZhFormTab5Component implements OnInit {
   }
 
   async getCorineBio(habitats) {
-    console.log(habitats);
     // Since it is async, need to set a temporary
     //   table. This prevents duplicate pushes on
     //   this.corineBioTable
