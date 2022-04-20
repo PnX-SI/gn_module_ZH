@@ -205,15 +205,12 @@ class BibOrganismes(DB.Model):
     def get_bib_organisms(org_type):
         bib_organismes = DB.session.query(BibOrganismes).all()
         if org_type == "operator":
-            is_op_org = True
+            return [bib_org.as_dict() for bib_org in bib_organismes if bib_org.is_op_org]
         elif org_type == "management_structure":
-            is_op_org = False
+            return [bib_org.as_dict() for bib_org in bib_organismes]
         else:
             return "error in org type", 500
-        bib_organismes_list = [
-            bib_org.as_dict() for bib_org in bib_organismes if bib_org.is_op_org == is_op_org
-        ]
-        return bib_organismes_list
+        
 
 
 @serializable
