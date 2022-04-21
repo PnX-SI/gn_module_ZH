@@ -143,6 +143,29 @@ def get_function_list(mnemo):
             message="get_function_list_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
 
+def get_all_function_list(mnemo):
+    try:
+        # get id_type of mnemo (ex : 'FONCTIONS_HYDRO') in BibNomenclatureTypes
+        id_type_main_function = DB.session.query(BibNomenclaturesTypes).filter(BibNomenclaturesTypes.mnemonique == mnemo).one().id_type
+
+        # get list of TNomenclatures ids by id_type
+        nomenclature_ids = [nomenc.id_nomenclature for nomenc in DB.session.query(TNomenclatures).filter(
+            TNomenclatures.id_type == id_type_main_function).all()]
+
+        return [
+            {
+                "id_nomenclature": function.CorMainFct.id_function,
+                "mnemonique": function.TNomenclatures.mnemonique,
+                "id_category": function.CorMainFct.id_main_function,
+                "category": DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == function.CorMainFct.id_main_function).one().mnemonique.upper()
+            } for function in CorMainFct.get_all_functions(nomenclature_ids)
+        ]
+    except Exception as e:
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="get_all_function_list_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+
+
 def get_urban_docs():
     try:
         return [
@@ -189,7 +212,9 @@ def get_nomenc(config):
     nomenc_info = {}
     for mnemo in config:
         if mnemo in ['FONCTIONS_HYDRO', 'FONCTIONS_BIO', 'INTERET_PATRIM']:
+            mnemo_all = mnemo + '_all'
             nomenc_info = {**nomenc_info, mnemo: get_function_list(mnemo)}
+            nomenc_info = {**nomenc_info, mnemo_all: get_all_function_list(mnemo)}
         elif mnemo == 'IMPACTS':
             nomenc_info = {**nomenc_info, mnemo: get_impact_list()}
         elif mnemo == 'CORINE_BIO':

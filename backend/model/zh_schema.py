@@ -687,6 +687,13 @@ class CorMainFct(DB.Model):
             .all()
 
     @staticmethod
+    def get_all_functions(nomenc_ids):
+        return DB.session.query(CorMainFct, TNomenclatures)\
+            .join(TNomenclatures, TNomenclatures.id_nomenclature == CorMainFct.id_function)\
+            .filter(CorMainFct.id_function.in_(nomenc_ids))\
+            .all()
+
+    @staticmethod
     def get_main_function_list(ids):
         q_id_types = DB.session.query(
             func.distinct(CorMainFct.id_main_function)).all()
