@@ -164,7 +164,9 @@ def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
                     .filter(CorZhRb.id_zh == feature.properties['id_zh'])
                     .all()
             ]
+            delims = [lim.TNomenclatures.mnemonique for lim in DB.session.query(CorLimList, TNomenclatures).filter(CorLimList.id_lim_list==feature["properties"]["id_lim_list"]).filter(TNomenclatures.id_nomenclature==CorLimList.id_lim).all()]
             feature["properties"]["bassin_versant"] = rb_names
+            feature["properties"]["delims"] = delims
             featureCollection.append(feature)
         return {
             "total": nb_results_without_limit,

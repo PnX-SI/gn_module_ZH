@@ -25,6 +25,7 @@ available_maplist_column = [
     {"prop": "code", "name": "Code"},
     {"prop": "sdage", "name": "Typologie SDAGE"},
     {"prop": "bassin_versant", "name": "Bassin versant"},
+    {"prop": "delims", "name": "Critères délimitation (de la zh)"},
     {"prop": "create_date", "name": "Date de création"},
     {"prop": "author", "name": "Auteur"},
     {"prop": "organism", "name": "Organisme"},
