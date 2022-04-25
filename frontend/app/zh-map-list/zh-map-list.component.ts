@@ -156,7 +156,7 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   displayAuthorName(element) {
-    return element.nom_complet;
+    return element.prenom_role == "" ? element.nom_role : element.nom_complet;
   }
 
   displayDate(element): string {
