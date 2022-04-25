@@ -187,6 +187,9 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     feature["properties"]["create_date"] = this.displayDate(
       feature["properties"]["create_date"]
     );
+    feature["properties"]["update_date"] = this.displayDate(
+      feature["properties"]["update_date"]
+    );
 
     feature["properties"]["sdage"] = this.displaySdageName(
       feature["properties"]["id_sdage"]
