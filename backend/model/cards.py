@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import text
-#from pypnusershub.db.models import Organisme
+from pypnusershub.db.models import Organisme
 
 from geonature.utils.env import DB
 from geonature.core.ref_geo.models import LAreas
@@ -168,32 +168,21 @@ class Author:
         self.create_author = self.__get_author()
         self.edit_author = self.__get_author(type='coauthors')
         self.id_organisme = id_organisme
-
+        
     def __str__(self):
         return {
             "auteur": self.create_author,
             "auteur_modif": self.edit_author,
             "date": self.create_date,
             "date_modif": self.update_date,
-            # "organism": DB.session.query(Organisme).filter(Organisme.id_organisme == self.id_organisme).one().nom_organisme
-            "organism": self.__temporary_get_organism(self.id_organisme)
+            "organism": DB.session.query(Organisme).filter(Organisme.id_organisme == self.id_organisme).one().nom_organisme
         }
 
     def __get_author(self, type='authors'):
         zh = TZH.get_tzh_by_id(self.id_zh)
-        prenom = getattr(zh, type).prenom_role
-        nom = getattr(zh, type).nom_role
+        prenom = getattr(zh, type).prenom_role if getattr(zh, type).prenom_role is not None else ''
+        nom = getattr(zh, type).nom_role if getattr(zh, type).nom_role is not None else ''
         return prenom + ' ' + nom.upper()
-
-    def __temporary_get_organism(self, id_organism):
-        # waiting for update of pypnusershub with Organisme class
-        query = \
-            """
-                SELECT nom_organisme
-                FROM utilisateurs.bib_organismes
-                WHERE id_organisme = {id_organisme}
-            """.format(id_organisme=id_organism)
-        return DB.session.execute(text(query)).fetchone().nom_organisme
 
 
 class Municipalities:
@@ -382,10 +371,14 @@ class HabHeritage:
         self.hab_cover: int = hab_cover
 
     def __str__(self):
+        biotope_lb_hab_fr = DB.session.query(Habref).filter(Habref.lb_code == self.id_corine_bio).filter(Habref.cd_typo == 22).one().lb_hab_fr
+        biotope_lb_code = DB.session.query(Habref).filter(Habref.lb_code == self.id_corine_bio).filter(Habref.cd_typo == 22).one().lb_code
+        cahier_lb_hab_fr = DB.session.query(Habref).filter(Habref.cd_hab == self.id_cahier_hab).one().lb_hab_fr
+        cahier_lb_code = DB.session.query(Habref).filter(Habref.cd_hab == self.id_cahier_hab).one().lb_code
         return {
-            "biotope": DB.session.query(Habref).filter(Habref.lb_code == self.id_corine_bio).filter(Habref.cd_typo == 22).one().lb_hab_fr,
+            "biotope": biotope_lb_code + ' - ' + biotope_lb_hab_fr,
             "etat": Utils.get_mnemo(self.id_preservation_state),
-            "cahier": DB.session.query(Habref).filter(Habref.cd_hab == self.id_cahier_hab).one().lb_hab_fr,
+            "cahier": cahier_lb_code + ' - ' + cahier_lb_hab_fr,
             "recouvrement": self.hab_cover
         }
 
@@ -565,7 +558,7 @@ class Activity:
         self.remark_activity: str = remark_activity
 
     def __str_impact(self):
-        return [cor.TNomenclatures.mnemonique for cor in CorImpactTypes.get_impacts() if cor.CorImpactTypes.id_cor_impact_types in self.ids_impact]
+        return [cor.TNomenclatures.label_fr for cor in CorImpactTypes.get_impacts() if cor.CorImpactTypes.id_cor_impact_types in self.ids_impact]
 
     def __str__(self):
         return {

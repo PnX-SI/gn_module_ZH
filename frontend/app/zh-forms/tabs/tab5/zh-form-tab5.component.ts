@@ -43,6 +43,9 @@ export class ZhFormTab5Component implements OnInit {
   public valSocEcoTable: any[] = [];
   public corineBioTable: any[] = [];
   public config = ModuleConfig;
+  default_qualification: string = "Non évaluée";
+  default_knowledge: string = "Lacunaire ou nulle";
+  default_preservation_state: string = "Non évaluée";
 
   readonly functionSize: string = "30%";
   readonly qualifSize: string = "10%";
@@ -117,13 +120,13 @@ export class ZhFormTab5Component implements OnInit {
     {
       name: "corinBio",
       label: "Corine biotopes",
-      subcell: { name: "CB_label" },
+      subcell: { name: "front_name" },
       size: this.functionSize,
     },
     {
       name: "cahierHab",
       label: "Cahier d'habitats",
-      subcell: { name: "lb_hab_fr" },
+      subcell: { name: "front_name" },
     },
     {
       name: "preservationState",
@@ -438,6 +441,20 @@ export class ZhFormTab5Component implements OnInit {
   // open the add fonction hydrologique modal
   onAddHydroFct(event: any, modal: any) {
     this.hydroFctForm.reset();
+    this.hydroFctForm.controls["qualification"].setValue(
+      this.formMetaData["FONCTIONS_QUALIF"].find((item) => {
+        if (item.mnemonique == this.default_qualification) {
+          return item;
+        }
+      })
+    );
+    this.hydroFctForm.controls["knowledge"].setValue(
+      this.formMetaData["FONCTIONS_CONNAISSANCE"].find((item) => {
+        if (item.mnemonique == this.default_knowledge) {
+          return item;
+        }
+      })
+    );
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'une fonction hydrologique / biogéochimique";
@@ -537,6 +554,20 @@ export class ZhFormTab5Component implements OnInit {
   // open the add fonction biologique modal
   onAddBioFct(event: any, modal: any) {
     this.bioFctForm.reset();
+    this.bioFctForm.controls["qualification"].setValue(
+      this.formMetaData["FONCTIONS_QUALIF"].find((item) => {
+        if (item.mnemonique == this.default_qualification) {
+          return item;
+        }
+      })
+    );
+    this.bioFctForm.controls["knowledge"].setValue(
+      this.formMetaData["FONCTIONS_CONNAISSANCE"].find((item) => {
+        if (item.mnemonique == this.default_knowledge) {
+          return item;
+        }
+      })
+    );
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'une fonction biologique / écologique";
@@ -634,6 +665,20 @@ export class ZhFormTab5Component implements OnInit {
   // open the add fonction intérêt patrimonal modal
   onAddInteretPat(event: any, modal: any) {
     this.interetPatForm.reset();
+    this.interetPatForm.controls["qualification"].setValue(
+      this.formMetaData["FONCTIONS_QUALIF"].find((item) => {
+        if (item.mnemonique == this.default_qualification) {
+          return item;
+        }
+      })
+    );
+    this.interetPatForm.controls["knowledge"].setValue(
+      this.formMetaData["FONCTIONS_CONNAISSANCE"].find((item) => {
+        if (item.mnemonique == this.default_knowledge) {
+          return item;
+        }
+      })
+    );
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'un intérêt patrimonal";
@@ -787,6 +832,20 @@ export class ZhFormTab5Component implements OnInit {
 
   onAddValSocEco(event: any, modal: any) {
     this.valSocEcoForm.reset();
+    this.valSocEcoForm.controls["qualification"].setValue(
+      this.formMetaData["FONCTIONS_QUALIF"].find((item) => {
+        if (item.mnemonique == this.default_qualification) {
+          return item;
+        }
+      })
+    );
+    this.valSocEcoForm.controls["knowledge"].setValue(
+      this.formMetaData["FONCTIONS_CONNAISSANCE"].find((item) => {
+        if (item.mnemonique == this.default_knowledge) {
+          return item;
+        }
+      })
+    );
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'une valeur socio-économique";
@@ -889,6 +948,13 @@ export class ZhFormTab5Component implements OnInit {
   // open the add CorineBio modal
   onAddCorineBio(event: any, modal: any) {
     this.corineBioForm.reset();
+    this.corineBioForm.controls["preservationState"].setValue(
+      this.formMetaData["ETAT_CONSERVATION"].find((item) => {
+        if (item.mnemonique == this.default_preservation_state) {
+          return item;
+        }
+      })
+    );
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'un habitat humide patrimonial";

@@ -64,6 +64,7 @@ export class ZhFormTab6Component implements OnInit {
   private $_currentZhSub: Subscription;
   private $_fromChangeSub: Subscription;
   public selectedItems = [];
+  default_status: string = "Indéterminé";
 
   readonly urbanColSize: string = "15%";
 
@@ -167,7 +168,7 @@ export class ZhFormTab6Component implements OnInit {
       searchPlaceholderText: "Rechercher",
       enableSearchFilter: true,
       groupBy: "category",
-      position: "top"
+      position: "top",
     };
 
     this.getMetaData();
@@ -386,6 +387,13 @@ export class ZhFormTab6Component implements OnInit {
   // open the add status modal
   onAddStatus(event: any, modal: any) {
     this.statusForm.reset();
+    this.statusForm.controls["status"].setValue(
+      this.formMetaData["STATUT_PROPRIETE"].find((item) => {
+        if (item.mnemonique == this.default_status) {
+          return item;
+        }
+      })
+    );
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'un statut de propriété";
@@ -824,9 +832,6 @@ export class ZhFormTab6Component implements OnInit {
     if (this.planForm.valid) {
       let formValues = this.planForm.value;
       this.managements.map((item: any) => {
-        // moreDetails enable to expand the table to show the plans
-        // set it to true here enable to expand when plan is added
-        item.moreDetails = true;
         if (item.id_org == this.selectedManagement.id_org) {
           if (!item.plans || item.plans.length == 0) {
             formValues.plan_date = this.dateParser.format(formValues.plan_date);
@@ -840,6 +845,9 @@ export class ZhFormTab6Component implements OnInit {
               formValues.plan_date = this.dateParser.format(
                 formValues.plan_date
               );
+              // moreDetails enable to expand the table to show the plans
+              // set it to true here enable to expand when plan is added
+              item.moreDetails = true;
               item.plans.push(formValues);
             }
           }
@@ -969,6 +977,10 @@ export class ZhFormTab6Component implements OnInit {
 
   onDeSelectAll() {
     this.formTab6.get("protections").reset();
+  }
+
+  handleEnterKeyPress() {
+    return false;
   }
 
   onFormSubmit() {

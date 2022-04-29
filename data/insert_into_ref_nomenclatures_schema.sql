@@ -105,6 +105,7 @@ INSERT INTO ref_nomenclatures.t_nomenclatures(id_type,cd_nomenclature,mnemonique
     ((select ref_nomenclatures.get_id_nomenclature_type('ACTIV_HUM')),'19','19 - Gestion conservatoire','19 - Gestion conservatoire','19 - Gestion conservatoire','19 - Gestion conservatoire','19 - Gestion conservatoire','ZONES_HUMIDES','non validé','3.4'),
     ((select ref_nomenclatures.get_id_nomenclature_type('ACTIV_HUM')),'20','20 - Prélèvements d’eau','20 - Prélèvements d’eau','20 - Prélèvements d’eau','20 - Prélèvements d’eau','20 - Prélèvements d’eau','ZONES_HUMIDES','non validé','3.4'),
     ((select ref_nomenclatures.get_id_nomenclature_type('ACTIV_HUM')),'21','21 - Autre (préciser dans l’encart réservé aux remarques)','21 - Autre (préciser dans l’encart réservé aux remarques)','21 - Autre (préciser dans l’encart réservé aux remarques)','21 - Autre (préciser dans l’encart réservé aux remarques)','21 - Autre (préciser dans l’encart réservé aux remarques)','ZONES_HUMIDES','non validé','3.4'),
+    ((select ref_nomenclatures.get_id_nomenclature_type('LOCALISATION')),'0','Non déterminée','Non déterminée','Non déterminée','Non déterminée','Non déterminée','ZONES_HUMIDES','non validé','3.4'),
     ((select ref_nomenclatures.get_id_nomenclature_type('LOCALISATION')),'1','Au niveau de la zone humide','Au niveau de la zone humide','Au niveau de la zone humide','Au niveau de la zone humide','Au niveau de la zone humide','ZONES_HUMIDES','non validé','3.4'),
     ((select ref_nomenclatures.get_id_nomenclature_type('LOCALISATION')),'2','Au niveau de l’espace de fonctionnalité','Au niveau de l’espace de fonctionnalité','Au niveau de l’espace de fonctionnalité','Au niveau de l’espace de fonctionnalité','Au niveau de l’espace de fonctionnalité','ZONES_HUMIDES','non validé','3.4'),
     ((select ref_nomenclatures.get_id_nomenclature_type('LOCALISATION')),'3','Au niveau de la zone humide et de l’espace de fonctionnalité','Au niveau de la zone humide et de l’espace de fonctionnalité','Au niveau de la zone humide et de l’espace de fonctionnalité','Au niveau de la zone humide et de l’espace de fonctionnalité','Au niveau de la zone humide et de l’espace de fonctionnalité','ZONES_HUMIDES','non validé','3.4'),
@@ -156,7 +157,6 @@ INSERT INTO ref_nomenclatures.t_nomenclatures(id_type,cd_nomenclature,mnemonique
     ((select ref_nomenclatures.get_id_nomenclature_type('IMPACTS')),'72.0','introduction, gestion ou limitation des populations','72.0 - Introduction, gestion ou limitation des populations','72.0 - Introduction, gestion ou limitation des populations','72.0 - Introduction, gestion ou limitation des populations','72.0 - Introduction, gestion ou limitation des populations','ZONES_HUMIDES','non validé','3.4'),
     ((select ref_nomenclatures.get_id_nomenclature_type('IMPACTS')),'73.0','gestion des habitats pour l’accueil et l’information du public','73.0 - Gestion des habitats pour l’accueil et l’information du public','73.0 - Gestion des habitats pour l’accueil et l’information du public','73.0 - Gestion des habitats pour l’accueil et l’information du public','73.0 - Gestion des habitats pour l’accueil et l’information du public','ZONES_HUMIDES','non validé','3.4'),
     ((select ref_nomenclatures.get_id_nomenclature_type('IMPACTS')),'74.0','autre (préciser dans l’encart réservé aux remarques)','74.0 - Autre (préciser dans l’encart réservé aux remarques)','74.0 - Autre (préciser dans l’encart réservé aux remarques)','74.0 - Autre (préciser dans l’encart réservé aux remarques)','74.0 - Autre (préciser dans l’encart réservé aux remarques)','ZONES_HUMIDES','non validé','3.4'),
-    ((select ref_nomenclatures.get_id_nomenclature_type('IMPACTS')),'75','pratiques aquacoles','75 - Pratiques aquacoles','75 - Pratiques aquacoles','75 - Pratiques aquacoles','75 - Pratiques aquacoles','ZONES_HUMIDES','non validé','3.4'),
     ((select ref_nomenclatures.get_id_nomenclature_type('IMPACTS')),'75.0','aménagements liés à la pisciculture ou à la conchyliculture','75.0 - Aménagements liés à la pisciculture ou à la conchyliculture','75.0 - Aménagements liés à la pisciculture ou à la conchyliculture','75.0 - Aménagements liés à la pisciculture ou à la conchyliculture','75.0 - Aménagements liés à la pisciculture ou à la conchyliculture','ZONES_HUMIDES','non validé','3.4'),
     ((select ref_nomenclatures.get_id_nomenclature_type('IMPACTS')),'76.0','fertilisation, amendements','76.0 - Fertilisation, amendements','76.0 - Fertilisation, amendements','76.0 - Fertilisation, amendements','76.0 - Fertilisation, amendements','ZONES_HUMIDES','non validé','3.4'),
     ((select ref_nomenclatures.get_id_nomenclature_type('IMPACTS')),'77.0','alimentation artificielle','77.0 - Alimentation artificielle','77.0 - Alimentation artificielle','77.0 - Alimentation artificielle','77.0 - Alimentation artificielle','ZONES_HUMIDES','non validé','3.4'),
@@ -300,6 +300,7 @@ INSERT INTO ref_nomenclatures.t_nomenclatures(id_type,cd_nomenclature,mnemonique
     ((select ref_nomenclatures.get_id_nomenclature_type('INSTRU_CONTRAC_FINANC')),'5','Mesures agri-environnementales (CTE, MAE, …)','Mesures agri-environnementales (CTE, MAE, …)','Mesures agri-environnementales (CTE, MAE, …)','Mesures agri-environnementales (CTE, MAE, …)','Mesures agri-environnementales (CTE, MAE, …)','ZONES_HUMIDES','non validé','6.4'),
     ((select ref_nomenclatures.get_id_nomenclature_type('INSTRU_CONTRAC_FINANC')),'6','Convention CREN','Convention CREN','Convention CREN','Convention CREN','Convention CREN','ZONES_HUMIDES','non validé','6.4'),
     ((select ref_nomenclatures.get_id_nomenclature_type('INSTRU_CONTRAC_FINANC')),'7','Autres (SDAU, PSG, opération grand site, …)','Autres (SDAU, PSG, opération grand site, …)','Autres (SDAU, PSG, opération grand site, …)','Autres (SDAU, PSG, opération grand site, …)','Autres (SDAU, PSG, opération grand site, …)','ZONES_HUMIDES','non validé','6.4'),
+    ((select ref_nomenclatures.get_id_nomenclature_type('NIVEAU_PRIORITE')),'0','Non définie','Non définie','Non définie','Non définie','Non définie','ZONES_HUMIDES','non validé','7.4'), 
     ((select ref_nomenclatures.get_id_nomenclature_type('NIVEAU_PRIORITE')),'1','Priorité 1','Priorité 1','Priorité 1','Priorité 1','Priorité 1','ZONES_HUMIDES','non validé','7.4'),
     ((select ref_nomenclatures.get_id_nomenclature_type('NIVEAU_PRIORITE')),'2','Priorité 2','Priorité 2','Priorité 2','Priorité 2','Priorité 2','ZONES_HUMIDES','non validé','7.4'),
     ((select ref_nomenclatures.get_id_nomenclature_type('NIVEAU_PRIORITE')),'3','Priorité 3','Priorité 3','Priorité 3','Priorité 3','Priorité 3','ZONES_HUMIDES','non validé','7.4'),
@@ -491,6 +492,33 @@ INSERT INTO ref_nomenclatures.defaults_nomenclatures_value VALUES
 ('STATUT_PROPRIETE',(select id_organisme from utilisateurs.bib_organismes where nom_organisme = 'ALL'),(SELECT ref_nomenclatures.get_id_nomenclature('STATUT_PROPRIETE','0'))),
 ('STATUT_PROTECTION',(select id_organisme from utilisateurs.bib_organismes where nom_organisme = 'ALL'),(SELECT ref_nomenclatures.get_id_nomenclature('STATUT_PROTECTION','0')))
 ON CONFLICT (mnemonique_type, id_organism) DO NOTHING;
+;
+
+-- hierarchy :
+-- step 1 : insert qualifications which are not already in ref_nomenclatures.t_nomenclatures
+INSERT INTO ref_nomenclatures.t_nomenclatures(id_type, cd_nomenclature, mnemonique, label_default, label_fr, source, statut) VALUES
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'iso', 'ZH isolée', 'ZH isolée', 'ZH isolée', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'res', 'ZH participant d''un réseau ou continuum', 'ZH participant d''un réseau ou continuum', 'ZH participant d''un réseau ou continuum', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '0', 'Aucun', 'Aucun', 'Aucun', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '1 ou 2', '1 ou 2', '1 ou 2', '1 ou 2', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '3 à 5', '3 à 5', '3 à 5', '3 à 5', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '>5', '>5', '>5', '>5', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '1 à 4', '1 à 4', '1 à 4', '1 à 4', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '5 à 7', '5 à 7', '5 à 7', '5 à 7', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '8 ou 9', '8 ou 9', '8 ou 9', '8 ou 9', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '>9', '>9', '>9', '>9', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '1', '1', '1', '1', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '2', '2', '2', '2', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '3', '3', '3', '3', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), '>3', '>3', '>3', '>3', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'faible', 'Faible (conventionnel / contractuel / inventaire)', 'Faible (conventionnel / contractuel / inventaire)', 'Faible (conventionnel / contractuel / inventaire)', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'fort', 'Fort (réglementaire / maîtrise foncière)', 'Fort (réglementaire / maîtrise foncière)', 'Fort (réglementaire / maîtrise foncière)', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'OUI', 'OUI', 'OUI', 'OUI', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'NON', 'NON', 'NON', 'NON', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'bon', 'Pas ou peu dégradée', 'Pas ou peu dégradée', 'Pas ou peu dégradée', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'mauvais', 'Fortement dégradée', 'Fortement dégradée', 'Fortement dégradée', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'moyen', 'Partiellement dégradée', 'Partiellement dégradée', 'Partiellement dégradée', 'ZONES_HUMIDES', 'Non validé'),
+((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'NE', 'Non évaluée', 'Non évaluée', 'Non évaluée', 'ZONES_HUMIDES', 'Non validé')
 ;
 
 

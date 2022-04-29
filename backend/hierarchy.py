@@ -174,7 +174,7 @@ class Item:
                 return self.__get_id_nomenc(self.__get_id_type('HIERARCHY'), '0')
 
             # get qualif_id :
-
+ 
             # if 'nothing' cd in values -> return 0
             for cd in q_status:
                 if cd in self.nomenc_ids['nothing']:
@@ -221,7 +221,7 @@ class Item:
 
     def __get_selected_status(self):
         try:
-            return [getattr(q_.TNomenclatures, 'id_nomenclature') for q_ in DB.session.query(CorZhProtection, CorProtectionLevelType, TNomenclatures).join(CorProtectionLevelType, CorZhProtection.id_protection == CorProtectionLevelType.id_protection).join(TNomenclatures, TNomenclatures.id_nomenclature == CorProtectionLevelType.id_protection_status).all()]
+            return [getattr(q_.TNomenclatures, 'id_nomenclature') for q_ in DB.session.query(CorZhProtection, CorProtectionLevelType, TNomenclatures).join(CorProtectionLevelType, CorZhProtection.id_protection == CorProtectionLevelType.id_protection).join(TNomenclatures, TNomenclatures.id_nomenclature == CorProtectionLevelType.id_protection_status).filter(CorZhProtection.id_zh == self.id_zh).all()]
         except ZHApiError as e:
             raise ZHApiError(
                 message=str(e.message), details=str(e.details), status_code=e.status_code)

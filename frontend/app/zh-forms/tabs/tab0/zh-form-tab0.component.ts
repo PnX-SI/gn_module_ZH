@@ -17,7 +17,6 @@ import { ToastrService } from "ngx-toastr";
 import { ZhDataService } from "../../../services/zh-data.service";
 import { TabsService } from "../../../services/tabs.service";
 import { ErrorTranslatorService } from "../../../services/error-translator.service";
-import { zhNameValidator } from "../../../validators/zhNameValidator";
 
 const GEOM_CONTAINED_ID = 1;
 
@@ -178,14 +177,7 @@ export class ZhFormTab0Component implements OnInit {
   createForm(): void {
     this.form = this.fb.group({
       id_org: [null, Validators.required],
-      main_name: [
-        null,
-        {
-          validators: [Validators.required],
-          asyncValidators: [zhNameValidator(this._dataService, 500)],
-          updateOn: "blur",
-        },
-      ],
+      main_name: [null, Validators.required],
       critere_delim: [null, Validators.required],
       sdage: ["", Validators.required],
     });
@@ -375,7 +367,7 @@ export class ZhFormTab0Component implements OnInit {
     let features = [];
     // We can have a multipolygon and a polygon here.
     // It can be checked with their coordinates
-    if (geometry.coordinates.length > 1) {
+    if (geometry.coordinates.length > 1 && geometry.type !== 'Polygon') {
       geometry.coordinates.forEach((coord) =>
         features.push(this.getPolygonFeature(coord))
       );

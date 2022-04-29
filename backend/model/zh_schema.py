@@ -10,7 +10,8 @@ from sqlalchemy.ext.declarative import declarative_base
 
 
 from pypnnomenclature.models import (
-    TNomenclatures
+    TNomenclatures,
+    BibNomenclaturesTypes
 )
 
 from pypn_habref_api.models import (
@@ -136,6 +137,27 @@ class Nomenclatures(TNomenclatures):
 
 
 @serializable
+class DefaultsNomenclaturesValues(DB.Model):
+    __tablename__ = "defaults_nomenclatures_value"
+    __table_args__ = {"schema": "ref_nomenclatures"}
+    mnemonique_type = DB.Column(
+        DB.Unicode(length=255), 
+        ForeignKey(BibNomenclaturesTypes.mnemonique),
+        primary_key=True
+    )
+    id_organism = DB.Column(
+        DB.Integer, 
+        ForeignKey("utilisateurs.bib_organismes.id_organisme"),
+        primary_key=True
+    )
+    id_nomenclature = DB.Column(
+        DB.Integer, 
+        ForeignKey(TNomenclatures.id_nomenclature),
+        nullable=False
+    )
+
+
+@serializable
 class BibSiteSpace(DB.Model):
     __tablename__ = "bib_site_space"
     __table_args__ = {"schema": "pr_zh"}
@@ -183,15 +205,12 @@ class BibOrganismes(DB.Model):
     def get_bib_organisms(org_type):
         bib_organismes = DB.session.query(BibOrganismes).all()
         if org_type == "operator":
-            is_op_org = True
+            return [bib_org.as_dict() for bib_org in bib_organismes if bib_org.is_op_org]
         elif org_type == "management_structure":
-            is_op_org = False
+            return [bib_org.as_dict() for bib_org in bib_organismes]
         else:
             return "error in org type", 500
-        bib_organismes_list = [
-            bib_org.as_dict() for bib_org in bib_organismes if bib_org.is_op_org == is_op_org
-        ]
-        return bib_organismes_list
+        
 
 
 @serializable
@@ -299,7 +318,7 @@ class TZH(ZhModel):
     )
 
     def get_geofeature(self, recursif=True, relationships=()):
-        return self.as_geofeature("geom", "id_zh", recursif, relationships=relationships)
+        return self.as_geofeature("geom", "id_zh", fields=['authors', 'coauthors', 'authors.organisme', 'coauthors.organisme'])
 
     @staticmethod
     def get_site_space_name(id):

@@ -30,6 +30,7 @@
         <div class="form-group col-md-6">
           <small>Sous-type SAGE</small>
           <select class="form-control" [formControl]="form.controls.id_sage">
+            <option></option>
             <option *ngFor="let sg of sage" [ngValue]="sg.id_nomenclature">
               {{ sg.mnemonique }}
             </option>
