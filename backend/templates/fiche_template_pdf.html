@@ -38,6 +38,12 @@
     page-break-before: always;
   }
 }
+@page {
+  @bottom-left {
+    content: counter(page) " sur " counter(pages);
+    width: 25%;
+  }
+}
 
 .main-title {
   font-family: Roboto;
@@ -65,7 +71,7 @@
 
   font-style: normal;
   font-weight: 500;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 143%;
   /* or 37px */
   letter-spacing: 0.15px;
@@ -164,8 +170,8 @@ tr {
 }
 
 .image {
-  width: 600px;
-  height: 300px;
+  max-height: 300px;
+  max-width: 300px;
   margin-left: 5px;
   margin-right: 5px;
   margin-top: 5px;
