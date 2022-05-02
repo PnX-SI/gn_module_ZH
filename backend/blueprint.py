@@ -907,6 +907,7 @@ def download(id_zh: int):
     media = get_last_pdf_export(id_zh=id_zh, last_date=last_date)
     if media is None:
         dataset = get_complete_card(id_zh)
+        dataset['config'] = blueprint.config
         module_name = blueprint.config['MODULE_CODE'].lower()
         upload_path = blueprint.config['file_path']
         filename = f'{id_zh}_fiche_{dt.now().strftime("%Y-%m-%d")}.pdf'
