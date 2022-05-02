@@ -98,7 +98,7 @@
           >
             <small class="radio-label">{{ connexionType.mnemonique }}</small>
             <img
-              [src]="'external_assets/zones_humides/' + connexionType.image"
+              [src]="_dataService.getStatic(connexionType.image)"
               alt=""
           /></label>
           <input
