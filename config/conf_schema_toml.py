@@ -121,6 +121,10 @@ module_dir_name = 'gn_module_zones_humides'
 # Name of the source of species data (tab5)
 species_source_name = 'GeoNature'
 
+# Under this value the map layer will be the second layer defined by 
+# pdf_small_layer_number which will take the Xth layer defined in GeoNature config
+pdf_layer_threashold_ha = 1000
+pdf_layer_number = 0  # Begins at 0 !
 
 class GnModuleSchemaConf(Schema):
     default_maplist_columns = fields.List(
@@ -143,3 +147,6 @@ class GnModuleSchemaConf(Schema):
     file_path = fields.String(load_default=file_path)
     module_dir_name = fields.String(load_default=module_dir_name)
     species_source_name = fields.String(load_default=species_source_name)
+    ##### TODO: LOAD DEFAULT
+    pdf_layer_threashold_ha = fields.Float(load_default=pdf_layer_threashold_ha)
+    pdf_layer_number = fields.Integer(load_default=pdf_layer_number)
