@@ -124,7 +124,13 @@ species_source_name = 'GeoNature'
 # Under this value the map layer will be the second layer defined by 
 # pdf_small_layer_number which will take the Xth layer defined in GeoNature config
 pdf_layer_threashold_ha = 1000
-pdf_layer_number = 0  # Begins at 0 !
+# Layer number in the list of layer defined in GN config to apply if ZH area < threshold
+# Begins at 0 !
+pdf_layer_number = 0
+# Name of the image in the static folder of the zone_humide module
+# This image will be displayed at the last page of the pdf document
+# If None => will not be displayed obviously
+pdf_last_page_img = 'entree_sortie.svg'
 
 class GnModuleSchemaConf(Schema):
     default_maplist_columns = fields.List(
@@ -150,3 +156,4 @@ class GnModuleSchemaConf(Schema):
     ##### TODO: LOAD DEFAULT
     pdf_layer_threashold_ha = fields.Float(load_default=pdf_layer_threashold_ha)
     pdf_layer_number = fields.Integer(load_default=pdf_layer_number)
+    pdf_last_page_img = fields.String(load_default=pdf_last_page_img)
