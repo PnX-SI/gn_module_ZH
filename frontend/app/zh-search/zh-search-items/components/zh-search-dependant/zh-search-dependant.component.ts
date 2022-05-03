@@ -27,6 +27,9 @@ export class ZhSearchDependantComponent implements OnInit {
     labelKey: "name",
     primaryKey: "code",
     enableFilterSelectAll: false,
+    selectAllText: "Tout sélectionner",
+    unSelectAllText: "Tout désélectionner",
+    searchPlaceholderText: "Rechercher",
     disabled: true,
   };
 
@@ -50,23 +53,9 @@ export class ZhSearchDependantComponent implements OnInit {
 
   //Awkward but taken from the doc : https://cuppalabs.github.io/angular2-multiselect-dropdown/#/disablemode
   disable() {
-    this.dropdownSettings = {
-      enableSearchFilter: true,
-      text: "",
-      labelKey: "name",
-      primaryKey: "code",
-      enableFilterSelectAll: false,
-      disabled: true,
-    };
+    this.dropdownSettings = { ...this.dropdownSettings, disabled: true };
   }
   enable() {
-    this.dropdownSettings = {
-      enableSearchFilter: true,
-      text: "",
-      labelKey: "name",
-      primaryKey: "code",
-      enableFilterSelectAll: false,
-      disabled: false,
-    };
+    this.dropdownSettings = { ...this.dropdownSettings, disabled: false };
   }
 }
