@@ -930,9 +930,10 @@ def download(id_zh: int):
 @json_resp
 def departments():
     query = DB.session.query(LAreas).with_entities(LAreas.area_name, LAreas.area_code, LAreas.id_type,
-                                                   BibAreasTypes.type_code).join(BibAreasTypes, LAreas.id_type == BibAreasTypes.id_type)
-    query = query.filter(BibAreasTypes.type_code == 'DEP')
-    query = query.order_by(LAreas.area_code)
+                                                   BibAreasTypes.type_code).join(BibAreasTypes, LAreas.id_type == BibAreasTypes.id_type)\
+                                    .filter(BibAreasTypes.type_code == 'DEP')\
+                                    .filter(LAreas.enable)\
+                                    .order_by(LAreas.area_code)
     resp = query.all()
     return [{"code": r.area_code, "name": r.area_name} for r in resp]
 
@@ -944,7 +945,8 @@ def get_area_from_department() -> dict:
     if code:
         query = DB.session.query(LiMunicipalities).with_entities(LiMunicipalities.id_area, LAreas.area_name, LAreas.area_code)\
             .join(LAreas, LiMunicipalities.id_area == LAreas.id_area)\
-            .filter(LiMunicipalities.insee_com.like('{}%'.format(code)))
+            .filter(LiMunicipalities.insee_com.like('{}%'.format(code)))\
+            .filter(LAreas.enable)
         query = query.order_by(LAreas.area_code)
         resp = query.all()
         return [{"code": r.area_code, "name": r.area_name} for r in resp]
