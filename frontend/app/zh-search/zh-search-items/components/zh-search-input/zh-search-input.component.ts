@@ -20,6 +20,7 @@ export class ZhSearchInputComponent implements OnInit {
     labelKey: "name",
     primaryKey: "code",
     enableFilterSelectAll: false,
+    searchPlaceholderText: "Rechercher",
   };
 
   constructor() {}
