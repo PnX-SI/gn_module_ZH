@@ -191,10 +191,9 @@ export class ZhFormTab5Component implements OnInit {
   ngOnInit() {
     this.getMetaData();
     this.initForms();
-    this.getCurrentZh();
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
       if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
-      this.$_currentZhSub.unsubscribe();
+      if (this.$_currentZhSub)  this.$_currentZhSub.unsubscribe();
       if (tabPosition == 5) {
         this.getCurrentZh();
       }

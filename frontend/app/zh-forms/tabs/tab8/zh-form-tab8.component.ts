@@ -67,7 +67,6 @@ export class ZhFormTab8Component implements OnInit {
         this.getCurrentZh();
       }
     });
-    this.getCurrentZh();
   }
 
   // initialize forms

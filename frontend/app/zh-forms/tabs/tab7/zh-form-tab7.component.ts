@@ -150,10 +150,9 @@ export class ZhFormTab7Component implements OnInit {
 
   ngOnInit() {
     this.initForms();
-    this.getCurrentZh();
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
-      this.$_fromChangeSub.unsubscribe();
-      this.$_currentZhSub.unsubscribe();
+      if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
+      if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
       if (tabPosition == 7) {
         this.getCurrentZh();
       }
