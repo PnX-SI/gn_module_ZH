@@ -810,6 +810,8 @@ def write_csv(id_zh, info_role):
         names = []
         FILE_PATH = blueprint.config['file_path']
         MODULE_NAME = blueprint.config['MODULE_CODE'].lower()
+        zh_code = DB.session.query(TZH).filter(
+            TZH.id_zh == id_zh).one().code
         # author name
         prenom = DB.session.query(User).filter(
             User.id_role == info_role.id_role).one().prenom_role
@@ -841,7 +843,9 @@ def write_csv(id_zh, info_role):
                     } for row in query
                 ]
                 name_file = blueprint.config[i]['category'] + "_" + \
-                    current_date.strftime("%Y-%m-%d_%H:%M:%S") + ".csv"
+                    blueprint.config['species_source_name'] + "_" + \
+                    zh_code + "_" + \
+                    current_date.strftime("%Y-%m-%d-%H:%M:%S") + ".csv"
                 media_path = Path('external_modules',
                                   MODULE_NAME, FILE_PATH, name_file)
                 full_name = ROOT_DIR / media_path
@@ -853,8 +857,7 @@ def write_csv(id_zh, info_role):
 
                 id_media = post_file_info(
                     id_zh,
-                    blueprint.config[i]['category'] + "_" +
-                    current_date.strftime("%Y-%m-%d_%H:%M:%S"),
+                    name_file.split(".csv")[0],
                     author,
                     'Liste des taxons générée sur demande de l\'utilisateur dans l\'onglet 5',
                     '.csv')
