@@ -73,7 +73,7 @@ export class ZhFormTab0Component implements OnInit {
     // do not delete it
     this.$_geojsonSub = this._mapService.gettingGeojson$.subscribe(() => {});
 
-    this.intiTab();
+    this.intiTab(); // FIXME Find a way to remove this
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
       if (tabPosition == 0) {
         this.intiTab();
@@ -367,7 +367,7 @@ export class ZhFormTab0Component implements OnInit {
     let features = [];
     // We can have a multipolygon and a polygon here.
     // It can be checked with their coordinates
-    if (geometry.coordinates.length > 1 && geometry.type !== 'Polygon') {
+    if (geometry.coordinates.length > 1 && geometry.type !== "Polygon") {
       geometry.coordinates.forEach((coord) =>
         features.push(this.getPolygonFeature(coord))
       );

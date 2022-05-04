@@ -52,15 +52,13 @@ export class ZhFormTab2Component implements OnInit, AfterViewInit {
 
     this.getMetaData();
     this.createForm();
-    this.initTab();
   }
 
   ngAfterViewInit() {
     //FIXME: Try to find a way to remove this double this.initTab()
-    this.initTab();
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
       if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
-      this.$_currentZhSub.unsubscribe();
+      if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
       if (tabPosition == 2) {
         this.initTab();
       }
