@@ -95,7 +95,10 @@ from .search import main_search
 
 import pdb
 
-blueprint = Blueprint("pr_zh", __name__, template_folder='templates')
+blueprint = Blueprint("pr_zh", 
+                      __name__,
+                      '../static', 
+                      template_folder='templates')
 
 
 # Route pour afficher liste des zones humides
@@ -907,11 +910,13 @@ def download(id_zh: int):
     media = get_last_pdf_export(id_zh=id_zh, last_date=last_date)
     if media is None:
         dataset = get_complete_card(id_zh)
+        dataset['config'] = blueprint.config
         module_name = blueprint.config['MODULE_CODE'].lower()
         upload_path = blueprint.config['file_path']
         filename = f'{id_zh}_fiche_{dt.now().strftime("%Y-%m-%d")}.pdf'
+        stored_filename = f"{uuid.uuid4()}.pdf"
         media_path = Path(ROOT_DIR, 'external_modules',
-                          module_name, upload_path, filename)
+                          module_name, upload_path, stored_filename)
         pdf_file = gen_pdf(id_zh=id_zh, dataset=dataset, filename=media_path)
         post_file_info(
             id_zh=id_zh,

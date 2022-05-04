@@ -45,9 +45,12 @@
               {% endfor %}
           </tbody>
         </table>
+        {% else %}
+        <span class="small-title">Aucun plan de gestion renseigné</span><br>
         {% endif %}
     {% endfor %}
   </section>
+  <br>
   <section class="content col">
     <h5 class="subtitle">
       Instruments contractuels et financiers
@@ -63,7 +66,7 @@
           {% for instru in data['statuts']['instruments'] %}
           <tr>
             <td>{{ instru['instrument'] }}</td>
-            <td>{{ instru['date'] }}</td>
+            <td>{{ instru['date'] or "" }}</td>
           </tr>
           {% endfor %}
       </tbody>
@@ -74,16 +77,34 @@
       Principaux statuts
     </h5>
     {% for status in data['statuts']['statuts'] %}
-      <span class="small-title">{{ status }}</span>
+      <span class="small-title">{{ status }}</span><br>
     {% endfor %}
   </section>
   <section class="content col">
     <h5 class="subtitle">
       Autres inventaires
     </h5>
-    {% for autre in data['statuts']['autre_inventaire'] %}
-      <span class="small-title">{{ autre['zh_type_name'] }} - {{ autre['area_code'] }} - <a href="{{ autre['url']}}">{{ autre['area_name'] }}</a></span>
-    {% endfor %}
+    <table class="custom-table">
+      <tbody>
+        {% for type in data['config']['ref_geo_referentiels'] %}
+        <tr>
+          <td class="border-bottom">{{ type['zh_name'] }}</td>
+          <td class="border-bottom">
+            {% for ref in data['statuts']['autres_inventaires'][type['zh_name']] %}
+            <span>
+              {{ ref.area_code }} - 
+              <a href="{{ ref.url }}">{{ ref.area_name }}</a>
+            </span><br>
+            {% endfor %}
+          </td>
+        </tr>
+        {% endfor %}
+        <tr>
+          <td class="border-bottom">Autres études / inventaires naturalistes</td>
+          <td class="border-bottom">{{ data['statuts']['autre_etude'] }}</td>
+        </tr>
+      </tbody>
+    </table>
   </section>
   <section class="content col">
     <h5 class="subtitle">
@@ -103,7 +124,11 @@
           <tr>
             <td>{{ zonage['commune'] }}</td>
             <td>{{ zonage['type_doc'] }}</td>
-            <td>{{ zonage['type_classement'] }}</td>
+            <td>
+            {% for classement in zonage['type_classement'] %}
+            <span>{{ classement }}</span><br>
+            {% endfor %}
+            </td>
             <td>{{ zonage['remarque']}}</td>
           </tr>
           {% endfor %}

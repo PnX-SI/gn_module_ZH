@@ -1,6 +1,7 @@
 import { Component, Input } from "@angular/core";
 import { TableColumn } from "../../commonComponents/table/table-interface";
 import { FonctionnementModel } from "../models/fonctionnement.model";
+import { ZhDataService } from "../../services/zh-data.service";
 
 @Component({
   selector: "zh-details-fonctionnement",
@@ -13,7 +14,6 @@ export class FonctionnementComponent {
   readonly flowSize: string = "15%";
   readonly permaSize: string = "15%";
 
-  public readonly imgPath = "external_assets/zones_humides";
   public readonly corConnectionType = {
     "Aucune connexion": "aucune_connexion.svg",
     "Entrée et sortie": "entree_sortie.svg",
@@ -35,10 +35,13 @@ export class FonctionnementComponent {
     { name: "permanence", label: "Permanence", size: this.permaSize },
     { name: "toponymie", label: "Toponymie et compléments d'information" },
   ];
+
+  constructor(private _dataService: ZhDataService) {}
+
   ngOnInit() {
     if (this.data.connexion in this.corConnectionType) {
       const connectionType = this.corConnectionType[this.data.connexion];
-      this.connectionImg = `${this.imgPath}/${connectionType}`;
+      this.connectionImg = this._dataService.getStatic(connectionType);
     }
   }
 }

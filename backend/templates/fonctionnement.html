@@ -43,5 +43,14 @@
     <span class="small-title">
       <b>{{ data['fonctionnement']['connexion'] }}</b>
     </span>
+    {% set connexions = {
+      "Aucune connexion": "aucune_connexion.svg",
+      "Entrée et sortie": "entree_sortie.svg",
+      Entrée: "entree.svg",
+      Sortie: "sortie.svg",
+      Traversée: "traversee.svg",
+      "Passe à coté": "passe_a_cote.svg",
+    } %}
+    <img src="{{ url_for('pr_zh.static', filename=connexions[data['fonctionnement']['connexion']]) }}">
   </section>
 </div>

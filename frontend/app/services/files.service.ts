@@ -120,7 +120,7 @@ export class FilesService {
   downloadFile(file: ZhFile) {
     this.downloadFilePromise(file.id_media)
       .then((res) => {
-        this.saveFile(res, file.media_path);
+        this.saveFile(res, file.title_fr);
       })
       // TODO: to remove !
       .catch((error) => {

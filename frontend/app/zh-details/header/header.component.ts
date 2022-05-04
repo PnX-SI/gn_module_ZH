@@ -1,6 +1,5 @@
 import { Component, Input } from "@angular/core";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { saveAs } from "file-saver";
 import { ZhDataService } from "../../services/zh-data.service";
 import { CommonService } from "@geonature_common/service/common.service";
 import { Router } from "@angular/router";
@@ -69,7 +68,15 @@ export class HeaderComponent {
         const rawDate: string = new Date().toLocaleDateString();
         const date: string = rawDate.replace(/\//g, "-");
         const filename: string = `${this.zhCode}_${date}_fiche.pdf`;
-        saveAs(result, filename);
+        // Not possible to use saveas since it does not open it in a 
+        // new tab => create a <a> then click on it...
+        const blob = new Blob([result], { type: "application/type" });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.target = "_blank"
+        link.click()
       },
       (error) => {
         this.loadingPdf = false;

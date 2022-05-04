@@ -19,6 +19,10 @@ export class ZhDataService {
     this.zh.next(zh);
   }
 
+  getStatic(filename: string) {
+    return `${AppConfig.API_ENDPOINT}/zones_humides/static/${filename}`
+  }
+
   getZhById(id: number) {
     return this._api.get<any>(`${AppConfig.API_ENDPOINT}/zones_humides/${id}`);
   }
