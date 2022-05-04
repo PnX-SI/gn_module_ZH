@@ -489,7 +489,7 @@ export class ZhFormTab3Component implements OnInit {
   }
 
   ngOnDestroy() {
-    this.$_currentZhSub.unsubscribe();
-    this.$_fromChangeSub.unsubscribe();
+    if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
+    if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
   }
 }

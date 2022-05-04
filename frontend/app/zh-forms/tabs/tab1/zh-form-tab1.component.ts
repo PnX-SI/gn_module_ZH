@@ -58,7 +58,7 @@ export class ZhFormTab1Component implements OnInit {
   ngOnInit() {
     this.getMetaData();
     this.createForm();
-    
+
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
       if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
       if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
@@ -210,7 +210,7 @@ export class ZhFormTab1Component implements OnInit {
   formatter = (result: any) => `${result.title}`;
 
   ngOnDestroy() {
-    this.$_currentZhSub.unsubscribe();
+    if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
     this.ngbModal.dismissAll();
   }
 }
