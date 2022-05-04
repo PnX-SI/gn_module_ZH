@@ -111,3 +111,4 @@ frontend/app/module.config.ts
 
 static/*
 !static/.gitkeep
+!static/*.svg
