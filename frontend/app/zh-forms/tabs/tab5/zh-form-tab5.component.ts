@@ -32,9 +32,12 @@ export class ZhFormTab5Component implements OnInit {
   public valSocEcoForm: FormGroup;
   public corineBioForm: FormGroup;
   public fctHydroInput: any;
+  public fctHydroInputForTables: any;
   public bioFctInput: any;
+  public bioFctInputForTables: any;
   public valSocEcoInput: any;
   public interetPatInput: any;
+  public interetPatInputForTables: any;
   public corineBioInput: any;
   public cahierHabInput: any;
   public fctHydroTable: any[] = [];
@@ -254,11 +257,20 @@ export class ZhFormTab5Component implements OnInit {
     this.fctHydroInput = this.groupArrayByCategory(
       this.formMetaData["FONCTIONS_HYDRO"]
     );
+    this.fctHydroInputForTables = this.groupArrayByCategory(
+      this.formMetaData["FONCTIONS_HYDRO_all"]
+    );
     this.bioFctInput = this.groupArrayByCategory(
       this.formMetaData["FONCTIONS_BIO"]
     );
+    this.bioFctInputForTables = this.groupArrayByCategory(
+      this.formMetaData["FONCTIONS_BIO_all"]
+    );
     this.interetPatInput = this.groupArrayByCategory(
       this.formMetaData["INTERET_PATRIM"]
+    );
+    this.interetPatInput = this.groupArrayByCategory(
+      this.formMetaData["INTERET_PATRIM_all"]
     );
     this.valSocEcoInput = [...this.formMetaData["VAL_SOC_ECO"]];
     this.corinBioMetaData = [...this.formMetaData["CORINE_BIO"]].filter(
@@ -337,7 +349,7 @@ export class ZhFormTab5Component implements OnInit {
     this.interetPatTable = [];
     fonctions.forEach((pat: any) => {
       this.interetPatTable.push({
-        function: this.interetPatInput
+        function: this.interetPatInputForTables
           .flat()
           .find((item: any) => item.id_nomenclature == pat.id_function),
         qualification: this.formMetaData["FONCTIONS_QUALIF"].find(
@@ -373,7 +385,7 @@ export class ZhFormTab5Component implements OnInit {
     this.bioFctTable = [];
     fonctions.forEach((bioFct: any) => {
       this.bioFctTable.push({
-        function: this.bioFctInput
+        function: this.bioFctInputForTables
           .flat()
           .find((item: any) => item.id_nomenclature == bioFct.id_function),
         qualification: this.formMetaData["FONCTIONS_QUALIF"].find(
@@ -391,7 +403,7 @@ export class ZhFormTab5Component implements OnInit {
     this.fctHydroTable = [];
     fonctions.forEach((hydroFct: any) => {
       this.fctHydroTable.push({
-        function: this.fctHydroInput
+        function: this.fctHydroInputForTables
           .flat()
           .find((item: any) => item.id_nomenclature == hydroFct.id_function),
         qualification: this.formMetaData["FONCTIONS_QUALIF"].find(
