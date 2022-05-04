@@ -87,7 +87,9 @@ def filter_sdage(query, json: dict):
 
 def filter_nameorcode(query, json: dict):
     # Checks if the code OR the name is already taken
-    return query.filter((TZH.code == json) | (TZH.main_name == json))
+    if json:
+        return query.filter((TZH.code.contains(json)) | (TZH.main_name.contains(json)))
+    return query
 
 
 def filter_ensemble(query, json: dict):

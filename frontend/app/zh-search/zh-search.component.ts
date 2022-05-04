@@ -167,8 +167,10 @@ export class ZhSearchComponent implements OnInit {
       let value = values[key];
       if (value !== null && value !== []) {
         if (value instanceof Array) {
-          value = value.filter((item) => item != null);
-          filtered[key] = value;
+          if (value.length !== 0) {
+            value = value.filter((item) => item !== null);
+            filtered[key] = value;
+          }
         } else if (value instanceof Object) {
           value = this.filterFormGroup(value);
           if (Object.keys(value).length !== 0) {
