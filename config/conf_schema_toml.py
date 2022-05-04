@@ -16,16 +16,16 @@ default_map_list_conf = [
     {"prop": "main_name", "name": "Nom principal"},
     {"prop": "code", "name": "Code"},
     {"prop": "sdage", "name": "Typologie SDAGE", "sortable": False},
-    {"prop": "bassin_versant", "name": "Bassin versant"}
+    {"prop": "bassin_versant", "name": "Bassin versant", "sortable": False}
 ]
 
 
 available_maplist_column = [
     {"prop": "main_name", "name": "Nom principal"},
     {"prop": "code", "name": "Code"},
-    {"prop": "sdage", "name": "Typologie SDAGE"},
-    {"prop": "bassin_versant", "name": "Bassin versant"},
-    {"prop": "delims", "name": "Critères délimitation (de la zh)"},
+    {"prop": "sdage", "name": "Typologie SDAGE", "sortable": False},
+    {"prop": "bassin_versant", "name": "Bassin versant", "sortable": False},
+    {"prop": "delims", "name": "Critères délimitation (de la zh)", "sortable": False},
     {"prop": "create_date", "name": "Date de création"},
     {"prop": "author", "name": "Auteur"},
     {"prop": "organism", "name": "Organisme"},
