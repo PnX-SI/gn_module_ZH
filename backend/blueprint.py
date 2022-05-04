@@ -151,24 +151,15 @@ def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
 
         data = query.limit(limit).offset(page * limit).all()
 
-        # check if municipalities and dep in ref_geo
         is_ref_geo = check_ref_geo_schema()
 
         featureCollection = []
         for n in data:
             releve_cruved = n.get_releve_cruved(user, user_cruved)
-            feature = n.get_geofeature(
-                relationships=()
-            )
+            feature = n.get_geofeature(relationships=())
             feature["properties"]["rights"] = releve_cruved
-            rb_names = [
-                name for (name,) in DB.session.query(TRiverBasin.name)
-                    .filter(TRiverBasin.id_rb == CorZhRb.id_rb)
-                    .filter(CorZhRb.id_zh == feature.properties['id_zh'])
-                    .all()
-            ]
-            feature["properties"]["bassin_versant"] = rb_names
             featureCollection.append(feature)
+
         return {
             "total": nb_results_without_limit,
             "total_filtered": len(data),

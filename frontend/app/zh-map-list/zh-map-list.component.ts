@@ -156,7 +156,7 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   displayAuthorName(element) {
-    return element.nom_complet;
+    return element.prenom_role == "" ? element.nom_role : element.nom_complet;
   }
 
   displayDate(element): string {
@@ -186,6 +186,9 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     // format Date
     feature["properties"]["create_date"] = this.displayDate(
       feature["properties"]["create_date"]
+    );
+    feature["properties"]["update_date"] = this.displayDate(
+      feature["properties"]["update_date"]
     );
 
     feature["properties"]["sdage"] = this.displaySdageName(

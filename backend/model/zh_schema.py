@@ -1,3 +1,4 @@
+from multiprocessing.sharedctypes import Array
 from flask import current_app, Blueprint
 from sqlalchemy import ForeignKey
 # import utiles pour déclarer les classes SQLAlchemy
@@ -7,6 +8,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import table
 from sqlalchemy.sql.type_api import STRINGTYPE
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 
 
 from pypnnomenclature.models import (
@@ -212,6 +214,24 @@ class BibOrganismes(DB.Model):
             return "error in org type", 500
         
 
+@serializable
+class CorLimList(DB.Model):
+    __tablename__ = "cor_lim_list"
+    __table_args__ = {"schema": "pr_zh"}
+    id_lim_list = DB.Column(
+        UUID(as_uuid=True),
+        primary_key=True
+    )
+    id_lim = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        primary_key=True
+    )
+
+    def get_lims_by_id(id):
+        return DB.session.query(CorLimList).filter(
+            CorLimList.id_lim_list == id).all()
+
 
 @serializable
 @geoserializable
@@ -252,6 +272,7 @@ class TZH(ZhModel):
         nullable=False)
     id_lim_list = DB.Column(
         UUID(as_uuid=True),
+        ForeignKey(CorLimList.id_lim_list),
         nullable=False)
     remark_lim = DB.Column(DB.Unicode)
     remark_lim_fs = DB.Column(DB.Unicode)
@@ -341,6 +362,21 @@ class TZH(ZhModel):
                 TFctArea.geom.ST_Intersects(cast(id_zh_geom, Geography))).all()
         return q
 
+    @hybrid_property
+    def delims(self):
+        delims = [element.TNomenclatures.mnemonique for element in DB.session.query(CorLimList, TNomenclatures).filter(CorLimList.id_lim_list == self.id_lim_list).filter(TNomenclatures.id_nomenclature==CorLimList.id_lim).all()]
+        return ', '.join([str(item) for item in delims])
+
+    @hybrid_property
+    def bassin_versant(self):
+        bassin_versant = [
+            name for (name,) in DB.session.query(TRiverBasin.name)
+                .filter(TRiverBasin.id_rb == CorZhRb.id_rb)
+                .filter(CorZhRb.id_zh == self.id_zh)
+                .all()
+        ]
+        return ', '.join([str(item) for item in bassin_versant])
+
 
 @serializable
 class CorZhArea(DB.Model):
@@ -393,22 +429,7 @@ class CorZhArea(DB.Model):
         ]
 
 
-class CorLimList(DB.Model):
-    __tablename__ = "cor_lim_list"
-    __table_args__ = {"schema": "pr_zh"}
-    id_lim_list = DB.Column(
-        UUID(as_uuid=True),
-        primary_key=True
-    )
-    id_lim = DB.Column(
-        DB.Integer,
-        ForeignKey(TNomenclatures.id_nomenclature),
-        primary_key=True
-    )
 
-    def get_lims_by_id(id):
-        return DB.session.query(CorLimList).filter(
-            CorLimList.id_lim_list == id).all()
 
 
 class TRiverBasin(DB.Model):
