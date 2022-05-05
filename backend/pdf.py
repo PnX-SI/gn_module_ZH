@@ -29,9 +29,9 @@ def get_main_picture(id_zh: int):
 def gen_map(coordinates, url_template=None):
     if url_template is None:
         url_template = 'http://c.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png'
-    protocol = "http:"
+    protocol = "http"
     if not protocol in url_template:
-        url_template = protocol + url_template
+        url_template = f"{protocol}:{url_template}"
     if coordinates:
         m = StaticMap(width=600, height=300, url_template=url_template)
         for coord in coordinates:
