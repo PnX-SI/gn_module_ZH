@@ -196,7 +196,7 @@ export class ZhFormTab5Component implements OnInit {
     this.initForms();
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
       if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
-      if (this.$_currentZhSub)  this.$_currentZhSub.unsubscribe();
+      if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
       if (tabPosition == 5) {
         this.getCurrentZh();
       }
@@ -269,7 +269,7 @@ export class ZhFormTab5Component implements OnInit {
     this.interetPatInput = this.groupArrayByCategory(
       this.formMetaData["INTERET_PATRIM"]
     );
-    this.interetPatInput = this.groupArrayByCategory(
+    this.interetPatInputForTables = this.groupArrayByCategory(
       this.formMetaData["INTERET_PATRIM_all"]
     );
     this.valSocEcoInput = [...this.formMetaData["VAL_SOC_ECO"]];
