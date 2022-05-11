@@ -69,7 +69,7 @@ ref_geo_referentiels = [
         "active": True
     },
     {
-        "zh_name": "Natura 2000 - Directive Habitat (ZSC)",
+        "zh_name": "Natura 2000 – Directive « Habitats, faune, flore »",
         "type_code_ref_geo": "SIC",
         "active": True
     },
