@@ -32,11 +32,8 @@ class Utils(ZH):
                 result = DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == ids).one()
                 return (result.cd_nomenclature, result.label_default)
             
-            results = []
-            for id in ids:
-                res = DB.session.query(TNomenclatures).filter(TNomenclatures.id_nomenclature == id).one()
-                results.append((res.cd_nomenclature, res.label_default))
-            return results
+            return DB.session.query(TNomenclatures.cd_nomenclature, TNomenclatures.label_default).filter(TNomenclatures.id_nomenclature.in_(ids)).all()
+        
         return []
 
     @staticmethod
