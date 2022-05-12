@@ -556,6 +556,85 @@ CREATE  TABLE pr_zh.cor_zh_notes (
 
 COMMENT ON TABLE pr_zh.cor_zh_notes IS 'Table correspondance entre une ZH, ses règles et ses notes';
 
+CREATE  TABLE pr_zh.bib_hier_categories ( 
+	cat_id               integer  NOT NULL ,
+	abbreviation		 varchar(4)  NOT NULL,
+	label                varchar(100)  NOT NULL ,
+	CONSTRAINT pk_bib_hier_categories_cat_id PRIMARY KEY ( cat_id )
+ );
+
+COMMENT ON TABLE pr_zh.bib_hier_categories IS 'Liste des rubriques pour la hiérarchisation';
+
+CREATE  TABLE pr_zh.bib_hier_panes ( 
+	pane_id              integer  NOT NULL ,
+	label                varchar(50)  NOT NULL ,
+	CONSTRAINT pk_bib_panes_pane_id PRIMARY KEY ( pane_id )
+ );
+
+COMMENT ON TABLE pr_zh.bib_hier_panes IS 'liste des volets';
+
+CREATE  TABLE pr_zh.bib_hier_subcategories ( 
+	subcat_id            integer  NOT NULL ,
+	label                varchar(100)  NOT NULL ,
+	CONSTRAINT pk_bib_subcategories_id_subcat PRIMARY KEY ( subcat_id )
+ );
+
+CREATE  TABLE pr_zh.bib_note_types ( 
+	note_id              integer  NOT NULL ,
+	id_knowledge         integer,
+	CONSTRAINT pk_bib_note_types_note_id PRIMARY KEY ( note_id )
+ );
+
+CREATE  TABLE pr_zh.t_rules ( 
+	rule_id              integer  NOT NULL ,
+	abbreviation		 varchar(15)  NOT NULL,
+	pane_id              integer  NOT NULL ,
+	cat_id               integer  NOT NULL ,
+	subcat_id            integer   ,
+	CONSTRAINT pk_t_items_item_id PRIMARY KEY ( rule_id )
+ );
+
+CREATE  TABLE pr_zh.cor_rb_rules ( 
+	cor_rule_id          integer  NOT NULL ,
+	rb_id                integer  NOT NULL ,
+	rule_id              integer  NOT NULL ,
+	UNIQUE (rb_id, rule_id),
+	CONSTRAINT pk_cor_rb_items_id_cor PRIMARY KEY ( cor_rule_id )
+ );
+
+COMMENT ON TABLE pr_zh.cor_rb_rules IS 'list of selected rules by river basin';
+
+CREATE  TABLE pr_zh.t_items ( 
+	val_id               integer  NOT NULL ,
+	cor_rule_id          integer  NOT NULL ,
+	attribute_id         integer  NOT NULL ,
+	note                 real  NOT NULL ,
+	note_type_id         integer  NOT NULL ,
+	CONSTRAINT pk_t_attribute_values_id_val PRIMARY KEY ( val_id )
+ );
+ 
+CREATE  TABLE pr_zh.cor_item_value ( 
+	attribute_id         integer  NOT NULL ,
+	val_min              real  NOT NULL ,
+	val_max              real  NOT NULL ,
+	CONSTRAINT pk_cor_item_value_id_val PRIMARY KEY ( attribute_id )
+ );
+
+CREATE  TABLE pr_zh.t_cor_qualif ( 
+	combination          varchar(4)  NOT NULL ,
+	id_qualification        integer  NOT NULL,
+	CONSTRAINT pk_t_cor_qualif_combination PRIMARY KEY ( combination )
+);
+
+CREATE  TABLE pr_zh.cor_rule_nomenc ( 
+	rule_id              integer  NOT NULL ,
+	nomenc_id            integer  NOT NULL ,
+	qualif_id			 integer ,
+	CONSTRAINT pk_cor_rule_nomenc PRIMARY KEY ( rule_id, nomenc_id )
+ );
+
+COMMENT ON TABLE pr_zh.cor_rule_nomenc IS 'correspondance between hierarchy rules and cd_nomenclatures (through nomenclature ids) used for rule evaluation';
+
 ALTER TABLE pr_zh.cor_impact_list ADD CONSTRAINT fk_cor_activity_id_impact FOREIGN KEY ( id_cor_impact_types ) REFERENCES pr_zh.cor_impact_types( id_cor_impact_types )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_impact_list ADD CONSTRAINT fk_id_impact_list FOREIGN KEY ( id_impact_list ) REFERENCES pr_zh.t_activity( id_impact_list )  ON UPDATE CASCADE ON DELETE CASCADE;
@@ -1001,85 +1080,6 @@ CREATE OR REPLACE VIEW pr_zh.flora AS
 			OR (bdc_statut.statut_type in ('Liste rouge', 'Réglementation', 'Protection', 'Directives européennes') and bdc_statut.cd_sig = 'TERFXFR')
 		)
 		GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, taxref.cd_nom, bdc_statut.statut_type, bdc_statut.article, bdc_statut.statut, bdc_statut.doc_url, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;
-
-CREATE  TABLE pr_zh.bib_hier_categories ( 
-	cat_id               integer  NOT NULL ,
-	abbreviation		 varchar(4)  NOT NULL,
-	label                varchar(100)  NOT NULL ,
-	CONSTRAINT pk_bib_hier_categories_cat_id PRIMARY KEY ( cat_id )
- );
-
-COMMENT ON TABLE pr_zh.bib_hier_categories IS 'Liste des rubriques pour la hiérarchisation';
-
-CREATE  TABLE pr_zh.bib_hier_panes ( 
-	pane_id              integer  NOT NULL ,
-	label                varchar(50)  NOT NULL ,
-	CONSTRAINT pk_bib_panes_pane_id PRIMARY KEY ( pane_id )
- );
-
-COMMENT ON TABLE pr_zh.bib_hier_panes IS 'liste des volets';
-
-CREATE  TABLE pr_zh.bib_hier_subcategories ( 
-	subcat_id            integer  NOT NULL ,
-	label                varchar(100)  NOT NULL ,
-	CONSTRAINT pk_bib_subcategories_id_subcat PRIMARY KEY ( subcat_id )
- );
-
-CREATE  TABLE pr_zh.bib_note_types ( 
-	note_id              integer  NOT NULL ,
-	id_knowledge         integer,
-	CONSTRAINT pk_bib_note_types_note_id PRIMARY KEY ( note_id )
- );
-
-CREATE  TABLE pr_zh.t_rules ( 
-	rule_id              integer  NOT NULL ,
-	abbreviation		 varchar(15)  NOT NULL,
-	pane_id              integer  NOT NULL ,
-	cat_id               integer  NOT NULL ,
-	subcat_id            integer   ,
-	CONSTRAINT pk_t_items_item_id PRIMARY KEY ( rule_id )
- );
-
-CREATE  TABLE pr_zh.cor_rb_rules ( 
-	cor_rule_id          integer  NOT NULL ,
-	rb_id                integer  NOT NULL ,
-	rule_id              integer  NOT NULL ,
-	UNIQUE (rb_id, rule_id),
-	CONSTRAINT pk_cor_rb_items_id_cor PRIMARY KEY ( cor_rule_id )
- );
-
-COMMENT ON TABLE pr_zh.cor_rb_rules IS 'list of selected rules by river basin';
-
-CREATE  TABLE pr_zh.t_items ( 
-	val_id               integer  NOT NULL ,
-	cor_rule_id          integer  NOT NULL ,
-	attribute_id         integer  NOT NULL ,
-	note                 real  NOT NULL ,
-	note_type_id         integer  NOT NULL ,
-	CONSTRAINT pk_t_attribute_values_id_val PRIMARY KEY ( val_id )
- );
- 
-CREATE  TABLE pr_zh.cor_item_value ( 
-	attribute_id         integer  NOT NULL ,
-	val_min              real  NOT NULL ,
-	val_max              real  NOT NULL ,
-	CONSTRAINT pk_cor_item_value_id_val PRIMARY KEY ( attribute_id )
- );
-
-CREATE  TABLE pr_zh.t_cor_qualif ( 
-	combination          varchar(4)  NOT NULL ,
-	id_qualification        integer  NOT NULL,
-	CONSTRAINT pk_t_cor_qualif_combination PRIMARY KEY ( combination )
-);
-
-CREATE  TABLE pr_zh.cor_rule_nomenc ( 
-	rule_id              integer  NOT NULL ,
-	nomenc_id            integer  NOT NULL ,
-	qualif_id			 integer ,
-	CONSTRAINT pk_cor_rule_nomenc PRIMARY KEY ( rule_id, nomenc_id )
- );
-
-COMMENT ON TABLE pr_zh.cor_rule_nomenc IS 'correspondance between hierarchy rules and cd_nomenclatures (through nomenclature ids) used for rule evaluation';
 
 ALTER TABLE pr_zh.cor_rb_rules ADD CONSTRAINT fk_cor_rb_items_t_items FOREIGN KEY ( rule_id ) REFERENCES pr_zh.t_rules( rule_id )  ON UPDATE CASCADE;
 

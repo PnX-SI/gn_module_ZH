@@ -631,7 +631,7 @@ INSERT INTO pr_zh.cor_impact_types(id_cor_impact_types,id_impact,id_impact_type)
 (46, (SELECT ref_nomenclatures.get_id_nomenclature('IMPACTS','72.0')), (SELECT ref_nomenclatures.get_id_nomenclature('IMPACT_TYP','70'))),
 (47, (SELECT ref_nomenclatures.get_id_nomenclature('IMPACTS','73.0')), (SELECT ref_nomenclatures.get_id_nomenclature('IMPACT_TYP','70'))),
 (48, (SELECT ref_nomenclatures.get_id_nomenclature('IMPACTS','74.0')), (SELECT ref_nomenclatures.get_id_nomenclature('IMPACT_TYP','70'))),
-(49, (SELECT ref_nomenclatures.get_id_nomenclature('IMPACTS','75')), (SELECT ref_nomenclatures.get_id_nomenclature('IMPACT_TYP','75'))),
+-- (49, (SELECT ref_nomenclatures.get_id_nomenclature('IMPACTS','75')), (SELECT ref_nomenclatures.get_id_nomenclature('IMPACT_TYP','75'))),
 (50, (SELECT ref_nomenclatures.get_id_nomenclature('IMPACTS','75.0')), (SELECT ref_nomenclatures.get_id_nomenclature('IMPACT_TYP','75'))),
 (51, (SELECT ref_nomenclatures.get_id_nomenclature('IMPACTS','76.0')), (SELECT ref_nomenclatures.get_id_nomenclature('IMPACT_TYP','75'))),
 (52, (SELECT ref_nomenclatures.get_id_nomenclature('IMPACTS','77.0')), (SELECT ref_nomenclatures.get_id_nomenclature('IMPACT_TYP','75'))),
