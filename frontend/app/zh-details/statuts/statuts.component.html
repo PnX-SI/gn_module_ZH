@@ -6,10 +6,7 @@
           <h5 class="section-title">Régime foncier - Statut de propriété</h5>
         </legend>
         <div>
-          <zh-table
-            [tableCols]="regimeTableCol"
-            [data]="data.regime"
-          ></zh-table>
+          <zh-table [tableCols]="regimeTableCol" [data]="data.regime"></zh-table>
         </div>
       </fieldset>
     </div>
@@ -21,10 +18,7 @@
         <div class="mb-3" *ngFor="let struct of data.structure">
           <p class="structure-label">{{ struct.structure }} :</p>
           <div>
-            <zh-table
-              [tableCols]="plansTableCol"
-              [data]="struct.plans"
-            ></zh-table>
+            <zh-table [tableCols]="plansTableCol" [data]="struct.plans"></zh-table>
           </div>
         </div>
       </fieldset>
@@ -35,10 +29,7 @@
           <h5 class="section-title">Instruments contractuels et financiers</h5>
         </legend>
         <div>
-          <zh-table
-            [tableCols]="instrumentsTableCol"
-            [data]="data.instruments"
-          ></zh-table>
+          <zh-table [tableCols]="instrumentsTableCol" [data]="data.instruments"></zh-table>
         </div>
       </fieldset>
     </div>
@@ -54,10 +45,17 @@
                 <td>{{ geo.zh_name }} </td>
                 <td>
                   <ul>
-                    <li class="label-item" *ngFor="let ref of table[geo.type_code_ref_geo]">
-                      {{ ref.area_code }} - 
-                      <a href="{{ ref.url }}" target="_blank">{{ ref.area_name }}</a>
-                    </li>
+                    <ng-container *ngIf="table[geo.type_code_ref_geo]?.length > 0; else elseBlock">
+                      <li class="label-item" *ngFor="let ref of table[geo.type_code_ref_geo]">
+                        {{ ref.area_code }} -
+                        <a href="{{ ref.url }}" target="_blank">{{ ref.area_name }}</a>
+                      </li>
+                    </ng-container>
+                    <ng-template #elseBlock>
+                      <li class="label-item">
+                        Aucun
+                      </li>
+                    </ng-template>
                   </ul>
                 </td>
               </tr>
@@ -99,10 +97,7 @@
           <h5 class="section-title">Zonage des documents d'urbanisme</h5>
         </legend>
         <div>
-          <zh-table
-            [tableCols]="zonageTableCol"
-            [data]="data.zonage"
-          ></zh-table>
+          <zh-table [tableCols]="zonageTableCol" [data]="data.zonage"></zh-table>
         </div>
       </fieldset>
     </div>
