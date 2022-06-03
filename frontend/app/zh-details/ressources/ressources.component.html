@@ -1,43 +1,29 @@
 <div class="mt-3">
-  <div
-    class="row"
-    *ngIf="
+  <div class="row" *ngIf="
       _filesService.filterByExtension(
-        _filesService.EXT_IMAGES.concat(_filesService.EXT_PDF)
+        _filesService.EXT_IMAGES.concat(_filesService.EXT_PDF).concat(_filesService.EXT_CSV)
       ).length > 0;
       else nofile
-    "
-  >
-    <div
-      class="col-12"
-      *ngIf="
+    ">
+    <div class="col-12" *ngIf="
         _filesService.filterByExtension(_filesService.EXT_IMAGES).length > 0
-      "
-    >
+      ">
       <zh-label label="Images de la zone humide :"></zh-label>
-      <zh-image-table
-        [tableCols]="fileTableCol"
-        [data]="_filesService.filterByExtension(_filesService.EXT_IMAGES)"
-        [downloadable]="true"
-        (onDownload)="_filesService.downloadFile($event)"
-      ></zh-image-table>
+      <zh-image-table [tableCols]="fileTableCol" [data]="_filesService.filterByExtension(_filesService.EXT_IMAGES)"
+        [downloadable]="true" (onDownload)="_filesService.downloadFile($event)"></zh-image-table>
     </div>
-    <div
-      class="col-12"
-      *ngIf="_filesService.filterByExtension(_filesService.EXT_PDF).length > 0"
-    >
+    <div class="col-12" *ngIf="_filesService.filterByExtension(_filesService.EXT_PDF).length > 0">
       <zh-label label="Documents pdf de la zone humide :"></zh-label>
-      <zh-table
-        [tableCols]="fileTableCol"
-        [data]="_filesService.filterByExtension(_filesService.EXT_PDF)"
-        [downloadable]="true"
-        (onDownload)="_filesService.downloadFile($event)"
-      ></zh-table>
+      <zh-table [tableCols]="fileTableCol" [data]="_filesService.filterByExtension(_filesService.EXT_PDF)"
+        [downloadable]="true" (onDownload)="_filesService.downloadFile($event)"></zh-table>
+    </div>
+    <div class="col-12" *ngIf="_filesService.filterByExtension(_filesService.EXT_CSV).length > 0">
+      <zh-label label="Documents CSV de la zone humide :"></zh-label>
+      <zh-table [tableCols]="fileTableCol" [data]="_filesService.filterByExtension(_filesService.EXT_CSV)"
+        [downloadable]="true" (onDownload)="_filesService.downloadFile($event)"></zh-table>
     </div>
   </div>
   <ng-template #nofile>
-    <span
-      >Aucune ressource documentaire n'a été trouvée sur cette zone humide</span
-    >
+    <span>Aucune ressource documentaire n'a été trouvée sur cette zone humide</span>
   </ng-template>
 </div>
