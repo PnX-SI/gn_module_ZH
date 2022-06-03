@@ -7,6 +7,8 @@
   </head>
 
   <body>
+    <header>{{ data['config']['pdf_title'] }}</header>
+    <footer>{{ data['date_now'] }}</footer>
     <h1 class="main-title">Fiche de synthèse de la zone humide</h1>
     <h1 class="title">Renseignements généraux</h1>
     {% include 'renseignements.html' %}
@@ -39,12 +41,35 @@
     page-break-before: always;
   }
 }
+
 @page {
-  @bottom-left {
+  @top-left {
+    content: element(header);
+  }
+}
+
+header {
+  position: running(header);
+  font-size: 8pt;
+}
+
+@page {
+  @bottom-right {
     content: counter(page) " sur " counter(pages);
     width: 25%;
     font-size: 8pt;
   }
+}
+
+@page {
+  @bottom-left {
+    content: element(footer);
+  }
+}
+
+footer {
+  position: running(footer);
+  font-size: 8pt;
 }
 
 .main-title {
