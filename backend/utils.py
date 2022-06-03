@@ -6,6 +6,7 @@ from sqlalchemy.orm import Query
 
 from geonature.utils.env import ROOT_DIR, DB
 from geonature.core.gn_commons.models import TMedias
+from geonature.core.gn_permissions.tools import get_or_fetch_user_cruved
 from pypnnomenclature.models import (
     TNomenclatures
 )
@@ -82,6 +83,12 @@ def check_ref_geo_schema():
         raise ZHApiError(
             message="check_ref_geo_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
 
+def get_user_cruved(info_role, session):
+    user = info_role
+    user_cruved = get_or_fetch_user_cruved(
+            session=session, id_role=info_role.id_role, module_code="ZONES_HUMIDES"
+        )
+    return (user, user_cruved)
 
 def get_extension(file_name):
     split_filename = file_name.split('.')

@@ -2,6 +2,7 @@ import { Component, HostListener, OnInit, ViewChild } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { ZhDataService } from "../../services/zh-data.service";
 import { MatTabGroup } from "@angular/material";
+import { CruvedStoreService } from "@geonature_common/service/cruved-store.service";
 import { NgbModalConfig, NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { TabsService } from "../../services/tabs.service";
 
@@ -31,7 +32,8 @@ export class ZhTabsComponent implements OnInit {
     public ngbModal: NgbModal,
     private _dataService: ZhDataService,
     private _tabService: TabsService,
-    private config: NgbModalConfig
+    private config: NgbModalConfig,
+    private _cruvedStore: CruvedStoreService
   ) {
     config.backdrop = "static";
   }

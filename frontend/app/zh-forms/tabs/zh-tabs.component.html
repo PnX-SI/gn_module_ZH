@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid" *ngIf="_cruvedStore.cruved?.ZONES_HUMIDES?.cruved.U !== '0'; else elseBlock">
   <div
     class="custom-container"
     [ngStyle]="{ 'min-height.px': cardContentHeight }"
@@ -123,6 +123,9 @@
     </mat-tab-group>
   </div>
 </div>
+<ng-template #elseBlock>
+  <h1>Vous ne disposez pas des droits pour éditer cette Zone Humide...</h1>
+</ng-template>
 
 <!--  CHANGE TAB MODAL -->
 <ng-template #tabsChangeModal let-c="close" let-d="dismiss">

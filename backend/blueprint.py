@@ -80,6 +80,7 @@ from .utils import (
     delete_file,
     check_ref_geo_schema,
     get_main_picture_id,
+    get_user_cruved,
     get_last_pdf_export
 )
 
@@ -137,10 +138,8 @@ def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
         # Pour obtenir le nombre de résultat de la requete sans le LIMIT
         nb_results_without_limit = query.count()
 
-        user = info_role
-        user_cruved = get_or_fetch_user_cruved(
-            session=session, id_role=info_role.id_role, module_code="ZONES_HUMIDES"
-        )
+        user, user_cruved = get_user_cruved(info_role=info_role,
+                                            session=session)
 
         if orderby in TZH.__table__.columns:
             col = getattr(TZH, orderby, None)
@@ -207,7 +206,14 @@ def get_zh_by_id(id_zh, info_role):
     """Get zh form data by id
     """
     try:
-        return ZH(id_zh).__repr__()
+        zh = ZH(id_zh)
+        user, user_cruved = get_user_cruved(
+            session=session, info_role=info_role
+            )
+        if zh.zh.user_is_allowed_to(user, user_cruved['R']):
+            return zh.__repr__()
+            
+        raise ZHApiError(message="user_not_allowed", details="You are not allowed to see this zh")
     except Exception as e:
         exc_type, value, tb = sys.exc_info()
         if e.__class__.__name__ == 'NoResultFound':
@@ -232,8 +238,14 @@ def get_complete_info(id_zh, info_role):
     """Get zh complete info
     """
     try:
-        # get other referentials needed for the module from the config file
-        return get_complete_card(id_zh)
+        zh = ZH(id_zh)
+        user, user_cruved = get_user_cruved(
+            session=session, info_role=info_role
+            )
+        if zh.zh.user_is_allowed_to(user, user_cruved['R']):
+            # get other referentials needed for the module from the config file
+            return get_complete_card(id_zh)
+        raise ZHApiError(message="user_not_allowed", details="You are not allowed to see this zh")
     except Exception as e:
         exc_type, value, tb = sys.exc_info()
         if e.__class__.__name__ == 'NoResultFound':
@@ -429,7 +441,7 @@ def get_ref_autocomplete(info_role):
 
 
 @ blueprint.route("/<int:id_zh>/files", methods=["GET"])
-@ permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
+@ permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
 @ json_resp_accept_empty_list
 def get_file_list(id_zh, info_role):
     """get a list of the zh files contained in static repo
@@ -889,6 +901,14 @@ def returnUserCruved(info_role):
         module_code=blueprint.config['MODULE_CODE']
     )
     return user_cruved
+
+
+@blueprint.route('/user/rights/<int:id_zh>', methods=['GET'])
+@permissions.check_cruved_scope('R', True)
+def userRights(id_zh, info_role):
+    user, user_cruved = get_user_cruved(info_role, session)
+    zh = ZH(id_zh).zh
+    return {k: zh.user_is_allowed_to(user, user_cruved[k]) for k in user_cruved.keys()}
 
 
 @blueprint.route("/export_pdf/<int:id_zh>", methods=["GET"])

@@ -35,7 +35,7 @@
       </mat-icon>
     </button>
       <button
-        *ngIf="_cruvedStore.cruved?.ZONES_HUMIDES?.cruved.C !== '0'"
+        *ngIf="rights?.U"
         type="button"
         ngbAutofocus
         mat-raised-button
@@ -46,7 +46,7 @@
         Modifier
       </button>
       <button
-        *ngIf="_cruvedStore.cruved?.ZONES_HUMIDES?.cruved.D !== '0'"
+        *ngIf="rights?.D"
         type="button"
         ngbAutofocus
         mat-raised-button
