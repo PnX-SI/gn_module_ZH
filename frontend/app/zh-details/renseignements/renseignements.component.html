@@ -1,62 +1,75 @@
 <div>
   <div class="row my-3">
-    <div class="col-12 col-xl-4 col-lg-4 col-md-6">
+    <div class="col-12 col-xl-3 col-lg-3 col-md-6">
       <fieldset>
         <legend>
           <h5 class="section-title">Identification de la zone humide</h5>
         </legend>
-        <zh-label label="Nom usuel de la zone humide :"
-          ><span>{{ data.identification?.nom }}</span>
+        <zh-label label="Nom usuel de la zone humide :"><span>{{ data.identification?.nom }}</span>
         </zh-label>
         <zh-label label="Autre nom :">
           <span>{{ data.identification?.autre }}</span>
         </zh-label>
-        <zh-label label="Partie d’un ensemble :"
-          ><span>{{ data.identification?.inclus }}</span>
+        <zh-label label="Partie d’un ensemble :"><span>{{ data.identification?.inclus }}</span>
         </zh-label>
-        <zh-label
-          *ngIf="data.identification?.inclus != 'Non'"
-          label="Nom du grand ensemble :"
-          ><span>{{ data.identification?.ensemble }}</span>
+        <zh-label *ngIf="data.identification?.inclus != 'Non'" label="Nom du grand ensemble :"><span>{{
+            data.identification?.ensemble }}</span>
         </zh-label>
-        <zh-label label="Code de la zone humide :"
-          ><span>{{ data.identification?.code }}</span>
+        <zh-label label="Code de la zone humide :"><span>{{ data.identification?.code }}</span>
         </zh-label>
       </fieldset>
     </div>
-    <div class="col-12 col-xl-4 col-lg-4 col-md-6">
+    <div class="col-12 col-xl-6 col-lg-6 col-md-6">
       <fieldset>
         <legend>
           <h5 class="section-title">Auteurs</h5>
         </legend>
-        <zh-label label="Organisme :">
-          <span> {{ data.auteur?.organism }} </span>
-        </zh-label>
-        <zh-label label="Auteur de la fiche :">
-          <span>{{ data.auteur?.auteur }}</span></zh-label
-        >
-        <zh-label label="Auteur des dernières modifications :">
-          <span>{{ data.auteur?.auteur_modif }}</span>
-        </zh-label>
-        <zh-label label="Date d’établissement :">
-          <span>{{ data.auteur?.date | date:'dd/MM/yy' }}</span>
-        </zh-label>
-        <zh-label label="Date des dernières modifications :">
-          <span>{{ data.auteur?.date_modif | date:'dd/MM/yy' }}</span>
-        </zh-label>
+        <div class="row">
+          <div class="col-6">
+            <zh-label label="Auteur de la fiche :">
+              <span>{{ data.auteur?.auteur }}</span>
+            </zh-label>
+          </div>
+          <div class="col-6">
+            <zh-label label="Auteur des dernières modifications :">
+              <span>{{ data.auteur?.auteur_modif }}</span>
+            </zh-label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6">
+            <zh-label label="Organisme :">
+              <span> {{ data.auteur?.organism }} </span>
+            </zh-label>
+          </div>
+          <div class="col-6">
+            <zh-label label="Organisme des dernières modifications :">
+              <span> {{ data.auteur?.coorganism }} </span>
+            </zh-label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6">
+            <zh-label label="Date d’établissement :">
+              <span>{{ data.auteur?.date | date:'dd/MM/yy' }}</span>
+            </zh-label>
+          </div>
+          <div class="col-6">
+            <zh-label label="Date des dernières modifications :">
+              <span>{{ data.auteur?.date_modif | date:'dd/MM/yy' }}</span>
+            </zh-label>
+          </div>
+        </div>
       </fieldset>
     </div>
-    <div class="col-12 col-xl-4 col-lg-4 col-md-6">
+    <div class="col-12 col-xl-3 col-lg-3 col-md-6">
       <fieldset>
         <legend>
           <h5 class="section-title">Localisation de la zone humide</h5>
         </legend>
         <zh-label label="Region :">
           <ul>
-            <li
-              class="label-item"
-              *ngFor="let reg of data.localisation?.region"
-            >
+            <li class="label-item" *ngFor="let reg of data.localisation?.region">
               <span>{{ reg }}</span>
             </li>
           </ul>
@@ -64,26 +77,18 @@
 
         <zh-label label="Département :">
           <ul>
-            <li
-              class="label-item"
-              *ngFor="let dep of data.localisation?.departement"
-            >
+            <li class="label-item" *ngFor="let dep of data.localisation?.departement">
               <span>{{ dep.nom }} ({{ dep.code }})</span>
             </li>
           </ul>
         </zh-label>
         <zh-label label="Commune (surface ZH/surface commune) :">
           <ul>
-            <li
-              class="label-item"
-              *ngFor="let commune of data.localisation?.commune"
-              [ngbTooltip]="'Insee : ' + commune.insee"
-            >
-              <span
-                >{{ commune.nom }} ({{
-                  commune.couverture + '%' || "non renseigné"
-                }})</span
-              >
+            <li class="label-item" *ngFor="let commune of data.localisation?.commune"
+              [ngbTooltip]="'Insee : ' + commune.insee">
+              <span>{{ commune.nom }} ({{
+                commune.couverture + '%' || "non renseigné"
+                }})</span>
             </li>
           </ul>
         </zh-label>
@@ -96,10 +101,7 @@
         <legend>
           <h5 class="section-title">Principales références bibliographiques</h5>
         </legend>
-        <zh-table
-          [tableCols]="biblioTableCols"
-          [data]="data.references"
-        ></zh-table>
+        <zh-table [tableCols]="biblioTableCols" [data]="data.references"></zh-table>
       </fieldset>
     </div>
   </div>

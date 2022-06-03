@@ -161,13 +161,14 @@ class Localisation:
 
 class Author:
 
-    def __init__(self, id_zh, create_date, update_date, id_organisme):
-        self.id_zh = id_zh
+    def __init__(self, id_zh, create_date, update_date):
+        self.zh = TZH.get_tzh_by_id(id_zh)
         self.create_date = create_date
         self.update_date = update_date
         self.create_author = self.__get_author()
         self.edit_author = self.__get_author(type='coauthors')
-        self.id_organisme = id_organisme
+        self.organism = self.__get_organism()
+        self.coorganism = self.__get_organism(type='coauthors')
         
     def __str__(self):
         return {
@@ -175,14 +176,18 @@ class Author:
             "auteur_modif": self.edit_author,
             "date": self.create_date,
             "date_modif": self.update_date,
-            "organism": DB.session.query(Organisme).filter(Organisme.id_organisme == self.id_organisme).one().nom_organisme
+            "organism": self.organism,
+            "coorganism": self.coorganism
         }
 
     def __get_author(self, type='authors'):
-        zh = TZH.get_tzh_by_id(self.id_zh)
-        prenom = getattr(zh, type).prenom_role if getattr(zh, type).prenom_role is not None else ''
-        nom = getattr(zh, type).nom_role if getattr(zh, type).nom_role is not None else ''
+        prenom = getattr(self.zh, type).prenom_role if getattr(self.zh, type).prenom_role is not None else ''
+        nom = getattr(self.zh, type).nom_role if getattr(self.zh, type).nom_role is not None else ''
         return prenom + ' ' + nom.upper()
+
+    def __get_organism(self, type='authors'):
+        author =  getattr(self.zh, type)
+        return author.organisme.nom_organisme if author.organisme is not None else ""
 
 
 class Municipalities:
@@ -1065,8 +1070,7 @@ class Card(ZH):
         self.info.authors = Author(
             self.id_zh,
             self.properties['create_date'],
-            self.properties['update_date'],
-            self.properties['authors']['id_organisme']
+            self.properties['update_date']
         )
 
     def __set_references(self):
