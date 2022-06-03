@@ -80,12 +80,24 @@
   </div>
 </div>
 
-{% if data['map'] is not none %}
 <section class="content">
+  {% if data['map'] is not none %}
   <img src="{{ data['map'] }}">
-  <div class="fieldset">
-    <label>Superficie de la zone humide</label>
-    <span>{{ data['description']['presentation']['area'] }} ha</span>
+  {% endif %}
+  <div class="left">
+    <div class="fieldset">
+      <label>Superficie de la zone humide</label>
+      <span>{{ data['description']['presentation']['area'] }} ha</span>
+    </div>
+  </div>
+  <div class="right">
+    <div class="fieldset">
+      <label>Superficie de l'espace de fonctionalité</label>
+      {% if data['description']['presentation']['ef_area'] %}
+      <span>{{ data['description']['presentation']['ef_area'] }} ha</span>
+      {% else %}
+      <span>Non identifié ou non calculable</span>
+      {% endif %}
+    </div>
   </div>
 </section>
-{% endif %}

@@ -136,6 +136,7 @@ COMMENT ON COLUMN pr_zh.cor_zh_area.cover IS 'couverture de la zh par rapport à
 CREATE  TABLE pr_zh.t_fct_area ( 
 	id_fct_area          integer  NOT NULL ,
 	geom                 geometry  NOT NULL ,
+	area                 real  NOT NULL ,
 	CONSTRAINT pk_t_fct_area_id_fct_area PRIMARY KEY ( id_fct_area )
  );
 
@@ -217,7 +218,7 @@ CREATE  TABLE pr_zh.t_zh (
 	id_sage              integer   ,
 	remark_pres          varchar(2000)   ,
 	v_habref             varchar(10)   ,
-	ef_area              integer   ,
+	ef_area              real   ,
 	global_remark_activity varchar(2000)   ,
 	id_thread            integer DEFAULT ref_nomenclatures.get_default_nomenclature_value('EVAL_GLOB_MENACES')  ,
 	id_frequency         integer DEFAULT ref_nomenclatures.get_default_nomenclature_value('SUBMERSION_FREQ')  ,

@@ -515,6 +515,10 @@ class TFctArea(DB.Model):
         geoalchemy2.Geometry("GEOMETRY", 4326),
         nullable=False
     )
+    area = DB.Column(
+        DB.REAL,
+        nullable=False
+    )
 
 
 class CorZhFctArea(DB.Model):
