@@ -34,7 +34,7 @@ export class ZhFormTab7Component implements OnInit {
   private $_currentZhSub: Subscription;
   public actionTable: any[] = [];
   public currentZh: any;
-  default_prio_level: string = 'Non définie';
+  default_prio_level: string = "Non définie";
 
   readonly qualifSize: string = "10%";
   readonly knowledgeSize: string = "15%";
@@ -199,6 +199,7 @@ export class ZhFormTab7Component implements OnInit {
       remark_eval_functions: null,
       remark_eval_thread: null,
       remark_eval_actions: null,
+      id_strat_gestion: null,
     });
 
     this.actionForm = this.fb.group({
@@ -321,6 +322,7 @@ export class ZhFormTab7Component implements OnInit {
             this.currentZh.properties.remark_eval_functions,
           remark_eval_thread: this.currentZh.properties.remark_eval_thread,
           remark_eval_actions: this.currentZh.properties.remark_eval_actions,
+          id_strat_gestion: this.currentZh.properties.id_strat_gestion,
         });
         if (
           this.currentZh.properties.actions &&
@@ -352,13 +354,13 @@ export class ZhFormTab7Component implements OnInit {
   // open the add action modal
   onAddAction(event: any, modal: any) {
     this.getMetaData();
-    this.actionForm.controls['priority'].setValue(this.formMetaData["NIVEAU_PRIORITE"].find(
-      (item) => {
+    this.actionForm.controls["priority"].setValue(
+      this.formMetaData["NIVEAU_PRIORITE"].find((item) => {
         if (item.mnemonique == this.default_prio_level) {
           return item;
         }
-      }
-    ));
+      })
+    );
     this.patchModal = false;
     this.addModalBtnLabel = "Ajouter";
     this.modalTitle = "Ajout d'une proposition d'action";
@@ -477,6 +479,7 @@ export class ZhFormTab7Component implements OnInit {
         remark_eval_functions: this.formTab7.value.remark_eval_functions,
         remark_eval_thread: this.formTab7.value.remark_eval_thread,
         remark_eval_actions: this.formTab7.value.remark_eval_actions,
+        id_strat_gestion: this.formTab7.value.id_strat_gestion,
         actions: actions,
       };
 

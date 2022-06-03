@@ -151,6 +151,7 @@ export class ZhSearchComponent implements OnInit {
       statuts: this._fb.group({
         statuts: [null],
         plans: [null],
+        strategies: [null],
       }),
       evaluations: this._fb.group({
         hydros: [null],
