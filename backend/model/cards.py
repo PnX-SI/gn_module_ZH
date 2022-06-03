@@ -1,4 +1,5 @@
 from datetime import datetime
+from itertools import groupby
 
 from sqlalchemy import text
 from pypnusershub.db.models import Organisme
@@ -705,10 +706,12 @@ class Status:
         q_protections = DB.session.query(CorProtectionLevelType)\
             .filter(CorProtectionLevelType.id_protection_status.in_(self.protections))\
             .all()
-        return [
-            Utils.get_mnemo(protection.id_protection_status)
-            for protection in q_protections
-        ]
+        temp = [{"status": Utils.get_mnemo(protection.id_protection_status),
+                 "category": Utils.get_mnemo(protection.id_protection_type)} for protection in q_protections]
+        return [{
+                "category": key or "AUTRE",
+                "items": list(group)
+            } for key, group in groupby(temp, lambda x: x.get('category'))]
 
     def __str__(self):
         return {

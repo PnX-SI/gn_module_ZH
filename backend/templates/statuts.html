@@ -77,7 +77,10 @@
       Principaux statuts
     </h5>
     {% for status in data['statuts']['statuts'] %}
-      <span class="small-title">{{ status }}</span><br>
+    <span class="small-title">{{ status['category'] }}</span><br>
+    {% for item in status['items'] %}
+    <span class="small-title">{{ item['status'] }}</span><br>
+    {% endfor %}
     {% endfor %}
   </section>
   <section class="content col">
