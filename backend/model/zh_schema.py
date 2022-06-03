@@ -657,6 +657,13 @@ class BibCb(DB.Model):
         return ch
 
 
+class CorChStatus(DB.Model):
+    __tablename__ = "cor_ch_status"
+    __table_args__ = {"schema": "pr_zh"}
+    lb_code = DB.Column(DB.Unicode(length=50), primary_key=True, nullable=False)
+    priority = DB.Column(DB.Unicode(length=10), nullable=False)
+
+
 class CorImpactTypes(DB.Model):
     __tablename__ = "cor_impact_types"
     __table_args__ = {"schema": "pr_zh"}
