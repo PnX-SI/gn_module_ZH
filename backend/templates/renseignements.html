@@ -91,7 +91,11 @@
   <div class="left">
     <div class="fieldset">
       <label>Superficie de la zone humide</label>
+      {% if data['description']['presentation']['area'] %}
       <span>{{ data['description']['presentation']['area'] }} ha</span>
+      {% else %}
+      <span>Non identifié ou non calculable</span>
+      {% endif %}
     </div>
   </div>
   <div class="right">
