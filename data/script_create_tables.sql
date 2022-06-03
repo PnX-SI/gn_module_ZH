@@ -149,6 +149,15 @@ CREATE  TABLE pr_zh.cor_zh_cb (
 
 COMMENT ON TABLE pr_zh.cor_zh_cb IS 'Correspondance zh et corine biotope';
 
+CREATE  TABLE pr_zh.cor_ch_status ( 
+	lb_code               varchar(50)  NOT NULL,
+	priority              varchar(10)  NOT NULL
+ );
+
+COMMENT ON TABLE pr_zh.cor_zh_cb IS 'Correspondance cahier habitat, prioritaire';
+COMMENT ON COLUMN pr_zh.cor_ch_status.lb_code IS 'Id cahier habitat';
+COMMENT ON COLUMN pr_zh.cor_ch_status.priority IS 'IC/PR';
+
 CREATE  TABLE pr_zh.t_hydro_area ( 
 	id_hydro             integer  DEFAULT nextval('pr_zh.t_hydro_area_id_hydro_seq'::regclass) NOT NULL ,
 	name                 varchar(100)  NOT NULL ,

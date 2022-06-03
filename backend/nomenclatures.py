@@ -17,6 +17,7 @@ from pypn_habref_api.models import (
 from geonature.utils.env import DB
 
 from .model.zh_schema import (
+    CorChStatus,
     Nomenclatures,
     CorSdageSage,
     BibCb,
@@ -79,11 +80,13 @@ def get_ch(lb_code):
         # get list of cd_hab_entre/lb_code/lb_hab_fr for each cahier habitat
         ch = []
         for q in q_cd_hab_entre:
+            hab = DB.session.query(Habref).filter(Habref.cd_hab == q.cd_hab_entre).one()
             ch.append({
                 "cd_hab": q.cd_hab_entre,
-                "front_name": DB.session.query(Habref).filter(Habref.cd_hab == q.cd_hab_entre).one().lb_code + ' - ' + DB.session.query(Habref).filter(Habref.cd_hab == q.cd_hab_entre).one().lb_hab_fr,
-                "lb_code": DB.session.query(Habref).filter(Habref.cd_hab == q.cd_hab_entre).one().lb_code,
-                "lb_hab_fr": DB.session.query(Habref).filter(Habref.cd_hab == q.cd_hab_entre).one().lb_hab_fr
+                "front_name": hab.lb_code + ' - ' + hab.lb_hab_fr,
+                "lb_code": hab.lb_code,
+                "lb_hab_fr": hab.lb_hab_fr,
+                "priority": DB.session.query(CorChStatus).filter(CorChStatus.lb_code == hab.lb_code).one().priority
             })
         return ch
     except Exception as e:

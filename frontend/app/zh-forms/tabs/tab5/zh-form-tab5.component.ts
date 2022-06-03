@@ -132,6 +132,11 @@ export class ZhFormTab5Component implements OnInit {
       subcell: { name: "front_name" },
     },
     {
+      name: "cahierHab",
+      label: "Statut*",
+      subcell: { name: "priority" },
+    },
+    {
       name: "preservationState",
       label: "État de conservation",
       subcell: { name: "mnemonique" },
@@ -270,6 +275,9 @@ export class ZhFormTab5Component implements OnInit {
       this.formMetaData["INTERET_PATRIM"]
     );
     this.interetPatInput = this.groupArrayByCategory(
+      this.formMetaData["INTERET_PATRIM_all"]
+    );
+    this.interetPatInputForTables = this.groupArrayByCategory(
       this.formMetaData["INTERET_PATRIM_all"]
     );
     this.valSocEcoInput = [...this.formMetaData["VAL_SOC_ECO"]];
