@@ -87,17 +87,23 @@
     <table class="custom-table">
       <tbody>
         {% for type in data['config']['ref_geo_referentiels'] %}
+        {% if type["active"] %}
         <tr>
           <td class="border-bottom">{{ type['zh_name'] }}</td>
           <td class="border-bottom">
+            {% if not data['statuts']['autres_inventaires'][type['zh_name']] %}
+            <span>Aucun</span><br>
+            {% else %}
             {% for ref in data['statuts']['autres_inventaires'][type['zh_name']] %}
             <span>
-              {{ ref.area_code }} - 
+              {{ ref.area_code }} -
               <a href="{{ ref.url }}">{{ ref.area_name }}</a>
             </span><br>
             {% endfor %}
+            {% endif %}
           </td>
         </tr>
+        {% endif %}
         {% endfor %}
         <tr>
           <td class="border-bottom">Autres études / inventaires naturalistes</td>
