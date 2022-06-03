@@ -137,6 +137,8 @@ pdf_layer_number = 0
 # This image will be displayed at the last page of the pdf document
 # If None => will not be displayed obviously
 pdf_last_page_img = 'entree_sortie.svg'
+# Name of the source
+pdf_title = 'Inventaire des zones humides'
 
 class GnModuleSchemaConf(Schema):
     default_maplist_columns = fields.List(
@@ -163,3 +165,4 @@ class GnModuleSchemaConf(Schema):
     pdf_layer_threashold_ha = fields.Float(load_default=pdf_layer_threashold_ha)
     pdf_layer_number = fields.Integer(load_default=pdf_layer_number)
     pdf_last_page_img = fields.String(load_default=pdf_last_page_img)
+    pdf_title = fields.String(load_default=pdf_title)

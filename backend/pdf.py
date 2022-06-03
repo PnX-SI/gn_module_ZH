@@ -101,6 +101,9 @@ def gen_pdf(id_zh, dataset, filename = "rapport.pdf"):
         others[k] = list(v)
     dataset['statuts']['autres_inventaires'] = others
     
+    #  pdf date
+    dataset['date_now'] = dt.now().strftime("%d/%m/%Y - %H:%M:%S")
+
     # Generate pdf
     pdf_file = generate_pdf_from_template("fiche_template_pdf.html", dataset, filename)
     return Path(pdf_file)
