@@ -84,7 +84,12 @@
         <zh-label label="Statuts : ">
           <ul>
             <li class="label-item" *ngFor="let item of data.statuts">
-              <span>{{ item }}</span>
+              <span>{{ item.category }}</span>
+              <ul>
+                <li class="label-item ml-1" *ngFor="let status of item.items">
+                  <span>{{ status.status }}</span>
+                </li>
+              </ul>
             </li>
           </ul>
         </zh-label>
