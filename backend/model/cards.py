@@ -501,7 +501,7 @@ class Basin:
             DB.session.query(THydroArea.name)
             .filter(THydroArea.id_hydro == CorZhHydro.id_hydro)
             .filter(CorZhHydro.id_zh == self.id_zh)
-            .all()
+            .distinct()
         ]
 
 
