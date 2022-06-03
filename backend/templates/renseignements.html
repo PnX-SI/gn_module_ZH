@@ -23,31 +23,31 @@
   </div>
   <div class="right">
     <section>
-    <div class="flex-container">
-      <div class="left">
-        <div class="fieldset">
-          <label>Région</label>
-          {% for region in data['renseignements']['localisation']['region'] %}
-          <span>{{ region }}</span><br>
-          {% endfor %}
+      <div class="flex-container">
+        <div class="left">
+          <div class="fieldset">
+            <label>Région</label>
+            {% for region in data['renseignements']['localisation']['region'] %}
+            <span>{{ region }}</span><br>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="right">
+          <div class="fieldset">
+            <label>Département</label>
+            {% for dep in data['renseignements']['localisation']['departement'] %}
+            <span>{{ dep['nom'] }} ({{ dep['code'] }})</span><br>
+            {% endfor %}
+          </div>
         </div>
       </div>
-      <div class="right">
-        <div class="fieldset">
-          <label>Département</label>
-          {% for dep in data['renseignements']['localisation']['departement'] %}
-          <span>{{ dep['nom'] }} ({{ dep['code'] }})</span><br>
-          {% endfor %}
-        </div>
+      <div class="fieldset">
+        <label>Commune [surface ZH/surface commune]</label>
+        {% for com in data['renseignements']['localisation']['commune'] %}
+        <span>{{ com['nom'] }} ({{ com['insee'] }}) [{{ com['couverture'] }}%]</span><br>
+        {% endfor %}
       </div>
-    </div>
-    <div class="fieldset">
-      <label>Commune [surface ZH/surface commune]</label>
-      {% for com in data['renseignements']['localisation']['commune'] %}
-      <span>{{ com['nom'] }} ({{ com['insee'] }}) [{{ com['couverture'] }}%]</span><br>
-      {% endfor %}
-    </div>
-  </section>
+    </section>
   </div>
 </div>
 <div class="flex-container">
@@ -76,6 +76,10 @@
     <div class="fieldset">
       <label>Auteur des dernières modifications</label>
       <span>{{ data['renseignements']['auteur']['auteur_modif'] }}</span>
+    </div>
+    <div class="fieldset">
+      <label>Organisme des dernières modifications</label>
+      <span>{{ data['renseignements']['auteur']['coorganism'] }}</span>
     </div>
   </div>
 </div>
