@@ -13,6 +13,7 @@ from sqlalchemy import (
     # desc,
     and_
 )
+from geoalchemy2.types import Geography
 
 import sqlalchemy.exc as exc
 from sqlalchemy.sql.expression import delete
@@ -101,11 +102,12 @@ def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referenti
         # fill cor_zh_hydro
         post_cor_zh_hydro(form_data['geom']['geometry'], new_zh.id_zh)
         # fill cor_zh_fct_area
-        post_cor_zh_fct_area(form_data['geom']['geometry'], new_zh.id_zh)
+        total_cover = post_cor_zh_fct_area(form_data['geom']['geometry'], new_zh.id_zh)
 
         # create zh code
         code = Code(new_zh.id_zh, new_zh.id_org, new_zh.geom)
         new_zh.code = code.__repr__()
+        new_zh.ef_area = total_cover
 
         # set default values
         fct_delim_default_id = DB.session.query(DefaultsNomenclaturesValues).filter(DefaultsNomenclaturesValues.mnemonique_type == 'CRIT_DEF_ESP_FCT').one().id_nomenclature
@@ -212,12 +214,19 @@ def post_cor_zh_hydro(geom, id_zh):
 
 def post_cor_zh_fct_area(geom, id_zh):
     try:
-        fas = TZH.get_zh_area_intersected(
+        result = TZH.get_zh_area_intersected(
             'fct_area', func.ST_GeomFromGeoJSON(str(geom)))
-        for fa in fas:
-            DB.session.add(CorZhFctArea(
-                id_zh=id_zh, id_fct_area=fa.id_fct_area))
-            DB.session.flush()
+        
+        cor_zh_area = []
+        total_cover = 0
+        for res in result:
+            cor_zh_area.append(CorZhFctArea(id_zh=id_zh, id_fct_area=res.id_fct_area))
+            total_cover += res.area
+        DB.session.add_all(cor_zh_area)
+        DB.session.flush()
+
+        return total_cover
+        
     except Exception as e:
         if e.__class__.__name__ == 'DataError':
             raise ZHApiError(
@@ -232,11 +241,20 @@ def update_zh_tab0(form_data, polygon, area, info_role, zh_date, geo_refs):
         is_geom_new = check_polygon(polygon, form_data['id_zh'])
 
         # update pr_zh.cor_lim_list
-        id_lim_list = DB.session.query(TZH.id_lim_list).filter(
-            TZH.id_zh == form_data['id_zh']).one()[0]
+        id_lim_list, ef_area = DB.session.query(TZH.id_lim_list, TZH.ef_area).filter(
+            TZH.id_zh == form_data['id_zh']).one()
+
         DB.session.query(CorLimList).filter(
             CorLimList.id_lim_list == id_lim_list).delete()
         post_cor_lim_list(id_lim_list, form_data['critere_delim'])
+
+        if is_geom_new:
+            update_cor_zh_area(polygon, form_data['id_zh'], geo_refs)
+            update_cor_zh_rb(form_data['geom']['geometry'], form_data['id_zh'])
+            update_cor_zh_hydro(
+                form_data['geom']['geometry'], form_data['id_zh'])
+            ef_area = update_cor_zh_fct_area(
+                form_data['geom']['geometry'], form_data['id_zh'])
 
         # update zh : fill pr_zh.t_zh
         DB.session.query(TZH).filter(TZH.id_zh == form_data['id_zh']).update({
@@ -246,17 +264,11 @@ def update_zh_tab0(form_data, polygon, area, info_role, zh_date, geo_refs):
             TZH.update_date: zh_date,
             TZH.id_sdage: form_data['sdage'],
             TZH.geom: polygon,
-            TZH.area: area
+            TZH.area: area,
+            TZH.ef_area: ef_area
         })
         DB.session.flush()
 
-        if is_geom_new:
-            update_cor_zh_area(polygon, form_data['id_zh'], geo_refs)
-            update_cor_zh_rb(form_data['geom']['geometry'], form_data['id_zh'])
-            update_cor_zh_hydro(
-                form_data['geom']['geometry'], form_data['id_zh'])
-            update_cor_zh_fct_area(
-                form_data['geom']['geometry'], form_data['id_zh'])
 
         DB.session.flush()
         return form_data['id_zh']
@@ -316,7 +328,7 @@ def update_cor_zh_hydro(geom, id_zh):
 def update_cor_zh_fct_area(geom, id_zh):
     DB.session.query(CorZhFctArea).filter(
         CorZhFctArea.id_zh == id_zh).delete()
-    post_cor_zh_fct_area(geom, id_zh)
+    return post_cor_zh_fct_area(geom, id_zh)
 
 
 # tab 1

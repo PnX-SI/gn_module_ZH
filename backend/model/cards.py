@@ -503,13 +503,14 @@ class Basin:
 
 class Presentation:
 
-    def __init__(self, area, id_sdage, id_sage, cb_codes_corine_biotope, remark_pres):
+    def __init__(self, area, id_sdage, id_sage, cb_codes_corine_biotope, remark_pres, ef_area):
         self.area: float = area
         self.id_sdage: int = id_sdage
         self.id_sage: int = id_sage
         self.cb_codes_corine_biotope: list(
             CorineBiotope) = cb_codes_corine_biotope
         self.remark_pres: str = remark_pres
+        self.ef_area: int = ef_area
 
     def __str__(self):
         return {
@@ -517,7 +518,8 @@ class Presentation:
             "sdage": Utils.get_mnemo(self.id_sdage),
             "typologie_locale": Utils.get_mnemo(self.id_sage),
             "corine_biotope": [cb.__str__() for cb in self.cb_codes_corine_biotope],
-            "remarques": Utils.get_string(self.remark_pres)
+            "remarques": Utils.get_string(self.remark_pres),
+            "ef_area": self.ef_area
         }
 
 
@@ -1154,7 +1156,8 @@ class Card(ZH):
             self.properties['id_sdage'],
             self.properties['id_sage'],
             self.__get_cb(),
-            self.properties['remark_pres']
+            self.properties['remark_pres'],
+            self.properties['ef_area']
         )
         self.description.basin = Basin(self.id_zh)
         self.description.id_corine_landcovers = self.properties['id_corine_landcovers']
