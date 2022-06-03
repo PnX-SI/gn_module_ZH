@@ -1005,10 +1005,19 @@ export class ZhFormTab5Component implements OnInit {
     this._dataService
       .getHabitatByCorine(corineBio.corinBio.CB_code)
       .subscribe((habitats: any) => {
-        this.cahierHabInput = habitats;
         selectedCahierHab = this.cahierHabInput.find(
           (item: any) => item.cd_hab == corineBio.cahierHab.cd_hab
         );
+        this.cahierHabInput = habitats.map((item) => {
+          item.disabled = this.corineBioTable
+            .map((cor) => cor.cahierHab)
+            .some(
+              (e) =>
+                e.cd_hab === item.cd_hab &&
+                e.cd_hab !== selectedCahierHab.cd_hab
+            );
+          return item;
+        });
         this.corineBioForm.get("cahierHab").enable();
         // patch form values
         this.corineBioForm.patchValue({
@@ -1017,7 +1026,7 @@ export class ZhFormTab5Component implements OnInit {
           cahierHab: selectedCahierHab,
           habCover: corineBio.habCover,
         });
-        this.tempID = corineBio.corinBio.CB_code;
+        this.tempID = selectedCahierHab.cd_hab;
         this.ngbModal.open(modal, {
           centered: true,
           size: "lg",
@@ -1032,7 +1041,7 @@ export class ZhFormTab5Component implements OnInit {
     if (this.corineBioForm.valid) {
       let formValues = this.corineBioForm.value;
       this.corineBioTable = this.corineBioTable.map((item: any) =>
-        item.corinBio.CB_code != this.tempID ? item : formValues
+        item.cahierHab.cd_hab != this.tempID ? item : formValues
       );
       this.sortCorineBio();
       this.tempID = null;
