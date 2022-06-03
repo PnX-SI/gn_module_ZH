@@ -9,11 +9,15 @@ import { MatAccordion } from "@angular/material/expansion";
 import { ActivatedRoute } from "@angular/router";
 import { MapService } from "@geonature_common/map/map.service";
 import { ZhDataService } from "../services/zh-data.service";
+import { ErrorTranslatorService } from "../services/error-translator.service";
+import { Rights } from "../models/rights";
 import { ToastrService } from "ngx-toastr";
 import { GeoJSON } from "leaflet";
 import * as L from "leaflet";
 
 import { DetailsModel } from "./models/zh-details.model";
+
+
 
 @Component({
   selector: "zh-details",
@@ -25,24 +29,36 @@ export class ZhDetailsComponent implements OnInit, AfterViewInit {
   public cardContentHeight: number;
   public id_zh: number;
   public zhDetails: DetailsModel;
+  public rights: Rights;
   public expanded: boolean = false;
+  public onError: boolean = false;
 
   constructor(
     private _mapService: MapService,
     private _zhService: ZhDataService,
     private _route: ActivatedRoute,
-    private _toastr: ToastrService
+    private _toastr: ToastrService,
+    private _error: ErrorTranslatorService
   ) {}
 
   ngOnInit() {
     this.id_zh = this._route.snapshot.params["id"];
+    this.getRights(this.id_zh);
     this.getData();
+  }
+
+  getRights(idZh: number) {
+    this._zhService
+      .getRights(idZh)
+      .toPromise()
+      .then((rights: Rights) => (this.rights = rights));
   }
 
   // get zone humides details data
   getData() {
     this._zhService.getZhDetails(this.id_zh).subscribe(
       (data: DetailsModel) => {
+        this.onError = false;
         this.zhDetails = data;
         let geojson: GeoJSON = {
           geometry: data.geometry,
@@ -55,7 +71,11 @@ export class ZhDetailsComponent implements OnInit, AfterViewInit {
         }, 0);
       },
       (error) => {
-        this._toastr.error(error.error, "", {
+        this.onError = true;
+        const frontMsg: string = this._error.getFrontError(
+          error.error.message
+        );
+        this._toastr.error(frontMsg, "", {
           positionClass: "toast-top-right",
         });
       }

@@ -125,19 +125,19 @@
               </i>
             </ng-template>
             <ng-template let-row="row" ngx-datatable-cell-template>
-              <button
-                class="btn btn-outline-shadow btn-no-padding btn-ghost"
-                [disabled]="!row.rights.D"
-                (click)="openDeleteModal($event, modalConfirm, iElement, row)"
-              >
-                <i
-                  [ngClass]="{ disabled: !row.rights.D }"
-                  #iElement
-                  matTooltip="{{ 'Supprimer' }}"
-                  class="fa fa-trash-o"
-                  aria-hidden="true"
-                ></i>
-              </button>
+              <ng-container *ngIf="row.rights.D">
+                <button
+                  class="btn btn-outline-shadow btn-no-padding btn-ghost"
+                  (click)="openDeleteModal($event, modalConfirm, iElement, row)"
+                >
+                  <i
+                    #iElement
+                    matTooltip="{{ 'Supprimer' }}"
+                    class="fa fa-trash-o"
+                    aria-hidden="true"
+                  ></i>
+                </button>
+              </ng-container>
             </ng-template>
           </ngx-datatable-column>
             <!-- DATA COLUMNS -->

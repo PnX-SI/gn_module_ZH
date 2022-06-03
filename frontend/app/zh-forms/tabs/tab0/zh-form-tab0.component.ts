@@ -243,7 +243,7 @@ export class ZhFormTab0Component implements OnInit {
             this.posted = false;
             var msg: string = "Impossible de créer la zone humide : ";
             const frontMsg: string = this._error.getFrontError(
-              error.error.message
+              error.error.message || error.error.name
             );
             // Not really good, but must filter error id to remove the
             // geometry or not

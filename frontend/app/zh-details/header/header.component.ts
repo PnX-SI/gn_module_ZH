@@ -3,7 +3,6 @@ import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { ZhDataService } from "../../services/zh-data.service";
 import { CommonService } from "@geonature_common/service/common.service";
 import { Router } from "@angular/router";
-import { CruvedStoreService } from "@geonature_common/service/cruved-store.service";
 import { ErrorTranslatorService } from "../../services/error-translator.service";
 
 @Component({
@@ -14,10 +13,10 @@ import { ErrorTranslatorService } from "../../services/error-translator.service"
 export class HeaderComponent {
   @Input() zhId: number;
   @Input() zhCode: number;
+  @Input() rights;
   public loadingPdf: boolean = false;
 
   constructor(
-    public _cruvedStore: CruvedStoreService,
     private ngModal: NgbModal,
     private router: Router,
     private _zhService: ZhDataService,

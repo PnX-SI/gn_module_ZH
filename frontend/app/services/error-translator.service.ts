@@ -96,6 +96,11 @@ export class ErrorTranslatorService {
       api: "empty_geometry",
       front: "Veuillez tracer une geométrie",
       id: 16,
+    },
+    {
+      api: "Forbidden",
+      front: "Vous ne possedez pas les droits pour effectuer cela",
+      id: 17,
     }
   ];
 

@@ -171,4 +171,10 @@ export class ZhDataService {
       params: options,
     });
   }
+
+  getRights(idZh: number) {
+    return this._api.get(
+      `${AppConfig.API_ENDPOINT}/zones_humides/user/rights/${idZh}`
+    );
+  }
 }

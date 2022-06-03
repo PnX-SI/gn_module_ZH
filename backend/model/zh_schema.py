@@ -59,13 +59,11 @@ class ZhModel(DB.Model):
 
     __abstract__ = True
 
-    def user_is_observer_or_digitiser(self, user):
-        observers = [d.id_role for d in self.observers]
-        return user.id_role == self.id_digitiser or user.id_role in observers
+    def user_is_owner(self, user):
+        return user.id_role == self.create_author
 
     def user_is_in_dataset_actor(self, user):
-        only_user = user.value_filter == "1"
-        return self.id_dataset in TDatasets.get_user_datasets(user, only_user=only_user)
+        return user.id_organisme == self.authors.id_organisme
 
     def user_is_allowed_to(self, user, level):
         """
@@ -81,7 +79,7 @@ class ZhModel(DB.Model):
             return True
 
         # Si l'utilisateur est propriétaire de la données
-        if self.user_is_observer_or_digitiser(user):
+        if self.user_is_owner(user):
             return True
 
         # Si l'utilisateur appartient à un organisme
@@ -120,9 +118,6 @@ class ZhModel(DB.Model):
             for action, level in user_cruved.items()
         }
 
-    def user_is_observer_or_digitiser(self, user):
-        observers = [d.id_role for d in self.observers]
-        return user.id_role == self.id_digitiser or user.id_role in observers
 
 
 class Nomenclatures(TNomenclatures):
