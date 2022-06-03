@@ -72,6 +72,7 @@ def main_search(query, json):
     if statuts is not None:
         query = filter_statuts(query, statuts)
         query = filter_plans(query, statuts)
+        query = filter_strategies(query, statuts)
 
     evaluations = json.get("evaluations")
     if evaluations is not None:
@@ -237,7 +238,7 @@ def filter_fct(query, json: dict, type_: str):
 def filter_statuts(query, json: dict):
     ids_statuts = [f.get("id_nomenclature") for f in json.get("statuts", [])]
 
-    if ids_statuts and ids_statuts:
+    if ids_statuts:
         subquery = (
             DB.session.query(TOwnership.id_zh)
             .with_entities(TOwnership.id_zh, TOwnership.id_status)
@@ -272,6 +273,11 @@ def filter_plans(query, json: dict):
 
     return query
 
+def filter_strategies(query, json: dict):
+    ids_strategies = [f.get("id_nomenclature") for f in json.get("strategies", [])]
+    if ids_strategies:
+        query = query.filter(TZH.id_strat_gestion.in_(ids_strategies)).distinct()
+    return query
 
 def filter_evaluations(query, json: dict):
     ids_hydros = [f.get("id_nomenclature") for f in json.get("hydros", [])]

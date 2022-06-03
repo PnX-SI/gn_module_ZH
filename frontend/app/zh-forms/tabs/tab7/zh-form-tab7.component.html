@@ -150,6 +150,22 @@
         </h5>
       </legend>
       <div class="form-row">
+        <div class="form-group col-md-4">
+          <small>Stratégie de gestion</small>
+          <select
+            class="form-control"
+            [formControl]="formTab7.controls.id_strat_gestion"
+          >
+            <option
+              *ngFor="let strat of formMetaData.STRAT_GESTION"
+              [ngValue]="strat.id_nomenclature"
+            >
+              {{ strat.mnemonique }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
         <button
           mat-raised-button
           class="mb-3"

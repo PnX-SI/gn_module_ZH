@@ -305,6 +305,10 @@ class TZH(ZhModel):
         DB.Integer,
         ForeignKey(TNomenclatures.id_nomenclature),
         default=TNomenclatures.get_default_nomenclature("FONCTIONNALITE_BIO"))
+    id_strat_gestion = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature),
+        default=TNomenclatures.get_default_nomenclature("STRAT_GESTION"))
     remark_diag = DB.Column(DB.Unicode)
     is_other_inventory = DB.Column(DB.Boolean, default=False)
     is_carto_hab = DB.Column(DB.Boolean, default=False)

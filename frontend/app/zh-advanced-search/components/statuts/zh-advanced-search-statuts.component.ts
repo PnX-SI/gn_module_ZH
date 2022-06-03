@@ -9,6 +9,7 @@ import { FormGroup } from "@angular/forms";
 export class ZhAdvancedSearchStatutsComponent implements OnInit {
   @Input() statuts: any;
   @Input() plans: [];
+  @Input() strategies: [];
   @Input() form: FormGroup;
   public dropdownSettings: {};
   constructor() {}
@@ -30,5 +31,8 @@ export class ZhAdvancedSearchStatutsComponent implements OnInit {
   }
   onDeSelectAllPlans() {
     this.form.get("plans").reset();
+  }
+  onDeSelectAllStrategies() {
+    this.form.get("strategies").reset();
   }
 }

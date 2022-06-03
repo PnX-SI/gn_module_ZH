@@ -226,6 +226,7 @@ CREATE  TABLE pr_zh.t_zh (
 	id_connexion         integer   ,
 	id_diag_hydro        integer DEFAULT ref_nomenclatures.get_default_nomenclature_value('FONCTIONNALITE_HYDRO')  ,
 	id_diag_bio          integer DEFAULT ref_nomenclatures.get_default_nomenclature_value('FONCTIONNALITE_BIO')  ,
+	id_strat_gestion     integer DEFAULT ref_nomenclatures.get_default_nomenclature_value('STRAT_GESTION')  ,
 	remark_diag          varchar(2000)   ,
 	is_other_inventory   boolean DEFAULT false NOT NULL ,
 	is_carto_hab         boolean DEFAULT false NOT NULL ,
@@ -297,6 +298,8 @@ COMMENT ON COLUMN pr_zh.t_zh.id_connexion IS 'Connexion de la zone humide dans s
 COMMENT ON COLUMN pr_zh.t_zh.id_diag_hydro IS 'fonctionnalité hydrologique';
 
 COMMENT ON COLUMN pr_zh.t_zh.id_diag_bio IS 'fonctionnalité biologique';
+
+COMMENT ON COLUMN pr_zh.t_zh.id_strat_gestion IS 'Stratégie de gestion';
 
 COMMENT ON COLUMN pr_zh.t_zh.remark_diag IS 'Remarque sur diagnostic fonctionnel';
 
@@ -710,6 +713,8 @@ ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_t_nomenclatures_connexion FOREIGN 
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_t_nomenclatures_diag_hydro FOREIGN KEY ( id_diag_hydro ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_t_nomenclatures_diag_bio FOREIGN KEY ( id_diag_bio ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_t_nomenclatures_strat_gestion FOREIGN KEY ( id_strat_gestion ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_sdage_t_nomenclatures FOREIGN KEY ( id_sdage ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 

@@ -70,6 +70,9 @@
             Stratégie de gestion et orientations d'actions
           </h5>
         </legend>
+        <zh-label label="Stratégie de gestion :">
+          <span>{{ data.strategie?.mgmt_strategy }}</span>
+        </zh-label>
         <zh-table
           [tableCols]="propositionsCol"
           [data]="data.strategie?.propositions"

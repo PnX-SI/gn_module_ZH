@@ -957,6 +957,7 @@ class EvalAction:
     def __init__(self):
         self.__actions: list(Action)
         self.__remark_eval_actions: str
+        self.__mgmt_strategy: str
 
     @property
     def actions(self):
@@ -980,8 +981,17 @@ class EvalAction:
     def remark_eval_actions(self, val):
         self.__remark_eval_actions = val
 
+    @property
+    def mgmt_strategy(self):
+        return self.__mgmt_strategy
+
+    @mgmt_strategy.setter
+    def mgmt_strategy(self, val):
+        self.__mgmt_strategy = val
+
     def __str__(self):
         return {
+            "mgmt_strategy": Utils.get_mnemo(self.mgmt_strategy),
             "propositions": [action.__str__() for action in self.actions],
             "commentaires": Utils.get_string(self.remark_eval_actions)
         }
@@ -1228,3 +1238,4 @@ class Card(ZH):
     def __set_actions(self):
         self.evaluation.action.actions = self.properties['actions']
         self.evaluation.action.remark_eval_actions = self.properties['remark_eval_actions']
+        self.evaluation.action.mgmt_strategy = self.properties['id_strat_gestion']
