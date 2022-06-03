@@ -74,6 +74,11 @@ ref_geo_referentiels = [
         "active": True
     },
     {
+        "zh_name": "Natura 2000 – Directive « Oiseaux » (ZPS)",
+        "type_code_ref_geo": "ZPS",
+        "active": True
+    },
+    {
         "zh_name": "Site de l’observatoire national des zones humides",
         "type_code_ref_geo": "",
         "active": False
