@@ -162,7 +162,9 @@ export class ZhHierarchySearchTableComponent implements OnInit {
 
   attributesChanged(event) {
     this.knowledges = this.getKnowledge(event);
-    this.localForm.controls["knowledges"].setValue([this.knowledges[0]]);
+    if (this.knowledges.length > 0) {
+      this.localForm.controls["knowledges"].setValue([this.knowledges[0]]);
+    }
   }
 
   getFilterIndex(value) {
