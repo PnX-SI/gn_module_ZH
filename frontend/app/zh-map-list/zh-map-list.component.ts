@@ -18,6 +18,10 @@ import { Subscription } from "rxjs/Subscription";
 import { GlobalSubService } from "@geonature/services/global-sub.service";
 import { ToastrService } from "ngx-toastr";
 import { ErrorTranslatorService } from "../services/error-translator.service";
+import geobuf from "geobuf";
+import Pbf from "pbf";
+import "leaflet.vectorgrid";
+import { PbfService } from "../services/pbf.service";
 
 @Component({
   selector: "zh-map-list",
@@ -39,6 +43,7 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     public mapListService: MapListService,
     private _mapService: MapService,
+    private _pbfService: PbfService,
     private _zhService: ZhDataService,
     public ngbModal: NgbModal,
     public globalSub: GlobalSubService,
@@ -96,9 +101,8 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
       // Filter without data = get all ZH
       //this.filterZh({});
     });
-
-    // end OnInit
   }
+
 
   ngAfterViewInit() {
     setTimeout(() => this.calcCardContentHeight(), 500);
@@ -108,6 +112,18 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
         this._mapService.currentExtend.zoom
       );
     }
+    // Load all geoms
+    this._pbfService
+      .getPbf(this._mapService.map).toPromise().then(data => 
+        data.on(
+          "click",
+          function (e) {
+            var properties = e.layer.properties;
+            this.filterZh({ id_zh: properties.id_zh });
+          }.bind(this)
+        )
+        .addTo(this._mapService.map))
+
     // Create Button
     L.easyButton("fa fa-crosshairs fa-lg", () => {
       this.resetMap();

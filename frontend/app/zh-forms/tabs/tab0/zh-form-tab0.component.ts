@@ -17,6 +17,7 @@ import { ToastrService } from "ngx-toastr";
 import { ZhDataService } from "../../../services/zh-data.service";
 import { TabsService } from "../../../services/tabs.service";
 import { ErrorTranslatorService } from "../../../services/error-translator.service";
+import { PbfService } from "../../../services/pbf.service";
 
 const GEOM_CONTAINED_ID = 1;
 
@@ -54,7 +55,8 @@ export class ZhFormTab0Component implements OnInit {
     private _mapService: MapService,
     private _router: Router,
     private _toastr: ToastrService,
-    private _error: ErrorTranslatorService
+    private _error: ErrorTranslatorService,
+    private _pbfService: PbfService,
   ) {}
 
   ngOnInit() {
@@ -83,31 +85,20 @@ export class ZhFormTab0Component implements OnInit {
 
   ngAfterViewInit() {
     setTimeout(() => this.calcCardContentHeight(), 0);
+    this.geomLayers = [];
+    this.removeLayers();
+    // Here so that the mapService is already initialized
+    this._pbfService.getPbf(this._mapService.map).toPromise().then(data =>
+      {
+        // Do not show the data on the map by default
+        data = data.setOpacity(0)
+        this.geomLayers.push(
+        data.addTo(this._mapService.map))
+      })
   }
 
   intiTab() {
-    this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
-      this._dataService.getAllZhGeom().subscribe((geoms: any) => {
-        this.geomLayers = [];
-        this.removeLayers();
-        geoms.forEach((geom) => {
-          let geojson = {
-            geometry: geom.geometry,
-            properties: { idZh: geom.id_zh },
-            type: "Feature",
-          };
-          if (!zh || zh.properties.id_zh != geom.id_zh) {
-            this.geomLayers.push(
-              L.geoJSON(geojson, {
-                onEachFeature: (feature, layer) => {
-                  layer.geomTag = "allGeom";
-                  layer.setStyle(this.getLayerStyle(this.toggleChecked));
-                },
-              }).addTo(this._mapService.map)
-            );
-          }
-        });
-      });
+    this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {     
       if (zh) {
         this._currentZh = zh;
         this.zhId = this._currentZh.properties.id_zh;
@@ -269,16 +260,9 @@ export class ZhFormTab0Component implements OnInit {
     }
   }
 
-  getLayerStyle(shown: boolean) {
-    return {
-      opacity: 1 * +shown,
-      fillOpacity: 0.2 * +shown,
-    };
-  }
-
   slideToggleChanged() {
     this.geomLayers.forEach((layer: any) => {
-      layer.setStyle(this.getLayerStyle(this.toggleChecked));
+      layer.setOpacity(this.toggleChecked ? 1 : 0)
     });
   }
 
