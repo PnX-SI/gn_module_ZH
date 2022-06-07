@@ -1,4 +1,4 @@
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from sqlalchemy.sql.expression import select
 
 from geonature.utils.env import DB
@@ -7,6 +7,7 @@ from pypnnomenclature.models import TNomenclatures
 
 from .model.zh_schema import (
     TZH,
+    CorZhNotes,
     THydroArea,
     TRiverBasin,
     TOwnership,
@@ -76,6 +77,11 @@ def main_search(query, json):
     evaluations = json.get("evaluations")
     if evaluations is not None:
         query = filter_evaluations(query, evaluations)
+
+    # --- Hierarchy search
+    hierarchy = json.get("hierarchy")
+    if hierarchy is not None:
+        query = filter_hierarchy(query, hierarchy)
 
     return query
 
@@ -288,3 +294,41 @@ def filter_evaluations(query, json: dict):
         query = query.filter(TZH.id_thread.in_(ids_menaces))
 
     return query
+
+
+def filter_hierarchy(query, json: dict):
+    and_ = json.get("and", False)
+    hierarchy = json.get("hierarchy")
+    if hierarchy is None:
+        return query
+    filters = []
+    for hier in hierarchy:
+        knowledges = hier.get("knowledges")
+        if knowledges is None:
+            attributes = hier.get("attributes", [])
+            subquery = generate_attributes_subqquery(attributes=attributes)
+        else:
+            subquery = generate_attributes_subqquery(attributes=knowledges)
+
+        filters.append(TZH.id_zh.in_(subquery))
+    if not and_:
+        query = query.filter(or_(*filters))
+    else:
+        query = query.filter(*filters)
+    return query
+
+def generate_attributes_subqquery(attributes: list):
+    subquery = DB.session.query(CorZhNotes.id_zh)
+    attribute_ids = []
+    note_type_ids = []
+    notes = []
+    for attribute in attributes:
+        attribute_ids.append(attribute["id_attribut"])
+        note_type_ids.append(attribute["note_type_id"])
+        notes.append(attribute["note"])
+    
+    subquery = subquery.filter(CorZhNotes.attribute_id.in_(attribute_ids))\
+                       .filter(CorZhNotes.note_type_id.in_(note_type_ids))\
+                       .filter(CorZhNotes.note.in_(notes))
+
+    return subquery.subquery()

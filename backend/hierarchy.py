@@ -1,8 +1,7 @@
 # from abc import get_cache_token
 import sys
 
-import numpy as np
-
+from itertools import groupby
 import sqlalchemy
 from sqlalchemy import and_, distinct
 from sqlalchemy.orm.exc import NoResultFound
@@ -12,6 +11,7 @@ from pypnnomenclature.models import (
     BibNomenclaturesTypes
 )
 
+from utils_flask_sqla.generic import GenericQuery
 from geonature.utils.env import DB
 
 from .api_error import ZHApiError
@@ -487,9 +487,12 @@ class Item:
     def __set_note(self):
         try:
             if self.active:
-                note = round(getattr(DB.session.query(TItems).filter(and_(TItems.attribute_id == self.qualif_id,
-                             TItems.cor_rule_id == self.cor_rule_id, TItems.note_type_id == self.knowledge)).one(), 'note'), 2)
-                post_note(self.id_zh, self.cor_rule_id, note)
+                result = DB.session.query(TItems).filter(and_(TItems.attribute_id == self.qualif_id,
+                             TItems.cor_rule_id == self.cor_rule_id, TItems.note_type_id == self.knowledge)).one()
+                note = round(result.note, 2)
+                attribute_id = result.attribute_id
+                note_type_id = result.note_type_id
+                post_note(self.id_zh, self.cor_rule_id, note, attribute_id=attribute_id, note_type_id=note_type_id)
                 DB.session.commit()
                 return note
         except ZHApiError as e:
@@ -831,3 +834,28 @@ class Hierarchy(ZH):
             "global_note": Hierarchy.get_str_note(self.global_note, self.total_denom),
             "final_note": Hierarchy.get_str_note(self.final_note, 100)
         }
+
+def get_all_hierarchy_fields(id_rb: int):
+    query = GenericQuery(DB=DB, tableName="all_rb_rules", schemaName="pr_zh",
+                         filters={"id_rb": id_rb}, limit=-1)
+    
+    results = query.return_query()
+
+    notes = [note for note in results.get("items", [])]
+
+    # TODO: to optimize with recursive function
+    fields = {"categories": []}
+    for name, items in groupby(notes, lambda note: note['volet']):
+        temp = {"name": name, 
+                "subcategory": []}
+        for subname,subitems in groupby(list(items), lambda note: note['rubrique']):
+            temp["subcategory"].append({
+                "name": subname,
+                "subcategory": []
+            })
+            for subsubname, subsubitems in groupby(list(subitems), lambda note: note['sousrubrique']):
+                temp["subcategory"][-1]["subcategory"].append({"name": subsubname,
+                                                               "subcategory": []})
+        fields["categories"].append(temp)
+    fields["items"] = notes
+    return fields
