@@ -3,4 +3,10 @@ export interface TableColumn {
   label: string;
   // size (Width) of the column
   size?: string;
+  subcell?: SubCell;
+  subarr?: SubCell;
+}
+
+export interface SubCell {
+  name: string;
 }

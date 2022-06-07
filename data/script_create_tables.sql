@@ -564,6 +564,8 @@ CREATE  TABLE pr_zh.cor_zh_notes (
 	id_zh                integer  NOT NULL ,
 	cor_rule_id          integer  NOT NULL ,
 	note                 real  NOT NULL ,
+	attribute_id          integer  NOT NULL ,
+	note_type_id          integer  NOT NULL ,
 	CONSTRAINT pk_cor_zh_note PRIMARY KEY ( id_zh, cor_rule_id )
  );
 
@@ -1131,6 +1133,7 @@ SELECT
 	(SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE id_nomenclature = items.attribute_id) AS id_attribut,
 	(SELECT label_default FROM ref_nomenclatures.t_nomenclatures WHERE id_nomenclature = items.attribute_id) AS attribut,
 	items.note AS note,
+    items.note_type_id as note_type_id,
 	(SELECT mnemonique FROM ref_nomenclatures.t_nomenclatures WHERE id_nomenclature = (SELECT id_knowledge FROM pr_zh.bib_note_types WHERE note_id = items.note_type_id)) AS note_type
 FROM pr_zh.t_river_basin rb
 RIGHT JOIN pr_zh.cor_rb_rules rb_rules ON rb.id_rb = rb_rules.rb_id

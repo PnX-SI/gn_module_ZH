@@ -1463,3 +1463,11 @@ class CorZhNotes(DB.Model):
     note = DB.Column(
         DB.Float
     )
+    attribute_id = DB.Column(
+        DB.Integer,
+        ForeignKey(TNomenclatures.id_nomenclature)
+    )
+    note_type_id = DB.Column(
+        DB.Integer,
+        ForeignKey(BibNoteTypes.note_id)
+    )

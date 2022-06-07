@@ -891,7 +891,7 @@ def update_file_extension(id_media, extension):
         raise ZHApiError(message="update_file_extension_error", details=str(e))
 
 
-def post_note(id_zh, cor_rule_id, note):
+def post_note(id_zh, cor_rule_id, note, attribute_id, note_type_id):
     try:
         element = DB.session.query(CorZhNotes).filter(CorZhNotes.id_zh == id_zh).filter(
             CorZhNotes.cor_rule_id == cor_rule_id).first()
@@ -904,7 +904,9 @@ def post_note(id_zh, cor_rule_id, note):
                 CorZhNotes(
                     id_zh=id_zh,
                     cor_rule_id=cor_rule_id,
-                    note=note
+                    note=note,
+                    attribute_id=attribute_id,
+                    note_type_id=note_type_id,
                 )
             )
             DB.session.flush()

@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
+import { HydrographicZone } from "../models/zones";
 
 import { ErrorTranslatorService } from "../services/error-translator.service";
 
@@ -16,12 +17,14 @@ export class ZhSearchComponent implements OnInit {
   @Output() onClose = new EventEmitter<object>();
   @Output() onSearch = new EventEmitter<object>();
   public advancedSearchToggled: boolean = false;
+  public hierarchySearchToggled: boolean = false;
   public basins: [];
-  public hydrographicZones: [];
+  public hydrographicZones: HydrographicZone[];
   public departements: [];
   public communes: [];
   public advancedForm: FormGroup;
   public searchForm: FormGroup;
+  public hierarchyForm: FormGroup;
 
   constructor(
     private _dataService: ZhDataService,
@@ -89,10 +92,10 @@ export class ZhSearchComponent implements OnInit {
       const searchObj = Object.assign(
         {},
         this.searchForm.value,
-        this.advancedForm.value
+        this.advancedForm.value,
+        this.hierarchyForm.value
       );
       const filtered = this.filterFormGroup(searchObj);
-
       this.onSearch.emit(filtered);
     }
   }
@@ -100,12 +103,10 @@ export class ZhSearchComponent implements OnInit {
   onReset() {
     this.searchForm.reset();
     this.advancedForm.reset();
+    // reset does not work with FormArray...
+    this.initHierarchyForm();
     // Emit empty object to search all ZH
     this.onSearch.emit(new Object());
-  }
-
-  onAdvancedFormChanged(event) {
-    this.advancedForm = event;
   }
 
   initForm() {
@@ -157,6 +158,16 @@ export class ZhSearchComponent implements OnInit {
         hydros: [null],
         bios: [null],
         menaces: [null],
+      }),
+    });
+    this.initHierarchyForm();
+  }
+
+  initHierarchyForm() {
+    this.hierarchyForm = this._fb.group({
+      hierarchy: this._fb.group({
+        hierarchy: this._fb.array([]),
+        and: [false], // if !"and" => OR
       }),
     });
   }

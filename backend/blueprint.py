@@ -1061,3 +1061,9 @@ def get_hierarchy(id_zh, info_role):
     finally:
         DB.session.rollback()
         DB.session.close()
+
+@blueprint.route("/hierarchy/fields/<int:id_rb>", methods=["GET"])
+@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@json_resp
+def get_hierarchy_fields(id_rb, info_role):
+    return get_all_hierarchy_fields(id_rb=id_rb)
