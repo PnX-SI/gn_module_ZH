@@ -330,14 +330,18 @@ def generate_attributes_subqquery(attributes: list):
     subquery = DB.session.query(CorZhNotes.id_zh)
     attribute_ids = []
     note_type_ids = []
+    cor_rule_ids = []
     notes = []
     for attribute in attributes:
         attribute_ids.append(attribute["id_attribut"])
         note_type_ids.append(attribute["note_type_id"])
+        cor_rule_ids.append(attribute["cor_rule_id"])
         notes.append(attribute["note"])
     
+    #TODO: see if all of these are usefull... Are cor_rule_id with note sufficient? 
     subquery = subquery.filter(CorZhNotes.attribute_id.in_(attribute_ids))\
                        .filter(CorZhNotes.note_type_id.in_(note_type_ids))\
+                       .filter(CorZhNotes.cor_rule_id.in_(cor_rule_ids))\
                        .filter(CorZhNotes.note.in_(notes))
 
     return subquery.subquery()
