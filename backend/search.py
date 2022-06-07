@@ -18,6 +18,9 @@ from .api_error import ZHApiError
 
 
 def main_search(query, json):
+    for key in json.keys():
+        if key in TZH.__table__.columns:
+            query = query.filter(getattr(TZH, key) == json[key])
     sdage = json.get("sdage")
     if sdage is not None:
         query = filter_sdage(query, sdage)

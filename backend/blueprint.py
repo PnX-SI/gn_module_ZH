@@ -5,6 +5,7 @@ from flask import (
     request,
     json,
     jsonify,
+    Response,
     send_file
 )
 
@@ -366,6 +367,47 @@ def get_cahier_hab(info_role, lb_code):
     finally:
         DB.session.close()
 
+@blueprint.route("/pbf", methods=["GET"])
+def get_pbf():
+    sql = """
+    SELECT ST_AsGeobuf(q, 'geom') as pbf
+    FROM (SELECT id_zh, geom from pr_zh.t_zh tz) AS q;
+    """
+    query = DB.session.execute(sql)
+    row = query.first()
+    if row['pbf']:
+        return Response(bytes(row['pbf']), mimetype='application/protobuf')
+
+@blueprint.route("/pbf/complete", methods=["GET"])
+def get_pbf_complete():
+    sql = """
+    SELECT ST_AsGeobuf(q, 'polygon_4326') as pbf
+    FROM (SELECT * from pr_zh.atlas_app tz) AS q;
+    """
+    query = DB.session.execute(sql)
+    row = query.first()
+    if row['pbf']:
+        return Response(bytes(row['pbf']), mimetype='application/protobuf')
+
+@blueprint.route("/geojson", methods=["GET"])
+def get_json():
+    sql = """
+    SELECT jsonb_build_object(
+    'type',     'FeatureCollection',
+    'features', json_agg(features.feature)
+    )::json as geojson
+    FROM (
+    SELECT jsonb_build_object(
+        'type',       'Feature',
+        'id',         inputs.id,
+        'geometry',   ST_AsGeoJSON(inputs.polygon_4326)::jsonb,
+        'properties', to_jsonb(inputs) - 'polygon_4326'
+    ) AS feature
+    FROM (SELECT * FROM pr_zh.atlas_app tz) inputs) features;
+    """
+    query = DB.session.execute(sql)
+    row = query.first()
+    return row["geojson"]
 
 @blueprint.route("/geometries", methods=["GET"])
 @permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")

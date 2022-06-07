@@ -20,7 +20,7 @@ export class ZhDataService {
   }
 
   getStatic(filename: string) {
-    return `${AppConfig.API_ENDPOINT}/zones_humides/static/${filename}`
+    return `${AppConfig.API_ENDPOINT}/zones_humides/static/${filename}`;
   }
 
   getZhById(id: number) {
@@ -172,6 +172,11 @@ export class ZhDataService {
     });
   }
 
+  getPbf() {
+    return this._api.get(`${AppConfig.API_ENDPOINT}/zones_humides/pbf`, {
+      responseType: "blob",
+    });
+  }
   getRights(idZh: number) {
     return this._api.get(
       `${AppConfig.API_ENDPOINT}/zones_humides/user/rights/${idZh}`
