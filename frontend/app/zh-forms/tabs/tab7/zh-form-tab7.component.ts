@@ -222,7 +222,7 @@ export class ZhFormTab7Component implements OnInit {
           this.socEcoData = [];
           if (evalZh.fonctions_bio && evalZh.fonctions_bio.length > 0) {
             evalZh.fonctions_bio.forEach((fctBio: any) => {
-              let namefctBio = this.formMetaData["FONCTIONS_BIO"].find(
+              let namefctBio = this.formMetaData["FONCTIONS_BIO_all"].find(
                 (item: any) => item.id_nomenclature == fctBio.id_function
               );
               let nameQaulif = this.formMetaData["FONCTIONS_QUALIF"].find(
@@ -242,7 +242,7 @@ export class ZhFormTab7Component implements OnInit {
           }
           if (evalZh.fonctions_hydro && evalZh.fonctions_hydro.length > 0) {
             evalZh.fonctions_hydro.forEach((fctBio: any) => {
-              let namefctHydro = this.formMetaData["FONCTIONS_HYDRO"].find(
+              let namefctHydro = this.formMetaData["FONCTIONS_HYDRO_all"].find(
                 (item: any) => item.id_nomenclature == fctBio.id_function
               );
               let nameQaulif = this.formMetaData["FONCTIONS_QUALIF"].find(
@@ -262,7 +262,7 @@ export class ZhFormTab7Component implements OnInit {
           }
           if (evalZh.interet_patrim && evalZh.interet_patrim.length > 0) {
             evalZh.interet_patrim.forEach((fctBio: any) => {
-              let namePatrim = this.formMetaData["INTERET_PATRIM"].find(
+              let namePatrim = this.formMetaData["INTERET_PATRIM_all"].find(
                 (item: any) => item.id_nomenclature == fctBio.id_function
               );
               let nameQaulif = this.formMetaData["FONCTIONS_QUALIF"].find(
