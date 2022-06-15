@@ -172,6 +172,7 @@ export class ZhFormTab3Component implements OnInit {
               })
             );
           });
+          activity.impacts = this.sortImpacts(activity.impacts);
           let impactNames = impacts.map((item) => {
             return item["mnemonique"];
           });
@@ -322,6 +323,7 @@ export class ZhFormTab3Component implements OnInit {
           activity.human_activity.id_nomenclature
       );
       if (!itemExist) {
+        activity.impacts = this.sortImpacts(activity.impacts);
         let impactNames = activity.impacts.map((item) => {
           return item["mnemonique"];
         });
@@ -384,6 +386,7 @@ export class ZhFormTab3Component implements OnInit {
     this.formImpactSubmitted = true;
     if (this.activityForm.valid) {
       let activity = this.activityForm.value;
+      activity.impacts = this.sortImpacts(activity.impacts);
       let impactNames = activity.impacts.map((item) => {
         return item["mnemonique"];
       });
@@ -486,6 +489,19 @@ export class ZhFormTab3Component implements OnInit {
         ? -1
         : 0
     );
+  }
+
+  sortImpacts(impacts) {
+    if (impacts) {
+      return impacts.sort((a, b) =>
+        a.mnemonique.slice(0, 2) > b.mnemonique.slice(0, 2)
+          ? 1
+          : b.mnemonique.slice(0, 2) > a.mnemonique.slice(0, 2)
+          ? -1
+          : 0
+      );
+    }
+    return impacts;
   }
 
   ngOnDestroy() {
