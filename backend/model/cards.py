@@ -1180,7 +1180,7 @@ class Card(ZH):
 
     def __get_cb(self):
         return [
-            CorineBiotope(cb) for cb in self.properties['cb_codes_corine_biotope']
+            CorineBiotope(cb) for cb in sorted(self.properties['cb_codes_corine_biotope'])
         ]
 
     def __set_use(self):
