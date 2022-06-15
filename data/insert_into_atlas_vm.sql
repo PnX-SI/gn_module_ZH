@@ -61,6 +61,7 @@ LEFT JOIN ref_geo.l_areas la on cza.id_area = la.id_area
 LEFT JOIN pr_zh.cor_zh_rb czr on tzh.id_zh = czr.id_zh
 LEFT JOIN pr_zh.t_river_basin trb on czr.id_rb = trb.id_rb
 LEFT JOIN gn_commons.t_medias med on med.uuid_attached_row = tzh.zh_uuid
+WHERE cza.cover NOTNULL
 GROUP BY tzh.id_zh
 ORDER BY tzh.id_zh ASC;
 
