@@ -68,6 +68,16 @@
           >
           <!-- ACTION COLUMNS -->
           <ngx-datatable-column maxWidth="10">
+            <ng-template ngx-datatable-header-template>
+              <i
+                class="fa fa-cog clickable"
+                aria-haspopup="true"
+                aria-expanded="false"
+                matTooltip="{{'List.Columns' | translate}}"
+                (click)="openModalCol($event, modalCol)"
+              >
+              </i>
+            </ng-template>
             <ng-template let-row="row" ngx-datatable-cell-template>
               <ng-container *ngIf="row.rights.U; else disabledEditBlc">
                 <a
@@ -84,6 +94,17 @@
             </ng-template>
           </ngx-datatable-column>
           <ngx-datatable-column maxWidth="10">
+            <ng-template ngx-datatable-header-template>
+              <i
+              class="fa fa-refresh clickable"
+              aria-hidden="true"
+              aria-haspopup="true"
+              aria-expanded="false"
+              matTooltip="Afficher toutes les zones humides"
+              (click)="this.filterZh({})"
+            >
+            </i>
+            </ng-template>
             <ng-template let-row="row" ngx-datatable-cell-template>
               <ng-container *ngIf="row.rights.R; else disabledInfoBlc">
                 <a
@@ -112,18 +133,6 @@
             </ng-template>
           </ngx-datatable-column>
           <ngx-datatable-column maxWidth="10">
-            <ng-template ngx-datatable-header-template>
-              <i
-                class="fa fa-cog clickable"
-                aria-hidden="true"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-                matTooltip="{{'List.Columns' | translate}}"
-                (click)="openModalCol($event, modalCol)"
-              >
-              </i>
-            </ng-template>
             <ng-template let-row="row" ngx-datatable-cell-template>
               <ng-container *ngIf="row.rights.D">
                 <button
