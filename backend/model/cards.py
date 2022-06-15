@@ -1,5 +1,6 @@
 from datetime import datetime
 from itertools import groupby
+import re
 
 from sqlalchemy import text
 from pypnusershub.db.models import Organisme
@@ -15,6 +16,11 @@ from ..api_error import ZHApiError
 
 import pdb
 
+
+def natural_sort(l): 
+    convert = lambda text: int(text) if text.isdigit() else text.lower() 
+    alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)] 
+    return sorted(l, key=alphanum_key)
 
 class Utils(ZH):
 
@@ -1180,7 +1186,7 @@ class Card(ZH):
 
     def __get_cb(self):
         return [
-            CorineBiotope(cb) for cb in sorted(self.properties['cb_codes_corine_biotope'])
+            CorineBiotope(cb) for cb in natural_sort(self.properties['cb_codes_corine_biotope'])
         ]
 
     def __set_use(self):
