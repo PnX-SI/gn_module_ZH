@@ -381,8 +381,25 @@ def get_pbf():
 @blueprint.route("/pbf/complete", methods=["GET"])
 def get_pbf_complete():
     sql = """
-    SELECT ST_AsGeobuf(q, 'polygon_4326') as pbf
-    FROM (SELECT * from pr_zh.atlas_app tz) AS q;
+    SELECT St_asgeobuf(q, 'polygon_4326') AS pbf
+    FROM   (SELECT tz.id,
+               tz.nom,
+               tz.slug,
+               tz.code,
+               tz.date,
+               tz.polygon_4326,
+               tz.superficie,
+               tz.operateur,
+               tz.type_code,
+               tz.type,
+               tz.menaces,
+               tz.diagnostic_bio,
+               tz.diagnostic_hydro,
+               Json_build_object('criteres_delim', tz.criteres_delim,
+                         'communes',
+                         tz.communes,
+                         'bassin_versant', tz.bassin_versant) as json_arrays
+        FROM   pr_zh.atlas_app tz) AS q;
     """
     query = DB.session.execute(sql)
     row = query.first()
