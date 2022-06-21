@@ -15,17 +15,17 @@ class MapListConfig(Schema):
 default_map_list_conf = [
     {"prop": "main_name", "name": "Nom principal"},
     {"prop": "code", "name": "Code"},
-    {"prop": "sdage", "name": "Typologie SDAGE", "sortable": False},
-    {"prop": "bassin_versant", "name": "Bassin versant", "sortable": False}
+    {"prop": "sdage", "name": "Typologie SDAGE", "sortable": True},
+    {"prop": "bassin_versant", "name": "Bassin versant", "sortable": True}
 ]
 
 
 available_maplist_column = [
     {"prop": "main_name", "name": "Nom principal"},
     {"prop": "code", "name": "Code"},
-    {"prop": "sdage", "name": "Typologie SDAGE", "sortable": False},
-    {"prop": "bassin_versant", "name": "Bassin versant", "sortable": False},
-    {"prop": "delims", "name": "Critères délimitation (de la zh)", "sortable": False},
+    {"prop": "sdage", "name": "Typologie SDAGE", "sortable": True},
+    {"prop": "bassin_versant", "name": "Bassin versant", "sortable": True},
+    {"prop": "delims", "name": "Critères délimitation (de la zh)", "sortable": True},
     {"prop": "create_date", "name": "Date de création"},
     {"prop": "author", "name": "Auteur"},
     {"prop": "organism", "name": "Organisme"},
