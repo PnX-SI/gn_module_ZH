@@ -112,7 +112,9 @@ blueprint = Blueprint("pr_zh",
 def get_zh(info_role):
     try:
         coauthor = aliased(User, name="coauthor")
-        q = DB.session.query(TZH).join(TNomenclatures, TZH.sdage).join(User, TZH.authors).join(coauthor, TZH.coauthors).join(Organisme, User.organisme)
+        coorganism = aliased(Organisme, name="coorganism")
+        q = DB.session.query(TZH).join(TNomenclatures, TZH.sdage).join(User, TZH.authors).join(coauthor, TZH.coauthors)\
+            .join(Organisme, User.organisme).join(coorganism, coauthor.organisme)
 
         parameters = request.args
         limit = int(parameters.get("limit", 100))
@@ -150,9 +152,9 @@ def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
             if col is not None:
                 if order == 'desc':
                     col = col.desc()
-                else:
-                    query = query.order_by(col)
-        if orderby in ["sdage", "author", "update_author", "organism"]:
+                query = query.order_by(col)
+
+        if orderby in ["sdage", "author", "update_author", "organism", "update_organism"]:
             if orderby == "sdage":
                 desc_query = TNomenclatures.label_default
             elif orderby == "author":
@@ -161,6 +163,8 @@ def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
                 desc_query = text("coauthor.nom_role")
             elif orderby == "organism":
                 desc_query = Organisme.nom_organisme
+            elif orderby == "update_organism":
+                desc_query = text("coorganism.nom_organisme")
             if order == 'desc':
                 desc_query = desc(desc_query)
             query = query.order_by(desc_query)
