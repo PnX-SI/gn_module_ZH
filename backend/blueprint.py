@@ -27,7 +27,8 @@ from sqlalchemy.sql.expression import delete
 
 from geojson import FeatureCollection
 
-from sqlalchemy import func, text, desc, and_, inspect
+from sqlalchemy import func, text, desc, asc, and_, inspect
+from sqlalchemy.orm import aliased
 from sqlalchemy.orm.exc import NoResultFound
 
 import geoalchemy2
@@ -47,6 +48,7 @@ from geonature.core.gn_commons.models import TMedias
 # import des fonctions utiles depuis le sous-module d'authentification
 from geonature.core.gn_permissions import decorators as permissions
 from geonature.core.gn_permissions.tools import get_or_fetch_user_cruved
+from pypnusershub.db.models import User, Organisme
 
 from .model.zh_schema import (
     TZH,
@@ -109,7 +111,8 @@ blueprint = Blueprint("pr_zh",
 @json_resp
 def get_zh(info_role):
     try:
-        q = DB.session.query(TZH)
+        coauthor = aliased(User, name="coauthor")
+        q = DB.session.query(TZH).join(TNomenclatures, TZH.sdage).join(User, TZH.authors).join(coauthor, TZH.coauthors).join(Organisme, User.organisme)
 
         parameters = request.args
         limit = int(parameters.get("limit", 100))
@@ -147,7 +150,20 @@ def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
             if col is not None:
                 if order == 'desc':
                     col = col.desc()
-                query = query.order_by(col)
+                else:
+                    query = query.order_by(col)
+        if orderby in ["sdage", "author", "update_author", "organism"]:
+            if orderby == "sdage":
+                desc_query = TNomenclatures.label_default
+            elif orderby == "author":
+                desc_query = User.nom_role
+            elif orderby == "update_author":
+                desc_query = text("coauthor.nom_role")
+            elif orderby == "organism":
+                desc_query = Organisme.nom_organisme
+            if order == 'desc':
+                desc_query = desc(desc_query)
+            query = query.order_by(desc_query)
 
         data = query.limit(limit).offset(page * limit).all()
 

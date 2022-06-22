@@ -325,6 +325,12 @@ class TZH(ZhModel):
     main_pict_id = DB.Column(DB.Integer)
     area = DB.Column(DB.Float)
 
+    sdage = DB.relationship(
+        TNomenclatures,
+        lazy="joined",
+        primaryjoin=(TNomenclatures.id_nomenclature == id_sdage)
+    )
+    
     authors = DB.relationship(
         User,
         lazy="joined",
