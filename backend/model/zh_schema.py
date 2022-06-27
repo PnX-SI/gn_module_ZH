@@ -577,7 +577,7 @@ class CorZhRef(DB.Model):
     @staticmethod
     def get_references_by_id(id_zh):
         return DB.session.query(TReferences).join(
-            CorZhRef).filter(CorZhRef.id_zh == id_zh).all()
+            CorZhRef).filter(CorZhRef.id_zh == id_zh).order_by(TReferences.pub_year).all()
 
 
 class CorZhLimFs(DB.Model):
