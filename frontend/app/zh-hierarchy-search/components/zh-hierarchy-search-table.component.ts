@@ -1,5 +1,4 @@
 import { Component, OnInit, Input } from "@angular/core";
-import "leaflet-easybutton";
 import { ZhDataService } from "../../services/zh-data.service";
 import { ToastrService } from "ngx-toastr";
 import { ErrorTranslatorService } from "../../services/error-translator.service";
