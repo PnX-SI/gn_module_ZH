@@ -932,8 +932,8 @@ def write_csv(id_zh, info_role):
                                   MODULE_NAME, FILE_PATH, name_file)
                 full_name = ROOT_DIR / media_path
                 names.append(str(full_name))
-                with open(full_name, 'w', encoding='UTF8', newline='') as f:
-                    writer = csv.DictWriter(f, fieldnames=rows[0].keys())
+                with open(full_name, 'w', encoding='utf-8-sig', newline='') as f:
+                    writer = csv.DictWriter(f, delimiter=";", fieldnames=rows[0].keys())
                     writer.writeheader()
                     writer.writerows(rows)
 
