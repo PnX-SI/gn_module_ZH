@@ -39,13 +39,13 @@
         <div class="row">
           <div class="col-12">
             <zh-label label="Superficie de la zone humide (ha) :">
-              <span>{{ data.presentation.area }}</span>
+              <span>{{ data.presentation.area | number:'1.2-2' }}</span>
             </zh-label>
           </div>
           <div class="col-6">
             <zh-label label="Superficie de l’espace de fonctionnalité (ha) :">
               <span *ngIf="data.presentation.ef_area">
-                {{ data.presentation.ef_area }}
+                {{ data.presentation.ef_area | number:'1.2-2' }}
               </span>
               <span *ngIf="!data.presentation.ef_area">
                 Non identifié ou non calculable
