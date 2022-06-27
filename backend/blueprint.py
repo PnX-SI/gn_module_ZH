@@ -49,6 +49,7 @@ from geonature.core.gn_commons.models import TMedias
 from geonature.core.gn_permissions import decorators as permissions
 from geonature.core.gn_permissions.tools import get_or_fetch_user_cruved
 from pypnusershub.db.models import User, Organisme
+from utils_flask_sqla.generic import GenericQuery
 
 from .model.zh_schema import (
     TZH,
@@ -895,34 +896,31 @@ def write_csv(id_zh, info_role):
         zh_code = DB.session.query(TZH).filter(
             TZH.id_zh == id_zh).one().code
         # author name
-        prenom = DB.session.query(User).filter(
-            User.id_role == info_role.id_role).one().prenom_role
-        nom = DB.session.query(User).filter(
-            User.id_role == info_role.id_role).one().nom_role
-        author = prenom + ' ' + nom
+        user = DB.session.query(User).filter(
+            User.id_role == info_role.id_role).one()
+        author = user.prenom_role + ' ' + user.nom_role
         for i in ['vertebrates_view_name', 'invertebrates_view_name', 'flora_view_name']:
-            model = get_view_model(
-                blueprint.config[i]['table_name'],
-                blueprint.config[i]['schema_name']
-            )
-            query = DB.session.query(model).filter(model.id_zh == id_zh).all()
+            query = GenericQuery(DB=DB, tableName=blueprint.config[i]['table_name'], 
+                                 schemaName=blueprint.config[i]['schema_name'],
+                                 filters={"id_zh": id_zh}, limit=-1)
+            results = query.return_query().get('items', [])
             current_date = dt.now()
-            if query:
+            if results:
                 rows = [
                     {
-                        "Groupe d'étude - classe": row.group_class,
-                        "Groupe d'étude - ordre": row.group_order,
-                        "Nom Scientifique": row.scientific_name,
-                        "Nom vernaculaire": row.vernac_name,
-                        "Statut types": row.statut_type,
-                        "Statuts d’évaluation, de protection et de menace": row.statut,
-                        "Article": row.article,
-                        "URL doc": row.doc_url,
-                        "Nombre d'observations": row.obs_nb,
-                        "Date de la dernière observation": row.last_date,
-                        "Dernier observateur": row.observer,
-                        "Organisme": row.organisme
-                    } for row in query
+                        "Groupe d'étude - classe": row.get("group_class"),
+                        "Groupe d'étude - ordre": row.get("group_order"),
+                        "Nom Scientifique": row.get("scientific_name"),
+                        "Nom vernaculaire": row.get("vernac_name"),
+                        "Types de Statuts": row.get("statut_type"),
+                        "Statuts d’évaluation, de protection et de menace": row.get("statut"),
+                        "Article": row.get("article"),
+                        "Lien Article": row.get("doc_url"),
+                        "Nombre d'observations": row.get("obs_nb"),
+                        "Date de la dernière observation": row.get("last_date"),
+                        "Dernier observateur": row.get("observer"),
+                        "Organisme": row.get("organisme")
+                    } for row in results
                 ]
                 name_file = blueprint.config[i]['category'] + "_" + \
                     blueprint.config['species_source_name'] + "_" + \
