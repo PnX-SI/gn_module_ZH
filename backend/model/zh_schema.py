@@ -642,7 +642,7 @@ class BibCb(DB.Model):
     @staticmethod
     def get_label():
         return DB.session.query(BibCb, Habref).join(
-            Habref, BibCb.lb_code == Habref.lb_code).filter(Habref.cd_typo == 22).all()
+            Habref, BibCb.lb_code == Habref.lb_code).filter(Habref.cd_typo == 22).order_by(BibCb.lb_code).all()
 
     @staticmethod
     def get_ch(lb_code):
