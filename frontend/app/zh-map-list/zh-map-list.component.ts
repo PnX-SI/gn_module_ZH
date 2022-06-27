@@ -5,7 +5,6 @@ import {
   OnDestroy,
   AfterViewInit,
 } from "@angular/core";
-import "leaflet-easybutton";
 import * as L from "leaflet";
 import { MapListService } from "@geonature_common/map-list/map-list.service";
 import { MapService } from "@geonature_common/map/map.service";
@@ -123,13 +122,6 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
           }.bind(this)
         )
         .addTo(this._mapService.map))
-
-    // Create Button
-    L.easyButton("fa fa-crosshairs fa-lg", () => {
-      this.resetMap();
-    })
-      .setPosition("topright")
-      .addTo(this._mapService.getMap());
   }
 
   @HostListener("window:resize", ["$event"])
