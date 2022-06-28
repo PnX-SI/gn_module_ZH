@@ -348,6 +348,13 @@ export class ZhFormTab5Component implements OnInit {
           this.$_fromChangeSub = this.formTab5.valueChanges.subscribe(() => {
             this.canChangeTab.emit(false);
           });
+          
+          if (this._filesService.files.length === 0) {
+            this._filesService
+                .loadFiles(this.currentZh.properties.id_zh)
+                .toPromise()
+                .then(() => {});
+          }
         }
       }
     );
