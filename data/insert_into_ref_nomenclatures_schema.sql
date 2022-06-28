@@ -49,7 +49,7 @@ INSERT INTO ref_nomenclatures.bib_nomenclatures_types(mnemonique,label_default,d
 
 INSERT INTO ref_nomenclatures.bib_nomenclatures_types(mnemonique, label_default, definition_default, label_fr, source, statut)  VALUES
 ('HIERARCHY', 'Hiérarchie', 'Hierarchie des zones humides', 'Hiérarchie', 'ZONES_HUMIDES', 'Non validé')
-ON CONFLICT (id_type) DO NOTHING
+ON CONFLICT (mnemonique) DO NOTHING
 ;
 
     
@@ -527,7 +527,7 @@ INSERT INTO ref_nomenclatures.t_nomenclatures(id_type, cd_nomenclature, mnemoniq
 ((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'mauvais', 'Fortement dégradée', 'Fortement dégradée', 'Fortement dégradée', 'ZONES_HUMIDES', 'Non validé'),
 ((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'moyen', 'Partiellement dégradée', 'Partiellement dégradée', 'Partiellement dégradée', 'ZONES_HUMIDES', 'Non validé'),
 ((SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY'), 'NE', 'Non évaluée', 'Non évaluée', 'Non évaluée', 'ZONES_HUMIDES', 'Non validé')
-;
+ON CONFLICT (id_type, cd_nomenclature) DO NOTHING;
 
 
 -- add csv in media_types
