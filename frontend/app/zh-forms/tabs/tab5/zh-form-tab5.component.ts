@@ -1224,9 +1224,9 @@ export class ZhFormTab5Component implements OnInit {
 
   sortCorineBio() {
     this.corineBioTable.sort((a, b) =>
-      a.corinBio.CB_label > b.corinBio.CB_label
+      a.corinBio.CB_code > b.corinBio.CB_code
         ? 1
-        : b.corinBio.CB_label > a.corinBio.CB_label
+        : b.corinBio.CB_code > a.corinBio.CB_code
         ? -1
         : 0
     );
