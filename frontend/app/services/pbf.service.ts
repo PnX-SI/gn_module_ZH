@@ -58,7 +58,7 @@ export class PbfService {
       },
       pane: "zhPane",
       interactive: true,
-      maxZoom: 22,
+      maxZoom: 18,
       indexMaxZoom: 5,
     });
     return vector;
