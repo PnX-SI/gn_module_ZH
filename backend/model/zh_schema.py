@@ -1214,65 +1214,6 @@ class TManagementPlans(DB.Model):
     )
 
 
-def get_view_model(table_name, schema_name):
-
-    class TaxaView(DB.Model):
-        __tablename__ = table_name
-        __table_args__ = {
-            'extend_existing': True,
-            "schema": schema_name
-        }
-
-        id_zh = DB.Column(
-            DB.Integer,
-            ForeignKey(TZH.id_zh),
-            primary_key=True
-        )
-        cd_nom = DB.Column(
-            DB.Integer,
-            ForeignKey(Taxref.cd_nom),
-            primary_key=True
-        )
-        group_class = DB.Column(
-            DB.Unicode
-        )
-        group_order = DB.Column(
-            DB.Unicode
-        )
-        scientific_name = DB.Column(
-            DB.Unicode
-        )
-        vernac_name = DB.Column(
-            DB.Unicode
-        )
-        statut_type = DB.Column(
-            DB.Unicode
-        )
-        statut = DB.Column(
-            DB.Unicode
-        )
-        article = DB.Column(
-            DB.Unicode
-        )
-        doc_url = DB.Column(
-            DB.Unicode
-        )
-        obs_nb = DB.Column(
-            DB.Integer
-        )
-        last_date = DB.Column(
-            DB.DateTime
-        )
-        observer = DB.Column(
-            DB.Unicode
-        )
-        organisme = DB.Column(
-            DB.Unicode
-        )
-
-    return TaxaView
-
-
 class BibHierPanes(DB.Model):
     __tablename__ = "bib_hier_panes"
     __table_args__ = {"schema": "pr_zh"}
