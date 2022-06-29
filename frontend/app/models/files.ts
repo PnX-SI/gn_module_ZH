@@ -1,3 +1,9 @@
+type FilesExt = {
+  name: string;
+  files: ZhFile[];
+  editable?: boolean;
+};
+
 type ZhFile = {
   id_media: number;
   id_nomenclature_media_type: number;
@@ -29,4 +35,4 @@ type ZhFiles = {
   main_pict_id: number;
 };
 
-export { ZhFile, ZhFiles };
+export { ZhFile, ZhFiles, FilesExt };

@@ -5,7 +5,7 @@ import { saveAs } from "file-saver";
 import { ToastrService } from "ngx-toastr";
 
 import { ZhDataService } from "./zh-data.service";
-import { ZhFile, ZhFiles } from "../zh-forms/tabs/tab8/zh-form-tab8.models";
+import { ZhFile, ZhFiles } from "../models/files";
 import { ErrorTranslatorService } from "./error-translator.service";
 
 @Injectable({
