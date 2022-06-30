@@ -1,10 +1,4 @@
-import {
-  Component,
-  HostListener,
-  OnInit,
-  AfterViewInit,
-  ViewChild,
-} from "@angular/core";
+import { Component, HostListener, OnInit, AfterViewInit, ViewChild } from "@angular/core";
 import { MatAccordion } from "@angular/material/expansion";
 import { ActivatedRoute } from "@angular/router";
 import { MapService } from "@geonature_common/map/map.service";
@@ -16,8 +10,6 @@ import { GeoJSON } from "leaflet";
 import * as L from "leaflet";
 
 import { DetailsModel } from "./models/zh-details.model";
-
-
 
 @Component({
   selector: "zh-details",
@@ -72,9 +64,7 @@ export class ZhDetailsComponent implements OnInit, AfterViewInit {
       },
       (error) => {
         this.onError = true;
-        const frontMsg: string = this._error.getFrontError(
-          error.error.message
-        );
+        const frontMsg: string = this._error.getFrontError(error.error.message);
         this._toastr.error(frontMsg, "", {
           positionClass: "toast-top-right",
         });

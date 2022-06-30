@@ -1,10 +1,4 @@
-import {
-  Component,
-  HostListener,
-  OnInit,
-  OnDestroy,
-  AfterViewInit,
-} from "@angular/core";
+import { Component, HostListener, OnInit, OnDestroy, AfterViewInit } from "@angular/core";
 import * as L from "leaflet";
 import { MapListService } from "@geonature_common/map-list/map-list.service";
 import { MapService } from "@geonature_common/map/map.service";
@@ -83,8 +77,7 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     // columns to be default displayed
     this.mapListService.displayColumns = this.zhConfig.default_maplist_columns;
     // columns available for display
-    this.mapListService.availableColumns =
-      this.zhConfig.available_maplist_column;
+    this.mapListService.availableColumns = this.zhConfig.available_maplist_column;
 
     this.mapListService.idName = this.idName;
     // FETCH THE DATA
@@ -102,7 +95,6 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-
   ngAfterViewInit() {
     setTimeout(() => this.calcCardContentHeight(), 500);
     if (this._mapService.currentExtend) {
@@ -113,15 +105,19 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     // Load all geoms
     this._pbfService
-      .getPbf(this._mapService.map).toPromise().then(data => 
-        data.on(
-          "click",
-          function (e) {
-            var properties = e.layer.properties;
-            this.filterZh({ id_zh: properties.id_zh });
-          }.bind(this)
-        )
-        .addTo(this._mapService.map))
+      .getPbf(this._mapService.map)
+      .toPromise()
+      .then((data) =>
+        data
+          .on(
+            "click",
+            function (e) {
+              var properties = e.layer.properties;
+              this.filterZh({ id_zh: properties.id_zh });
+            }.bind(this)
+          )
+          .addTo(this._mapService.map)
+      );
   }
 
   @HostListener("window:resize", ["$event"])
@@ -184,28 +180,18 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   zhCustomCallBack(feature): any {
     // set Author name
-    feature["properties"]["author"] = this.displayAuthorName(
-      feature["properties"]["authors"]
-    );
+    feature["properties"]["author"] = this.displayAuthorName(feature["properties"]["authors"]);
     // set Change Author name
     feature["properties"]["update_author"] = this.displayAuthorName(
       feature["properties"]["coauthors"]
     );
     // format Date
-    feature["properties"]["create_date"] = this.displayDate(
-      feature["properties"]["create_date"]
-    );
-    feature["properties"]["update_date"] = this.displayDate(
-      feature["properties"]["update_date"]
-    );
+    feature["properties"]["create_date"] = this.displayDate(feature["properties"]["create_date"]);
+    feature["properties"]["update_date"] = this.displayDate(feature["properties"]["update_date"]);
 
-    feature["properties"]["sdage"] = this.displaySdageName(
-      feature["properties"]["id_sdage"]
-    );
+    feature["properties"]["sdage"] = this.displaySdageName(feature["properties"]["id_sdage"]);
 
-    feature["properties"]["organism"] = this.displayOrganism(
-      feature["properties"]["authors"]
-    );
+    feature["properties"]["organism"] = this.displayOrganism(feature["properties"]["authors"]);
 
     feature["properties"]["update_organism"] = this.displayOrganism(
       feature["properties"]["coauthors"]
@@ -218,10 +204,7 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     this._zhService.deleteOneZh(row.id_zh).subscribe(
       () => {
         this.mapListService.deleteObsFront(row.id_zh);
-        this._commonService.translateToaster(
-          "success",
-          "la zh a été supprimée avec succès"
-        );
+        this._commonService.translateToaster("success", "la zh a été supprimée avec succès");
       },
       (error) => {
         if (error.status === 403) {
@@ -251,15 +234,11 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
   toggle(col) {
     const isChecked = this.isChecked(col);
     if (isChecked) {
-      this.mapListService.displayColumns =
-        this.mapListService.displayColumns.filter((c) => {
-          return c.prop !== col.prop;
-        });
+      this.mapListService.displayColumns = this.mapListService.displayColumns.filter((c) => {
+        return c.prop !== col.prop;
+      });
     } else {
-      this.mapListService.displayColumns = [
-        ...this.mapListService.displayColumns,
-        col,
-      ];
+      this.mapListService.displayColumns = [...this.mapListService.displayColumns, col];
     }
   }
 
@@ -305,10 +284,7 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
       selectedLayer.setStyle(this.mapListService.originStyle);
     }
     const layers = Object.keys(this.mapListService.layerDict);
-    this.mapListService.zoomOnSeveralSelectedLayers(
-      this._mapService.getMap(),
-      layers
-    );
+    this.mapListService.zoomOnSeveralSelectedLayers(this._mapService.getMap(), layers);
   }
 
   ngOnDestroy() {

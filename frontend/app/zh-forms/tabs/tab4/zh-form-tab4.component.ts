@@ -155,10 +155,7 @@ export class ZhFormTab4Component implements OnInit {
         this.inflowsTable = [];
         this.outflowsTable = [];
         //patch forms values
-        if (
-          this.currentZh.properties.flows &&
-          this.currentZh.properties.flows.length > 0
-        ) {
+        if (this.currentZh.properties.flows && this.currentZh.properties.flows.length > 0) {
           this.currentZh.properties.flows.forEach((element: any) => {
             for (const key in element) {
               if (key == "inflows") {
@@ -168,11 +165,9 @@ export class ZhFormTab4Component implements OnInit {
                       inflow: this.formMetaData["ENTREE_EAU"].find((item) => {
                         return item.id_nomenclature == inflow.id_inflow;
                       }),
-                      permanance: this.formMetaData["PERMANENCE_ENTREE"].find(
-                        (item) => {
-                          return item.id_nomenclature == inflow.id_permanance;
-                        }
-                      ),
+                      permanance: this.formMetaData["PERMANENCE_ENTREE"].find((item) => {
+                        return item.id_nomenclature == inflow.id_permanance;
+                      }),
                       topo: inflow.topo,
                     });
                   });
@@ -185,11 +180,9 @@ export class ZhFormTab4Component implements OnInit {
                       outflow: this.formMetaData["SORTIE_EAU"].find((item) => {
                         return item.id_nomenclature == outflow.id_outflow;
                       }),
-                      permanance: this.formMetaData["PERMANENCE_SORTIE"].find(
-                        (item) => {
-                          return item.id_nomenclature == outflow.id_permanance;
-                        }
-                      ),
+                      permanance: this.formMetaData["PERMANENCE_SORTIE"].find((item) => {
+                        return item.id_nomenclature == outflow.id_permanance;
+                      }),
                       topo: outflow.topo,
                     });
                   });
@@ -203,20 +196,14 @@ export class ZhFormTab4Component implements OnInit {
             return item.id_nomenclature == this.currentZh.properties.id_spread;
           }),
           frequency: this.formMetaData["SUBMERSION_FREQ"].find((item) => {
-            return (
-              item.id_nomenclature == this.currentZh.properties.id_frequency
-            );
+            return item.id_nomenclature == this.currentZh.properties.id_frequency;
           }),
           connexion: this.currentZh.properties.id_connexion,
           diag_hydro: this.formMetaData["FONCTIONNALITE_HYDRO"].find((item) => {
-            return (
-              item.id_nomenclature == this.currentZh.properties.id_diag_hydro
-            );
+            return item.id_nomenclature == this.currentZh.properties.id_diag_hydro;
           }),
           diag_bio: this.formMetaData["FONCTIONNALITE_BIO"].find((item) => {
-            return (
-              item.id_nomenclature == this.currentZh.properties.id_diag_bio
-            );
+            return item.id_nomenclature == this.currentZh.properties.id_diag_bio;
           }),
           remark_diag: this.currentZh.properties.remark_diag,
         });
@@ -256,8 +243,7 @@ export class ZhFormTab4Component implements OnInit {
       let inflowValues = this.inflowForm.value;
       // check if the inflow to add is already added
       let itemExist = this.inflowsTable.some(
-        (item: any) =>
-          item.inflow.id_nomenclature == inflowValues.inflow.id_nomenclature
+        (item: any) => item.inflow.id_nomenclature == inflowValues.inflow.id_nomenclature
       );
       if (!itemExist) {
         this.inflowsTable.push(inflowValues);
@@ -353,8 +339,7 @@ export class ZhFormTab4Component implements OnInit {
       let outflowValues = this.outflowForm.value;
       // check if the outflow to add is already added
       let itemExist = this.outflowsTable.some(
-        (item: any) =>
-          item.outflow.id_nomenclature == outflowValues.outflow.id_nomenclature
+        (item: any) => item.outflow.id_nomenclature == outflowValues.outflow.id_nomenclature
       );
       if (!itemExist) {
         this.outflowsTable.push(outflowValues);
@@ -449,12 +434,8 @@ export class ZhFormTab4Component implements OnInit {
         id_frequency: this.formTab4.value.frequency
           ? this.formTab4.value.frequency.id_nomenclature
           : null,
-        id_spread: this.formTab4.value.spread
-          ? this.formTab4.value.spread.id_nomenclature
-          : null,
-        id_connexion: this.formTab4.value.connexion
-          ? Number(this.formTab4.value.connexion)
-          : null,
+        id_spread: this.formTab4.value.spread ? this.formTab4.value.spread.id_nomenclature : null,
+        id_connexion: this.formTab4.value.connexion ? Number(this.formTab4.value.connexion) : null,
         id_diag_hydro: this.formTab4.value.diag_hydro
           ? this.formTab4.value.diag_hydro.id_nomenclature
           : null,
@@ -468,23 +449,19 @@ export class ZhFormTab4Component implements OnInit {
       this.posted = true;
       this._dataService.postDataForm(formToPost, 4).subscribe(
         () => {
-          this._dataService
-            .getZhById(this.currentZh.properties.id_zh)
-            .subscribe((zh: any) => {
-              this._dataService.setCurrentZh(zh);
-              this.posted = false;
-              this.canChangeTab.emit(true);
-              this._toastr.success("Vos données sont bien enregistrées", "", {
-                positionClass: "toast-top-right",
-              });
-              this.nextTab.emit(5);
+          this._dataService.getZhById(this.currentZh.properties.id_zh).subscribe((zh: any) => {
+            this._dataService.setCurrentZh(zh);
+            this.posted = false;
+            this.canChangeTab.emit(true);
+            this._toastr.success("Vos données sont bien enregistrées", "", {
+              positionClass: "toast-top-right",
             });
+            this.nextTab.emit(5);
+          });
         },
         (error) => {
           this.posted = false;
-          const frontMsg: string = this._error.getFrontError(
-            error.error.message
-          );
+          const frontMsg: string = this._error.getFrontError(error.error.message);
           this._toastr.error(frontMsg, "", {
             positionClass: "toast-top-right",
           });

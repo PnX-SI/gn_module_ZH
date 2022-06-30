@@ -10,10 +10,7 @@ import { ModuleConfig } from "../../../module.config";
 
 import { ToastrService } from "ngx-toastr";
 import { Subscription } from "rxjs";
-import {
-  DatepickerI18n,
-  I18n,
-} from "../../../services/datepicker-i18n.service";
+import { DatepickerI18n, I18n } from "../../../services/datepicker-i18n.service";
 
 import { ZhDataService } from "../../../services/zh-data.service";
 import { ErrorTranslatorService } from "../../../services/error-translator.service";
@@ -177,8 +174,7 @@ export class ZhFormTab6Component implements OnInit {
     this._tabService.getTabChange().subscribe((tabPosition: number) => {
       if (tabPosition == 6) {
         this.getCurrentZh();
-        if (this.$_fromChangeSub != undefined)
-          this.$_fromChangeSub.unsubscribe();
+        if (this.$_fromChangeSub != undefined) this.$_fromChangeSub.unsubscribe();
         if (this.$_currentZhSub != undefined) this.$_currentZhSub.unsubscribe();
       }
     });
@@ -213,10 +209,7 @@ export class ZhFormTab6Component implements OnInit {
     this.planForm = this.fb.group({
       plan: [null, Validators.required],
       plan_date: [null, Validators.required],
-      duration: [
-        null,
-        Validators.compose([Validators.required, Validators.min(0)]),
-      ],
+      duration: [null, Validators.compose([Validators.required, Validators.min(0)])],
       remark: null,
     });
   }
@@ -239,145 +232,133 @@ export class ZhFormTab6Component implements OnInit {
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
         this.currentZh = zh;
-        this._dataService
-          .getMunicipalitiesByZh(zh.id)
-          .subscribe((municipalities: any) => {
-            this.statusTable = [];
-            this.urbanDocTable = [];
-            this.managements = [];
-            this.instrumentTable = [];
-            this.municipalities = municipalities;
-            //patch forms values
-            let protections = [];
-            if (
-              this.currentZh.properties.protections &&
-              this.currentZh.properties.protections.length > 0
-            ) {
-              this.currentZh.properties.protections.forEach((element) => {
-                let protection = this.formMetaData["PROTECTIONS"].find(
-                  (item: any) => item.id_protection_status == element
-                );
+        this._dataService.getMunicipalitiesByZh(zh.id).subscribe((municipalities: any) => {
+          this.statusTable = [];
+          this.urbanDocTable = [];
+          this.managements = [];
+          this.instrumentTable = [];
+          this.municipalities = municipalities;
+          //patch forms values
+          let protections = [];
+          if (
+            this.currentZh.properties.protections &&
+            this.currentZh.properties.protections.length > 0
+          ) {
+            this.currentZh.properties.protections.forEach((element) => {
+              let protection = this.formMetaData["PROTECTIONS"].find(
+                (item: any) => item.id_protection_status == element
+              );
 
-                protections.push(protection);
-              });
-            }
-            this.formTab6.patchValue({
-              protections: protections,
-              is_other_inventory: this.currentZh.properties.is_other_inventory,
-              remark_is_other_inventory:
-                this.currentZh.properties.remark_is_other_inventory,
+              protections.push(protection);
             });
-            if (
-              this.currentZh.properties.ownerships &&
-              this.currentZh.properties.ownerships.length > 0
-            ) {
-              this.currentZh.properties.ownerships.forEach((owner: any) => {
-                this.statusTable.push({
-                  status: this.formMetaData["STATUT_PROPRIETE"].find(
-                    (item: any) => item.id_nomenclature == owner.id_status
-                  ),
-                  remark: owner.remark,
-                });
-                this.statusInput.map((item: any) => {
-                  if (item.id_nomenclature == owner.id_status) {
-                    item.disabled = true;
-                  }
-                });
-              });
-            }
-            if (
-              this.currentZh.properties.instruments &&
-              this.currentZh.properties.instruments.length > 0
-            ) {
-              this.currentZh.properties.instruments.forEach(
-                (instrument: any) => {
-                  this.instrumentTable.push({
-                    instrument: this.formMetaData["INSTRU_CONTRAC_FINANC"].find(
-                      (item: any) =>
-                        item.id_nomenclature == instrument.id_instrument
-                    ),
-                    instrument_date: instrument.instrument_date,
-                  });
-                  this.instrumentInput.map((item: any) => {
-                    if (item.id_nomenclature == instrument.id_instrument) {
-                      item.disabled = true;
-                    }
-                  });
-                }
-              );
-            }
-            if (
-              this.currentZh.properties.managements &&
-              this.currentZh.properties.managements.length > 0
-            ) {
-              this.currentZh.properties.managements.forEach(
-                (management: any) => {
-                  let structure = this.formMetaData[
-                    "BIB_MANAGEMENT_STRUCTURES"
-                  ].find((item: any) => item.id_org == management.structure);
-                  let plans = [];
-                  if (management.plans && management.plans.length > 0) {
-                    management.plans.forEach((plan) => {
-                      plans.push({
-                        plan: this.formMetaData["PLAN_GESTION"].find(
-                          (item: any) => item.id_nomenclature == plan.id_nature
-                        ),
-                        plan_date: plan.plan_date,
-                        duration: plan.duration,
-                        remark: plan.remark,
-                      });
-                    });
-                  }
-                  structure.plans = plans;
-
-                  // moreDetails enable to expand the table to show the plans
-                  // set it to true by default
-                  structure.moreDetails = true;
-
-                  this.managements.push(structure);
-                }
-              );
-            }
-            if (
-              this.currentZh.properties.urban_docs &&
-              this.currentZh.properties.urban_docs.length > 0
-            ) {
-              this.currentZh.properties.urban_docs.forEach((doc: any) => {
-                let docType = this.formMetaData["TYP_DOC_COMM"].find(
-                  (item: any) => item.id_nomenclature == doc.id_doc_type
-                );
-                let typeClassement = [];
-                if (docType.type_classement) {
-                  doc.id_cors.forEach((idCor) => {
-                    let temp = docType.type_classement.find(
-                      (item: any) => item.id_cor == idCor
-                    );
-                    typeClassement.push(temp);
-                  });
-                }
-                let classementNames = typeClassement.map((item) => {
-                  return item["mnemonique"];
-                });
-                this.urbanDocTable.push({
-                  area: this.municipalities.find(
-                    (item: any) => item.id_area == doc.id_area
-                  ),
-                  urbanType: docType,
-                  typeClassement: {
-                    typeClassement: typeClassement,
-                    mnemonique: classementNames.join("\r\n"),
-                  },
-                  remark: doc.remark,
-                });
-                this.municipalities.map((item: any) => {
-                  if (item.id_area == doc.id_area) {
-                    item.disabled = true;
-                  }
-                });
-              });
-              this.sortUrbanDocs();
-            }
+          }
+          this.formTab6.patchValue({
+            protections: protections,
+            is_other_inventory: this.currentZh.properties.is_other_inventory,
+            remark_is_other_inventory: this.currentZh.properties.remark_is_other_inventory,
           });
+          if (
+            this.currentZh.properties.ownerships &&
+            this.currentZh.properties.ownerships.length > 0
+          ) {
+            this.currentZh.properties.ownerships.forEach((owner: any) => {
+              this.statusTable.push({
+                status: this.formMetaData["STATUT_PROPRIETE"].find(
+                  (item: any) => item.id_nomenclature == owner.id_status
+                ),
+                remark: owner.remark,
+              });
+              this.statusInput.map((item: any) => {
+                if (item.id_nomenclature == owner.id_status) {
+                  item.disabled = true;
+                }
+              });
+            });
+          }
+          if (
+            this.currentZh.properties.instruments &&
+            this.currentZh.properties.instruments.length > 0
+          ) {
+            this.currentZh.properties.instruments.forEach((instrument: any) => {
+              this.instrumentTable.push({
+                instrument: this.formMetaData["INSTRU_CONTRAC_FINANC"].find(
+                  (item: any) => item.id_nomenclature == instrument.id_instrument
+                ),
+                instrument_date: instrument.instrument_date,
+              });
+              this.instrumentInput.map((item: any) => {
+                if (item.id_nomenclature == instrument.id_instrument) {
+                  item.disabled = true;
+                }
+              });
+            });
+          }
+          if (
+            this.currentZh.properties.managements &&
+            this.currentZh.properties.managements.length > 0
+          ) {
+            this.currentZh.properties.managements.forEach((management: any) => {
+              let structure = this.formMetaData["BIB_MANAGEMENT_STRUCTURES"].find(
+                (item: any) => item.id_org == management.structure
+              );
+              let plans = [];
+              if (management.plans && management.plans.length > 0) {
+                management.plans.forEach((plan) => {
+                  plans.push({
+                    plan: this.formMetaData["PLAN_GESTION"].find(
+                      (item: any) => item.id_nomenclature == plan.id_nature
+                    ),
+                    plan_date: plan.plan_date,
+                    duration: plan.duration,
+                    remark: plan.remark,
+                  });
+                });
+              }
+              structure.plans = plans;
+
+              // moreDetails enable to expand the table to show the plans
+              // set it to true by default
+              structure.moreDetails = true;
+
+              this.managements.push(structure);
+            });
+          }
+          if (
+            this.currentZh.properties.urban_docs &&
+            this.currentZh.properties.urban_docs.length > 0
+          ) {
+            this.currentZh.properties.urban_docs.forEach((doc: any) => {
+              let docType = this.formMetaData["TYP_DOC_COMM"].find(
+                (item: any) => item.id_nomenclature == doc.id_doc_type
+              );
+              let typeClassement = [];
+              if (docType.type_classement) {
+                doc.id_cors.forEach((idCor) => {
+                  let temp = docType.type_classement.find((item: any) => item.id_cor == idCor);
+                  typeClassement.push(temp);
+                });
+              }
+              let classementNames = typeClassement.map((item) => {
+                return item["mnemonique"];
+              });
+              this.urbanDocTable.push({
+                area: this.municipalities.find((item: any) => item.id_area == doc.id_area),
+                urbanType: docType,
+                typeClassement: {
+                  typeClassement: typeClassement,
+                  mnemonique: classementNames.join("\r\n"),
+                },
+                remark: doc.remark,
+              });
+              this.municipalities.map((item: any) => {
+                if (item.id_area == doc.id_area) {
+                  item.disabled = true;
+                }
+              });
+            });
+            this.sortUrbanDocs();
+          }
+        });
         this.$_fromChangeSub = this.formTab6.valueChanges.subscribe(() => {
           this.canChangeTab.emit(false);
         });
@@ -413,8 +394,7 @@ export class ZhFormTab6Component implements OnInit {
       let formValues = this.statusForm.value;
       // check if the status to add is already added
       let itemExist = this.statusTable.some(
-        (item: any) =>
-          item.status.id_nomenclature == formValues.status.id_nomenclature
+        (item: any) => item.status.id_nomenclature == formValues.status.id_nomenclature
       );
       if (!itemExist) {
         this.statusTable.push(formValues);
@@ -513,12 +493,9 @@ export class ZhFormTab6Component implements OnInit {
       let formValues = this.instrumentForm.value;
       // check if the instrument to add is already added
       let itemExist = this.instrumentTable.some(
-        (item: any) =>
-          item.instrument.id_nomenclature ==
-          formValues.instrument.id_nomenclature
+        (item: any) => item.instrument.id_nomenclature == formValues.instrument.id_nomenclature
       );
-      formValues.instrument_date =
-        this.dateParser.format(formValues.instrument_date) || null;
+      formValues.instrument_date = this.dateParser.format(formValues.instrument_date) || null;
 
       if (!itemExist) {
         this.instrumentTable.push(formValues);
@@ -534,9 +511,7 @@ export class ZhFormTab6Component implements OnInit {
   //delete instrument from the instrument array
   onDeleteInstrument(instrument: any) {
     this.instrumentTable = this.instrumentTable.filter((item: any) => {
-      return (
-        item.instrument.id_nomenclature != instrument.instrument.id_nomenclature
-      );
+      return item.instrument.id_nomenclature != instrument.instrument.id_nomenclature;
     });
     this.canChangeTab.emit(false);
   }
@@ -548,8 +523,7 @@ export class ZhFormTab6Component implements OnInit {
     this.modalTitle = "Modifier l'instrument contractuel et financier";
     // init inputs object type
     const selectedinstrument = this.instrumentInput.find(
-      (item: any) =>
-        item.id_nomenclature == instrument.instrument.id_nomenclature
+      (item: any) => item.id_nomenclature == instrument.instrument.id_nomenclature
     );
     // patch form values
     this.instrumentForm.patchValue({
@@ -571,9 +545,7 @@ export class ZhFormTab6Component implements OnInit {
     this.modalFormSubmitted = true;
     if (this.instrumentForm.valid) {
       let formValues = this.instrumentForm.value;
-      formValues.instrument_date = this.dateParser.format(
-        formValues.instrument_date
-      );
+      formValues.instrument_date = this.dateParser.format(formValues.instrument_date);
       this.instrumentTable = this.instrumentTable.map((item: any) =>
         item.instrument.id_nomenclature != this.tempID ? item : formValues
       );
@@ -601,12 +573,10 @@ export class ZhFormTab6Component implements OnInit {
       size: "lg",
       windowClass: "bib-modal",
     });
-    let $_urbanTypeInputSub = this.urbanDocForm
-      .get("urbanType")
-      .valueChanges.subscribe((val) => {
-        this.urbanDocForm.get("typeClassement").reset();
-        if (val) this.typeClassementInput = val.type_classement;
-      });
+    let $_urbanTypeInputSub = this.urbanDocForm.get("urbanType").valueChanges.subscribe((val) => {
+      this.urbanDocForm.get("typeClassement").reset();
+      if (val) this.typeClassementInput = val.type_classement;
+    });
 
     modalRef.result.then().finally(() => {
       $_urbanTypeInputSub.unsubscribe();
@@ -684,24 +654,20 @@ export class ZhFormTab6Component implements OnInit {
       typeClassement: urbanDoc.typeClassement.typeClassement,
       remark: urbanDoc.remark,
     });
-    let $_urbanTypeInputSub = this.urbanDocForm
-      .get("urbanType")
-      .valueChanges.subscribe((val) => {
-        this.urbanDocForm.get("typeClassement").reset();
-        if (val) this.typeClassementInput = val.type_classement;
-      });
+    let $_urbanTypeInputSub = this.urbanDocForm.get("urbanType").valueChanges.subscribe((val) => {
+      this.urbanDocForm.get("typeClassement").reset();
+      if (val) this.typeClassementInput = val.type_classement;
+    });
 
     this.tempID = urbanDoc.area.id_area;
     // manger disabled urbanDoc input items
-    let $_areaInputSub = this.urbanDocForm
-      .get("area")
-      .valueChanges.subscribe(() => {
-        this.municipalities.map((item: any) => {
-          if (item.id_area == urbanDoc.area.id_area) {
-            item.disabled = false;
-          }
-        });
+    let $_areaInputSub = this.urbanDocForm.get("area").valueChanges.subscribe(() => {
+      this.municipalities.map((item: any) => {
+        if (item.id_area == urbanDoc.area.id_area) {
+          item.disabled = false;
+        }
       });
+    });
     const modalRef = this.ngbModal.open(modal, {
       centered: true,
       size: "lg",
@@ -758,9 +724,7 @@ export class ZhFormTab6Component implements OnInit {
     // multi select : returns an Array...
     const structure = this.formTab6.value.structure[0];
     if (structure) {
-      let itemExist = this.managements.some(
-        (item) => item.id_org == structure.id_org
-      );
+      let itemExist = this.managements.some((item) => item.id_org == structure.id_org);
       if (!itemExist && structure.id_org) {
         this.managements.push(structure);
       }
@@ -808,13 +772,9 @@ export class ZhFormTab6Component implements OnInit {
     this.planInput = [...this.formMetaData["PLAN_GESTION"]];
     this.planInput.map((item: any) => {
       item.disabled = false;
-      if (
-        this.selectedManagement.plans &&
-        this.selectedManagement.plans.length > 0
-      ) {
+      if (this.selectedManagement.plans && this.selectedManagement.plans.length > 0) {
         this.selectedManagement.plans.forEach((plan) => {
-          if (plan.plan.id_nomenclature == item.id_nomenclature)
-            item.disabled = true;
+          if (plan.plan.id_nomenclature == item.id_nomenclature) item.disabled = true;
         });
       }
     });
@@ -841,13 +801,10 @@ export class ZhFormTab6Component implements OnInit {
             item.plans = [formValues];
           } else if (item.plans && item.plans.length > 0) {
             let palnExist = item.plans.some(
-              (item: any) =>
-                item.plan.id_nomenclature == formValues.plan.id_nomenclature
+              (item: any) => item.plan.id_nomenclature == formValues.plan.id_nomenclature
             );
             if (!palnExist) {
-              formValues.plan_date = this.dateParser.format(
-                formValues.plan_date
-              );
+              formValues.plan_date = this.dateParser.format(formValues.plan_date);
               // moreDetails enable to expand the table to show the plans
               // set it to true here enable to expand when plan is added
               item.moreDetails = true;
@@ -903,13 +860,9 @@ export class ZhFormTab6Component implements OnInit {
     this.planInput = [...this.formMetaData["PLAN_GESTION"]];
     this.planInput.map((item: any) => {
       item.disabled = false;
-      if (
-        this.selectedManagement.plans &&
-        this.selectedManagement.plans.length > 0
-      ) {
+      if (this.selectedManagement.plans && this.selectedManagement.plans.length > 0) {
         this.selectedManagement.plans.forEach((plan) => {
-          if (plan.plan.id_nomenclature == item.id_nomenclature)
-            item.disabled = true;
+          if (plan.plan.id_nomenclature == item.id_nomenclature) item.disabled = true;
         });
       }
     });
@@ -927,15 +880,13 @@ export class ZhFormTab6Component implements OnInit {
       remark: plan.remark,
     });
 
-    let $_planInputSub = this.planForm
-      .get("plan")
-      .valueChanges.subscribe(() => {
-        this.planInput.map((item: any) => {
-          if (item.id_nomenclature == plan.plan.id_nomenclature) {
-            item.disabled = false;
-          }
-        });
+    let $_planInputSub = this.planForm.get("plan").valueChanges.subscribe(() => {
+      this.planInput.map((item: any) => {
+        if (item.id_nomenclature == plan.plan.id_nomenclature) {
+          item.disabled = false;
+        }
       });
+    });
 
     this.tempID = plan.plan.id_nomenclature;
 
@@ -1041,10 +992,7 @@ export class ZhFormTab6Component implements OnInit {
           });
         });
       }
-      if (
-        this.formTab6.value.protections &&
-        this.formTab6.value.protections.length > 0
-      ) {
+      if (this.formTab6.value.protections && this.formTab6.value.protections.length > 0) {
         this.formTab6.value.protections.forEach((item: any) => {
           protections.push(item.id_protection_status);
         });
@@ -1057,31 +1005,26 @@ export class ZhFormTab6Component implements OnInit {
         instruments: instruments,
         protections: protections,
         is_other_inventory: this.formTab6.value.is_other_inventory,
-        remark_is_other_inventory:
-          this.formTab6.value.remark_is_other_inventory,
+        remark_is_other_inventory: this.formTab6.value.remark_is_other_inventory,
         urban_docs: urban_docs,
       };
 
       this.posted = true;
       this._dataService.postDataForm(formToPost, 6).subscribe(
         () => {
-          this._dataService
-            .getZhById(this.currentZh.properties.id_zh)
-            .subscribe((zh: any) => {
-              this._dataService.setCurrentZh(zh);
-              this.posted = false;
-              this.canChangeTab.emit(true);
-              this._toastr.success("Vos données sont bien enregistrées", "", {
-                positionClass: "toast-top-right",
-              });
-              this.nextTab.emit(7);
+          this._dataService.getZhById(this.currentZh.properties.id_zh).subscribe((zh: any) => {
+            this._dataService.setCurrentZh(zh);
+            this.posted = false;
+            this.canChangeTab.emit(true);
+            this._toastr.success("Vos données sont bien enregistrées", "", {
+              positionClass: "toast-top-right",
             });
+            this.nextTab.emit(7);
+          });
         },
         (error) => {
           this.posted = false;
-          const frontMsg: string = this._error.getFrontError(
-            error.error.message
-          );
+          const frontMsg: string = this._error.getFrontError(error.error.message);
           this._toastr.error(frontMsg, "", {
             positionClass: "toast-top-right",
           });
@@ -1092,7 +1035,11 @@ export class ZhFormTab6Component implements OnInit {
 
   sortUrbanDocs() {
     this.urbanDocTable.sort((a, b) =>
-      a.area.municipality_name > b.area.municipality_name ? 1 : b.area.municipality_name > a.area.municipality_name ? -1 : 0
+      a.area.municipality_name > b.area.municipality_name
+        ? 1
+        : b.area.municipality_name > a.area.municipality_name
+        ? -1
+        : 0
     );
   }
 }

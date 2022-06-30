@@ -40,10 +40,7 @@ export class HeaderComponent {
   deleteZh(idZh: number) {
     this._zhService.deleteOneZh(idZh).subscribe(
       () => {
-        this._commonService.translateToaster(
-          "success",
-          "la zh a été supprimée avec succès"
-        );
+        this._commonService.translateToaster("success", "la zh a été supprimée avec succès");
         this.router.navigate(["/zones_humides"]);
       },
       (error) => {
@@ -67,21 +64,20 @@ export class HeaderComponent {
         const rawDate: string = new Date().toLocaleDateString();
         const date: string = rawDate.replace(/\//g, "-");
         const filename: string = `${this.zhCode}_${date}_fiche.pdf`;
-        // Not possible to use saveas since it does not open it in a 
+        // Not possible to use saveas since it does not open it in a
         // new tab => create a <a> then click on it...
         const blob = new Blob([result], { type: "application/type" });
         const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
+        const link = document.createElement("a");
         link.href = url;
         link.download = filename;
-        link.target = "_blank"
-        link.click()
+        link.target = "_blank";
+        link.click();
       },
       (error) => {
         this.loadingPdf = false;
         const frontMsg: string =
-          "Erreur de téléchargement du PDF " +
-          this._error.getFrontError(error.error.message);
+          "Erreur de téléchargement du PDF " + this._error.getFrontError(error.error.message);
         this._commonService.translateToaster("error", frontMsg);
       },
       () => (this.loadingPdf = false)

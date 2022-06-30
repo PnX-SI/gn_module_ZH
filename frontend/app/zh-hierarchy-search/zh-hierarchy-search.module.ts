@@ -7,9 +7,7 @@ import { AngularMultiSelectModule } from "angular2-multiselect-dropdown";
 import { ZhHierarchySearchTableComponent } from "./components/zh-hierarchy-search-table.component";
 import { ZhDetailsModule } from "../zh-details/zh-details.module";
 
-const routes: Routes = [
-  { path: "/hierarchy_search", component: ZhHierarchySearchComponent },
-];
+const routes: Routes = [{ path: "/hierarchy_search", component: ZhHierarchySearchComponent }];
 
 @NgModule({
   declarations: [ZhHierarchySearchComponent, ZhHierarchySearchTableComponent],

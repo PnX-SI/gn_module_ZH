@@ -1,29 +1,24 @@
 <div *ngIf="evalZh" class="container-fluid">
-  <h2 class="tabsTitle">Evaluation génerale du site                
-</h2>
+  <h2 class="tabsTitle">Evaluation génerale du site</h2>
   <form>
     <fieldset>
       <legend>
         <h5 class="section-title">
           Fonctions et valeurs majeures
           <mat-icon
-          class="info-icon"
-          ngbTooltip="Cette rubrique met en avant les principaux enjeux liés à la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
-          placement="right"
-          >info
-        </mat-icon>
-      </h5>
-
+            class="info-icon"
+            ngbTooltip="Cette rubrique met en avant les principaux enjeux liés à la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
+            placement="right"
+            >info
+          </mat-icon>
+        </h5>
       </legend>
-      <div
-        *ngIf="hydroFctData && hydroFctData.length > 0"
-        class="table-responsive"
-      >
-      <zh-table
-      class="eval-table"
-      [tableCols]="hydroFctTableCol"
-      [data]="hydroFctData"
-      ></zh-table>
+      <div *ngIf="hydroFctData && hydroFctData.length > 0" class="table-responsive">
+        <zh-table
+          class="eval-table"
+          [tableCols]="hydroFctTableCol"
+          [data]="hydroFctData"
+        ></zh-table>
       </div>
       <div *ngIf="bioFctData && bioFctData.length > 0" class="table-responsive">
         <zh-table
@@ -44,9 +39,7 @@
           <table class="table white-table mb-4">
             <thead class="thead-inverse table-header">
               <tr>
-                <th>
-                  Nombre d'espèces faunistiques patrimoniales
-                </th>
+                <th>Nombre d'espèces faunistiques patrimoniales</th>
                 <th>Nombre d'espèces floristiques patrimoniales</th>
               </tr>
             </thead>
@@ -105,11 +98,11 @@
         <h5 class="section-title">
           Bilan des menaces et de l’état fonctionnel de la zone humide
           <mat-icon
-          class="info-icon"
-          ngbTooltip="Cette rubrique met en avant les menaces et l’état fonctionnel de la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
-          placement="right"
-          >info
-        </mat-icon>
+            class="info-icon"
+            ngbTooltip="Cette rubrique met en avant les menaces et l’état fonctionnel de la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
+            placement="right"
+            >info
+          </mat-icon>
         </h5>
       </legend>
       <div class="col-sm">
@@ -118,9 +111,7 @@
             <tr>
               <th>Évaluation globale des menaces potentielles ou avérées</th>
               <th>Fonctionnalité hydrologique / biogéochimique</th>
-              <th>
-                Fonctionnalité biologique / écologique
-              </th>
+              <th>Fonctionnalité biologique / écologique</th>
             </tr>
           </thead>
           <tbody>
@@ -145,17 +136,12 @@
     </fieldset>
     <fieldset>
       <legend>
-        <h5 class="section-title">
-          Stratégie de gestion et orientations d'actions
-        </h5>
+        <h5 class="section-title">Stratégie de gestion et orientations d'actions</h5>
       </legend>
       <div class="form-row">
         <div class="form-group col-md-4">
           <small>Stratégie de gestion</small>
-          <select
-            class="form-control"
-            [formControl]="formTab7.controls.id_strat_gestion"
-          >
+          <select class="form-control" [formControl]="formTab7.controls.id_strat_gestion">
             <option
               *ngFor="let strat of formMetaData.STRAT_GESTION"
               [ngValue]="strat.id_nomenclature"
@@ -175,18 +161,15 @@
           <mat-icon>add_box</mat-icon>
           proposition d’action
         </button>
-        <div
-          *ngIf="actionTable && actionTable.length > 0"
-          class="table-responsive"
-        >
-        <zh-table
-          [tableCols]="actionTableCol"
-          [data]="actionTable"
-          [deletable]="true"
-          [editable]="true"
-          (onDelete)="onDeleteAction($event)"
-          (onEdit)="onEditAction(actionModal, $event)"
-        ></zh-table>
+        <div *ngIf="actionTable && actionTable.length > 0" class="table-responsive">
+          <zh-table
+            [tableCols]="actionTableCol"
+            [data]="actionTable"
+            [deletable]="true"
+            [editable]="true"
+            (onDelete)="onDeleteAction($event)"
+            (onEdit)="onEditAction(actionModal, $event)"
+          ></zh-table>
         </div>
       </div>
       <div class="form-group col-md-12">
@@ -200,10 +183,7 @@
       </div>
     </fieldset>
     <div class="footer-btn">
-      <zh-cancelButton
-        *ngIf="currentZh"
-        [zhId]="currentZh.properties.id_zh"
-      ></zh-cancelButton>
+      <zh-cancelButton *ngIf="currentZh" [zhId]="currentZh.properties.id_zh"></zh-cancelButton>
       <button
         type="submit"
         mat-raised-button
@@ -251,14 +231,8 @@
       </div>
       <div class="form-group col-md-6">
         <small class="required">Niveau de priorité</small>
-        <select
-          class="form-control"
-          [formControl]="actionForm.controls.priority"
-        >
-          <option
-            *ngFor="let qualif of formMetaData.NIVEAU_PRIORITE"
-            [ngValue]="qualif"
-          >
+        <select class="form-control" [formControl]="actionForm.controls.priority">
+          <option *ngFor="let qualif of formMetaData.NIVEAU_PRIORITE" [ngValue]="qualif">
             {{ qualif.mnemonique }}
           </option>
         </select>

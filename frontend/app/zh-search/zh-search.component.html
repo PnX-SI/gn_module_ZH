@@ -9,51 +9,79 @@
       </div>
     </div>
     <div class="card-body">
-      <zh-search-sdage [data]="data?.SDAGE" [form]="searchForm.get('sdage')">
-      </zh-search-sdage>
+      <zh-search-sdage [data]="data?.SDAGE" [form]="searchForm.get('sdage')"> </zh-search-sdage>
       <hr />
-      <zh-search-code [form]="searchForm.get('nameorcode')">
-      </zh-search-code>
+      <zh-search-code [form]="searchForm.get('nameorcode')"> </zh-search-code>
       <hr />
       <zh-search-ensemble [data]="data?.BIB_SITE_SPACE" [form]="searchForm.get('ensemble')">
       </zh-search-ensemble>
       <hr />
-      <zh-search-area [form]="searchForm.get('area')">
-      </zh-search-area>
+      <zh-search-area [form]="searchForm.get('area')"> </zh-search-area>
       <hr />
-      <zh-search-input label="Département" [form]="searchForm.get('departement')" [displayCode]="true"
-        [data]="departements" (onSelected)="onDepartmentSelected($event)">
+      <zh-search-input
+        label="Département"
+        [form]="searchForm.get('departement')"
+        [displayCode]="true"
+        [data]="departements"
+        (onSelected)="onDepartmentSelected($event)"
+      >
       </zh-search-input>
-      <zh-search-dependant label="Communes" [inputData]="communes" [form]="searchForm.get('communes')">
+      <zh-search-dependant
+        label="Communes"
+        [inputData]="communes"
+        [form]="searchForm.get('communes')"
+      >
       </zh-search-dependant>
       <hr />
-      <zh-search-input label="Bassin versant" [form]="searchForm.get('basin')" [data]="basins"
-        (onSelected)="onBasinSelected($event)">
+      <zh-search-input
+        label="Bassin versant"
+        [form]="searchForm.get('basin')"
+        [data]="basins"
+        (onSelected)="onBasinSelected($event)"
+      >
       </zh-search-input>
-      <zh-search-dependant label="Zones hydrographiques" [form]="searchForm.get('zones')"
-        [inputData]="hydrographicZones">
+      <zh-search-dependant
+        label="Zones hydrographiques"
+        [form]="searchForm.get('zones')"
+        [inputData]="hydrographicZones"
+      >
       </zh-search-dependant>
       <hr />
 
       <div class="row">
         <div class="col-12">
-          <mat-slide-toggle [checked]="advancedSearchToggled" (change)="advancedSearchToggled=!advancedSearchToggled">
-            Recherche avancée</mat-slide-toggle>
+          <mat-slide-toggle
+            [checked]="advancedSearchToggled"
+            (change)="advancedSearchToggled = !advancedSearchToggled"
+          >
+            Recherche avancée</mat-slide-toggle
+          >
         </div>
         <div class="col-12">
-          <mat-slide-toggle [checked]="hierarchySearchToggled"
-            (change)="hierarchySearchToggled=!hierarchySearchToggled">
-            Recherche hiérarchisation</mat-slide-toggle>
+          <mat-slide-toggle
+            [checked]="hierarchySearchToggled"
+            (change)="hierarchySearchToggled = !hierarchySearchToggled"
+          >
+            Recherche hiérarchisation</mat-slide-toggle
+          >
         </div>
       </div>
       <div class="d-flex justify-content-start searchButtons">
-        <button mat-raised-button color="primary" class="btn-action hard-shadow button-success uppercase"
-          (click)="search()">
+        <button
+          mat-raised-button
+          color="primary"
+          class="btn-action hard-shadow button-success uppercase"
+          (click)="search()"
+        >
           Recherche
           <mat-icon>search</mat-icon>
         </button>
-        <button mat-raised-button color="warning" class="btn-action hard-shadow button-warning uppercase ml-3"
-          (click)="onReset()">
+        <button
+          mat-raised-button
+          color="warning"
+          class="btn-action hard-shadow button-warning uppercase ml-3"
+          (click)="onReset()"
+        >
           Réinitialiser
           <mat-icon>cleaning_services</mat-icon>
         </button>
@@ -64,7 +92,10 @@
     <zh-advanced-search [data]="data" [form]="advancedForm"></zh-advanced-search>
   </div>
   <div *ngIf="hierarchySearchToggled" class="card">
-    <zh-hierarchy-search [riverBasin]="searchForm.get('basin')" [zones]="searchForm.get('zones')"
-      [form]="hierarchyForm.get('hierarchy')"></zh-hierarchy-search>
+    <zh-hierarchy-search
+      [riverBasin]="searchForm.get('basin')"
+      [zones]="searchForm.get('zones')"
+      [form]="hierarchyForm.get('hierarchy')"
+    ></zh-hierarchy-search>
   </div>
 </div>

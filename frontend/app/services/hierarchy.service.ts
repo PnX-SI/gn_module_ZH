@@ -48,9 +48,7 @@ export class HierarchyService {
         this.isLoading = false;
         this.items = [];
         if (error.status === 400 || error.status === 500) {
-          const frontError: string = this._error.getFrontError(
-            error.error.message
-          );
+          const frontError: string = this._error.getFrontError(error.error.message);
           const timeOut: number = 10000;
           this._toastr.error(frontError, "", {
             positionClass: "toast-top-right",
@@ -72,9 +70,7 @@ export class HierarchyService {
       return [];
     }
 
-    this.items = [
-      { name: "", active: true, qualification: "", knowledge: "", note: "" },
-    ];
+    this.items = [{ name: "", active: true, qualification: "", knowledge: "", note: "" }];
 
     // cat 1
     this.items.push({
@@ -155,7 +151,7 @@ export class HierarchyService {
       knowledge: "",
       note: "",
     });
-    
+
     // cat 2
     this.items.push({
       name: data.volet1.cat2_heritage.name.toUpperCase(),
@@ -184,7 +180,6 @@ export class HierarchyService {
       knowledge: "",
       note: "",
     });
-
 
     // cat 5
     this.items.push({

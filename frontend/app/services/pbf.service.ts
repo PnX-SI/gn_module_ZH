@@ -24,10 +24,8 @@ export class PbfService {
       return this._zhService.getPbf().map(
         async (result) => {
           const res = await result["arrayBuffer"]();
-          const pbf = new Pbf(res)
-          const vector = await this.setVectorGrid(
-            geobuf.decode(pbf)
-          );
+          const pbf = new Pbf(res);
+          const vector = await this.setVectorGrid(geobuf.decode(pbf));
           this.res = res;
           this.vector = vector;
           return vector;
@@ -36,9 +34,7 @@ export class PbfService {
       );
     } else {
       const pbf = new Pbf(this.res);
-      return of(this.setVectorGrid(
-        geobuf.decode(pbf)
-      ));
+      return of(this.setVectorGrid(geobuf.decode(pbf)));
     }
   }
 

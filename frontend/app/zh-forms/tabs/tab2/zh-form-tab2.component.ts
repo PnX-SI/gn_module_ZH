@@ -1,11 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  AfterViewInit,
-  Output,
-} from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, AfterViewInit, Output } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
 import { Subscription } from "rxjs";
@@ -71,19 +64,13 @@ export class ZhFormTab2Component implements OnInit, AfterViewInit {
         this.currentZh = zh;
         const selectedCritDelim = [];
         this.critDelim.forEach((critere) => {
-          if (
-            this.currentZh.properties.id_lims.includes(critere.id_nomenclature)
-          ) {
+          if (this.currentZh.properties.id_lims.includes(critere.id_nomenclature)) {
             selectedCritDelim.push(critere);
           }
         });
         const selectedCritDelimFs = [];
         this.critDelimFct.forEach((critere) => {
-          if (
-            this.currentZh.properties.id_lims_fs.includes(
-              critere.id_nomenclature
-            )
-          ) {
+          if (this.currentZh.properties.id_lims_fs.includes(critere.id_nomenclature)) {
             selectedCritDelimFs.push(critere);
           }
         });
@@ -137,23 +124,19 @@ export class ZhFormTab2Component implements OnInit, AfterViewInit {
       this.posted = true;
       this._dataService.postDataForm(formToPost, 2).subscribe(
         () => {
-          this._dataService
-            .getZhById(this.currentZh.properties.id_zh)
-            .subscribe((zh: any) => {
-              this._dataService.setCurrentZh(zh);
-              this.posted = false;
-              this.canChangeTab.emit(true);
-              this._toastr.success("Vos données sont bien enregistrées", "", {
-                positionClass: "toast-top-right",
-              });
-              this.nextTab.emit(3);
+          this._dataService.getZhById(this.currentZh.properties.id_zh).subscribe((zh: any) => {
+            this._dataService.setCurrentZh(zh);
+            this.posted = false;
+            this.canChangeTab.emit(true);
+            this._toastr.success("Vos données sont bien enregistrées", "", {
+              positionClass: "toast-top-right",
             });
+            this.nextTab.emit(3);
+          });
         },
         (error) => {
           this.posted = false;
-          const frontMsg: string = this._error.getFrontError(
-            error.error.message
-          );
+          const frontMsg: string = this._error.getFrontError(error.error.message);
           this._toastr.error(frontMsg, "", {
             positionClass: "toast-top-right",
           });

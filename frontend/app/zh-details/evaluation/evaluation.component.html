@@ -6,31 +6,19 @@
           <h5 class="section-title">
             Fonctions et valeurs majeures
             <mat-icon
-            class="info-icon"
-            ngbTooltip="Cette rubrique met en avant les principaux enjeux liés à la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
-            placement="right"
-            >info
-          </mat-icon>
+              class="info-icon"
+              ngbTooltip="Cette rubrique met en avant les principaux enjeux liés à la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
+              placement="right"
+              >info
+            </mat-icon>
           </h5>
         </legend>
-        <zh-table
-          [tableCols]="hydroFunctionsCols"
-          [data]="data.fonctions?.hydrologique"
-        ></zh-table>
-        <zh-table
-          [tableCols]="bioFunctionsCols"
-          [data]="data.fonctions?.biologique"
-        ></zh-table>
-        <zh-table
-          [tableCols]="patrimonialInterestsCols"
-          [data]="data.interet?.interet"
-        ></zh-table>
+        <zh-table [tableCols]="hydroFunctionsCols" [data]="data.fonctions?.hydrologique"></zh-table>
+        <zh-table [tableCols]="bioFunctionsCols" [data]="data.fonctions?.biologique"></zh-table>
+        <zh-table [tableCols]="patrimonialInterestsCols" [data]="data.interet?.interet"></zh-table>
         <div class="row">
           <div class="col-12 col-xl-6">
-            <zh-table
-              [tableCols]="nbFauneFloreCols"
-              [data]="getFauneFloreData()"
-            ></zh-table>
+            <zh-table [tableCols]="nbFauneFloreCols" [data]="getFauneFloreData()"></zh-table>
           </div>
           <div class="col-12 col-xl-6">
             <zh-table [tableCols]="nbHabCols" [data]="getHabitatData()"></zh-table>
@@ -66,17 +54,12 @@
       </fieldset>
       <fieldset>
         <legend>
-          <h5 class="section-title">
-            Stratégie de gestion et orientations d'actions
-          </h5>
+          <h5 class="section-title">Stratégie de gestion et orientations d'actions</h5>
         </legend>
         <zh-label label="Stratégie de gestion :">
           <span>{{ data.strategie?.mgmt_strategy }}</span>
         </zh-label>
-        <zh-table
-          [tableCols]="propositionsCol"
-          [data]="data.strategie?.propositions"
-        ></zh-table>
+        <zh-table [tableCols]="propositionsCol" [data]="data.strategie?.propositions"></zh-table>
         <zh-label label="Commentaires :">
           <span>{{ data.strategie?.commentaires }}</span>
         </zh-label>

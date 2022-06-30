@@ -47,9 +47,7 @@ export class ZhDataService {
   }
 
   checkRefGeo() {
-    return this._api.get<any>(
-      `${AppConfig.API_ENDPOINT}/zones_humides/check_ref_geo`
-    );
+    return this._api.get<any>(`${AppConfig.API_ENDPOINT}/zones_humides/check_ref_geo`);
   }
 
   getHabitatByCorine(corineId: string) {
@@ -59,16 +57,12 @@ export class ZhDataService {
   }
 
   getEvalZh(zhId: string) {
-    return this._api.get<any>(
-      `${AppConfig.API_ENDPOINT}/zones_humides/eval/${zhId}`
-    );
+    return this._api.get<any>(`${AppConfig.API_ENDPOINT}/zones_humides/eval/${zhId}`);
   }
 
   getMunicipalitiesByZh(zhId: number) {
     return this._api
-      .get<any>(
-        `${AppConfig.API_ENDPOINT}/zones_humides/municipalities/${zhId}`
-      )
+      .get<any>(`${AppConfig.API_ENDPOINT}/zones_humides/municipalities/${zhId}`)
       .pipe(
         map((municipalities: any) => {
           municipalities.map((item) => (item.disabled = false));
@@ -78,9 +72,7 @@ export class ZhDataService {
   }
 
   getAllZhGeom() {
-    return this._api.get<any>(
-      `${AppConfig.API_ENDPOINT}/zones_humides/geometries`
-    );
+    return this._api.get<any>(`${AppConfig.API_ENDPOINT}/zones_humides/geometries`);
   }
 
   getZhDetails(zhId: number) {
@@ -90,29 +82,21 @@ export class ZhDataService {
   }
 
   getZhFiles(zhId: number) {
-    return this._api.get(
-      `${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/files`
-    );
+    return this._api.get(`${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/files`);
   }
 
   deleteFile(mediaId: number) {
-    return this._api.delete(
-      `${AppConfig.API_ENDPOINT}/zones_humides/files/${mediaId}`
-    );
+    return this._api.delete(`${AppConfig.API_ENDPOINT}/zones_humides/files/${mediaId}`);
   }
 
   downloadFile(mediaId: number) {
-    return this._api.get(
-      `${AppConfig.API_ENDPOINT}/zones_humides/files/${mediaId}`,
-      { responseType: "blob" }
-    );
+    return this._api.get(`${AppConfig.API_ENDPOINT}/zones_humides/files/${mediaId}`, {
+      responseType: "blob",
+    });
   }
 
   patchFile(mediaId: number, form: FormData) {
-    return this._api.patch(
-      `${AppConfig.API_ENDPOINT}/zones_humides/files/${mediaId}`,
-      form
-    );
+    return this._api.patch(`${AppConfig.API_ENDPOINT}/zones_humides/files/${mediaId}`, form);
   }
 
   postMainPicture(zhId: number, mediaId: number) {
@@ -123,9 +107,7 @@ export class ZhDataService {
   }
 
   getTaxa(zhId: number) {
-    return this._api.get(
-      `${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/taxa`
-    );
+    return this._api.get(`${AppConfig.API_ENDPOINT}/zones_humides/${zhId}/taxa`);
   }
 
   getHierZh(zhId: string) {
@@ -135,10 +117,9 @@ export class ZhDataService {
   }
 
   getPdf(zhId: number) {
-    return this._api.get(
-      `${AppConfig.API_ENDPOINT}/zones_humides/export_pdf/${zhId}`,
-      { responseType: "blob" }
-    );
+    return this._api.get(`${AppConfig.API_ENDPOINT}/zones_humides/export_pdf/${zhId}`, {
+      responseType: "blob",
+    });
   }
 
   getDepartments() {
@@ -147,10 +128,7 @@ export class ZhDataService {
 
   getCommuneFromDepartment(code: number) {
     const payload = { code: code };
-    return this._api.post(
-      `${AppConfig.API_ENDPOINT}/zones_humides/communes`,
-      payload
-    );
+    return this._api.post(`${AppConfig.API_ENDPOINT}/zones_humides/communes`, payload);
   }
 
   getBasins() {
@@ -159,14 +137,11 @@ export class ZhDataService {
 
   getHydroZoneFromBasin(code: number) {
     const payload = { code: code };
-    return this._api.post(
-      `${AppConfig.API_ENDPOINT}/zones_humides/zones_hydro`,
-      payload
-    );
+    return this._api.post(`${AppConfig.API_ENDPOINT}/zones_humides/zones_hydro`, payload);
   }
 
   getHierarchyFields(basinId: number) {
-    return this._api.get(`${AppConfig.API_ENDPOINT}/zones_humides/hierarchy/fields/${basinId}`)
+    return this._api.get(`${AppConfig.API_ENDPOINT}/zones_humides/hierarchy/fields/${basinId}`);
   }
 
   // Search is a function that filter or not all the ZH
@@ -182,8 +157,6 @@ export class ZhDataService {
     });
   }
   getRights(idZh: number) {
-    return this._api.get(
-      `${AppConfig.API_ENDPOINT}/zones_humides/user/rights/${idZh}`
-    );
+    return this._api.get(`${AppConfig.API_ENDPOINT}/zones_humides/user/rights/${idZh}`);
   }
 }

@@ -145,11 +145,7 @@ export class ZhFormTab3Component implements OnInit {
         this.listActivity = [];
         const corineLandcovers = [];
         this.formMetaData.OCCUPATION_SOLS.forEach((critere) => {
-          if (
-            this.currentZh.properties.id_corine_landcovers.includes(
-              critere.id_nomenclature
-            )
-          ) {
+          if (this.currentZh.properties.id_corine_landcovers.includes(critere.id_nomenclature)) {
             corineLandcovers.push(critere);
           }
         });
@@ -158,9 +154,7 @@ export class ZhFormTab3Component implements OnInit {
           this.currentZh.properties.cb_codes_corine_biotope.length > 0
         ) {
           this.listCorinBio = this.corinBioMetaData.filter((v) =>
-            this.currentZh.properties.cb_codes_corine_biotope.includes(
-              v.CB_code
-            )
+            this.currentZh.properties.cb_codes_corine_biotope.includes(v.CB_code)
           );
         }
         this.currentZh.properties.activities.forEach((activity) => {
@@ -210,8 +204,7 @@ export class ZhFormTab3Component implements OnInit {
           id_corine_landcovers: corineLandcovers,
           remark_pres: this.currentZh.properties.remark_pres,
           id_thread: this.currentZh.properties.id_thread,
-          global_remark_activity:
-            this.currentZh.properties.global_remark_activity,
+          global_remark_activity: this.currentZh.properties.global_remark_activity,
         });
       }
 
@@ -271,9 +264,7 @@ export class ZhFormTab3Component implements OnInit {
       ),
       // Not to display a Corine that is already in the table
       map((term) =>
-        term.filter(
-          (t) => !this.listCorinBio.map((c) => c.CB_code).includes(t.CB_code)
-        )
+        term.filter((t) => !this.listCorinBio.map((c) => c.CB_code).includes(t.CB_code))
       )
     );
 
@@ -318,9 +309,7 @@ export class ZhFormTab3Component implements OnInit {
     if (this.activityForm.valid) {
       let activity = this.activityForm.value;
       let itemExist = this.listActivity.some(
-        (item) =>
-          item.human_activity.id_nomenclature ==
-          activity.human_activity.id_nomenclature
+        (item) => item.human_activity.id_nomenclature == activity.human_activity.id_nomenclature
       );
       if (!itemExist) {
         activity.impacts = this.sortImpacts(activity.impacts);
@@ -449,23 +438,19 @@ export class ZhFormTab3Component implements OnInit {
 
       this._dataService.postDataForm(formToPost, 3).subscribe(
         () => {
-          this._dataService
-            .getZhById(this.currentZh.properties.id_zh)
-            .subscribe((zh: any) => {
-              this._dataService.setCurrentZh(zh);
-              this.posted = false;
-              this.canChangeTab.emit(true);
-              this._toastr.success("Vos données sont bien enregistrées", "", {
-                positionClass: "toast-top-right",
-              });
-              this.nextTab.emit(4);
+          this._dataService.getZhById(this.currentZh.properties.id_zh).subscribe((zh: any) => {
+            this._dataService.setCurrentZh(zh);
+            this.posted = false;
+            this.canChangeTab.emit(true);
+            this._toastr.success("Vos données sont bien enregistrées", "", {
+              positionClass: "toast-top-right",
             });
+            this.nextTab.emit(4);
+          });
         },
         (error) => {
           this.posted = false;
-          const frontMsg: string = this._error.getFrontError(
-            error.error.message
-          );
+          const frontMsg: string = this._error.getFrontError(error.error.message);
           this._toastr.error(frontMsg, "", {
             positionClass: "toast-top-right",
           });
@@ -481,11 +466,9 @@ export class ZhFormTab3Component implements OnInit {
 
   sortHumanActivities() {
     this.listActivity.sort((a, b) =>
-      a.human_activity.mnemonique.slice(0, 2) >
-      b.human_activity.mnemonique.slice(0, 2)
+      a.human_activity.mnemonique.slice(0, 2) > b.human_activity.mnemonique.slice(0, 2)
         ? 1
-        : b.human_activity.mnemonique.slice(0, 2) >
-          a.human_activity.mnemonique.slice(0, 2)
+        : b.human_activity.mnemonique.slice(0, 2) > a.human_activity.mnemonique.slice(0, 2)
         ? -1
         : 0
     );

@@ -1,8 +1,8 @@
-<div class="container-fluid" *ngIf="_cruvedStore.cruved?.ZONES_HUMIDES?.cruved.U !== '0'; else elseBlock">
-  <div
-    class="custom-container"
-    [ngStyle]="{ 'min-height.px': cardContentHeight }"
-  >
+<div
+  class="container-fluid"
+  *ngIf="_cruvedStore.cruved?.ZONES_HUMIDES?.cruved.U !== '0'; else elseBlock"
+>
+  <div class="custom-container" [ngStyle]="{ 'min-height.px': cardContentHeight }">
     <mat-tab-group
       #tabs
       animationDuration="0ms"
@@ -133,16 +133,10 @@
     <h5 class="modal-title"><i class="fa fa-exchange"></i></h5>
   </div>
   <div class="modal-body">
-    Êtes-vous sûr de vouloir changer d'onglet sans enregistrer vos modifications
-    ?
+    Êtes-vous sûr de vouloir changer d'onglet sans enregistrer vos modifications ?
   </div>
   <div class="modal-footer">
-    <button
-      type="button"
-      mat-raised-button
-      class="mr-1 uppercase"
-      (click)="onChangeTab(false)"
-    >
+    <button type="button" mat-raised-button class="mr-1 uppercase" (click)="onChangeTab(false)">
       Annuler
     </button>
     <button

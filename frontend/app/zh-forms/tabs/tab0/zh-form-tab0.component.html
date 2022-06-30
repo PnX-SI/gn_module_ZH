@@ -1,9 +1,6 @@
 <div class="custom-container">
   <div class="row">
-    <div
-      class="col-xl-6 col-lg-7 col-sm-6"
-      [ngStyle]="{ 'min-height.px': cardContentHeight }"
-    >
+    <div class="col-xl-6 col-lg-7 col-sm-6" [ngStyle]="{ 'min-height.px': cardContentHeight }">
       <zh-form-map
         (draw)="updateGeom($event)"
         (endDraw)="onNewGeom($event)"
@@ -12,9 +9,7 @@
     </div>
     <div class="col-xl-6 col-lg-5 col-sm-6">
       <div class="d-flex mt-3">
-        <mat-slide-toggle
-          [(ngModel)]="toggleChecked"
-          (change)="slideToggleChanged()"
+        <mat-slide-toggle [(ngModel)]="toggleChecked" (change)="slideToggleChanged()"
           >Afficher toutes les zones humides sur la carte</mat-slide-toggle
         >
       </div>
@@ -26,11 +21,8 @@
           <div class="form-row">
             <!-- <h3 class="section-label">Identification de la zone humide</h3> -->
             <div class="form-group col-md-12" [hidden]="_currentZh">
-              <small class="required" >Organisme de l'opérateur </small>
-              <select
-                class="form-control form-control-sm"
-                [formControl]="form.controls.id_org"
-              >
+              <small class="required">Organisme de l'opérateur </small>
+              <select class="form-control form-control-sm" [formControl]="form.controls.id_org">
                 <option *ngFor="let id of idOrg" [ngValue]="id.id_org">
                   {{ id.name }}
                 </option>
@@ -48,11 +40,7 @@
           <div class="form-row">
             <div class="form-group col-md-6">
               <small class="required">Nom usuel de la zone humide</small>
-              <input
-                class="form-control"
-                type="text"
-                [formControl]="form.controls.main_name"
-              />
+              <input class="form-control" type="text" [formControl]="form.controls.main_name" />
               <small
                 *ngIf="
                   (form.controls.main_name.touched || submitted) &&
@@ -76,9 +64,7 @@
               Critères de délimitation de la zone humide
             </h3> -->
             <div class="form-group col-md-12">
-              <small class="required"
-                >Critères de délimitation de la zone humide</small
-              >
+              <small class="required">Critères de délimitation de la zone humide</small>
               <ng-multiselect-dropdown
                 [placeholder]="'Critères utilisés'"
                 [settings]="dropdownSettings"
@@ -109,8 +95,7 @@
               </select>
               <small
                 *ngIf="
-                  (form.controls.sdage.touched || submitted) &&
-                  form.controls.sdage.errors?.required
+                  (form.controls.sdage.touched || submitted) && form.controls.sdage.errors?.required
                 "
                 class="error-msg"
                 >Champ requis</small

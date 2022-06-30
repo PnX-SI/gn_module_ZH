@@ -3,9 +3,7 @@
     <div class="col-12 h-100">
       <fieldset>
         <legend>
-          <h5 class="section-title">
-            Bassin versant de la zone humide
-          </h5>
+          <h5 class="section-title">Bassin versant de la zone humide</h5>
         </legend>
         <div class="row">
           <div class="col-12 col-xl-6">
@@ -32,14 +30,12 @@
     <div class="col-12 h-100">
       <fieldset>
         <legend>
-          <h5 class="section-title">
-            Présentation de la zone humide et de ses milieux
-          </h5>
+          <h5 class="section-title">Présentation de la zone humide et de ses milieux</h5>
         </legend>
         <div class="row">
           <div class="col-12">
             <zh-label label="Superficie de la zone humide (ha) :">
-              <span>{{ data.presentation.area | number:'1.2-2' }}</span>
+              <span>{{ data.presentation.area | number: "1.2-2" }}</span>
             </zh-label>
           </div>
           <div class="col-12 col-xl-6">
@@ -53,9 +49,14 @@
             </zh-label>
           </div>
         </div>
-        <p class="section-label">Types d’habitats Corine biotopes humides (H) ou potentiellement humides (P) :</p>
+        <p class="section-label">
+          Types d’habitats Corine biotopes humides (H) ou potentiellement humides (P) :
+        </p>
         <div class="mx-2">
-          <zh-table [tableCols]="corineTableCols" [data]="data.presentation.corine_biotope"></zh-table>
+          <zh-table
+            [tableCols]="corineTableCols"
+            [data]="data.presentation.corine_biotope"
+          ></zh-table>
         </div>
         <zh-label label="Remarques :">
           <span>{{ data.presentation.remarques }}</span>
@@ -65,29 +66,23 @@
     <div class="col-12 h-100">
       <fieldset>
         <legend>
-          <h5 class="section-title">
-            Description de l'espace de fonctionnalité
-          </h5>
+          <h5 class="section-title">Description de l'espace de fonctionnalité</h5>
         </legend>
         <div class="row">
           <div class="col-6">
             <zh-label label="Superficie de l’espace de fonctionnalité (ha) :">
               <span *ngIf="data.presentation.ef_area">
-                {{ data.presentation.ef_area | number:'1.2-2' }}
+                {{ data.presentation.ef_area | number: "1.2-2" }}
               </span>
-              <span *ngIf="!data.presentation.ef_area">
-                Non identifié ou non calculable
-              </span>
+              <span *ngIf="!data.presentation.ef_area"> Non identifié ou non calculable </span>
             </zh-label>
           </div>
           <div class="col-6">
             <zh-label label="Comparaison avec la superficie de la zone humide (%) :">
               <span *ngIf="data.presentation.ef_area">
-                {{ data.presentation.area/data.presentation.ef_area*100 | number:'1.0-0'}}
+                {{ (data.presentation.area / data.presentation.ef_area) * 100 | number: "1.0-0" }}
               </span>
-              <span *ngIf="!data.presentation.ef_area">
-                Non identifié ou non calculable
-              </span>
+              <span *ngIf="!data.presentation.ef_area"> Non identifié ou non calculable </span>
             </zh-label>
           </div>
           <div class="col-12">

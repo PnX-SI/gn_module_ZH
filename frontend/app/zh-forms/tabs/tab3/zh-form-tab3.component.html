@@ -3,18 +3,13 @@
   <form>
     <fieldset>
       <legend>
-        <h5 class="section-title">
-          Présentation de la zone humide et de ses milieux
-        </h5>
+        <h5 class="section-title">Présentation de la zone humide et de ses milieux</h5>
       </legend>
       <div class="form-row">
         <div class="form-group col-md-6">
           <small class="required">Typologie SDAGE</small>
           <select class="form-control" [formControl]="form.controls.id_sdage">
-            <option
-              *ngFor="let sd of formMetaData.SDAGE"
-              [ngValue]="sd.id_nomenclature"
-            >
+            <option *ngFor="let sd of formMetaData.SDAGE" [ngValue]="sd.id_nomenclature">
               {{ sd.mnemonique }}
             </option>
           </select>
@@ -58,10 +53,7 @@
           </button>
         </div>
       </div>
-      <div
-        *ngIf="listCorinBio && listCorinBio.length > 0"
-        class="table-responsive"
-      >
+      <div *ngIf="listCorinBio && listCorinBio.length > 0" class="table-responsive">
         <zh-table
           [tableCols]="corinTableCol"
           [data]="listCorinBio"
@@ -109,18 +101,15 @@
         <mat-icon>add_box</mat-icon>
         Ajouter une activité humaine
       </button>
-      <div
-        *ngIf="listActivity && listActivity.length > 0"
-        class="table-responsive"
-      >
-      <zh-table
+      <div *ngIf="listActivity && listActivity.length > 0" class="table-responsive">
+        <zh-table
           [tableCols]="activityTableCol"
           [data]="listActivity"
           [deletable]="true"
           [editable]="true"
           (onEdit)="onEditActivity(activityModal, $event)"
           (onDelete)="onDeleteActivity($event)"
-      ></zh-table>
+        ></zh-table>
       </div>
       <div class="form-row">
         <div class="form-group col-md-12">
@@ -146,10 +135,7 @@
     </fieldset>
   </form>
   <div class="footer-btn">
-    <zh-cancelButton
-      *ngIf="currentZh"
-      [zhId]="currentZh.properties.id_zh"
-    ></zh-cancelButton>
+    <zh-cancelButton *ngIf="currentZh" [zhId]="currentZh.properties.id_zh"></zh-cancelButton>
     <button
       type="submit"
       mat-raised-button
@@ -193,8 +179,7 @@
           </select>
           <small
             *ngIf="
-              (activityForm.controls.human_activity.touched ||
-                formImpactSubmitted) &&
+              (activityForm.controls.human_activity.touched || formImpactSubmitted) &&
               activityForm.controls.human_activity.errors?.required
             "
             class="error-msg"
@@ -203,21 +188,14 @@
         </div>
         <div class="form-group col-md-6">
           <small class="required">Localisation</small>
-          <select
-            class="form-control"
-            [formControl]="activityForm.controls.localisation"
-          >
-            <option
-              *ngFor="let localisation of formMetaData.LOCALISATION"
-              [ngValue]="localisation"
-            >
+          <select class="form-control" [formControl]="activityForm.controls.localisation">
+            <option *ngFor="let localisation of formMetaData.LOCALISATION" [ngValue]="localisation">
               {{ localisation.mnemonique }}
             </option>
           </select>
           <small
             *ngIf="
-              (activityForm.controls.localisation.touched ||
-                formImpactSubmitted) &&
+              (activityForm.controls.localisation.touched || formImpactSubmitted) &&
               activityForm.controls.localisation.errors?.required
             "
             class="error-msg"

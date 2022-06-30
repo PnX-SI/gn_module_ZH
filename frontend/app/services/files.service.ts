@@ -76,12 +76,12 @@ export class FilesService {
               item.image = reader.result;
             };
           });
-        })
+        });
         return this.files;
       }),
       catchError((error) => {
         const frontMsg: string = this._error.getFrontError(error.error.message);
-          this.displayError(frontMsg);
+        this.displayError(frontMsg);
         return throwError(error);
       })
     );

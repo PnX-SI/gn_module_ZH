@@ -166,8 +166,7 @@ export class ZhFormTab7Component implements OnInit {
       searchPlaceholderText: "Rechercher",
       enableSearchFilter: true,
       singleSelection: true,
-      noDataLabel:
-        "Toutes les propositions disponibles ont déjà été renseignées dans le tableau",
+      noDataLabel: "Toutes les propositions disponibles ont déjà été renseignées dans le tableau",
     };
   }
 
@@ -179,10 +178,7 @@ export class ZhFormTab7Component implements OnInit {
   getMetaData(action?) {
     this.initActionInput();
     this.actionInput = this.actionInput.filter(
-      (item) =>
-        !this.actionTable
-          .map((m) => m.action.id_action)
-          .includes(item.id_action)
+      (item) => !this.actionTable.map((m) => m.action.id_action).includes(item.id_action)
     );
     this.selectedAction = null;
     if (action != null) {
@@ -228,9 +224,7 @@ export class ZhFormTab7Component implements OnInit {
               let nameQaulif = this.formMetaData["FONCTIONS_QUALIF"].find(
                 (item: any) => item.id_nomenclature == fctBio.id_qualification
               );
-              let nameKnowledge = this.formMetaData[
-                "FONCTIONS_CONNAISSANCE"
-              ].find(
+              let nameKnowledge = this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
                 (item: any) => item.id_nomenclature == fctBio.id_knowledge
               );
               this.bioFctData.push({
@@ -248,9 +242,7 @@ export class ZhFormTab7Component implements OnInit {
               let nameQaulif = this.formMetaData["FONCTIONS_QUALIF"].find(
                 (item: any) => item.id_nomenclature == fctBio.id_qualification
               );
-              let nameKnowledge = this.formMetaData[
-                "FONCTIONS_CONNAISSANCE"
-              ].find(
+              let nameKnowledge = this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
                 (item: any) => item.id_nomenclature == fctBio.id_knowledge
               );
               this.hydroFctData.push({
@@ -268,9 +260,7 @@ export class ZhFormTab7Component implements OnInit {
               let nameQaulif = this.formMetaData["FONCTIONS_QUALIF"].find(
                 (item: any) => item.id_nomenclature == fctBio.id_qualification
               );
-              let nameKnowledge = this.formMetaData[
-                "FONCTIONS_CONNAISSANCE"
-              ].find(
+              let nameKnowledge = this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
                 (item: any) => item.id_nomenclature == fctBio.id_knowledge
               );
               this.patrimData.push({
@@ -288,9 +278,7 @@ export class ZhFormTab7Component implements OnInit {
               let nameQaulif = this.formMetaData["FONCTIONS_QUALIF"].find(
                 (item: any) => item.id_nomenclature == socEco.id_qualification
               );
-              let nameKnowledge = this.formMetaData[
-                "FONCTIONS_CONNAISSANCE"
-              ].find(
+              let nameKnowledge = this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
                 (item: any) => item.id_nomenclature == socEco.id_knowledge
               );
               this.socEcoData.push({
@@ -311,30 +299,24 @@ export class ZhFormTab7Component implements OnInit {
             );
           }
           if (evalZh.id_diag_hydro) {
-            this.evalZh.diag_hydro = this.formMetaData[
-              "FONCTIONNALITE_HYDRO"
-            ].find((item: any) => item.id_nomenclature == evalZh.id_diag_hydro);
+            this.evalZh.diag_hydro = this.formMetaData["FONCTIONNALITE_HYDRO"].find(
+              (item: any) => item.id_nomenclature == evalZh.id_diag_hydro
+            );
           }
         });
         // patch forms values
         this.formTab7.patchValue({
-          remark_eval_functions:
-            this.currentZh.properties.remark_eval_functions,
+          remark_eval_functions: this.currentZh.properties.remark_eval_functions,
           remark_eval_thread: this.currentZh.properties.remark_eval_thread,
           remark_eval_actions: this.currentZh.properties.remark_eval_actions,
           id_strat_gestion: this.currentZh.properties.id_strat_gestion,
         });
-        if (
-          this.currentZh.properties.actions &&
-          this.currentZh.properties.actions.length > 0
-        ) {
+        if (this.currentZh.properties.actions && this.currentZh.properties.actions.length > 0) {
           this.initActionInput();
           const actionTable = [];
           this.currentZh.properties.actions.forEach((action: any) => {
             actionTable.push({
-              action: this.actionInput.find(
-                (item: any) => item.id_action == action.id_action
-              ),
+              action: this.actionInput.find((item: any) => item.id_action == action.id_action),
               priority: this.formMetaData["NIVEAU_PRIORITE"].find(
                 (item: any) => item.id_nomenclature == action.id_priority_level
               ),
@@ -486,23 +468,19 @@ export class ZhFormTab7Component implements OnInit {
       this.posted = true;
       this._dataService.postDataForm(formToPost, 7).subscribe(
         () => {
-          this._dataService
-            .getZhById(this.currentZh.properties.id_zh)
-            .subscribe((zh: any) => {
-              this._dataService.setCurrentZh(zh);
-              this.posted = false;
-              this.canChangeTab.emit(true);
-              this._toastr.success("Vos données sont bien enregistrées", "", {
-                positionClass: "toast-top-right",
-              });
-              this.nextTab.emit(8);
+          this._dataService.getZhById(this.currentZh.properties.id_zh).subscribe((zh: any) => {
+            this._dataService.setCurrentZh(zh);
+            this.posted = false;
+            this.canChangeTab.emit(true);
+            this._toastr.success("Vos données sont bien enregistrées", "", {
+              positionClass: "toast-top-right",
             });
+            this.nextTab.emit(8);
+          });
         },
         (error) => {
           this.posted = false;
-          const frontMsg: string = this._error.getFrontError(
-            error.error.message
-          );
+          const frontMsg: string = this._error.getFrontError(error.error.message);
           this._toastr.error(frontMsg, "", {
             positionClass: "toast-top-right",
           });
@@ -512,14 +490,9 @@ export class ZhFormTab7Component implements OnInit {
   }
 
   sortAction(action) {
-    const sortingArr = this.formMetaData["NIVEAU_PRIORITE"].map(
-      (item) => item.mnemonique
-    );
+    const sortingArr = this.formMetaData["NIVEAU_PRIORITE"].map((item) => item.mnemonique);
     action.sort(function (a, b) {
-      return (
-        sortingArr.indexOf(a.priority.mnemonique) -
-        sortingArr.indexOf(b.priority.mnemonique)
-      );
+      return sortingArr.indexOf(a.priority.mnemonique) - sortingArr.indexOf(b.priority.mnemonique);
     });
   }
 }
