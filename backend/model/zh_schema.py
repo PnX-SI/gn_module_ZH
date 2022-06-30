@@ -410,7 +410,7 @@ class CorZhArea(DB.Model):
     @staticmethod
     def get_municipalities_info(id_zh):
         return DB.session.query(CorZhArea, LiMunicipalities, TZH).join(LiMunicipalities, LiMunicipalities.id_area == CorZhArea.id_area).filter(
-            CorZhArea.id_zh == id_zh, TZH.id_zh == id_zh).all()
+            CorZhArea.id_zh == id_zh, TZH.id_zh == id_zh).order_by(LiMunicipalities.nom_com).all()
 
     @staticmethod
     def get_id_types_ref_geo(id_zh, ref_geo_config):

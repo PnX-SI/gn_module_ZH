@@ -375,6 +375,7 @@ export class ZhFormTab6Component implements OnInit {
                   }
                 });
               });
+              this.sortUrbanDocs();
             }
           });
         this.$_fromChangeSub = this.formTab6.valueChanges.subscribe(() => {
@@ -634,6 +635,7 @@ export class ZhFormTab6Component implements OnInit {
           };
         }
         this.urbanDocTable.push(formValues);
+        this.sortUrbanDocs();
       }
       // disable the added urbanDoc on the municipalities list
       this.municipalities.map((item: any) => {
@@ -730,6 +732,7 @@ export class ZhFormTab6Component implements OnInit {
       this.urbanDocTable = this.urbanDocTable.map((item: any) =>
         item.area.id_area != this.tempID ? item : formValues
       );
+      this.sortUrbanDocs();
       this.tempID = null;
       this.municipalities.map((item: any) => {
         if (item.id_area == formValues.area.id_area) {
@@ -1085,5 +1088,11 @@ export class ZhFormTab6Component implements OnInit {
         }
       );
     }
+  }
+
+  sortUrbanDocs() {
+    this.urbanDocTable.sort((a, b) =>
+      a.area.municipality_name > b.area.municipality_name ? 1 : b.area.municipality_name > a.area.municipality_name ? -1 : 0
+    );
   }
 }
