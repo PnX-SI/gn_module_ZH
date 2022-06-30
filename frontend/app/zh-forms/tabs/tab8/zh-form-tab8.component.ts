@@ -10,9 +10,9 @@ import { fileSizeValidator } from "../../../validators/fileSizeValidator";
 import { fileNameValidator } from "../../../validators/fileNameValidator";
 import { fileFormatValidator } from "../../../validators/fileFormatValidator";
 
-import { ZhFile } from "./zh-form-tab8.models";
 import { FilesService } from "../../../services/files.service";
 import { TabsService } from "../../../services/tabs.service";
+import { FilesExt, ZhFile } from "../../../models/files";
 
 @Component({
   selector: "zh-form-tab8",
@@ -49,7 +49,7 @@ export class ZhFormTab8Component implements OnInit {
     { name: "description_fr", label: "Résumé" },
   ];
 
-  public corFilesExt = [];
+  public corFilesExt: FilesExt[] = [];
   public imageFiles = {};
 
   constructor(
@@ -105,7 +105,7 @@ export class ZhFormTab8Component implements OnInit {
     this.handleImages();
     this.corFilesExt = [
       {
-        name: "Fichiers pdf",
+        name: "Fichiers PDF",
         files: this.getFilesByExtensions(EXT_PDF),
         editable: true,
       },
