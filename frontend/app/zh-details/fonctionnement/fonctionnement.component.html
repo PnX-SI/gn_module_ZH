@@ -5,14 +5,8 @@
         <legend>
           <h5 class="section-title">Régime hydrique</h5>
         </legend>
-        <zh-table
-          [tableCols]="entryTableCols"
-          [data]="data.regime.entree"
-        ></zh-table>
-        <zh-table
-          [tableCols]="exitTableCols"
-          [data]="data.regime.sortie"
-        ></zh-table>
+        <zh-table [tableCols]="entryTableCols" [data]="data.regime.entree"></zh-table>
+        <zh-table [tableCols]="exitTableCols" [data]="data.regime.sortie"></zh-table>
         <div class="row">
           <div class="col-12 col-xl-6 col-lg-6 col-md-6">
             <zh-label label="Submersion fréquence :">
@@ -30,9 +24,7 @@
     <div class="col-12 col-xl-5 col-lg-5 col-md-5">
       <fieldset>
         <legend>
-          <h5 class="section-title">
-            Connexion de la zone humide dans son environnement
-          </h5>
+          <h5 class="section-title">Connexion de la zone humide dans son environnement</h5>
         </legend>
         <zh-label label="Type de connexion :">
           <p *ngIf="!connectionImg">non renseigné</p>

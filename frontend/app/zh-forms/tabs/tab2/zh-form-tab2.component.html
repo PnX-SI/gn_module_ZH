@@ -1,13 +1,9 @@
 <div>
   <form [formGroup]="formTab2">
-    <h2 class="tabsTitle">
-      Délimitation de la zone humide et de l'espace de fonctionnalité
-    </h2>
+    <h2 class="tabsTitle">Délimitation de la zone humide et de l'espace de fonctionnalité</h2>
     <fieldset>
       <legend>
-        <h5 class="section-title">
-          Critères de délimitation de la zone humide
-        </h5>
+        <h5 class="section-title">Critères de délimitation de la zone humide</h5>
       </legend>
       <div class="form-row">
         <div class="form-group col-md-12">
@@ -22,20 +18,14 @@
         </div>
         <div class="form-group col-md-12">
           <small>Remarque</small>
-          <textarea
-            class="form-control form-control-sm"
-            rows="3"
-            formControlName="remark_lim"
-          >
+          <textarea class="form-control form-control-sm" rows="3" formControlName="remark_lim">
           </textarea>
         </div>
       </div>
     </fieldset>
     <fieldset>
       <legend>
-        <h5 class="section-title">
-          Critères de délimitation de l'espace de fonctionnalité
-        </h5>
+        <h5 class="section-title">Critères de délimitation de l'espace de fonctionnalité</h5>
       </legend>
       <div class="form-row">
         <div class="form-group col-md-12">
@@ -50,11 +40,7 @@
         </div>
         <div class="form-group col-md-12">
           <small>Remarque</small>
-          <textarea
-            class="form-control form-control-sm"
-            rows="3"
-            formControlName="remark_lim_fs"
-          >
+          <textarea class="form-control form-control-sm" rows="3" formControlName="remark_lim_fs">
           </textarea>
         </div>
       </div>
@@ -62,10 +48,7 @@
   </form>
 
   <div class="footer-btn">
-    <zh-cancelButton
-      *ngIf="currentZh"
-      [zhId]="currentZh.properties.id_zh"
-    ></zh-cancelButton>
+    <zh-cancelButton *ngIf="currentZh" [zhId]="currentZh.properties.id_zh"></zh-cancelButton>
     <button
       type="submit"
       mat-raised-button

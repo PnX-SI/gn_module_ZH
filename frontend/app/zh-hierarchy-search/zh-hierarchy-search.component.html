@@ -6,10 +6,12 @@
       </div>
     </div>
     <div class="card-body">
-      <div class="row" *ngIf="riverBasin?.value?.length > 0;else noZone">
+      <div class="row" *ngIf="riverBasin?.value?.length > 0; else noZone">
         <div class="col-12">
-
-          <zh-hierarchy-search-table [form]="form" [riverBasin]="riverBasin?.value[0]"></zh-hierarchy-search-table>
+          <zh-hierarchy-search-table
+            [form]="form"
+            [riverBasin]="riverBasin?.value[0]"
+          ></zh-hierarchy-search-table>
         </div>
       </div>
     </div>
@@ -17,5 +19,8 @@
 </div>
 
 <ng-template #noZone>
-  <span>Veuillez sélectionner au moins un bassin versant pour accéder aux filtres sur la hiérarchisation</span>
+  <span
+    >Veuillez sélectionner au moins un bassin versant pour accéder aux filtres sur la
+    hiérarchisation</span
+  >
 </ng-template>

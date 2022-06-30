@@ -63,34 +63,34 @@ export class ErrorTranslatorService {
     },
     {
       api: "user_not_allowed",
-      front:
-        "Vous n'avez pas les droits pour supprimer/modifier/lire cette zone humide",
+      front: "Vous n'avez pas les droits pour supprimer/modifier/lire cette zone humide",
       id: 10,
     },
     {
       api: "get_file_list_error",
-      front: "Impossible de récupérer la liste des fichiers sur cette zones humides, erreur serveur",
-      id: 11
+      front:
+        "Impossible de récupérer la liste des fichiers sur cette zones humides, erreur serveur",
+      id: 11,
     },
     {
       api: "upload_file_patch_error",
       front: "Impossible de mettre à jour ce fichier. Erreur serveur",
-      id: 12
+      id: 12,
     },
     {
       api: "delete_one_file_error",
       front: "Impossible de supprimer ce fichier. Erreur serveur",
-      id: 13
+      id: 13,
     },
     {
       api: "download_file_error",
       front: "Impossible de télécharger ce fichier. Erreur serveur",
-      id: 14
+      id: 14,
     },
     {
       api: "filter_zh_error",
       front: "Impossible de récupérer/filtrer les zones humides. Erreur serveur",
-      id: 15
+      id: 15,
     },
     {
       api: "empty_geometry",
@@ -101,13 +101,11 @@ export class ErrorTranslatorService {
       api: "Forbidden",
       front: "Vous ne possedez pas les droits pour effectuer cela",
       id: 17,
-    }
+    },
   ];
 
   getError(errorMsg: string): error {
-    const frontError: error = this.errors.filter(
-      (item) => item.api == errorMsg
-    )[0];
+    const frontError: error = this.errors.filter((item) => item.api == errorMsg)[0];
     return frontError;
   }
 

@@ -3,12 +3,7 @@ import { ZhDataService } from "../../services/zh-data.service";
 import { ToastrService } from "ngx-toastr";
 import { ErrorTranslatorService } from "../../services/error-translator.service";
 import { FormGroup, FormBuilder, FormArray } from "@angular/forms";
-import {
-  HierarchyField,
-  HierarchyFields,
-  Note,
-  RiverBasin,
-} from "../../models/hierarchy";
+import { HierarchyField, HierarchyFields, Note, RiverBasin } from "../../models/hierarchy";
 import { TableColumn } from "../../commonComponents/table/table-interface";
 
 type Data = {
@@ -114,17 +109,14 @@ export class ZhHierarchySearchTableComponent implements OnInit {
 
     const filteredNotes = this.notes.filter(
       (item) =>
-        (item.volet == event &&
-          item.rubrique == null &&
-          item.sousrubrique == null) ||
+        (item.volet == event && item.rubrique == null && item.sousrubrique == null) ||
         (item.rubrique == event && item.sousrubrique == null) ||
         item.sousrubrique == event
     );
 
     // Creates kind of a Set to have unique objects
     this.attributes = filteredNotes.filter(
-      (v, i, a) =>
-        a.findIndex((v2) => ["attribut"].every((k) => v2[k] === v[k])) === i
+      (v, i, a) => a.findIndex((v2) => ["attribut"].every((k) => v2[k] === v[k])) === i
     );
 
     //FIXME: problem here

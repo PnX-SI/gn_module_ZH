@@ -62,12 +62,7 @@ const routes: Routes = [
     ZhDetailsModule,
     ZhSearchModule,
   ],
-  providers: [
-    ZhDataService,
-    MapListService,
-    DatepickerI18n,
-    ErrorTranslatorService,
-  ],
+  providers: [ZhDataService, MapListService, DatepickerI18n, ErrorTranslatorService],
   bootstrap: [ZhMapListComponent],
 })
 export class GeonatureModule {}

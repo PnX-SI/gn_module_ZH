@@ -4,20 +4,7 @@ import { NgbDatepickerI18n, NgbDateStruct } from "@ng-bootstrap/ng-bootstrap";
 const I18N_VALUES = {
   fr: {
     weekdays: ["Lu", "Ma", "Me", "Je", "Ve", "Sa", "Di"],
-    months: [
-      "Jan",
-      "Fév",
-      "Mar",
-      "Avr",
-      "Mai",
-      "Juin",
-      "Juil",
-      "Aou",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Déc",
-    ],
+    months: ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Aou", "Sep", "Oct", "Nov", "Déc"],
     weekLabel: "sem",
   },
   // other languages you would support

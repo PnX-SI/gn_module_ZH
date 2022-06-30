@@ -3,15 +3,9 @@
     <div class="col-12 col-xl-6 col-lg-6 col-md-6">
       <fieldset>
         <legend>
-          <h5 class="section-title">
-            Critères de délimitation de la zone humide
-          </h5>
+          <h5 class="section-title">Critères de délimitation de la zone humide</h5>
         </legend>
-        <zh-label
-          *ngIf="data.delimitation_zone?.critere"
-          label="Critères utilisés :"
-        >
-        </zh-label>
+        <zh-label *ngIf="data.delimitation_zone?.critere" label="Critères utilisés :"> </zh-label>
         <ul>
           <li *ngFor="let item of data.delimitation_zone.critere">
             {{ item }}
@@ -26,14 +20,9 @@
     <div class="col-12 col-xl-6 col-lg-6 col-md-6">
       <fieldset>
         <legend>
-          <h5 class="section-title">
-            Critères de délimitation de l'espace de fonctionnalité
-          </h5>
+          <h5 class="section-title">Critères de délimitation de l'espace de fonctionnalité</h5>
         </legend>
-        <zh-label
-          *ngIf="data.delimitation_fonctions?.critere"
-          label="Critères utilisés :"
-        >
+        <zh-label *ngIf="data.delimitation_fonctions?.critere" label="Critères utilisés :">
         </zh-label>
         <ul>
           <li *ngFor="let item of data.delimitation_fonctions.critere">

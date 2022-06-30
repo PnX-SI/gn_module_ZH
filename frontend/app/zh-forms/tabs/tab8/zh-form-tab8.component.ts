@@ -89,10 +89,7 @@ export class ZhFormTab8Component implements OnInit {
     }
 
     validators.push(
-      fileSizeValidator(
-        this.config.max_jpg_size * 1000,
-        this.config.max_pdf_size * 1000
-      )
+      fileSizeValidator(this.config.max_jpg_size * 1000, this.config.max_pdf_size * 1000)
     );
 
     return validators;
@@ -159,12 +156,7 @@ export class ZhFormTab8Component implements OnInit {
 
   onEditFile(event: any, modal: any) {
     this.modalTitle = "Edition d'un fichier";
-    this.fillForm(
-      event.media_path,
-      event.title_fr,
-      event.author,
-      event.description_fr
-    );
+    this.fillForm(event.media_path, event.title_fr, event.author, event.description_fr);
     this.fileIdToPatch = event.id_media;
     this.patchModal = true;
     this.onOpenModal(modal);
@@ -256,9 +248,7 @@ export class ZhFormTab8Component implements OnInit {
   patchFile() {
     if (this.fileForm.valid) {
       this.loadingUpload = true;
-      const uploadForm: FormData = this.fillUploadForm(
-        this.fileToUpload.size !== 0
-      );
+      const uploadForm: FormData = this.fillUploadForm(this.fileToUpload.size !== 0);
       this._filesService
         .patchFile(this.fileIdToPatch, uploadForm)
         .toPromise()

@@ -23,9 +23,7 @@ import { HierarchyComponent } from "./hierarchy/hierarchy.component";
 import { RessourcesComponent } from "./ressources/ressources.component";
 
 // my module routing
-const routes: Routes = [
-  { path: "zhDetails/:id", component: ZhDetailsComponent },
-];
+const routes: Routes = [{ path: "zhDetails/:id", component: ZhDetailsComponent }];
 
 @NgModule({
   declarations: [
@@ -47,12 +45,7 @@ const routes: Routes = [
     DeleteModalComponent,
   ],
   entryComponents: [DeleteModalComponent],
-  imports: [
-    GN2CommonModule,
-    CommonModule,
-    RouterModule.forChild(routes),
-    MatRadioModule,
-  ],
+  imports: [GN2CommonModule, CommonModule, RouterModule.forChild(routes), MatRadioModule],
   exports: [
     CollapseComponent,
     TableComponent,

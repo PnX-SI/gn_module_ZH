@@ -13,27 +13,24 @@
       </button>
     </div>
     <div class="col-6">
-      <h5 class="d-flex justify-content-center title">
-        FICHE COMPLETE DE LA ZONE HUMIDE
-      </h5>
+      <h5 class="d-flex justify-content-center title">FICHE COMPLETE DE LA ZONE HUMIDE</h5>
     </div>
     <div class="col-3 changeButtons">
       <button
-      type="button"
-      ngbAutofocus
-      mat-raised-button
-      color="primary"
-      class="uppercase"
-      [class.spinner]="loading"
-      [disabled]="loadingPdf"
-      (click)="onDownloadPdf()"
-    >
-      <span *ngIf="!loadingPdf">Fiche pdf</span>  
-      <mat-icon *ngIf="loadingPdf">
-        <mat-spinner class="loading" color=warn diameter="25">
-        </mat-spinner>
-      </mat-icon>
-    </button>
+        type="button"
+        ngbAutofocus
+        mat-raised-button
+        color="primary"
+        class="uppercase"
+        [class.spinner]="loading"
+        [disabled]="loadingPdf"
+        (click)="onDownloadPdf()"
+      >
+        <span *ngIf="!loadingPdf">Fiche pdf</span>
+        <mat-icon *ngIf="loadingPdf">
+          <mat-spinner class="loading" color="warn" diameter="25"> </mat-spinner>
+        </mat-icon>
+      </button>
       <button
         *ngIf="rights?.U"
         type="button"
@@ -60,7 +57,7 @@
   </div>
 </div>
 <ng-template #content let-c="close" let-d="dismiss">
-  <zh-delete-modal (onCancel)="d()" (onDelete)=c()>
+  <zh-delete-modal (onCancel)="d()" (onDelete)="c()">
     <p>Etes-vous sûr de vouloir supprimer cette zone humide ? Cette action est irréversible</p>
   </zh-delete-modal>
 </ng-template>

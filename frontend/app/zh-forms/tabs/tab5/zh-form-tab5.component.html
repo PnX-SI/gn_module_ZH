@@ -16,11 +16,8 @@
           Fonction
         </button>
       </div>
-      <div
-        *ngIf="fctHydroTable && fctHydroTable.length > 0"
-        class="table-responsive"
-      >
-      <zh-table
+      <div *ngIf="fctHydroTable && fctHydroTable.length > 0" class="table-responsive">
+        <zh-table
           [tableCols]="hydroFctTableCol"
           [data]="fctHydroTable"
           [deletable]="true"
@@ -45,11 +42,8 @@
           Fonction
         </button>
       </div>
-      <div
-        *ngIf="bioFctTable && bioFctTable.length > 0"
-        class="table-responsive"
-      >
-      <zh-table
+      <div *ngIf="bioFctTable && bioFctTable.length > 0" class="table-responsive">
+        <zh-table
           [tableCols]="bioFctTableCol"
           [data]="bioFctTable"
           [deletable]="true"
@@ -73,30 +67,23 @@
           <mat-icon>add_box</mat-icon>
           Intérêt
         </button>
-        <div
-          *ngIf="interetPatTable && interetPatTable.length > 0"
-          class="table-responsive"
-        >
-        <zh-table
-          [tableCols]="interetsTableCol"
-          [data]="interetPatTable"
-          [deletable]="true"
-          [editable]="true"
-          (onDelete)="onDeleteInteretPat($event)"
-          (onEdit)="onEditInteretPat(interetPatModal, $event)"
-        ></zh-table>
+        <div *ngIf="interetPatTable && interetPatTable.length > 0" class="table-responsive">
+          <zh-table
+            [tableCols]="interetsTableCol"
+            [data]="interetPatTable"
+            [deletable]="true"
+            [editable]="true"
+            (onDelete)="onDeleteInteretPat($event)"
+            (onEdit)="onEditInteretPat(interetPatModal, $event)"
+          ></zh-table>
         </div>
       </div>
       <h3 class="sub-title">Habitats naturels humides patrimoniaux</h3>
       <div class="form-row">
         <div class="form-group col-md-4">
-          <small style="display: block; margin-bottom: 8px"
-            >Cartographie d'habitats</small
-          >
+          <small style="display: block; margin-bottom: 8px">Cartographie d'habitats</small>
           <mat-label ngClass="labelBeforeSlide">Non</mat-label>
-          <mat-slide-toggle [formControl]="formTab5.controls.is_carto_hab"
-            >oui</mat-slide-toggle
-          >
+          <mat-slide-toggle [formControl]="formTab5.controls.is_carto_hab">oui</mat-slide-toggle>
         </div>
         <div class="form-group col-md-4">
           <small>Nombre d'habitats</small>
@@ -108,10 +95,7 @@
             max="100"
           />
           <small
-            *ngIf="
-              formTab5.controls.nb_hab.value &&
-              formTab5.controls.nb_hab.errors?.min
-            "
+            *ngIf="formTab5.controls.nb_hab.value && formTab5.controls.nb_hab.errors?.min"
             class="error-msg"
             >Le nombre d'habitat(s) doit être supérieur à 0
           </small>
@@ -137,9 +121,7 @@
         </div>
       </div>
       <div class="form-row">
-        <small style="display: block; margin-bottom: 8px"
-            >Liste des habitats</small
-          >
+        <small style="display: block; margin-bottom: 8px">Liste des habitats</small>
       </div>
       <div class="form-row">
         <button
@@ -151,11 +133,10 @@
           <mat-icon>add_box</mat-icon>
           Habitat
         </button>
-        <div
-          *ngIf="corineBioTable && corineBioTable.length > 0"
-          class="table-responsive"
-        >
-          <i class="hint-text">*I.C. = Intérêt communautaire; P.R. = Intérêt communautaire prioritaire</i>
+        <div *ngIf="corineBioTable && corineBioTable.length > 0" class="table-responsive">
+          <i class="hint-text"
+            >*I.C. = Intérêt communautaire; P.R. = Intérêt communautaire prioritaire</i
+          >
           <zh-table
             [tableCols]="corineTableCol"
             [data]="corineBioTable"
@@ -163,7 +144,7 @@
             [editable]="true"
             (onDelete)="onDeleteCorineBio($event)"
             (onEdit)="onEditCorineBio(corineBioModal, $event)"
-        ></zh-table>
+          ></zh-table>
         </div>
       </div>
       <h3 class="sub-title">Faune et flore patrimoniale</h3>
@@ -172,12 +153,7 @@
           <small>Liste des espèces à statut de protection et/ou de conservation</small>
         </div>
         <div class="mb-2 col-12">
-          <button
-            mat-raised-button
-            class="mb-3"
-            color="primary"
-            (click)="onGenerateTaxa()"
-          >
+          <button mat-raised-button class="mb-3" color="primary" (click)="onGenerateTaxa()">
             <mat-icon>add_box</mat-icon>
             <mat-spinner *ngIf="taxaLoading" color="warn" diameter="25"></mat-spinner>
             Générer la liste des espèces
@@ -188,39 +164,51 @@
             [ngbTooltip]="htmlContent"
             tooltipClass="wide-tooltip"
             placement="right"
-            triggers="click:blur">
+            triggers="click:blur"
+          >
             help
           </mat-icon>
           <ng-template #htmlContent>
             <div class="bulle">
-              En fonction des données présentes dans la base de données ciblée par l'instance, ce dispositif génère un fichier Excel horodaté par type de taxon :
+              En fonction des données présentes dans la base de données ciblée par l'instance, ce
+              dispositif génère un fichier Excel horodaté par type de taxon :
               <ul>
                 <li>Flore</li>
                 <li>Faune, groupes des vertébrés</li>
                 <li>Faune, groupes des invertébrés</li>
               </ul>
-              <p>Une fois générés, ces fichiers sont archivés dans le présent onglet ainsi que dans l'onglet 8 regroupant les ressources documentaires de la ZH.</p>
-              
+              <p>
+                Une fois générés, ces fichiers sont archivés dans le présent onglet ainsi que dans
+                l'onglet 8 regroupant les ressources documentaires de la ZH.
+              </p>
+
               <p>Sont concernées les espèces observées :</p>
               <ul>
                 <li>rattachées à un pointage précis avec des coordonnées géographiques</li>
-                <li>ayant au moins un statut d’évaluation et/ou de protection et/ou de menace (au minimum de vulnérable)</li>
+                <li>
+                  ayant au moins un statut d’évaluation et/ou de protection et/ou de menace (au
+                  minimum de vulnérable)
+                </li>
                 <li>depuis moins de 20 ans</li>
                 <li>dans le périmètre strict de la zone humide cartographiée</li>
               </ul>
-                Dans le cas d'absence d'observation répondant à ces critères, aucun fichier ne sera généré
+              Dans le cas d'absence d'observation répondant à ces critères, aucun fichier ne sera
+              généré
             </div>
           </ng-template>
           <ng-container *ngIf="_filesService.filterByExtension('csv').length > 0">
             <zh-table
-            
-            [tableCols]="fileTableCol" 
-            [data]="_filesService.filterByExtension('csv')"
-            [downloadable]="true"
-            (onDownload)="_filesService.downloadFile($event)"
+              [tableCols]="fileTableCol"
+              [data]="_filesService.filterByExtension('csv')"
+              [downloadable]="true"
+              (onDownload)="_filesService.downloadFile($event)"
             ></zh-table>
             <p class="hint">
-              Vous pouvez retrouver ces fichiers dans l'onglet des ressources documentaires (<a [routerLink]="" (click)="nextTab.emit(8)">onglet 8</a>)
+              Vous pouvez retrouver ces fichiers dans l'onglet des ressources documentaires (<a
+                [routerLink]=""
+                (click)="nextTab.emit(8)"
+                >onglet 8</a
+              >)
             </p>
           </ng-container>
         </div>
@@ -233,10 +221,7 @@
             min="0"
           />
           <small
-            *ngIf="
-              formTab5.controls.nb_flora_sp.value &&
-              formTab5.controls.nb_flora_sp.errors?.min
-            "
+            *ngIf="formTab5.controls.nb_flora_sp.value && formTab5.controls.nb_flora_sp.errors?.min"
             class="error-msg"
             >Le nombre d'espèce(s) doit être supérieur à 0
           </small>
@@ -291,26 +276,20 @@
           <mat-icon>add_box</mat-icon>
           Valeur
         </button>
-        <div
-          *ngIf="valSocEcoTable && valSocEcoTable.length > 0"
-          class="table-responsive"
-        >
-        <zh-table
-          [tableCols]="socioEcoTableCol"
-          [data]="valSocEcoTable"
-          [deletable]="true"
-          [editable]="true"
-          (onDelete)="onDeleteValSocEco($event)"
-          (onEdit)="onEditValSocEco(valSocEcoModal, $event)"
-        ></zh-table>
+        <div *ngIf="valSocEcoTable && valSocEcoTable.length > 0" class="table-responsive">
+          <zh-table
+            [tableCols]="socioEcoTableCol"
+            [data]="valSocEcoTable"
+            [deletable]="true"
+            [editable]="true"
+            (onDelete)="onDeleteValSocEco($event)"
+            (onEdit)="onEditValSocEco(valSocEcoModal, $event)"
+          ></zh-table>
         </div>
       </div>
     </fieldset>
     <div class="footer-btn">
-      <zh-cancelButton
-        *ngIf="currentZh"
-        [zhId]="currentZh.properties.id_zh"
-      ></zh-cancelButton>
+      <zh-cancelButton *ngIf="currentZh" [zhId]="currentZh.properties.id_zh"></zh-cancelButton>
       <button
         type="submit"
         mat-raised-button
@@ -344,15 +323,8 @@
             ngbAutofocus
             [formControl]="hydroFctForm.controls.function"
           >
-            <optgroup
-              *ngFor="let group of fctHydroInput"
-              label="{{ group[0].category }}"
-            >
-              <option
-                *ngFor="let item of group"
-                [ngValue]="item"
-                [disabled]="item.disabled"
-              >
+            <optgroup *ngFor="let group of fctHydroInput" label="{{ group[0].category }}">
+              <option *ngFor="let item of group" [ngValue]="item" [disabled]="item.disabled">
                 {{ item.mnemonique }}
               </option>
             </optgroup>
@@ -368,21 +340,14 @@
         </div>
         <div class="form-group col-md-6">
           <small class="required">Qualifications</small>
-          <select
-            class="form-control"
-            [formControl]="hydroFctForm.controls.qualification"
-          >
-            <option
-              *ngFor="let qualif of formMetaData.FONCTIONS_QUALIF"
-              [ngValue]="qualif"
-            >
+          <select class="form-control" [formControl]="hydroFctForm.controls.qualification">
+            <option *ngFor="let qualif of formMetaData.FONCTIONS_QUALIF" [ngValue]="qualif">
               {{ qualif.mnemonique }}
             </option>
           </select>
           <small
             *ngIf="
-              (hydroFctForm.controls.qualification.touched ||
-                modalFormSubmitted) &&
+              (hydroFctForm.controls.qualification.touched || modalFormSubmitted) &&
               hydroFctForm.controls.qualification.errors?.required
             "
             class="error-msg"
@@ -391,10 +356,7 @@
         </div>
         <div class="form-group col-md-6">
           <small class="required">Connaissance</small>
-          <select
-            class="form-control"
-            [formControl]="hydroFctForm.controls.knowledge"
-          >
+          <select class="form-control" [formControl]="hydroFctForm.controls.knowledge">
             <option
               *ngFor="let knowledge of formMetaData.FONCTIONS_CONNAISSANCE"
               [ngValue]="knowledge"
@@ -459,11 +421,7 @@
               label="{{ group[0].category }}"
               class="test"
             >
-              <option
-                *ngFor="let item of group"
-                [ngValue]="item"
-                [disabled]="item.disabled"
-              >
+              <option *ngFor="let item of group" [ngValue]="item" [disabled]="item.disabled">
                 {{ item.mnemonique }}
               </option>
             </optgroup>
@@ -479,21 +437,14 @@
         </div>
         <div class="form-group col-md-6">
           <small class="required">Qualifications</small>
-          <select
-            class="form-control"
-            [formControl]="bioFctForm.controls.qualification"
-          >
-            <option
-              *ngFor="let qualif of formMetaData.FONCTIONS_QUALIF"
-              [ngValue]="qualif"
-            >
+          <select class="form-control" [formControl]="bioFctForm.controls.qualification">
+            <option *ngFor="let qualif of formMetaData.FONCTIONS_QUALIF" [ngValue]="qualif">
               {{ qualif.mnemonique }}
             </option>
           </select>
           <small
             *ngIf="
-              (bioFctForm.controls.qualification.touched ||
-                modalFormSubmitted) &&
+              (bioFctForm.controls.qualification.touched || modalFormSubmitted) &&
               bioFctForm.controls.qualification.errors?.required
             "
             class="error-msg"
@@ -502,10 +453,7 @@
         </div>
         <div class="form-group col-md-6">
           <small class="required">Connaissance</small>
-          <select
-            class="form-control"
-            [formControl]="bioFctForm.controls.knowledge"
-          >
+          <select class="form-control" [formControl]="bioFctForm.controls.knowledge">
             <option
               *ngFor="let knowledge of formMetaData.FONCTIONS_CONNAISSANCE"
               [ngValue]="knowledge"
@@ -565,23 +513,15 @@
             ngbAutofocus
             [formControl]="interetPatForm.controls.function"
           >
-            <optgroup
-              *ngFor="let group of interetPatInput"
-              label="{{ group[0].category }}"
-            >
-              <option
-                *ngFor="let item of group"
-                [ngValue]="item"
-                [disabled]="item.disabled"
-              >
+            <optgroup *ngFor="let group of interetPatInput" label="{{ group[0].category }}">
+              <option *ngFor="let item of group" [ngValue]="item" [disabled]="item.disabled">
                 {{ item.mnemonique }}
               </option>
             </optgroup>
           </select>
           <small
             *ngIf="
-              (interetPatForm.controls.function.touched ||
-                modalFormSubmitted) &&
+              (interetPatForm.controls.function.touched || modalFormSubmitted) &&
               interetPatForm.controls.function.errors?.required
             "
             class="error-msg"
@@ -590,21 +530,14 @@
         </div>
         <div class="form-group col-md-6">
           <small class="required">Qualifications</small>
-          <select
-            class="form-control"
-            [formControl]="interetPatForm.controls.qualification"
-          >
-            <option
-              *ngFor="let qualif of formMetaData.FONCTIONS_QUALIF"
-              [ngValue]="qualif"
-            >
+          <select class="form-control" [formControl]="interetPatForm.controls.qualification">
+            <option *ngFor="let qualif of formMetaData.FONCTIONS_QUALIF" [ngValue]="qualif">
               {{ qualif.mnemonique }}
             </option>
           </select>
           <small
             *ngIf="
-              (interetPatForm.controls.qualification.touched ||
-                modalFormSubmitted) &&
+              (interetPatForm.controls.qualification.touched || modalFormSubmitted) &&
               interetPatForm.controls.qualification.errors?.required
             "
             class="error-msg"
@@ -613,10 +546,7 @@
         </div>
         <div class="form-group col-md-6">
           <small class="required">Connaissance</small>
-          <select
-            class="form-control"
-            [formControl]="interetPatForm.controls.knowledge"
-          >
+          <select class="form-control" [formControl]="interetPatForm.controls.knowledge">
             <option
               *ngFor="let knowledge of formMetaData.FONCTIONS_CONNAISSANCE"
               [ngValue]="knowledge"
@@ -626,8 +556,7 @@
           </select>
           <small
             *ngIf="
-              (interetPatForm.controls.knowledge.touched ||
-                modalFormSubmitted) &&
+              (interetPatForm.controls.knowledge.touched || modalFormSubmitted) &&
               interetPatForm.controls.knowledge.errors?.required
             "
             class="error-msg"
@@ -677,11 +606,7 @@
             ngbAutofocus
             [formControl]="valSocEcoForm.controls.function"
           >
-            <option
-              *ngFor="let item of valSocEcoInput"
-              [ngValue]="item"
-              [disabled]="item.disabled"
-            >
+            <option *ngFor="let item of valSocEcoInput" [ngValue]="item" [disabled]="item.disabled">
               {{ item.mnemonique }}
             </option>
           </select>
@@ -696,21 +621,14 @@
         </div>
         <div class="form-group col-md-6">
           <small class="required">Qualifications</small>
-          <select
-            class="form-control"
-            [formControl]="valSocEcoForm.controls.qualification"
-          >
-            <option
-              *ngFor="let qualif of formMetaData.FONCTIONS_QUALIF"
-              [ngValue]="qualif"
-            >
+          <select class="form-control" [formControl]="valSocEcoForm.controls.qualification">
+            <option *ngFor="let qualif of formMetaData.FONCTIONS_QUALIF" [ngValue]="qualif">
               {{ qualif.mnemonique }}
             </option>
           </select>
           <small
             *ngIf="
-              (valSocEcoForm.controls.qualification.touched ||
-                modalFormSubmitted) &&
+              (valSocEcoForm.controls.qualification.touched || modalFormSubmitted) &&
               valSocEcoForm.controls.qualification.errors?.required
             "
             class="error-msg"
@@ -719,10 +637,7 @@
         </div>
         <div class="form-group col-md-6">
           <small class="required">Connaissance</small>
-          <select
-            class="form-control"
-            [formControl]="valSocEcoForm.controls.knowledge"
-          >
+          <select class="form-control" [formControl]="valSocEcoForm.controls.knowledge">
             <option
               *ngFor="let knowledge of formMetaData.FONCTIONS_CONNAISSANCE"
               [ngValue]="knowledge"
@@ -732,8 +647,7 @@
           </select>
           <small
             *ngIf="
-              (valSocEcoForm.controls.knowledge.touched ||
-                modalFormSubmitted) &&
+              (valSocEcoForm.controls.knowledge.touched || modalFormSubmitted) &&
               valSocEcoForm.controls.knowledge.errors?.required
             "
             class="error-msg"
@@ -800,20 +714,19 @@
         </div>
         <div class="form-group col-md-6">
           <small class="required">Cahier habitats</small>
-          <select
-            class="form-control"
-            [formControl]="corineBioForm.controls.cahierHab"
-          >
+          <select class="form-control" [formControl]="corineBioForm.controls.cahierHab">
             <option value=""></option>
-            <option *ngFor="let habitat of cahierHabInput" [ngValue]="habitat"
-            [attr.disabled]="habitat?.disabled ? '' : null">
+            <option
+              *ngFor="let habitat of cahierHabInput"
+              [ngValue]="habitat"
+              [attr.disabled]="habitat?.disabled ? '' : null"
+            >
               {{ habitat.lb_code }} - {{ habitat.lb_hab_fr }}
             </option>
           </select>
           <small
             *ngIf="
-              (corineBioForm.controls.cahierHab.touched ||
-                modalFormSubmitted) &&
+              (corineBioForm.controls.cahierHab.touched || modalFormSubmitted) &&
               corineBioForm.controls.cahierHab.errors?.required
             "
             class="error-msg"
@@ -822,21 +735,14 @@
         </div>
         <div class="form-group col-md-6">
           <small class="required">État de conservation</small>
-          <select
-            class="form-control"
-            [formControl]="corineBioForm.controls.preservationState"
-          >
-            <option
-              *ngFor="let state of formMetaData.ETAT_CONSERVATION"
-              [ngValue]="state"
-            >
+          <select class="form-control" [formControl]="corineBioForm.controls.preservationState">
+            <option *ngFor="let state of formMetaData.ETAT_CONSERVATION" [ngValue]="state">
               {{ state.mnemonique }}
             </option>
           </select>
           <small
             *ngIf="
-              (corineBioForm.controls.preservationState.touched ||
-                modalFormSubmitted) &&
+              (corineBioForm.controls.preservationState.touched || modalFormSubmitted) &&
               corineBioForm.controls.preservationState.errors?.required
             "
             class="error-msg"

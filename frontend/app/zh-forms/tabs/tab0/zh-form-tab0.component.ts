@@ -1,11 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  HostListener,
-  Input,
-  OnInit,
-  Output,
-} from "@angular/core";
+import { Component, EventEmitter, HostListener, Input, OnInit, Output } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { Subscription } from "rxjs";
@@ -56,7 +49,7 @@ export class ZhFormTab0Component implements OnInit {
     private _router: Router,
     private _toastr: ToastrService,
     private _error: ErrorTranslatorService,
-    private _pbfService: PbfService,
+    private _pbfService: PbfService
   ) {}
 
   ngOnInit() {
@@ -88,17 +81,18 @@ export class ZhFormTab0Component implements OnInit {
     this.geomLayers = [];
     this.removeLayers();
     // Here so that the mapService is already initialized
-    this._pbfService.getPbf(this._mapService.map).toPromise().then(data =>
-      {
+    this._pbfService
+      .getPbf(this._mapService.map)
+      .toPromise()
+      .then((data) => {
         // Do not show the data on the map by default
-        data = data.setOpacity(0)
-        this.geomLayers.push(
-        data.addTo(this._mapService.map))
-      })
+        data = data.setOpacity(0);
+        this.geomLayers.push(data.addTo(this._mapService.map));
+      });
   }
 
   intiTab() {
-    this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {     
+    this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
         this._currentZh = zh;
         this.zhId = this._currentZh.properties.id_zh;
@@ -108,9 +102,7 @@ export class ZhFormTab0Component implements OnInit {
         );
         const selectedCritDelim = [];
         this.critDelim.forEach((critere) => {
-          if (
-            this._currentZh.properties.id_lims.includes(critere.id_nomenclature)
-          ) {
+          if (this._currentZh.properties.id_lims.includes(critere.id_nomenclature)) {
             selectedCritDelim.push(critere);
           }
         });
@@ -125,9 +117,7 @@ export class ZhFormTab0Component implements OnInit {
         setTimeout(() => {
           // Transform into a featureCollection to feed the
           // leafletDrawFeatureGroup
-          this.geometry = this.multipolygonToFeatureCollection(
-            this._currentZh.geometry
-          );
+          this.geometry = this.multipolygonToFeatureCollection(this._currentZh.geometry);
           // Clears the layers before adding the geometry to
           // prevent having the same superimposed layers...
           this._mapService.leafletDrawFeatureGroup.clearLayers();
@@ -238,9 +228,7 @@ export class ZhFormTab0Component implements OnInit {
             );
             // Not really good, but must filter error id to remove the
             // geometry or not
-            if (
-              this._error.getErrorId(error.error.message) == GEOM_CONTAINED_ID
-            ) {
+            if (this._error.getErrorId(error.error.message) == GEOM_CONTAINED_ID) {
               this._mapService.removeAllLayers(
                 this._mapService.map,
                 this._mapService.leafletDrawFeatureGroup
@@ -262,7 +250,7 @@ export class ZhFormTab0Component implements OnInit {
 
   slideToggleChanged() {
     this.geomLayers.forEach((layer: any) => {
-      layer.setOpacity(this.toggleChecked ? 1 : 0)
+      layer.setOpacity(this.toggleChecked ? 1 : 0);
     });
   }
 
@@ -273,10 +261,7 @@ export class ZhFormTab0Component implements OnInit {
 
     this.canChangeTab.emit(false);
     this._mapService.map.eachLayer((layer: any) => {
-      if (
-        this.currentLayer &&
-        layer._leaflet_id == this.currentLayer._leaflet_id
-      ) {
+      if (this.currentLayer && layer._leaflet_id == this.currentLayer._leaflet_id) {
         this._mapService.map.removeLayer(layer);
       }
     });
@@ -320,9 +305,7 @@ export class ZhFormTab0Component implements OnInit {
     // featureGroup
     const features = featureCollection.features;
     let coordinates = [];
-    features.forEach((element) =>
-      coordinates.push(element.geometry.coordinates)
-    );
+    features.forEach((element) => coordinates.push(element.geometry.coordinates));
     return {
       type: "Feature",
       geometry: {
@@ -352,9 +335,7 @@ export class ZhFormTab0Component implements OnInit {
     // We can have a multipolygon and a polygon here.
     // It can be checked with their coordinates
     if (geometry.coordinates.length > 1 && geometry.type !== "Polygon") {
-      geometry.coordinates.forEach((coord) =>
-        features.push(this.getPolygonFeature(coord))
-      );
+      geometry.coordinates.forEach((coord) => features.push(this.getPolygonFeature(coord)));
     } else {
       features.push(this.getPolygonFeature(geometry.coordinates));
     }

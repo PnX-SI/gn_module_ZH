@@ -1,13 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { Subscription, of, Observable } from "rxjs";
-import {
-  debounceTime,
-  distinctUntilChanged,
-  switchMap,
-  catchError,
-  map,
-} from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from "rxjs/operators";
 import { ToastrService } from "ngx-toastr";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { ZhDataService } from "../../../services/zh-data.service";
@@ -80,11 +74,9 @@ export class ZhFormTab1Component implements OnInit {
           id_site_space: this.currentZh.properties.id_site_space,
           id_zh: this.currentZh.properties.id_zh,
         });
-        this.$_fromChangeSub = this.generalInfoForm.valueChanges.subscribe(
-          () => {
-            this.canChangeTab.emit(false);
-          }
-        );
+        this.$_fromChangeSub = this.generalInfoForm.valueChanges.subscribe(() => {
+          this.canChangeTab.emit(false);
+        });
       }
     });
   }
@@ -101,17 +93,15 @@ export class ZhFormTab1Component implements OnInit {
   }
 
   onFormValueChanges(): void {
-    this.generalInfoForm
-      .get("is_id_site_space")
-      .valueChanges.subscribe((val: Boolean) => {
-        if (val == true) {
-          this.generalInfoForm.get("id_site_space").enable();
-          this.hasSiteSpace = true;
-        } else if (val == false) {
-          this.hasSiteSpace = false;
-          this.generalInfoForm.get("id_site_space").reset();
-        }
-      });
+    this.generalInfoForm.get("is_id_site_space").valueChanges.subscribe((val: Boolean) => {
+      if (val == true) {
+        this.generalInfoForm.get("id_site_space").enable();
+        this.hasSiteSpace = true;
+      } else if (val == false) {
+        this.hasSiteSpace = false;
+        this.generalInfoForm.get("id_site_space").reset();
+      }
+    });
   }
 
   getMetaData() {
@@ -122,9 +112,7 @@ export class ZhFormTab1Component implements OnInit {
     seletedBib.preventDefault();
     const bib = seletedBib.item;
     if (bib) {
-      let itemExist = this.listBib.some(
-        (item) => item.id_reference == bib.id_reference
-      );
+      let itemExist = this.listBib.some((item) => item.id_reference == bib.id_reference);
       if (!itemExist) {
         this.listBib.push(bib);
         this.canChangeTab.emit(false);
@@ -162,23 +150,19 @@ export class ZhFormTab1Component implements OnInit {
       this.posted = true;
       this._dataService.postDataForm(formToPost, 1).subscribe(
         () => {
-          this._dataService
-            .getZhById(this.currentZh.properties.id_zh)
-            .subscribe((zh: any) => {
-              this._dataService.setCurrentZh(zh);
-              this.posted = false;
-              this.canChangeTab.emit(true);
-              this._toastr.success("Vos données sont bien enregistrées", "", {
-                positionClass: "toast-top-right",
-              });
-              this.nextTab.emit(2);
+          this._dataService.getZhById(this.currentZh.properties.id_zh).subscribe((zh: any) => {
+            this._dataService.setCurrentZh(zh);
+            this.posted = false;
+            this.canChangeTab.emit(true);
+            this._toastr.success("Vos données sont bien enregistrées", "", {
+              positionClass: "toast-top-right",
             });
+            this.nextTab.emit(2);
+          });
         },
         (error) => {
           this.posted = false;
-          const frontMsg: string = this._error.getFrontError(
-            error.error.message
-          );
+          const frontMsg: string = this._error.getFrontError(error.error.message);
           this._toastr.error(frontMsg, "", {
             positionClass: "toast-top-right",
           });
@@ -195,9 +179,7 @@ export class ZhFormTab1Component implements OnInit {
         this._dataService.autocompletBib(searchText).pipe(
           map((res: any) =>
             res.filter((r) => {
-              return !this.listBib
-                .map((bib) => bib.id_reference)
-                .includes(r.id_reference);
+              return !this.listBib.map((bib) => bib.id_reference).includes(r.id_reference);
             })
           ),
           catchError(() => {

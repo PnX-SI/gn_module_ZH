@@ -17,7 +17,7 @@
       </div>
       <collapse [title]="imageFiles.name" *ngIf="imageFiles.files && imageFiles.files.length > 0">
         <zh-image-table
-          [tableCols]="fileTableCol" 
+          [tableCols]="fileTableCol"
           [data]="imageFiles.files"
           [deletable]="true"
           [editable]="true"
@@ -25,13 +25,14 @@
           (onDelete)="onDeleteFile($event)"
           (onEdit)="onEditFile($event, fileModal)"
           (onDownload)="_filesService.downloadFile($event)"
-          (onRadioChanged)="onChangeMainPhoto($event)">
+          (onRadioChanged)="onChangeMainPhoto($event)"
+        >
         </zh-image-table>
       </collapse>
       <ng-container *ngFor="let item of corFilesExt">
         <collapse [title]="item.name" *ngIf="item.files && item.files.length > 0">
           <zh-table
-            [tableCols]="fileTableCol" 
+            [tableCols]="fileTableCol"
             [data]="item.files"
             [deletable]="true"
             [editable]="item.editable"
@@ -45,17 +46,9 @@
     </fieldset>
 
     <div class="footer-btn">
-      <zh-cancelButton
-        *ngIf="zh"
-        [zhId]="zh.properties.id_zh"
-      ></zh-cancelButton>
-      <button
-        mat-raised-button
-        color="primary"
-        class="ml-3"
-        (click)="nextTab.emit(9)"
-      >
-      <mat-icon>save_outline</mat-icon>
+      <zh-cancelButton *ngIf="zh" [zhId]="zh.properties.id_zh"></zh-cancelButton>
+      <button mat-raised-button color="primary" class="ml-3" (click)="nextTab.emit(9)">
+        <mat-icon>save_outline</mat-icon>
         Enregistrer
       </button>
     </div>
@@ -71,39 +64,53 @@
     </button>
   </div>
   <div class="modal-body">
-    <div *ngIf="config?.filename_validated || 
-                config?.filename_validated || 
-                config?.max_pdf_size || 
-                config?.max_jpg_size"
-          class="flex-container alert alert-info">
+    <div
+      *ngIf="
+        config?.filename_validated ||
+        config?.filename_validated ||
+        config?.max_pdf_size ||
+        config?.max_jpg_size
+      "
+      class="flex-container alert alert-info"
+    >
       <ul>
         <li>
           <ng-container *ngIf="config?.fileformat_validated">
-            <span>Seules les extensions suivantes sont acceptées : 
-              <b *ngFor="let item of fileTypeAccepted; let isLast=last">
-              {{ item.split('/')[1] }}{{isLast ? '' : ', '}}
-              </b>
-             </span><br>
+            <span
+              >Seules les extensions suivantes sont acceptées :
+              <b *ngFor="let item of fileTypeAccepted; let isLast = last">
+                {{ item.split("/")[1] }}{{ isLast ? "" : ", " }}
+              </b> </span
+            ><br />
           </ng-container>
         </li>
         <li>
           <ng-container *ngIf="config?.filename_validated">
-            <span>Pour les images, le format doit être le suivant : <b>{{ zh.properties.code }}_#.jpeg</b> (avec # un nombre)</span><br>
+            <span
+              >Pour les images, le format doit être le suivant :
+              <b>{{ zh.properties.code }}_#.jpeg</b> (avec # un nombre)</span
+            ><br />
           </ng-container>
         </li>
         <li>
           <ng-container *ngIf="config?.max_pdf_size">
-            <span>La taille maximale des fichers pdf est de <b>{{ config.max_pdf_size }}Mo</b></span><br>
+            <span
+              >La taille maximale des fichers pdf est de <b>{{ config.max_pdf_size }}Mo</b></span
+            ><br />
           </ng-container>
         </li>
         <li>
           <ng-container *ngIf="config?.max_jpg_size">
-            <span>La taille maximale des fichers jpeg est de <b>{{ config.max_jpg_size }}Mo</b></span><br>
+            <span
+              >La taille maximale des fichers jpeg est de <b>{{ config.max_jpg_size }}Mo</b></span
+            ><br />
           </ng-container>
         </li>
         <li>
           <ng-container *ngIf="config?.fileformat_validated">
-            Apposer une signature numérique visible sur la photographie indiquant : © / Année de prise de vue / Sigle de l'organisme / 1er lettre du prénom de l'auteur / Nom de l'auteur (exemple : © 2022 - ABCD -N. DUPOND).
+            Apposer une signature numérique visible sur la photographie indiquant : © / Année de
+            prise de vue / Sigle de l'organisme / 1er lettre du prénom de l'auteur / Nom de l'auteur
+            (exemple : © 2022 - ABCD -N. DUPOND).
           </ng-container>
         </li>
       </ul>
@@ -120,27 +127,23 @@
             accept="image/*,.pdf"
           />
           <button mat-raised-button color="primary" (click)="fileInput.click()">Parcourir</button>
-          <small class="file-name" *ngIf="fileToUpload !== null">Fichier renseigné : {{ fileToUpload.name }}</small>
-          </div>
+          <small class="file-name" *ngIf="fileToUpload !== null"
+            >Fichier renseigné : {{ fileToUpload.name }}</small
+          >
+        </div>
         <div class="form-group col-md-12">
-          <small
-              *ngIf="
-                fileForm.controls.file.errors?.fileSizeValidator
-              "
-              class="error-msg"
-              >Le fichier excède le poids maximum autorisé qui est de {{ config.max_jpg_size }}Mo pour les photos, {{ config.max_pdf_size }}Mo pour les pdf.<br>Poids mesuré : {{ fileToUpload.size / 1000000 | number: '1.0-1' }}Mo</small>
-          <small
-            *ngIf="
-              fileForm.controls.file.errors?.fileNameValidator
-            "
-            class="error-msg"
-            >Le fichier ne respecte pas le format suivant : &lt;ZHCODE&gt;_&lt;nombre&gt;. Pour cette zone humide, un nom correct serait : {{ zh.properties.code }}_3.jpeg<br></small>
-          <small
-          *ngIf="
-            fileForm.controls.file.errors?.fileFormatValidator
-          "
-          class="error-msg"
-          >Le fichier n'est pas du bon format (image ou pdf)<br></small>
+          <small *ngIf="fileForm.controls.file.errors?.fileSizeValidator" class="error-msg"
+            >Le fichier excède le poids maximum autorisé qui est de {{ config.max_jpg_size }}Mo pour
+            les photos, {{ config.max_pdf_size }}Mo pour les pdf.<br />Poids mesuré :
+            {{ fileToUpload.size / 1000000 | number: "1.0-1" }}Mo</small
+          >
+          <small *ngIf="fileForm.controls.file.errors?.fileNameValidator" class="error-msg"
+            >Le fichier ne respecte pas le format suivant : &lt;ZHCODE&gt;_&lt;nombre&gt;. Pour
+            cette zone humide, un nom correct serait : {{ zh.properties.code }}_3.jpeg<br
+          /></small>
+          <small *ngIf="fileForm.controls.file.errors?.fileFormatValidator" class="error-msg"
+            >Le fichier n'est pas du bon format (image ou pdf)<br
+          /></small>
         </div>
 
         <div class="form-group col-md-6">
@@ -188,8 +191,8 @@
       class="uppercase"
       (click)="patchModal ? patchFile() : postFile()"
     >
-    <mat-spinner *ngIf="loadingUpload" color="warn" diameter="25"></mat-spinner>
-    Téléverser
+      <mat-spinner *ngIf="loadingUpload" color="warn" diameter="25"></mat-spinner>
+      Téléverser
     </button>
   </div>
 </ng-template>

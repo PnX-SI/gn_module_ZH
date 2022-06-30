@@ -19,7 +19,7 @@ export class EvaluationComponent {
       name: "type",
       label: "Principales fonctions hydrologiques / biogéochimiques",
     },
-    { name: "qualification", label: "Qualifications", size: this.qualifSize},
+    { name: "qualification", label: "Qualifications", size: this.qualifSize },
     { name: "connaissance", label: "Connaissance", size: this.knowledgeSize },
   ];
 

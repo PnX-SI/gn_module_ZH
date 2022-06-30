@@ -42,7 +42,7 @@
           <tbody>
             <ng-container *ngFor="let geo of config?.ref_geo_referentiels">
               <tr *ngIf="geo.active">
-                <td>{{ geo.zh_name }} </td>
+                <td>{{ geo.zh_name }}</td>
                 <td>
                   <ul>
                     <ng-container *ngIf="table[geo.type_code_ref_geo]?.length > 0; else elseBlock">
@@ -52,9 +52,7 @@
                       </li>
                     </ng-container>
                     <ng-template #elseBlock>
-                      <li class="label-item">
-                        Aucun
-                      </li>
+                      <li class="label-item">Aucun</li>
                     </ng-template>
                   </ul>
                 </td>

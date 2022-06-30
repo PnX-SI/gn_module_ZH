@@ -8,8 +8,12 @@
   </thead>
   <tbody>
     <ng-container *ngIf="data && data.length > 0">
-      <tr [ngStyle]="{'background':item[color_col_name] == color_value ? '#EBFFE5' : 'rgba(67, 175, 0, 0.04)'}"
-        *ngFor="let item of data">
+      <tr
+        [ngStyle]="{
+          background: item[color_col_name] == color_value ? '#EBFFE5' : 'rgba(67, 175, 0, 0.04)'
+        }"
+        *ngFor="let item of data"
+      >
         <td *ngFor="let col of tableCols">
           <ng-container *ngIf="col.subcell; else elseBlockSub">
             <ul *ngIf="isArray(item[col.name][col.subcell.key]); else elseBlockSubArr">
@@ -35,9 +39,13 @@
               </ng-template>
             </ul>
             <ng-template #elseBlockSub2>
-              <b *ngIf="bold_row_values.includes(item['name']) else italic">{{ item[col.name] }}</b>
+              <b *ngIf="bold_row_values.includes(item['name']); else italic">{{
+                item[col.name]
+              }}</b>
               <ng-template #italic>
-                <i *ngIf="italic_row_values.includes(item['name']) else normal">{{ item[col.name] }}</i>
+                <i *ngIf="italic_row_values.includes(item['name']); else normal">{{
+                  item[col.name]
+                }}</i>
               </ng-template>
               <ng-template #normal>
                 {{ item[col.name] }}
@@ -47,19 +55,35 @@
         </td>
         <td class="tab-buttons" *ngIf="editable || deletable || downloadable">
           <ng-container *ngIf="editable">
-            <button mat-icon-button class="mr-2" placement="top" ngbTooltip="Editer" (click)="onEditItem(item)">
+            <button
+              mat-icon-button
+              class="mr-2"
+              placement="top"
+              ngbTooltip="Editer"
+              (click)="onEditItem(item)"
+            >
               <mat-icon class="edit-icon">edit</mat-icon>
             </button>
           </ng-container>
           <ng-container *ngIf="deletable">
-            <button mat-icon-button class="mr-2" placement="top" ngbTooltip="Supprimer"
-              (click)="onDeleteItem(content, item)">
+            <button
+              mat-icon-button
+              class="mr-2"
+              placement="top"
+              ngbTooltip="Supprimer"
+              (click)="onDeleteItem(content, item)"
+            >
               <mat-icon class="delete-icon">close</mat-icon>
             </button>
           </ng-container>
           <ng-container *ngIf="downloadable">
-            <button mat-icon-button class="mr-2" placement="top" ngbTooltip="Télécharger"
-              (click)="onDownloadItem(item)">
+            <button
+              mat-icon-button
+              class="mr-2"
+              placement="top"
+              ngbTooltip="Télécharger"
+              (click)="onDownloadItem(item)"
+            >
               <mat-icon class="download-icon">download</mat-icon>
             </button>
           </ng-container>
@@ -72,7 +96,7 @@
   </tbody>
 </table>
 <ng-template #content let-c="close" let-d="dismiss">
-  <zh-delete-modal (onCancel)="d()" (onDelete)=c()>
+  <zh-delete-modal (onCancel)="d()" (onDelete)="c()">
     <p>Etes-vous sûr de vouloir supprimer cette ligne ?</p>
   </zh-delete-modal>
 </ng-template>

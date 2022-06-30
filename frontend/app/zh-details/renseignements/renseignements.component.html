@@ -5,17 +5,20 @@
         <legend>
           <h5 class="section-title">Identification de la zone humide</h5>
         </legend>
-        <zh-label label="Nom usuel de la zone humide :"><span>{{ data.identification?.nom }}</span>
+        <zh-label label="Nom usuel de la zone humide :"
+          ><span>{{ data.identification?.nom }}</span>
         </zh-label>
         <zh-label label="Autre nom :">
           <span>{{ data.identification?.autre }}</span>
         </zh-label>
-        <zh-label label="Partie d’un ensemble :"><span>{{ data.identification?.inclus }}</span>
+        <zh-label label="Partie d’un ensemble :"
+          ><span>{{ data.identification?.inclus }}</span>
         </zh-label>
-        <zh-label *ngIf="data.identification?.inclus != 'Non'" label="Nom du grand ensemble :"><span>{{
-            data.identification?.ensemble }}</span>
+        <zh-label *ngIf="data.identification?.inclus != 'Non'" label="Nom du grand ensemble :"
+          ><span>{{ data.identification?.ensemble }}</span>
         </zh-label>
-        <zh-label label="Code de la zone humide :"><span>{{ data.identification?.code }}</span>
+        <zh-label label="Code de la zone humide :"
+          ><span>{{ data.identification?.code }}</span>
         </zh-label>
       </fieldset>
     </div>
@@ -51,12 +54,12 @@
         <div class="row">
           <div class="col-6">
             <zh-label label="Date d’établissement :">
-              <span>{{ data.auteur?.date | date:'dd/MM/y' }}</span>
+              <span>{{ data.auteur?.date | date: "dd/MM/y" }}</span>
             </zh-label>
           </div>
           <div class="col-6">
             <zh-label label="Date des dernières modifications :">
-              <span>{{ data.auteur?.date_modif | date:'dd/MM/y' }}</span>
+              <span>{{ data.auteur?.date_modif | date: "dd/MM/y" }}</span>
             </zh-label>
           </div>
         </div>
@@ -84,11 +87,12 @@
         </zh-label>
         <zh-label label="Commune (surface ZH/surface commune) :">
           <ul>
-            <li class="label-item" *ngFor="let commune of data.localisation?.commune"
-              [ngbTooltip]="'Insee : ' + commune.insee">
-              <span>{{ commune.nom }} ({{
-                commune.couverture + '%' || "non renseigné"
-                }})</span>
+            <li
+              class="label-item"
+              *ngFor="let commune of data.localisation?.commune"
+              [ngbTooltip]="'Insee : ' + commune.insee"
+            >
+              <span>{{ commune.nom }} ({{ commune.couverture + "%" || "non renseigné" }})</span>
             </li>
           </ul>
         </zh-label>

@@ -35,13 +35,8 @@ const routes: Routes = [{ path: "/search", component: ZhSearchComponent }];
     RouterModule.forChild(routes),
     ZhDetailsModule,
     ZhAdvancedSearchModule,
-    ZhHierarchySearchModule
+    ZhHierarchySearchModule,
   ],
-  exports: [
-    TableComponent,
-    LabelComponent,
-    ZhSearchComponent,
-    AngularMultiSelectModule,
-  ],
+  exports: [TableComponent, LabelComponent, ZhSearchComponent, AngularMultiSelectModule],
 })
 export class ZhSearchModule {}

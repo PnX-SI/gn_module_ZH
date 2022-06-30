@@ -1,28 +1,34 @@
 <div class="row">
   <div class="col-12">
     <span class="mr-1">OU</span>
-    <mat-slide-toggle [formControl]="form.controls.and" matTooltip="Si OU est choisi, les zones humides recherchées respecteront au moins 1 critère listé ci-dessous. 
-      Si ET est choisi: elles respecteront tous les critères">
+    <mat-slide-toggle
+      [formControl]="form.controls.and"
+      matTooltip="Si OU est choisi, les zones humides recherchées respecteront au moins 1 critère listé ci-dessous. 
+      Si ET est choisi: elles respecteront tous les critères"
+    >
     </mat-slide-toggle>
     <span class="ml-1">ET</span>
   </div>
 </div>
 <div class="row">
   <div class="col-4">
-    <select class="form-control form-control-sm" placeholder="Champ" [formControl]="localForm?.controls.field"
-      (change)="fieldChanged($event.target.value)">
-      <ng-container *ngFor="let field of fields; let index=index">
+    <select
+      class="form-control form-control-sm"
+      placeholder="Champ"
+      [formControl]="localForm?.controls.field"
+      (change)="fieldChanged($event.target.value)"
+    >
+      <ng-container *ngFor="let field of fields; let index = index">
         <option class="option-title" [value]="field.name">{{ field.name | uppercase }}</option>
-        <ng-container *ngFor="let cat of field.subcategory; let subIndex=index">
+        <ng-container *ngFor="let cat of field.subcategory; let subIndex = index">
           <!-- &nbsp; because css does not work -->
-          <option *ngIf="cat?.name" [value]="cat.name"><span>&nbsp;{{ cat.name | titlecase
-              }}</span>
+          <option *ngIf="cat?.name" [value]="cat.name">
+            <span>&nbsp;{{ cat.name | titlecase }}</span>
           </option>
-          <ng-container *ngFor="let cat2 of cat.subcategory;let subsubIndex=index">
+          <ng-container *ngFor="let cat2 of cat.subcategory; let subsubIndex = index">
             <!-- &nbsp; because css does not work -->
-            <option class="option-subsubtitle" *ngIf="cat2?.name" [value]="cat2.name"><span>&nbsp;&nbsp;&nbsp;{{
-                cat2.name |
-                titlecase }}</span>
+            <option class="option-subsubtitle" *ngIf="cat2?.name" [value]="cat2.name">
+              <span>&nbsp;&nbsp;&nbsp;{{ cat2.name | titlecase }}</span>
             </option>
           </ng-container>
         </ng-container>
@@ -30,18 +36,31 @@
     </select>
   </div>
   <div class="col-3">
-    <angular2-multiselect [data]="attributes" [formControl]="localForm.controls.attributes"
-      [settings]="attributesSettings" (onSelect)="attributesChanged($event)">
+    <angular2-multiselect
+      [data]="attributes"
+      [formControl]="localForm.controls.attributes"
+      [settings]="attributesSettings"
+      (onSelect)="attributesChanged($event)"
+    >
     </angular2-multiselect>
   </div>
   <div class="col-3">
-    <angular2-multiselect [data]="knowledges" [formControl]="localForm.controls.knowledges"
-      [settings]="knowledgeSettings">
+    <angular2-multiselect
+      [data]="knowledges"
+      [formControl]="localForm.controls.knowledges"
+      [settings]="knowledgeSettings"
+    >
     </angular2-multiselect>
   </div>
   <div class="col-2">
-    <button mat-raised-button color="primary" (click)="onAddFilter()" [disabled]="localForm?.controls.field.value == null 
-                  || localForm?.controls.attributes.value == null">
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onAddFilter()"
+      [disabled]="
+        localForm?.controls.field.value == null || localForm?.controls.attributes.value == null
+      "
+    >
       <mat-icon>add_box</mat-icon>
       Ajouter
     </button>
@@ -49,7 +68,12 @@
 </div>
 <div class="row">
   <div class="col-12">
-    <zh-table [tableCols]="columns" [data]="data.value" [deletable]="true" (onDelete)="onDeleteFilter($event)">
+    <zh-table
+      [tableCols]="columns"
+      [data]="data.value"
+      [deletable]="true"
+      (onDelete)="onDeleteFilter($event)"
+    >
     </zh-table>
   </div>
 </div>

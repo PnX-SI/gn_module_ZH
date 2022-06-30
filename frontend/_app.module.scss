@@ -95,14 +95,8 @@
     background: #219653;
   }
 
-  .single-select-mode
-    .pure-checkbox
-    input[type="checkbox"]:focus
-    + label:before,
-  .single-select-mode
-    .pure-checkbox
-    input[type="checkbox"]:hover
-    + label:before {
+  .single-select-mode .pure-checkbox input[type="checkbox"]:focus + label:before,
+  .single-select-mode .pure-checkbox input[type="checkbox"]:hover + label:before {
     border-color: #219653;
     background-color: #f2f2f2;
   }
@@ -120,17 +114,11 @@
     background-color: transparent !important;
   }
 
-  .single-select-mode
-    .pure-checkbox
-    input[type="checkbox"]:disabled
-    + label:before {
+  .single-select-mode .pure-checkbox input[type="checkbox"]:disabled + label:before {
     border-color: #cccccc;
   }
 
-  .single-select-mode
-    .pure-checkbox
-    input[type="checkbox"]:disabled:checked
-    + label:before {
+  .single-select-mode .pure-checkbox input[type="checkbox"]:disabled:checked + label:before {
     background-color: #cccccc;
   }
 
@@ -138,17 +126,11 @@
     border-color: #219653;
   }
 
-  .single-select-mode
-    .pure-checkbox
-    input[type="radio"]:checked
-    + label:before {
+  .single-select-mode .pure-checkbox input[type="radio"]:checked + label:before {
     background-color: white;
   }
 
-  .single-select-mode
-    .pure-checkbox
-    input[type="checkbox"]:checked
-    + label:before {
+  .single-select-mode .pure-checkbox input[type="checkbox"]:checked + label:before {
     background: none !important;
   }
 
@@ -185,8 +167,8 @@ small.required::after {
 
 .table {
   background: #ffffff;
-  box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
-    0px 2px 2px rgba(0, 0, 0, 0.14), 0px 1px 5px rgba(0, 0, 0, 0.12);
+  box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px rgba(0, 0, 0, 0.14),
+    0px 1px 5px rgba(0, 0, 0, 0.12);
   border-bottom: 1px solid #6fcf97;
   border-radius: 4px;
   .table-header {
@@ -252,11 +234,7 @@ ng-multiselect-dropdown {
   border-left: 5px solid #ff0000 !important;
 }
 
-::ng-deep
-  ng-multiselect-dropdown
-  .multiselect-dropdown
-  .dropdown-btn
-  .selected-item {
+::ng-deep ng-multiselect-dropdown .multiselect-dropdown .dropdown-btn .selected-item {
   background: #219653 !important;
   border: 1px solid #219653 !important;
 }

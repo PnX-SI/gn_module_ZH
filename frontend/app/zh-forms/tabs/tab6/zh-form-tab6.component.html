@@ -15,18 +15,15 @@
           <mat-icon>add_box</mat-icon>
           Statut de propriété
         </button>
-        <div
-          *ngIf="statusTable && statusTable.length > 0"
-          class="table-responsive"
-        >
-        <zh-table
-          [tableCols]="statusTableCol"
-          [data]="statusTable"
-          [deletable]="true"
-          [editable]="true"
-          (onDelete)="onDeleteStatus($event)"
-          (onEdit)="onEditStatus(statusModal, $event)"
-        ></zh-table>
+        <div *ngIf="statusTable && statusTable.length > 0" class="table-responsive">
+          <zh-table
+            [tableCols]="statusTableCol"
+            [data]="statusTable"
+            [deletable]="true"
+            [editable]="true"
+            (onDelete)="onDeleteStatus($event)"
+            (onEdit)="onEditStatus(statusModal, $event)"
+          ></zh-table>
         </div>
       </div>
     </fieldset>
@@ -54,16 +51,17 @@
             class="mb-3"
             color="primary"
             (click)="onAddStructure()"
-            [ngbTooltip]="this.formTab6.value.structure ? '' : 'Veuillez d\'abord sélectionner un organisme dans le menu ci-contre'"
+            [ngbTooltip]="
+              this.formTab6.value.structure
+                ? ''
+                : 'Veuillez d\'abord sélectionner un organisme dans le menu ci-contre'
+            "
           >
             <mat-icon>add_box</mat-icon>
             Ajouter
           </button>
         </div>
-        <div
-          *ngIf="managements && managements.length > 0"
-          class="table-responsive"
-        >
+        <div *ngIf="managements && managements.length > 0" class="table-responsive">
           <table class="table">
             <thead class="thead-inverse table-header">
               <tr>
@@ -176,10 +174,7 @@
           <mat-icon>add_box</mat-icon>
           Instruments contractuels et financiers
         </button>
-        <div
-          *ngIf="instrumentTable && instrumentTable.length > 0"
-          class="table-responsive"
-        >
+        <div *ngIf="instrumentTable && instrumentTable.length > 0" class="table-responsive">
           <zh-table
             [tableCols]="instrumentTableCol"
             [data]="instrumentTable"
@@ -197,10 +192,12 @@
       </legend>
       <div class="form-row">
         <div class="form-group col-md-6">
-          <small>Les inventaires sont disponibles dans 
-            <a 
+          <small
+            >Les inventaires sont disponibles dans
+            <a
               routerLink="{{ config.MODULE_URL }}/zhDetails/{{ currentZh?.properties.id_zh }}"
-              target="_blank">
+              target="_blank"
+            >
               la fiche complete
             </a>
           </small>
@@ -209,22 +206,23 @@
       <div class="form-row">
         <div class="form-group col-md-6">
           <small style="display: block; margin-bottom: 8px"
-            >Autres études / inventaires naturalistes </small
-          >
+            >Autres études / inventaires naturalistes
+          </small>
           <div class="ml-3">
             <mat-label ngClass="labelBeforeSlide">Non</mat-label>
-            <mat-slide-toggle [formControl]="formTab6.controls.is_other_inventory"
-              ></mat-slide-toggle>
+            <mat-slide-toggle
+              [formControl]="formTab6.controls.is_other_inventory"
+            ></mat-slide-toggle>
             <mat-label ngClass="labelBeforeSlide">Oui</mat-label>
-            
+
             <!-- DO NOT FORGET formControl [formControl]="formTab4.controls.remark_diag" -->
             <textarea
               *ngIf="formTab6.controls.is_other_inventory.value"
               [formControl]="formTab6.controls.remark_is_other_inventory"
               class="form-control mt-3"
               placeholder="Commentaires"
-          ></textarea>
-        </div>
+            ></textarea>
+          </div>
         </div>
       </div>
     </fieldset>
@@ -261,11 +259,8 @@
           <mat-icon>add_box</mat-icon>
           Zonage d'urbanisme
         </button>
-        <div
-          *ngIf="urbanDocTable && urbanDocTable.length > 0"
-          class="table-responsive"
-        >
-        <zh-table
+        <div *ngIf="urbanDocTable && urbanDocTable.length > 0" class="table-responsive">
+          <zh-table
             [tableCols]="urbanDocTableCol"
             [data]="urbanDocTable"
             [deletable]="true"
@@ -277,10 +272,7 @@
       </div>
     </fieldset>
     <div class="footer-btn">
-      <zh-cancelButton
-        *ngIf="currentZh"
-        [zhId]="currentZh.properties.id_zh"
-      ></zh-cancelButton>
+      <zh-cancelButton *ngIf="currentZh" [zhId]="currentZh.properties.id_zh"></zh-cancelButton>
       <button
         type="submit"
         mat-raised-button
@@ -315,11 +307,7 @@
             ngbAutofocus
             [formControl]="statusForm.controls.status"
           >
-            <option
-              *ngFor="let item of statusInput"
-              [ngValue]="item"
-              [disabled]="item.disabled"
-            >
+            <option *ngFor="let item of statusInput" [ngValue]="item" [disabled]="item.disabled">
               {{ item.mnemonique }}
             </option>
           </select>
@@ -384,8 +372,7 @@
           </select>
           <small
             *ngIf="
-              (instrumentForm.controls.instrument.touched ||
-                modalFormSubmitted) &&
+              (instrumentForm.controls.instrument.touched || modalFormSubmitted) &&
               instrumentForm.controls.instrument.errors?.required
             "
             class="error-msg"
@@ -404,23 +391,14 @@
               #d="ngbDatepicker"
             />
             <div class="input-group-append">
-              <button
-                class="btn btn-sm btn-outline-shadow"
-                (click)="d.toggle()"
-                type="button"
-              >
-                <i
-                  _ngcontent-c41=""
-                  aria-hidden="true"
-                  class="fa fa-calendar"
-                ></i>
+              <button class="btn btn-sm btn-outline-shadow" (click)="d.toggle()" type="button">
+                <i _ngcontent-c41="" aria-hidden="true" class="fa fa-calendar"></i>
               </button>
             </div>
           </div>
           <small
             *ngIf="
-              (instrumentForm.controls.instrument_date.touched ||
-                modalFormSubmitted) &&
+              (instrumentForm.controls.instrument_date.touched || modalFormSubmitted) &&
               instrumentForm.controls.instrument_date.errors?.required
             "
             class="error-msg"
@@ -461,11 +439,7 @@
             ngbAutofocus
             [formControl]="urbanDocForm.controls.area"
           >
-            <option
-              *ngFor="let item of municipalities"
-              [ngValue]="item"
-              [disabled]="item.disabled"
-            >
+            <option *ngFor="let item of municipalities" [ngValue]="item" [disabled]="item.disabled">
               {{ item.municipality_name }}
             </option>
           </select>
@@ -485,10 +459,7 @@
             ngbAutofocus
             [formControl]="urbanDocForm.controls.urbanType"
           >
-            <option
-              *ngFor="let item of formMetaData.TYP_DOC_COMM"
-              [ngValue]="item"
-            >
+            <option *ngFor="let item of formMetaData.TYP_DOC_COMM" [ngValue]="item">
               {{ item.mnemonique }}
             </option>
           </select>
@@ -512,8 +483,7 @@
           </ng-multiselect-dropdown>
           <small
             *ngIf="
-              (urbanDocForm.controls.typeClassement.touched ||
-                modalFormSubmitted) &&
+              (urbanDocForm.controls.typeClassement.touched || modalFormSubmitted) &&
               urbanDocForm.controls.typeClassement.errors?.required
             "
             class="error-msg"
@@ -562,11 +532,7 @@
             ngbAutofocus
             [formControl]="planForm.controls.plan"
           >
-            <option
-              *ngFor="let item of planInput"
-              [ngValue]="item"
-              [disabled]="item.disabled"
-            >
+            <option *ngFor="let item of planInput" [ngValue]="item" [disabled]="item.disabled">
               {{ item.mnemonique }}
             </option>
           </select>
@@ -591,16 +557,8 @@
               #d="ngbDatepicker"
             />
             <div class="input-group-append">
-              <button
-                class="btn btn-sm btn-outline-shadow"
-                (click)="d.toggle()"
-                type="button"
-              >
-                <i
-                  _ngcontent-c41=""
-                  aria-hidden="true"
-                  class="fa fa-calendar"
-                ></i>
+              <button class="btn btn-sm btn-outline-shadow" (click)="d.toggle()" type="button">
+                <i _ngcontent-c41="" aria-hidden="true" class="fa fa-calendar"></i>
               </button>
             </div>
           </div>
@@ -654,7 +612,7 @@
   </div>
 </ng-template>
 <ng-template #content let-c="close" let-d="dismiss">
-  <zh-delete-modal (onCancel)="d()" (onDelete)=c()>
+  <zh-delete-modal (onCancel)="d()" (onDelete)="c()">
     <p>Etes-vous sûr de vouloir supprimer cette ligne ?</p>
   </zh-delete-modal>
 </ng-template>
