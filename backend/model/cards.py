@@ -729,7 +729,7 @@ class Status:
             "autre_etude": Utils.get_bool(self.is_other_inventory),
             "autre_etude_commentaire": self.remark_is_other_inventory,
             "statuts": self.__str_protections(),
-            "zonage": [urban_doc.__str__() for urban_doc in self.urban_docs]
+            "zonage": sorted([urban_doc.__str__() for urban_doc in self.urban_docs], key=lambda k: k["commune"])
         }
 
 
