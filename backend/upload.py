@@ -1,25 +1,20 @@
+import os
 import pdb
 import sys
-
-from werkzeug.utils import secure_filename
 from pathlib import Path
-import os
 
-from geonature.utils.env import ROOT_DIR
-from geonature.utils.env import DB
 from geonature.core.gn_commons.models import TMedias
+from geonature.utils.env import DB, ROOT_DIR
+from werkzeug.utils import secure_filename
 
-from .utils import get_file_path
 from .api_error import ZHApiError
-from .forms import (
-    post_file_info,
-    patch_file_info,
-    update_file_extension
-)
-from .utils import get_extension
+from .forms import patch_file_info, post_file_info, update_file_extension
+from .utils import get_extension, get_file_path
 
 
-def upload_process(request, extensions, pdf_size, jpg_size, upload_path, module_name, id_media=None):
+def upload_process(
+    request, extensions, pdf_size, jpg_size, upload_path, module_name, id_media=None
+):
 
     if request.files:
 
@@ -33,24 +28,19 @@ def upload_process(request, extensions, pdf_size, jpg_size, upload_path, module_
 
     # upoad file - including post to t_medias
     upload_file = upload(
-        request,
-        extensions,
-        pdf_size,
-        jpg_size,
-        upload_path,
-        module_name,
-        id_media
+        request, extensions, pdf_size, jpg_size, upload_path, module_name, id_media
     )
 
     # checks if error in user file or user http request:
     if "error" in upload_file:
         raise ZHApiError(
-            message=upload_file["error"], details=upload_file["error"], status_code=400)
+            message=upload_file["error"], details=upload_file["error"], status_code=400
+        )
 
     return {
         "media_path": upload_file["media_path"],
-        "secured_file_name": upload_file['file_name'],
-        "id_media": id_media
+        "secured_file_name": upload_file["file_name"],
+        "id_media": id_media,
     }
 
 
@@ -78,37 +68,36 @@ def upload(request, extensions, pdf_size, jpg_size, upload_path, module_name, id
             size = file.tell() / (1024 * 1024)
             file.seek(0)
 
-            if extension == '.pdf' and (size > pdf_size):
+            if extension == ".pdf" and (size > pdf_size):
                 return {"error": "FILE_OVERSIZE"}
-            if extension == '.jpg' and (size > jpg_size):
+            if extension == ".jpg" and (size > jpg_size):
                 return {"error": "FILE_OVERSIZE"}
 
         # post/patch here upload info to t_medias in order to include id_media as a prefix for filename (unique name)
 
         if id_media:
             patch_file_info(
-                request.form.to_dict()['id_zh'],
+                request.form.to_dict()["id_zh"],
                 id_media,
-                request.form.to_dict()['title'],
-                request.form.to_dict()['author'],
-                request.form.to_dict()['summary']
+                request.form.to_dict()["title"],
+                request.form.to_dict()["author"],
+                request.form.to_dict()["summary"],
             )
         else:
             # save in db
             id_media = post_file_info(
-                request.form.to_dict()['id_zh'],
-                request.form.to_dict()['title'],
-                request.form.to_dict()['author'],
-                request.form.to_dict()['summary'],
-                extension
+                request.form.to_dict()["id_zh"],
+                request.form.to_dict()["title"],
+                request.form.to_dict()["author"],
+                request.form.to_dict()["summary"],
+                extension,
             )
 
         if request.files:
 
             # set file name
-            media_filename = '_'.join([str(id_media), filename])
-            media_path = Path(
-                'external_modules', module_name, upload_path, media_filename)
+            media_filename = "_".join([str(id_media), filename])
+            media_path = Path("external_modules", module_name, upload_path, media_filename)
             full_path = ROOT_DIR / media_path
 
             # save user file in upload directory
@@ -118,9 +107,9 @@ def upload(request, extensions, pdf_size, jpg_size, upload_path, module_name, id
                 return {"error": "ERROR_WHILE_LOADING_FILE"}
 
             # update TMedias.media_path with media_filename
-            DB.session.query(TMedias)\
-                .filter(TMedias.id_media == id_media)\
-                .update({'media_path': str(media_path)})
+            DB.session.query(TMedias).filter(TMedias.id_media == id_media).update(
+                {"media_path": str(media_path)}
+            )
 
             update_file_extension(id_media, extension)
 
@@ -129,13 +118,16 @@ def upload(request, extensions, pdf_size, jpg_size, upload_path, module_name, id
         return {
             "file_name": get_file_path(id_media).name,
             "full_path": str(get_file_path(id_media)),
-            "media_path": getattr(DB.session.query(TMedias).filter(TMedias.id_media == id_media).one(), 'media_path'),
-            "extension": get_extension(get_file_path(id_media).name)
+            "media_path": getattr(
+                DB.session.query(TMedias).filter(TMedias.id_media == id_media).one(), "media_path"
+            ),
+            "extension": get_extension(get_file_path(id_media).name),
         }
     except Exception as e:
         exc_type, value, tb = sys.exc_info()
         raise ZHApiError(
-            message="upload_error", details=str(exc_type) + ': ' + str(e.with_traceback(tb)))
+            message="upload_error", details=str(exc_type) + ": " + str(e.with_traceback(tb))
+        )
 
 
 def check_file_name(request):
@@ -143,9 +135,9 @@ def check_file_name(request):
         if "file" not in request.files:
             return {"error": "NO_FILE_SENDED"}
         else:
-            if request.files['file'].filename == "":
+            if request.files["file"].filename == "":
                 return {"error": "NO_FILE_SENDED"}
-        file_name = secure_filename(request.files['file'].filename)
+        file_name = secure_filename(request.files["file"].filename)
         temp = file_name.split(".")
         extension = temp[len(temp) - 1]
     except Exception as e:

@@ -1,21 +1,13 @@
+from geonature.core.ref_geo.models import BibAreasTypes, LAreas
+from geonature.utils.env import DB
+from pypnnomenclature.models import TNomenclatures
 from sqlalchemy import func, or_
 from sqlalchemy.sql.expression import select
 
-from geonature.utils.env import DB
-from geonature.core.ref_geo.models import LAreas, BibAreasTypes
-from pypnnomenclature.models import TNomenclatures
-
-from .model.zh_schema import (
-    TZH,
-    CorZhNotes,
-    THydroArea,
-    TRiverBasin,
-    TOwnership,
-    TManagementStructures,
-    TManagementPlans,
-    TFunctions,
-)
 from .api_error import ZHApiError
+from .model.zh_schema import (TZH, CorZhNotes, TFunctions, THydroArea,
+                              TManagementPlans, TManagementStructures,
+                              TOwnership, TRiverBasin)
 
 
 def main_search(query, json):
@@ -132,9 +124,7 @@ def filter_area(query, json: dict, type_code: str):
     # Filter on departments
     subquery = (
         DB.session.query(LAreas)
-        .with_entities(
-            LAreas.area_name, LAreas.geom, LAreas.id_type, BibAreasTypes.type_code
-        )
+        .with_entities(LAreas.area_name, LAreas.geom, LAreas.id_type, BibAreasTypes.type_code)
         .join(BibAreasTypes, LAreas.id_type == BibAreasTypes.id_type)
         .filter(BibAreasTypes.type_code == type_code)
         .filter(LAreas.area_code.in_(codes))
@@ -144,9 +134,7 @@ def filter_area(query, json: dict, type_code: str):
     # Filter on geom.
     # Need to use (c) on subquery to get the column
     query = query.filter(
-        func.ST_Transform(func.ST_SetSRID(TZH.geom, 4326), 2154).ST_Intersects(
-            subquery.c.geom
-        )
+        func.ST_Transform(func.ST_SetSRID(TZH.geom, 4326), 2154).ST_Intersects(subquery.c.geom)
     )
 
     return query
@@ -165,9 +153,7 @@ def filter_hydro(query, json):
 
         # SET_SRID does not return a valid geom...
         query = query.filter(
-            func.ST_Transform(func.ST_SetSRID(TZH.geom, 4326), 4326).ST_Intersects(
-                subquery.c.geom
-            )
+            func.ST_Transform(func.ST_SetSRID(TZH.geom, 4326), 4326).ST_Intersects(subquery.c.geom)
         )
 
     return query
@@ -188,9 +174,7 @@ def filter_basin(query, json):
         )
         # SET_SRID does not return a valid geom...
         query = query.filter(
-            func.ST_Transform(func.ST_SetSRID(TZH.geom, 4326), 4326).ST_Intersects(
-                subquery.c.geom
-            )
+            func.ST_Transform(func.ST_SetSRID(TZH.geom, 4326), 4326).ST_Intersects(subquery.c.geom)
         )
 
     return query
@@ -225,9 +209,7 @@ def filter_fct(query, json: dict, type_: str):
         )
         .join(TFunctions, TFunctions.id_zh == TZH.id_zh)
         .join(TNomenclatures, TNomenclatures.id_nomenclature == TFunctions.id_function)
-        .filter_by(
-            id_type=select([func.ref_nomenclatures.get_id_nomenclature_type(type_)])
-        )
+        .filter_by(id_type=select([func.ref_nomenclatures.get_id_nomenclature_type(type_)]))
     )
 
     if ids_fct and all(id_ is not None for id_ in ids_fct):
@@ -282,11 +264,13 @@ def filter_plans(query, json: dict):
 
     return query
 
+
 def filter_strategies(query, json: dict):
     ids_strategies = [f.get("id_nomenclature") for f in json.get("strategies", [])]
     if ids_strategies:
         query = query.filter(TZH.id_strat_gestion.in_(ids_strategies)).distinct()
     return query
+
 
 def filter_evaluations(query, json: dict):
     ids_hydros = [f.get("id_nomenclature") for f in json.get("hydros", [])]
@@ -326,6 +310,7 @@ def filter_hierarchy(query, json: dict):
         query = query.filter(*filters)
     return query
 
+
 def generate_attributes_subqquery(attributes: list):
     subquery = DB.session.query(CorZhNotes.id_zh)
     attribute_ids = []
@@ -337,11 +322,13 @@ def generate_attributes_subqquery(attributes: list):
         note_type_ids.append(attribute["note_type_id"])
         cor_rule_ids.append(attribute["cor_rule_id"])
         notes.append(attribute["note"])
-    
-    #TODO: see if all of these are usefull... Are cor_rule_id with note sufficient? 
-    subquery = subquery.filter(CorZhNotes.attribute_id.in_(attribute_ids))\
-                       .filter(CorZhNotes.note_type_id.in_(note_type_ids))\
-                       .filter(CorZhNotes.cor_rule_id.in_(cor_rule_ids))\
-                       .filter(CorZhNotes.note.in_(notes))
+
+    # TODO: see if all of these are usefull... Are cor_rule_id with note sufficient?
+    subquery = (
+        subquery.filter(CorZhNotes.attribute_id.in_(attribute_ids))
+        .filter(CorZhNotes.note_type_id.in_(note_type_ids))
+        .filter(CorZhNotes.cor_rule_id.in_(cor_rule_ids))
+        .filter(CorZhNotes.note.in_(notes))
+    )
 
     return subquery.subquery()
