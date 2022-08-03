@@ -36,7 +36,7 @@ export class FonctionsComponent {
     { name: "cahier", label: "Cahier d'habitats" },
     { name: "priority", label: "Statut*" },
     { name: "etat", label: "État de conservation", size: this.qualifSize },
-    { name: "recouvrement", label: "Recouvrement de la ZH (%)", size: "5%" },
+    { name: "recouvrement", label: "Recouvrement sur la ZH (%)", size: "5%" },
   ];
 
   public socioEcoTableCol = [
