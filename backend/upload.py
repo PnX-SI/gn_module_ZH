@@ -74,14 +74,15 @@ def upload(request, extensions, pdf_size, jpg_size, upload_path, module_name, id
                 return {"error": "FILE_OVERSIZE"}
 
         # post/patch here upload info to t_medias in order to include id_media as a prefix for filename (unique name)
-
+        summary = request.form.to_dict()["summary"]
+        summary = summary if summary != "null" else None
         if id_media:
             patch_file_info(
                 request.form.to_dict()["id_zh"],
                 id_media,
                 request.form.to_dict()["title"],
                 request.form.to_dict()["author"],
-                request.form.to_dict()["summary"],
+                summary,
             )
         else:
             # save in db
@@ -89,7 +90,7 @@ def upload(request, extensions, pdf_size, jpg_size, upload_path, module_name, id
                 request.form.to_dict()["id_zh"],
                 request.form.to_dict()["title"],
                 request.form.to_dict()["author"],
-                request.form.to_dict()["summary"],
+                summary,
                 extension,
             )
 
