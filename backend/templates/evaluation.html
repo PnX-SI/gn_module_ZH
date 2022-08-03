@@ -78,8 +78,12 @@
         </thead>
         <tbody>
           <tr>
-            <td>{{ data['evaluation']['interet']['faunistique'] }}</td>
-            <td>{{ data['evaluation']['interet']['floristique'] }}</td>
+            {% if data['evaluation']['interet']['faunistique'] is not none %}
+              <td>{{ data['evaluation']['interet']['faunistique'] }}</td>
+            {% endif %}
+            {% if data['evaluation']['interet']['floristique'] is not none %}
+              <td>{{ data['evaluation']['interet']['floristique'] }}</td>
+            {% endif %}
           </tr>
         </tbody>
       </table>
@@ -94,8 +98,12 @@
         </thead>
         <tbody>
           <tr>
-            <td>{{ data['evaluation']['interet']['nb_hab'] }}</td>
-            <td>{{ data['evaluation']['interet']['total_hab_cover'] or ""}}</td>
+            {% if data['evaluation']['interet']['nb_hab'] is not none %}
+              <td>{{ data['evaluation']['interet']['nb_hab'] }}</td>
+            {% endif %}
+            {% if data['evaluation']['interet']['total_hab_cover'] is not none %}
+              <td>{{ data['evaluation']['interet']['total_hab_cover'] }}</td>
+            {% endif %}
           </tr>
         </tbody>
       </table>
