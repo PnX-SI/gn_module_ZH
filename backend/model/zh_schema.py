@@ -19,7 +19,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.inspection import inspect
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import column_property, relationship
 # import utiles pour déclarer les classes SQLAlchemy
 from sqlalchemy.sql import and_, cast, func, select
 from sqlalchemy.sql.expression import table
@@ -183,6 +183,7 @@ class TZH(ZhModel):
     zh_uuid = DB.Column(UUID(as_uuid=True), default=select([func.uuid_generate_v4()]))
     code = DB.Column(DB.Unicode, nullable=False)
     main_name = DB.Column(DB.Unicode, nullable=False)
+    fullname = column_property(main_name + " " + code)
     secondary_name = DB.Column(DB.Unicode)
     is_id_site_space = DB.Column(DB.Boolean, default=False)
     id_site_space = DB.Column(DB.Integer, ForeignKey(BibSiteSpace.id_site_space))

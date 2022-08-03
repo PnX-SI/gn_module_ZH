@@ -3,7 +3,14 @@
     <zh-label label="Nom ou code de la zone humide"> </zh-label>
   </div>
   <div class="form-group col-md-6">
-    <input id="code" name="code" type="text" class="form-control" [formControl]="form" />
+    <input
+      id="code"
+      name="code"
+      type="text"
+      class="form-control"
+      [formControl]="form"
+      [ngbTypeahead]="search"
+    />
   </div>
 </div>
 <small class="error-msg" *ngIf="form.errors?.pattern">
