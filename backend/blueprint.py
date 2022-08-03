@@ -489,7 +489,7 @@ def get_file_list(id_zh, info_role):
         )
         return {
             "media_data": [media.as_dict() for media in q_medias],
-            "main_pict_id": get_main_picture_id(id_zh),
+            "main_pict_id": get_main_picture_id(id_zh, media_list=q_medias),
         }
     except Exception as e:
         exc_type, value, tb = sys.exc_info()
@@ -535,7 +535,10 @@ def download_file(id_media, info_role):
 def post_main_pict(id_zh, id_media, info_role):
     """post main picture id in tzh"""
     try:
-        DB.session.query(TZH).filter(TZH.id_zh == id_zh).update({TZH.main_pict_id: id_media})
+        # FIXME: after insert+after update on t_zh => update_date=dt.now()
+        DB.session.query(TZH).filter(TZH.id_zh == id_zh).update(
+            {TZH.main_pict_id: id_media, TZH.update_date: dt.now()}
+        )
         DB.session.commit()
         return ("", 204)
     except Exception as e:
