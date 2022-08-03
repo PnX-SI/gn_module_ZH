@@ -1,13 +1,19 @@
+import unicodedata
+
 from geonature.core.ref_geo.models import BibAreasTypes, LAreas
 from geonature.utils.env import DB
 from pypnnomenclature.models import TNomenclatures
-from sqlalchemy import func, or_
+from sqlalchemy import desc, func, or_
 from sqlalchemy.sql.expression import select
 
 from .api_error import ZHApiError
 from .model.zh_schema import (TZH, CorZhNotes, TFunctions, THydroArea,
                               TManagementPlans, TManagementStructures,
                               TOwnership, TRiverBasin)
+
+
+def strip_accents(s):
+    return "".join(c for c in unicodedata.normalize("NFD", s) if unicodedata.category(c) != "Mn")
 
 
 def main_search(query, json):
@@ -90,7 +96,16 @@ def filter_sdage(query, json: dict):
 def filter_nameorcode(query, json: dict):
     # Checks if the code OR the name is already taken
     if json:
-        return query.filter((TZH.code.contains(json)) | (TZH.main_name.contains(json)))
+        json = strip_accents(json)
+        # TODO: create index with another function to make unaccent immutable
+        unaccent_fullname = func.lower(func.unaccent(TZH.fullname))
+        subquery = (
+            DB.session.query(TZH.id_zh, func.similarity(unaccent_fullname, json).label("idx_trgm"))
+            .filter(unaccent_fullname.ilike("%" + json + "%"))
+            .order_by(desc("idx_trgm"))
+            .subquery()
+        )
+        return query.filter(TZH.id_zh == subquery.c.id_zh)
     return query
 
 
