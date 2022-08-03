@@ -39,7 +39,7 @@ export class FilesService {
   // so that they can be separated in the html
   filterByExtension(extensions: string[]): ZhFile[] {
     return this.files.filter((file) =>
-      extensions.includes(file.media_path.split(".").slice(-1)[0])
+      extensions.includes(file.media_path.split(".").slice(-1)[0].toLocaleLowerCase())
     );
   }
 
@@ -47,7 +47,7 @@ export class FilesService {
   // respect the extensions provided
   unfilterByExtension(extensions: string[]): ZhFile[] {
     return this.files.filter(
-      (file) => !extensions.includes(file.media_path.split(".").slice(-1)[0])
+      (file) => !extensions.includes(file.media_path.split(".").slice(-1)[0].toLocaleLowerCase())
     );
   }
 
