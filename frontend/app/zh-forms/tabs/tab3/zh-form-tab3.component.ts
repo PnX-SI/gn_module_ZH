@@ -421,7 +421,7 @@ export class ZhFormTab3Component implements OnInit {
       let formToPost = {
         id_zh: Number(this.currentZh.properties.id_zh),
         id_sdage: this.form.value.id_sdage,
-        id_sage: this.form.value.id_sage,
+        id_sage: this.form.value.id_sage || null,
         id_corine_landcovers: [],
         corine_biotopes: this.listCorinBio,
         remark_pres: this.form.value.remark_pres,
