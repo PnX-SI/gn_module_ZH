@@ -65,10 +65,11 @@ export class HierarchyService {
 
   // set list of hierarchy items
   setItems(data) {
-    this.rb_name = data.river_basin_name;
     if (data == null) {
-      return [];
+      this.items = [];
+      return
     }
+    this.rb_name = data.river_basin_name;
 
     this.items = [{ name: "", active: true, qualification: "", knowledge: "", note: "" }];
 
