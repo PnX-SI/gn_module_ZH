@@ -53,13 +53,4 @@
     } %}
     <img src="{{ url_for('pr_zh.static', filename=connexions[data['fonctionnement']['connexion']]) }}">
   </section>
-  <section class="content">
-    <h5 class="subtitle">Diagnostic fonctionnel</h5>
-    <span class="small-title"><b>Fonctionnalité hydrologique / biogéochimique :</b></span><br>
-    <span class="small-title">{{ data['fonctionnement']['diagnostic']['hydrologique'] }}</span><br>
-    <span class="small-title"><b>Fonctionnalité biologique / écologique :</b></span><br>
-    <span class="small-title">{{ data['fonctionnement']['diagnostic']['biologique'] }}</span><br>
-    <span class="small-title"><b>Commentaires :</b></span><br>
-    <span class="small-title">{{ data['fonctionnement']['diagnostic']['commentaires'] or 'Aucun' }}</span><br>
-  </section>
 </div>
