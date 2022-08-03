@@ -6,3 +6,9 @@ small {
   font-size: 0.7rem;
   color: red;
 }
+
+::ng-deep ngb-typeahead-window {
+  button {
+    white-space: normal !important;
+  }
+}
