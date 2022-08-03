@@ -116,7 +116,7 @@ def gen_pdf(id_zh, dataset, filename="rapport.pdf"):
 
 
 @current_app.template_filter("datetime_format")
-def datetime_format(value: str, format="%d-%m-%y"):
+def datetime_format(value: str, format="%d/%m/%Y"):
     date = dt.strptime(value, "%Y-%m-%d %H:%M:%S")
     return date.strftime(format)
 
