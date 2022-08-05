@@ -89,6 +89,7 @@ export class ZhFormTab0Component implements OnInit {
         data = data.setOpacity(0);
         this.geomLayers.push(data.addTo(this._mapService.map));
       });
+    this._pbfService.setPaneBackground(this._mapService.map)
   }
 
   intiTab() {
@@ -336,6 +337,8 @@ export class ZhFormTab0Component implements OnInit {
     // It can be checked with their coordinates
     if (geometry.coordinates.length > 1 && geometry.type !== "Polygon") {
       geometry.coordinates.forEach((coord) => features.push(this.getPolygonFeature(coord)));
+    } else if (geometry.coordinates.length === 1 && geometry.type !== "Polygon") {
+      features.push(this.getPolygonFeature(geometry.coordinates[0]));
     } else {
       features.push(this.getPolygonFeature(geometry.coordinates));
     }
