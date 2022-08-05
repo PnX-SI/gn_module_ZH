@@ -17,7 +17,7 @@ def set_geom(geometry, id_zh=None):
         if not id_zh:
             id_zh = 0
         polygon = DB.session.query(func.ST_GeomFromGeoJSON(str(geometry))).one()[0]
-        q_zh = DB.session.query(TZH).all()
+        q_zh = DB.session.query(TZH).filter(TZH.geom.ST_Intersects(func.ST_GeomFromGeoJSON(str(geometry)))).all()
         is_intersected = False
         for zh in q_zh:
             if zh.id_zh != id_zh:

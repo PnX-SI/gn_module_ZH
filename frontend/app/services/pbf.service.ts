@@ -19,23 +19,21 @@ export class PbfService {
     if (!currentMap.getPane("zhPane")) {
       currentMap.createPane("zhPane");
     }
-    //currentMap.getPane("zhPane").style.zIndex = "600";
-    if (!this.vector) {
-      return this._zhService.getPbf().map(
-        async (result) => {
-          const res = await result["arrayBuffer"]();
-          const pbf = new Pbf(res);
-          const vector = await this.setVectorGrid(geobuf.decode(pbf));
-          this.res = res;
-          this.vector = vector;
-          return vector;
-        }
-        // To prevent : Property 'arrayBuffer' does not exist on type 'Blob'
-      );
-    } else {
-      const pbf = new Pbf(this.res);
-      return of(this.setVectorGrid(geobuf.decode(pbf)));
-    }
+    return this._zhService.getPbf().map(
+      async (result) => {
+        const res = await result["arrayBuffer"]();
+        const pbf = new Pbf(res);
+        const vector = await this.setVectorGrid(geobuf.decode(pbf));
+        this.res = res;
+        this.vector = vector;
+        return vector;
+      }
+      // To prevent : Property 'arrayBuffer' does not exist on type 'Blob'
+    );
+  }
+
+  setPaneBackground(currentMap: L.map): void {
+    currentMap.getPane("zhPane").style.zIndex = "200";
   }
 
   setVectorGrid(geojson): L.vectorGrid {
