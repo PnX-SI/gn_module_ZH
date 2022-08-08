@@ -110,7 +110,7 @@ def filter_nameorcode(query, json: dict):
 
 
 def filter_ensemble(query, json: dict):
-    ids = [obj.get("id_nomenclature") for obj in json]
+    ids = [obj.get("id_site_space") for obj in json]
     return query.filter(TZH.id_site_space.in_(ids))
 
 
