@@ -4,7 +4,7 @@
       <div class="d-flex justify-content-between">
         <h4>Recherche multi-critères</h4>
         <button mat-icon-button (click)="onCloseClicked()">
-          <mat-icon >arrow_back</mat-icon>
+          <mat-icon>arrow_back</mat-icon>
         </button>
       </div>
     </div>
@@ -45,15 +45,12 @@
       <zh-search-ensemble [data]="data?.BIB_SITE_SPACE" [form]="searchForm.get('ensemble')">
       </zh-search-ensemble>
       <hr />
-      <zh-search-area [form]="searchForm.get('area')"> </zh-search-area>
+      <zh-search-area [form]="searchForm.get('ha_area')"> </zh-search-area>
       <hr />
 
       <div class="row">
         <div class="col-12">
-          <mat-slide-toggle
-            [checked]="advancedSearchToggled"
-            (change)="onAdvancedSearchToggled()"
-          >
+          <mat-slide-toggle [checked]="advancedSearchToggled" (change)="onAdvancedSearchToggled()">
             Recherche avancée</mat-slide-toggle
           >
         </div>
@@ -115,19 +112,16 @@
   </div>
   <div class="modal-body">
     <p>
-      La recherche fonctionne comme suit : 
-      chaque critère s'ajoute et donc contraint la recherche.
+      La recherche fonctionne comme suit : chaque critère s'ajoute et donc contraint la recherche.
     </p>
     <p>
-      Pour les champs multiples (par exemple: les départements,
-      les communes ou les champs de la recherche avancée), il suffit que les
-      zones humides respectent l'un des éléments sélectionnés pour qu'elles 
-      apparaissent dans les résultats.
+      Pour les champs multiples (par exemple: les départements, les communes ou les champs de la
+      recherche avancée), il suffit que les zones humides respectent l'un des éléments sélectionnés
+      pour qu'elles apparaissent dans les résultats.
     </p>
     <p>
-      Exemple: si les fonctions hydrologiques / biogéochimiques 40 et 41 sont sélectionnées
-      alors les zones humides possédant au moins UNE de ces fonctions apparaitront
-      dans les résultats. 
+      Exemple: si les fonctions hydrologiques / biogéochimiques 40 et 41 sont sélectionnées alors
+      les zones humides possédant au moins UNE de ces fonctions apparaitront dans les résultats.
     </p>
     <div class="d-flex justify-content-end">
       <button type="button" mat-raised-button color="primary" class="uppercase" (click)="c()">
