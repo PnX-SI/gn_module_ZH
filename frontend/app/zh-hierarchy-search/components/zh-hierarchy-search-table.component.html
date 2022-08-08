@@ -14,21 +14,21 @@
   <div class="col-4">
     <select
       class="form-control form-control-sm"
-      placeholder="Champ"
       [formControl]="localForm?.controls.field"
       (change)="fieldChanged($event.target.value)"
     >
+      <option [ngValue]="null" selected>Sélectionner</option>
       <ng-container *ngFor="let field of fields; let index = index">
         <option class="option-title" [value]="field.name">{{ field.name | uppercase }}</option>
         <ng-container *ngFor="let cat of field.subcategory; let subIndex = index">
           <!-- &nbsp; because css does not work -->
           <option *ngIf="cat?.name" [value]="cat.name">
-            <span>&nbsp;{{ cat.name | titlecase }}</span>
+            <span>&nbsp;{{ cat.name | capitalize }}</span>
           </option>
           <ng-container *ngFor="let cat2 of cat.subcategory; let subsubIndex = index">
             <!-- &nbsp; because css does not work -->
             <option class="option-subsubtitle" *ngIf="cat2?.name" [value]="cat2.name">
-              <span>&nbsp;&nbsp;&nbsp;{{ cat2.name | titlecase }}</span>
+              <span>&nbsp;&nbsp;&nbsp;{{ cat2.name | capitalize }}</span>
             </option>
           </ng-container>
         </ng-container>

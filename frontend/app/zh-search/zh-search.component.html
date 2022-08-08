@@ -4,19 +4,24 @@
       <div class="d-flex justify-content-between">
         <h4>Recherche multi-critères</h4>
         <button mat-icon-button (click)="onCloseClicked()">
-          <mat-icon class="cancel-icon">cancel</mat-icon>
+          <mat-icon >arrow_back</mat-icon>
         </button>
       </div>
     </div>
     <div class="card-body">
-      <zh-search-sdage [data]="data?.SDAGE" [form]="searchForm.get('sdage')"> </zh-search-sdage>
-      <hr />
-      <zh-search-code [form]="searchForm.get('nameorcode')"> </zh-search-code>
-      <hr />
-      <zh-search-ensemble [data]="data?.BIB_SITE_SPACE" [form]="searchForm.get('ensemble')">
-      </zh-search-ensemble>
-      <hr />
-      <zh-search-area [form]="searchForm.get('area')"> </zh-search-area>
+      <zh-search-input
+        label="Bassin versant"
+        [form]="searchForm.get('basin')"
+        [data]="basins"
+        (onSelected)="onBasinSelected($event)"
+      >
+      </zh-search-input>
+      <zh-search-dependant
+        label="Zones hydrographiques"
+        [form]="searchForm.get('zones')"
+        [inputData]="hydrographicZones"
+      >
+      </zh-search-dependant>
       <hr />
       <zh-search-input
         label="Département"
@@ -33,26 +38,21 @@
       >
       </zh-search-dependant>
       <hr />
-      <zh-search-input
-        label="Bassin versant"
-        [form]="searchForm.get('basin')"
-        [data]="basins"
-        (onSelected)="onBasinSelected($event)"
-      >
-      </zh-search-input>
-      <zh-search-dependant
-        label="Zones hydrographiques"
-        [form]="searchForm.get('zones')"
-        [inputData]="hydrographicZones"
-      >
-      </zh-search-dependant>
+      <zh-search-code [form]="searchForm.get('nameorcode')"> </zh-search-code>
+      <hr />
+      <zh-search-sdage [data]="data?.SDAGE" [form]="searchForm.get('sdage')"> </zh-search-sdage>
+      <hr />
+      <zh-search-ensemble [data]="data?.BIB_SITE_SPACE" [form]="searchForm.get('ensemble')">
+      </zh-search-ensemble>
+      <hr />
+      <zh-search-area [form]="searchForm.get('area')"> </zh-search-area>
       <hr />
 
       <div class="row">
         <div class="col-12">
           <mat-slide-toggle
             [checked]="advancedSearchToggled"
-            (change)="advancedSearchToggled = !advancedSearchToggled"
+            (change)="onAdvancedSearchToggled()"
           >
             Recherche avancée</mat-slide-toggle
           >
@@ -60,7 +60,7 @@
         <div class="col-12">
           <mat-slide-toggle
             [checked]="hierarchySearchToggled"
-            (change)="hierarchySearchToggled = !hierarchySearchToggled"
+            (change)="onHierarchySearchToggled()"
           >
             Recherche hiérarchisation</mat-slide-toggle
           >
@@ -85,6 +85,15 @@
           Réinitialiser
           <mat-icon>cleaning_services</mat-icon>
         </button>
+        <button
+          mat-raised-button
+          color="warning"
+          class="btn-action hard-shadow button-warning uppercase ml-auto"
+          (click)="openModalHelp($event, modalHelp)"
+        >
+          Aide
+          <mat-icon>help</mat-icon>
+        </button>
       </div>
     </div>
   </div>
@@ -99,3 +108,31 @@
     ></zh-hierarchy-search>
   </div>
 </div>
+
+<ng-template #modalHelp let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4>Aide sur les différentes recherches</h4>
+  </div>
+  <div class="modal-body">
+    <p>
+      La recherche fonctionne comme suit : 
+      chaque critère s'ajoute et donc contraint la recherche.
+    </p>
+    <p>
+      Pour les champs multiples (par exemple: les départements,
+      les communes ou les champs de la recherche avancée), il suffit que les
+      zones humides respectent l'un des éléments sélectionnés pour qu'elles 
+      apparaissent dans les résultats.
+    </p>
+    <p>
+      Exemple: si les fonctions hydrologiques / biogéochimiques 40 et 41 sont sélectionnées
+      alors les zones humides possédant au moins UNE de ces fonctions apparaitront
+      dans les résultats. 
+    </p>
+    <div class="d-flex justify-content-end">
+      <button type="button" mat-raised-button color="primary" class="uppercase" (click)="c()">
+        Fermer
+      </button>
+    </div>
+  </div>
+</ng-template>

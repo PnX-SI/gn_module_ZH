@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { ToastrService } from "ngx-toastr";
 import { HydrographicZone } from "../models/zones";
 
@@ -30,7 +31,8 @@ export class ZhSearchComponent implements OnInit {
     private _dataService: ZhDataService,
     private _fb: FormBuilder,
     private _toastr: ToastrService,
-    private _error: ErrorTranslatorService
+    private _error: ErrorTranslatorService,
+    public ngbModal: NgbModal,
   ) {}
 
   ngOnInit() {
@@ -204,4 +206,25 @@ export class ZhSearchComponent implements OnInit {
   displayError(error: string) {
     this._toastr.error(error);
   }
+
+  openModalHelp(event, modal) {
+    this.ngbModal.open(modal);
+  }
+
+  onAdvancedSearchToggled() {
+    this.advancedSearchToggled = !this.advancedSearchToggled
+    if (this.hierarchySearchToggled) {
+      this.hierarchySearchToggled = false
+      this.initHierarchyForm();
+    }
+  }
+  onHierarchySearchToggled() {
+    this.hierarchySearchToggled = !this.hierarchySearchToggled
+    if (this.advancedSearchToggled) {
+      this.advancedSearchToggled = false
+      this.advancedForm.reset()
+    }
+
+  }
+
 }

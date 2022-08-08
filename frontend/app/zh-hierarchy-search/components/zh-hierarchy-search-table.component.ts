@@ -29,7 +29,7 @@ export class ZhHierarchySearchTableComponent implements OnInit {
   public knowledges: Note[] = [];
   public mainSettings = {
     enableCheckAll: false,
-    text: "Selectionner",
+    text: "Sélectionner",
     searchPlaceholderText: "Rechercher",
     enableSearchFilter: true,
     disabled: false,
@@ -49,7 +49,7 @@ export class ZhHierarchySearchTableComponent implements OnInit {
   };
 
   public columns: TableColumn[] = [
-    { name: "field", label: "Champs" },
+    { name: "field", label: "Rubrique" },
     { name: "attributes", label: "Attribut", subarr: { name: "attribut" } },
     {
       name: "knowledges",
