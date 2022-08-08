@@ -1025,7 +1025,7 @@ def get_area_from_department() -> dict:
 @json_resp
 def bassins():
     query = DB.session.query(TRiverBasin).with_entities(TRiverBasin.id_rb, TRiverBasin.name)
-    resp = query.all()
+    resp = query.order_by(TRiverBasin.name).all()
     return [{"code": r.id_rb, "name": r.name} for r in resp]
 
 
@@ -1038,10 +1038,10 @@ def get_hydro_zones_from_bassin() -> dict:
             DB.session.query(THydroArea)
             .with_entities(THydroArea.id_hydro, THydroArea.name, TRiverBasin.id_rb)
             .filter(TRiverBasin.id_rb == code)
-            .join(TRiverBasin, TRiverBasin.geom.ST_Intersects(THydroArea.geom))
+            .join(TRiverBasin, TRiverBasin.geom.ST_Contains(THydroArea.geom))
         )
 
-        resp = query.all()
+        resp = query.order_by(THydroArea.name).all()
         return [{"code": r.id_hydro, "name": r.name} for r in resp]
 
     return []
