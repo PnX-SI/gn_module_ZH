@@ -32,7 +32,7 @@ def main_search(query, json):
     if ensemble is not None:
         query = filter_ensemble(query, ensemble)
 
-    area = json.get("area")
+    area = json.get("ha_area")
     if area is not None:
         query = filter_area_size(query, area)
 

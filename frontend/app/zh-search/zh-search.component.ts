@@ -120,7 +120,7 @@ export class ZhSearchComponent implements OnInit {
       nameorcode: [null],
       zones: [null],
       ensemble: [null],
-      area: this._fb.group({
+      ha_area: this._fb.group({
         ha: [
           null,
           {
