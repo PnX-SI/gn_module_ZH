@@ -1080,7 +1080,7 @@ class Hierarchy(ZH):
     def __get_final_note(self):
         if self.total_denom != 0:
             return (
-                round(((self.global_note / self.total_denom) * 100), 2)
+                round(((self.global_note / self.total_denom) * 100), 1)
                 if self.global_note != 0
                 else 0
             )
