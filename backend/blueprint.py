@@ -480,16 +480,23 @@ def get_ref_autocomplete(info_role):
 def get_file_list(id_zh, info_role):
     """get a list of the zh files contained in static repo"""
     try:
+        #FIXME: to optimize... See relationships and lazy join with sqlalchemy
         zh_uuid = DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().zh_uuid
         q_medias = (
-            DB.session.query(TMedias)
+            DB.session.query(TMedias, TNomenclatures.label_default)
             .filter(TMedias.unique_id_media == zh_uuid)
+            .join(TNomenclatures, TNomenclatures.id_nomenclature == TMedias.id_nomenclature_media_type)
             .order_by(TMedias.meta_update_date.desc())
             .all()
         )
+        res_media, image_medias = [], []
+        for media, media_type in q_medias:
+            res_media.append(media)
+            if media_type == 'Photo':
+                image_medias.append(media)
         return {
-            "media_data": [media.as_dict() for media in q_medias],
-            "main_pict_id": get_main_picture_id(id_zh, media_list=q_medias),
+            "media_data": [media.as_dict() for media in res_media],
+            "main_pict_id": get_main_picture_id(id_zh, media_list=image_medias),
         }
     except Exception as e:
         exc_type, value, tb = sys.exc_info()
