@@ -28,7 +28,10 @@
       <h1 class="title">Évaluation générale du site</h1>
       {% include 'evaluation.html' %}
     </div>
-    <img class="banner" src="{{ url_for('pr_zh.static', filename=data['config']['pdf_last_page_img']) }}">
+    </br>
+    <div>
+      <img class="banner" src="{{ url_for('pr_zh.static', filename=data['config']['pdf_last_page_img']) }}">
+    </div>
   </body>
 <style>
   /* Puts style here since I cannot make blueprint static files work...*/

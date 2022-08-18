@@ -1,4 +1,5 @@
 import base64
+import os
 from datetime import datetime as dt
 from io import BytesIO
 from itertools import groupby
@@ -24,6 +25,17 @@ def get_main_picture(id_zh: int):
             encoded_string = base64.b64encode(image_file.read())
         return "data:image/jpeg;base64," + encoded_string.decode()
     return None
+
+
+def get_main_picture_name(id_zh: int):
+    try:
+        id_media = get_main_picture_id(id_zh)
+        if id_media:
+            file_name: str = os.path.basename(os.path.normpath(get_file_path(id_media)))
+            return file_name
+        return None
+    except Exception as e:
+        print("get_main_picture_name error")
 
 
 def gen_map(coordinates, url_template=None):
@@ -97,7 +109,7 @@ def gen_pdf(id_zh, dataset, filename="rapport.pdf"):
         print(f"Cannot generate the map inside the pdf ({e})... Continuing")
 
     try:
-        dataset["image"] = get_main_picture(id_zh=id_zh)
+        dataset["image_name"] = get_main_picture_name(id_zh=id_zh)
     except Exception as e:
         print("Cannot find image")
 

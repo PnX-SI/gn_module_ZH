@@ -12,7 +12,7 @@ from .api_error import ZHApiError
 from .model.zh_schema import TZH, BibAreasTypes, LAreas
 
 
-def get_main_picture_id(id_zh, media_list: None):
+def get_main_picture_id(id_zh, media_list=None):
     """
     Args:
         media_list(list): media_list of the zh to set the main_pict_id if not
