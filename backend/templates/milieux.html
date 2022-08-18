@@ -1,5 +1,5 @@
 <div class="flex-container">
-  {% if data['image'] %}
+  {% if data['image_name'] is not none %}
   <div class="left">
   {% else %}
   <div>
@@ -26,11 +26,19 @@
       </table>
     </section>
   </div>
+  {% if data['image_name'] is not none %}
+      <div class="right">
+        <section class="content"></section>
+          <img class="image" src="{{ url_for('pr_zh.static', filename=data['image_name']) }}">
+        </section>
+      </div>
+  {% endif %}
+  <!--
   {% if data['image'] %}
-    <div  class="right">
+    <div class="right">
       <section class="content">
         <img class="image" src="{{ data['image'] }}">
-      </section>
     </div>
   {% endif %}
+  -->
 </div>
