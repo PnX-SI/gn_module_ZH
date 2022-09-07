@@ -24,9 +24,9 @@ Connaître son profil utilisateur (expert ou consultant) pour que l'administrate
 L'écran d'accueil est constitué d'une carte et de la liste des zones humides. Un clic sur le polygone d'une ZH sur la carte met en surbrillance à droite la ZH correspondante dans la liste (et inversement avec en plus un zoom sur le polygone concerné).  
 
 La liste des zones humides inclut 3 boutons : 
-- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/pen-to-square.svg" width="20" height="20"> pour modifier/terminer la saisie de la zone humide (si droits utilisateur expert / et seulement sur les ZH créées par l'utilisateur) 
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/pen-to-square.svg" width="20" height="20"> pour modifier/terminer la saisie de la zone humide (si droits utilisateur expert / et en fonction des droits donnés dans le module admin) 
 - <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/circle-info.svg" width="20" height="20"> pour accéder la fiche complète d'information de la ZH 
-- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/trash-can.svg" width="20" height="20"> pour supprimer une ZH (si droits utilisateur expert / et seulement sur les ZH créées par l'utilisateur) 
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/trash-can.svg" width="20" height="20"> pour supprimer une ZH (si droits utilisateur expert / et en fonction des droits donnés dans le module admin) 
 
 La liste permet par défaut l'affichage des 100 dernières ZH saisies/modifiées dans le but d'améliorer les performances. Si l'utilisateur a besoin d'accéder à plus de ZH, il est nécessaire d'en faire la demande à l'administrateur pour qu'il puisse changer le nombre de ligne (100 par défaut) dans le fichier de configuration du module.  
 
@@ -53,7 +53,7 @@ Pour les champs à choix multiples (tels que le type SDAGE, les fonctions, quali
 
 _Filtres pour la hiérarchisation :_ 
 
-Les filtres comprennent également une “recherche par hiérarchisation”. Celle-ci ne peut pas se cumuler à la “recherche avancée”.  Pour utiliser la “recherche par hiérarchisation” il faut d’abord sélectionner un bassin versant dans le champ “Bassin versant” de la recherche multi-critères. Ensuite cliquer sur “Recherche hiérarchisation”. L’utilisateur pourra ensuite ajouter (bouton  “ajouter”) autant de critères de hiérarchisation que nécessaires à sa recherche, un critère étant défini par le triplet une règle, sa qualification et sa connaissance. Un bouton “OU/ET” permet à l’utilisateur d’indiquer si les zones humides recherchées respecteront tous les critères listés (“ET”) ou au moins un des critères (“OU”).  
+Les filtres comprennent également une “recherche par hiérarchisation”. Celle-ci ne peut pas se cumuler à la “recherche avancée”.  Pour utiliser la “recherche par hiérarchisation” il faut d’abord sélectionner un bassin versant dans le champ “Bassin versant” de la recherche multi-critères. Ensuite cliquer sur “Recherche hiérarchisation”. L’utilisateur pourra alors ajouter (bouton  “ajouter”) autant de critères de hiérarchisation que nécessaires à sa recherche, un critère étant défini par le triplet une règle, sa qualification et sa connaissance. Un bouton “OU/ET” permet à l’utilisateur d’indiquer si les zones humides recherchées respecteront tous les critères listés (“ET”) ou au moins un des critères (“OU”).  
 
 Il est possible de cliquer sur le bouton “réinitialiser” pour supprimer tous les filtres. 
 
