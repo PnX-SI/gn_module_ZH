@@ -4,6 +4,7 @@ import pdb
 import uuid
 from datetime import datetime as dt
 from pathlib import Path
+from urllib.parse import urljoin
 
 import geoalchemy2
 from flask import (Blueprint, Response, current_app, json, jsonify, request,
@@ -15,6 +16,7 @@ from geonature.core.gn_commons.models import TMedias
 from geonature.core.gn_permissions import decorators as permissions
 from geonature.core.gn_permissions.tools import get_or_fetch_user_cruved
 from geonature.core.ref_geo.models import BibAreasTypes, LAreas
+from geonature.utils.config import config
 from geonature.utils.env import DB, ROOT_DIR
 from geonature.utils.utilssqlalchemy import json_resp
 from pypn_habref_api.models import CorespHab, Habref
@@ -480,19 +482,22 @@ def get_ref_autocomplete(info_role):
 def get_file_list(id_zh, info_role):
     """get a list of the zh files contained in static repo"""
     try:
-        #FIXME: to optimize... See relationships and lazy join with sqlalchemy
+        # FIXME: to optimize... See relationships and lazy join with sqlalchemy
         zh_uuid = DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().zh_uuid
         q_medias = (
             DB.session.query(TMedias, TNomenclatures.label_default)
             .filter(TMedias.unique_id_media == zh_uuid)
-            .join(TNomenclatures, TNomenclatures.id_nomenclature == TMedias.id_nomenclature_media_type)
+            .join(
+                TNomenclatures,
+                TNomenclatures.id_nomenclature == TMedias.id_nomenclature_media_type,
+            )
             .order_by(TMedias.meta_update_date.desc())
             .all()
         )
         res_media, image_medias = [], []
         for media, media_type in q_medias:
             res_media.append(media)
-            if media_type == 'Photo':
+            if media_type == "Photo":
                 image_medias.append(media)
         return {
             "media_data": [media.as_dict() for media in res_media],
@@ -563,6 +568,25 @@ def post_main_pict(id_zh, id_media, info_role):
         )
     finally:
         DB.session.close()
+
+
+@blueprint.route("<int:id_zh>/photos", methods=["GET"])
+@json_resp
+def get_all_photos(id_zh: int):
+    q_medias = (
+        DB.session.query(TZH.main_pict_id, TMedias.id_media, TMedias.media_path)
+        .join(TZH, TZH.zh_uuid == TMedias.unique_id_media)
+        .join(TNomenclatures, TNomenclatures.id_nomenclature == TMedias.id_nomenclature_media_type)
+        .order_by(TMedias.meta_update_date.desc())
+        .filter(TNomenclatures.label_default == "Photo")
+        .filter(TZH.id_zh == id_zh)
+        .all()
+    )
+    api_uri = urljoin(config["API_ENDPOINT"], f"{blueprint.config['MODULE_CODE'].lower()}/static/")
+    return [
+        {"url": urljoin(api_uri, Path(media[-1]).name)}
+        for media in sorted(q_medias, key=lambda x: x[0] != x[1])
+    ]
 
 
 @blueprint.route("/form/<int:id_tab>", methods=["POST", "PATCH"])
@@ -1045,7 +1069,12 @@ def get_hydro_zones_from_bassin() -> dict:
             DB.session.query(THydroArea)
             .with_entities(THydroArea.id_hydro, THydroArea.name, TRiverBasin.id_rb)
             .filter(TRiverBasin.id_rb == code)
-            .join(TRiverBasin, TRiverBasin.geom.ST_Contains(THydroArea.geom))
+            .join(
+                TRiverBasin,
+                func.ST_Contains(
+                    func.ST_SetSRID(TRiverBasin.geom, 4326), func.ST_SetSRID(THydroArea.geom, 4326)
+                ),
+            )
         )
 
         resp = query.order_by(THydroArea.name).all()
