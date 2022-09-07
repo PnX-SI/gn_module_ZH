@@ -103,7 +103,7 @@ La seule contrainte de navigation se trouve lorsque l'utilisateur clique sur "aj
 
 **Quitter :** 
 
-L'utilisateur peut cliquer sur le bouton "quitter" à tout moment. Une pop-up de confirmation s'ouvre pour demander l'action à suivre : retourner sur la liste des ZH, aller dans sa fiche complète ou revenir à l’accueil du module.
+L'utilisateur peut cliquer sur le bouton "quitter" à tout moment. Une pop-up de confirmation s'ouvre pour demander l'action à suivre : retourner sur la liste des ZH ou aller dans sa fiche complète.
 
 ![redirection](doc/redirection.png)
 
