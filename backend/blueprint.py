@@ -985,7 +985,6 @@ def userRights(id_zh, info_role):
 
 
 @blueprint.route("/export_pdf/<int:id_zh>", methods=["GET"])
-@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
 def download(id_zh: int):
     """
     Downloads the report in pdf format
