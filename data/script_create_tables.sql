@@ -678,6 +678,8 @@ ALTER TABLE pr_zh.cor_rb_ref ADD CONSTRAINT fk_cor_zh_ref_t_zh FOREIGN KEY ( id_
 
 ALTER TABLE pr_zh.cor_rb_ref ADD CONSTRAINT fk_cor_rb_ref_t_references FOREIGN KEY ( id_ref ) REFERENCES pr_zh.t_references( id_reference )  ON UPDATE CASCADE;
 
+ALTER TABLE pr_zh.cor_rule_nomenc ADD CONSTRAINT fk_cor_rule_nomenc_qualif_id FOREIGN KEY (qualif_id) REFERENCES ref_nomenclatures.t_nomenclatures (id_nomenclature) MATCH SIMPLE ON UPDATE CASCADE ON DELETE NO ACTION;
+
 ALTER TABLE pr_zh.cor_sdage_sage ADD CONSTRAINT fk_cor_sdage FOREIGN KEY ( id_sdage ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_sdage_sage ADD CONSTRAINT fk_cor_sage FOREIGN KEY ( id_sage ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
@@ -711,6 +713,8 @@ ALTER TABLE pr_zh.cor_zh_hydro ADD CONSTRAINT fk_cor_zh_hydro_t_zh FOREIGN KEY (
 ALTER TABLE pr_zh.cor_zh_lim_fs ADD CONSTRAINT fk_cor_zh_lim_fs FOREIGN KEY ( id_lim_fs ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_zh_lim_fs ADD CONSTRAINT fk_cor_zh_lim_fs_t_zh FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh ) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.cor_zh_notes ADD CONSTRAINT fk_cor_zh_notes_attribute_id FOREIGN KEY (attribute_id) REFERENCES ref_nomenclatures.t_nomenclatures (id_nomenclature) MATCH SIMPLE ON UPDATE CASCADE ON DELETE NO ACTION;
 
 ALTER TABLE pr_zh.cor_zh_protection ADD CONSTRAINT fk_cor_zh_protection_t_zh FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh ) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -813,6 +817,8 @@ ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_sage_t_nomenclatures FOREIGN KEY (
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_id_org FOREIGN KEY ( id_org ) REFERENCES pr_zh.bib_organismes( id_org )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_id_media FOREIGN KEY ( main_pict_id ) REFERENCES gn_commons.t_medias( id_media ) ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_id_strat_gestion FOREIGN KEY (id_strat_gestion) REFERENCES ref_nomenclatures.t_nomenclatures (id_nomenclature) MATCH SIMPLE ON UPDATE CASCADE ON DELETE NO ACTION;
 
 ALTER TABLE pr_zh.cor_zh_notes ADD CONSTRAINT fk_cor_zh_note_t_zh FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh )  ON DELETE CASCADE ON UPDATE CASCADE;
 
