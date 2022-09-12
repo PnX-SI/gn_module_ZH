@@ -1,7 +1,31 @@
 # instance de la BDD
 from geonature.utils.env import DB
 
-from .zh_schema import *
+from .zh_schema import (
+    TZH,
+    CorLimList,
+    CorZhLimFs,
+    TFunctions,
+    TActivity,
+    TUrbanPlanningDocs,
+    CorZhArea,
+    InseeRegions,
+    TActions,
+    CorZhDocRange,
+    TOwnership,
+    TInflow,
+    TOutflow,
+    TInstruments,
+    TManagementPlans,
+    TManagementStructures,
+    CorZhProtection,
+    CorProtectionLevelType,
+    CorImpactList,
+    CorZhCorineCover,
+    CorZhRef,
+    CorZhCb,
+    THabHeritage
+)
 
 
 class ZH(TZH):

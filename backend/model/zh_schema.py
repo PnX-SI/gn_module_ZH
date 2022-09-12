@@ -1,32 +1,24 @@
-import pdb
-from multiprocessing.sharedctypes import Array
-
 import geoalchemy2
-from flask import Blueprint, current_app
-from geoalchemy2.shape import to_shape
-from geoalchemy2.types import Geography, Geometry
+from flask import Blueprint
+
+from sqlalchemy import ForeignKey
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import column_property, relationship
+from sqlalchemy.sql import and_, cast, func, select
+
+from geoalchemy2.types import Geography
 from geonature.core.ref_geo.models import (BibAreasTypes, LAreas,
                                            LiMunicipalities)
-from geonature.core.taxonomie.models import Taxref
-# instance de la BDD
 from geonature.utils.env import DB
 from pypn_habref_api.models import CorespHab, Habref
 from pypnnomenclature.models import BibNomenclaturesTypes, TNomenclatures
 from pypnusershub.db.models import User
 from pypnusershub.db.tools import InsufficientRightsError
-from sqlalchemy import ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
-from sqlalchemy.inspection import inspect
-from sqlalchemy.orm import column_property, relationship
-# import utiles pour déclarer les classes SQLAlchemy
-from sqlalchemy.sql import and_, cast, func, select
-from sqlalchemy.sql.expression import table
-from sqlalchemy.sql.type_api import STRINGTYPE
 # méthode de sérialisation
 from utils_flask_sqla.serializers import serializable
 from utils_flask_sqla_geo.serializers import geoserializable
+
 
 blueprint = Blueprint("pr_zh", __name__)
 

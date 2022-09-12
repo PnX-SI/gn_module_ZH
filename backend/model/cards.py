@@ -1,18 +1,29 @@
-import pdb
-import re
-from datetime import datetime
 from itertools import groupby
 
-from geonature.core.ref_geo.models import LAreas
+from geonature.core.ref_geo.models import LAreas, BibAreasTypes
 from geonature.utils.env import DB
-from pypnusershub.db.models import Organisme
-from sqlalchemy import text
+from pypn_habref_api.models import Habref
+from pypnnomenclature.models import TNomenclatures
+
 
 from ..api_error import ZHApiError
 from ..hierarchy import Hierarchy
 from ..nomenclatures import get_corine_biotope
 from .zh import ZH
-from .zh_schema import *
+from .zh_schema import (
+    TZH,
+    CorZhArea,
+    BibActions,
+    CorUrbanTypeRange,
+    BibOrganismes,
+    CorZhHydro,
+    THydroArea,
+    CorImpactTypes,
+    CorProtectionLevelType,
+    CorChStatus,
+    TRiverBasin,
+    CorZhRb
+)
 
 
 class Utils(ZH):

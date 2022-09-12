@@ -1,21 +1,23 @@
-# from abc import get_cache_token
-import pdb
 import sys
 from itertools import groupby
 
-import sqlalchemy
 from geonature.utils.env import DB
-from pypnnomenclature.models import BibNomenclaturesTypes
-from sqlalchemy import and_, distinct
+from pypnnomenclature.models import BibNomenclaturesTypes, TNomenclatures
+from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.sql.sqltypes import INTEGER, Boolean, Integer
 from utils_flask_sqla.generic import GenericQuery
 
 from .api_error import ZHApiError
 from .forms import post_note
 from .geometry import get_main_rb
 from .model.zh import ZH
-from .model.zh_schema import *
+from .model.zh_schema import (TZH, BibHierCategories, BibHierSubcategories,
+                              BibNoteTypes, CorItemValue,
+                              CorProtectionLevelType, CorRbRules,
+                              CorRuleNomenc, CorZhProtection, CorZhRb,
+                              RbNotesSummary, TCorQualif, TFunctions, TItems,
+                              TManagementPlans, TManagementStructures,
+                              TRiverBasin, TRules)
 
 
 class Item:

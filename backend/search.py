@@ -7,9 +7,16 @@ from sqlalchemy import desc, func, or_
 from sqlalchemy.sql.expression import select
 
 from .api_error import ZHApiError
-from .model.zh_schema import (TZH, CorZhNotes, TFunctions, THydroArea,
-                              TManagementPlans, TManagementStructures,
-                              TOwnership, TRiverBasin)
+from .model.zh_schema import (
+    TZH,
+    CorZhNotes,
+    TFunctions,
+    THydroArea,
+    TManagementPlans,
+    TManagementStructures,
+    TOwnership,
+    TRiverBasin,
+)
 
 
 def strip_accents(s):

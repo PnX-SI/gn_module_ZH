@@ -5,7 +5,11 @@ from sqlalchemy.sql import func
 
 from ..api_error import ZHApiError
 from .zh import ZH
-from .zh_schema import *
+from .zh_schema import (
+    CorZhArea,
+    TZH,
+    BibOrganismes
+)
 
 
 class Code(ZH):

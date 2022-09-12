@@ -7,7 +7,6 @@ class ZHApiError(Exception):
         self.details = details
         if status_code is not None:
             self.status_code = status_code
-        raised_error = self.__class__.__name__
 
     def to_dict(self):
         return {
