@@ -40,7 +40,6 @@ nomenclatures = [
     "SDAGE",
     "CORINE_BIO",
     "CRIT_DELIM",
-    "CRIT_DELIM",
     "CRIT_DEF_ESP_FCT",
     "OCCUPATION_SOLS",
     "ACTIV_HUM",
@@ -71,9 +70,6 @@ nomenclatures = [
     "NIVEAU_PRIORITE",
     "STRAT_GESTION",
 ]
-
-
-eval_mnemonique = ["Moyenne", "Forte"]
 
 
 ref_geo_referentiels = [
@@ -124,9 +120,9 @@ max_pdf_size = 1.5  # Mo
 
 max_jpg_size = 0.5  # Mo
 
-filename_validated = True
+filename_validated = False
 
-fileformat_validated = True
+fileformat_validated = False
 
 file_path = "static"
 
@@ -143,8 +139,8 @@ pdf_layer_threashold_ha = 1000
 pdf_layer_number = 0
 # Name of the image in the static folder of the zone_humide module
 # This image will be displayed at the last page of the pdf document
-# If None => will not be displayed obviously
-pdf_last_page_img = "entree_sortie.svg"
+# If pdf_last_page_img = "" => will not be displayed obviously
+pdf_last_page_img = ""
 # Name of the source
 pdf_title = "Inventaire des zones humides"
 
