@@ -22,6 +22,8 @@ CREATE SEQUENCE pr_zh.t_references_id_reference_seq START WITH 1 INCREMENT BY 1;
 
 CREATE SEQUENCE pr_zh.t_zh_id_zh_seq START WITH 1 INCREMENT BY 1;
 
+CREATE EXTENSION IF NOT EXISTS "unaccent";
+
 CREATE  TABLE pr_zh.bib_actions ( 
 	id_action            integer DEFAULT nextval('pr_zh.bib_actions_id_action_seq'::regclass) NOT NULL ,
 	name                 varchar(255)  NOT NULL ,
