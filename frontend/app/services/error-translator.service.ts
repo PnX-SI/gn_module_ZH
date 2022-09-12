@@ -102,6 +102,11 @@ export class ErrorTranslatorService {
       front: "Vous ne possedez pas les droits pour effectuer cela",
       id: 17,
     },
+    {
+      api: "no_department",
+      front: "Impossible de créer la géométrie, le tracé ne pas se situer sur un département de france métropolitaine",
+      id: 18,
+    }
   ];
 
   getError(errorMsg: string): error {
