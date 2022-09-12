@@ -74,8 +74,8 @@
       class="flex-container alert alert-info"
     >
       <ul>
-        <li>
-          <ng-container *ngIf="config?.fileformat_validated">
+        <li *ngIf="config?.fileformat_validated">
+          <ng-container>
             <span
               >Seules les extensions suivantes sont acceptées :
               <b *ngFor="let item of fileTypeAccepted; let isLast = last">
@@ -84,30 +84,30 @@
             ><br />
           </ng-container>
         </li>
-        <li>
-          <ng-container *ngIf="config?.filename_validated">
+        <li *ngIf="config?.filename_validated">
+          <ng-container>
             <span
               >Pour les images, le format doit être le suivant :
               <b>{{ zh.properties.code }}_#.jpeg</b> (avec # un nombre)</span
             ><br />
           </ng-container>
         </li>
-        <li>
-          <ng-container *ngIf="config?.max_pdf_size">
+        <li *ngIf="config?.max_pdf_size">
+          <ng-container>
             <span
-              >La taille maximale des fichers pdf est de <b>{{ config.max_pdf_size }}Mo</b></span
+              >La taille maximale des fichiers pdf est de <b>{{ config.max_pdf_size }}Mo</b></span
             ><br />
           </ng-container>
         </li>
-        <li>
-          <ng-container *ngIf="config?.max_jpg_size">
+        <li *ngIf="config?.max_jpg_size">
+          <ng-container>
             <span
-              >La taille maximale des fichers jpeg est de <b>{{ config.max_jpg_size }}Mo</b></span
+              >La taille maximale des fichiers image est de <b>{{ config.max_jpg_size }}Mo</b></span
             ><br />
           </ng-container>
         </li>
-        <li>
-          <ng-container *ngIf="config?.fileformat_validated">
+        <li *ngIf="config?.fileformat_validated">
+          <ng-container>
             Apposer une signature numérique visible sur la photographie indiquant : © / Année de
             prise de vue / Sigle de l'organisme / 1er lettre du prénom de l'auteur / Nom de l'auteur
             (exemple : © 2022 - ABCD -N. DUPOND).
