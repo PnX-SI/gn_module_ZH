@@ -12,13 +12,14 @@ class MapListConfig(Schema):
     pass
 
 
+# home page columns settings
+
 default_map_list_conf = [
     {"prop": "main_name", "name": "Nom principal"},
     {"prop": "code", "name": "Code"},
     {"prop": "sdage", "name": "Typologie SDAGE", "sortable": True},
     {"prop": "bassin_versant", "name": "Bassin versant", "sortable": True},
 ]
-
 
 available_maplist_column = [
     {"prop": "main_name", "name": "Nom principal"},
@@ -33,7 +34,6 @@ available_maplist_column = [
     {"prop": "update_author", "name": "Auteur dernière modification"},
     {"prop": "update_organism", "name": "Organisme de dernière modification"},
 ]
-
 
 nomenclatures = [
     "SDAGE-SAGE",
@@ -72,6 +72,8 @@ nomenclatures = [
 ]
 
 
+# zh intersections  :
+
 ref_geo_referentiels = [
     {"zh_name": "ZNIEFF Terre Type 1", "type_code_ref_geo": "ZNIEFF1", "active": True},
     {"zh_name": "ZNIEFF Terre Type 2", "type_code_ref_geo": "ZNIEFF2", "active": True},
@@ -97,12 +99,13 @@ ref_geo_referentiels = [
 # - reporter le type_code du référentiel dans "type_code_ref_geo" et mettre "active"=True dans conf_schema_toml.py
 
 
+# lists of taxons :
+
 vertebrates_view_name = {
     "schema_name": "pr_zh",
     "table_name": "vertebrates",
     "category": "vertebrates",
 }
-
 
 invertebrates_view_name = {
     "schema_name": "pr_zh",
@@ -110,9 +113,13 @@ invertebrates_view_name = {
     "category": "invertebrates",
 }
 
-
 flora_view_name = {"schema_name": "pr_zh", "table_name": "flora", "category": "flora"}
 
+# Name of the source of species data (tab5)
+species_source_name = "GeoNature"
+
+
+# file settings :
 
 allowed_extensions = [".pdf", ".jpg"]
 
@@ -128,8 +135,8 @@ file_path = "static"
 
 module_dir_name = "gn_module_zones_humides"
 
-# Name of the source of species data (tab5)
-species_source_name = "GeoNature"
+
+# pdf settings :
 
 # Under this value the map layer will be the second layer defined by
 # pdf_small_layer_number which will take the Xth layer defined in GeoNature config

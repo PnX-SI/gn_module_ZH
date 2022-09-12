@@ -1,5 +1,4 @@
 import os
-import pdb
 import sys
 from pathlib import Path
 
@@ -141,7 +140,7 @@ def check_file_name(request):
         file_name = secure_filename(request.files["file"].filename)
         temp = file_name.split(".")
         extension = temp[len(temp) - 1]
-    except Exception as e:
+    except Exception:
         file_name = "Filename_error"
         extension = "Extension_error"
         raise

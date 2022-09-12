@@ -1,44 +1,48 @@
 import csv
-import os
-import pdb
+import sys
 import uuid
 from datetime import datetime as dt
 from pathlib import Path
 from urllib.parse import urljoin
 
-import geoalchemy2
-from flask import (Blueprint, Response, current_app, json, jsonify, request,
-                   send_file, session)
-from flask.helpers import send_file, send_from_directory
+import sqlalchemy.exc as exc
+from flask import Blueprint, Response, jsonify, request, send_file, session
+from flask.helpers import send_file
 from geojson import FeatureCollection
 from geonature.core.gn_commons.models import TMedias
 # import des fonctions utiles depuis le sous-module d'authentification
 from geonature.core.gn_permissions import decorators as permissions
 from geonature.core.gn_permissions.tools import get_or_fetch_user_cruved
-from geonature.core.ref_geo.models import BibAreasTypes, LAreas
+from geonature.core.ref_geo.models import (BibAreasTypes, LAreas,
+                                           LiMunicipalities)
 from geonature.utils.config import config
 from geonature.utils.env import DB, ROOT_DIR
 from geonature.utils.utilssqlalchemy import json_resp
-from pypn_habref_api.models import CorespHab, Habref
+from pypnnomenclature.models import TNomenclatures
 from pypnusershub.db.models import Organisme, User
-from sqlalchemy import and_, asc, desc, func, inspect, text
+from sqlalchemy import desc, func, text
 from sqlalchemy.orm import aliased
-from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.sql.expression import delete
 from utils_flask_sqla.generic import GenericQuery
 from utils_flask_sqla.response import json_resp_accept_empty_list
-from werkzeug import utils
-from werkzeug.utils import secure_filename
 
 from .api_error import ZHApiError
-from .forms import *
+from .forms import (create_zh, post_file_info, update_actions,
+                    update_activities, update_corine_biotopes,
+                    update_corine_landcover, update_delim, update_fct_delim,
+                    update_functions, update_hab_heritages, update_inflow,
+                    update_instruments, update_managements, update_outflow,
+                    update_ownerships, update_protections, update_refs,
+                    update_tzh, update_urban_docs, update_zh_tab0,
+                    update_zh_tab6)
+# from .forms import *
 from .geometry import set_area, set_geom
-from .hierarchy import *
+from .hierarchy import Hierarchy, get_all_hierarchy_fields
 from .model.cards import Card
 from .model.repositories import ZhRepository
 from .model.zh import ZH
 from .model.zh_schema import (TZH, BibActions, BibOrganismes, BibSiteSpace,
-                              CorLimList, CorZhArea, CorZhRef, TReferences)
+                              CorLimList, CorZhArea, CorZhRef, THydroArea,
+                              TReferences, TRiverBasin)
 from .nomenclatures import get_ch, get_nomenc
 from .pdf import gen_pdf
 from .search import main_search
@@ -444,17 +448,8 @@ def get_ref_autocomplete(info_role):
             func.similarity(TReferences.title, search_title).label("idx_trgm"),
         )
 
-        # if "id_list" in params:
-        #    q = q.join(
-        #        CorListHabitat, CorListHabitat.cd_hab == AutoCompleteHabitat.cd_hab
-        #    ).filter(CorListHabitat.id_list == params.get("id_list"))
-
         search_title = search_title.replace(" ", "%")
         q = q.filter(TReferences.title.ilike("%" + search_title + "%")).order_by(desc("idx_trgm"))
-
-        # filter by typology
-        # if "cd_typo" in params:
-        #    q = q.filter(AutoCompleteHabitat.cd_typo == params.get("cd_typo"))
 
         limit = request.args.get("limit", 20)
         print(q)
@@ -842,27 +837,6 @@ def deleteOneZh(id_zh, info_role):
         raise ZHApiError(message="error_during_zh_delete", details=str(e))
     finally:
         DB.session.close()
-
-
-"""
-# Exemple d'une route protégée le CRUVED du sous module d'authentification
-@blueprint.route("/test_cruved", methods=["GET"])
-@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
-@json_resp
-def get_sensitive_view(info_role):
-    # Récupérer l'id de l'utilisateur qui demande la route
-    id_role = info_role.id_role
-    # Récupérer la portée autorisée à l'utilisateur pour l'acton 'R' (read)
-    read_scope = info_role.value_filter
-
-    # récupérer le CRUVED complet de l'utilisateur courant
-    user_cruved = get_or_fetch_user_cruved(
-        session=session, id_role=info_role.id_role, module_code="ZONES_HUMIDES",
-    )
-    q = DB.session.query(MySQLAModel)
-    data = q.all()
-    return [d.as_dict() for d in data]
-"""
 
 
 @blueprint.errorhandler(ZHApiError)

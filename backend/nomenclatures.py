@@ -1,4 +1,3 @@
-import pdb
 import sys
 
 from geonature.utils.env import DB
@@ -7,9 +6,16 @@ from pypnnomenclature.models import BibNomenclaturesTypes, TNomenclatures
 from sqlalchemy import and_
 
 from .api_error import ZHApiError
-from .model.zh_schema import (BibCb, CorChStatus, CorImpactTypes, CorMainFct,
-                              CorProtectionLevelType, CorSdageSage,
-                              CorUrbanTypeRange, Nomenclatures)
+from .model.zh_schema import (
+    BibCb,
+    CorChStatus,
+    CorImpactTypes,
+    CorMainFct,
+    CorProtectionLevelType,
+    CorSdageSage,
+    CorUrbanTypeRange,
+    Nomenclatures,
+)
 
 
 def get_sage_list():

@@ -1,24 +1,48 @@
 import datetime
 import math
-import pdb
 import sys
-import traceback
 import uuid
 
-import psycopg2
 import sqlalchemy.exc as exc
-from geoalchemy2.types import Geography
 from geonature.core.gn_commons.models import BibTablesLocation, TMedias
 from geonature.core.ref_geo.models import BibAreasTypes, LAreas
 from geonature.utils.env import DB
-from psycopg2 import OperationalError, errorcodes, errors
 from pypnnomenclature.models import TNomenclatures
-from sqlalchemy import and_, func, text  # desc,
-from sqlalchemy.sql.expression import delete
+from sqlalchemy import and_, func
 
 from .api_error import ZHApiError
 from .model.code import Code
-from .model.zh_schema import *
+from .model.zh_schema import (
+    TZH,
+    CorImpactList,
+    CorLimList,
+    CorProtectionLevelType,
+    CorUrbanTypeRange,
+    CorZhArea,
+    CorZhCb,
+    CorZhCorineCover,
+    CorZhDocRange,
+    CorZhFctArea,
+    CorZhHydro,
+    CorZhLimFs,
+    CorZhNotes,
+    CorZhProtection,
+    CorZhRb,
+    CorZhRef,
+    DefaultsNomenclaturesValues,
+    Nomenclatures,
+    TActions,
+    TActivity,
+    TFunctions,
+    THabHeritage,
+    TInflow,
+    TInstruments,
+    TManagementPlans,
+    TManagementStructures,
+    TOutflow,
+    TOwnership,
+    TUrbanPlanningDocs,
+)
 
 
 def update_tzh(data):

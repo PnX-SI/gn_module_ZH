@@ -34,7 +34,7 @@ def get_main_picture_name(id_zh: int):
             file_name: str = os.path.basename(os.path.normpath(get_file_path(id_media)))
             return file_name
         return None
-    except Exception as e:
+    except Exception:
         print("get_main_picture_name error")
 
 
@@ -110,7 +110,7 @@ def gen_pdf(id_zh, dataset, filename="rapport.pdf"):
 
     try:
         dataset["image_name"] = get_main_picture_name(id_zh=id_zh)
-    except Exception as e:
+    except Exception:
         print("Cannot find image")
 
     # Pre-treatment of other inventories:

@@ -1,15 +1,11 @@
-import pdb
 import sys
 
-from flask import abort
 from geoalchemy2.shape import to_shape
-from geoalchemy2.types import Geography, Geometry
 from geonature.utils.env import DB
-from sqlalchemy import cast, func
-from sqlalchemy.sql import and_, cast, func, select
+from sqlalchemy import func
 
 from .api_error import ZHApiError
-from .model.zh_schema import TZH, CorZhArea, CorZhRb, TRiverBasin
+from .model.zh_schema import TZH, CorZhRb, TRiverBasin
 
 
 def set_geom(geometry, id_zh=None):
