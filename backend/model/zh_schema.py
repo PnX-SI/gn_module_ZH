@@ -97,8 +97,10 @@ class Nomenclatures(TNomenclatures):
     def get_nomenclature_info(bib_mnemo):
         q = TNomenclatures.query.filter_by(
             id_type=select([func.ref_nomenclatures.get_id_nomenclature_type(bib_mnemo)])
-        ).all()
-        return q
+        )
+        if bib_mnemo == 'SDAGE':
+            q = q.order_by(TNomenclatures.id_nomenclature)
+        return q.all()
 
 
 @serializable
