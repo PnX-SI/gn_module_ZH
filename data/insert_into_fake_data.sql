@@ -1,5 +1,13 @@
 BEGIN;
 
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+
 -- insert Calavon River Basin (departments 84 and 04) as an example 
 INSERT INTO pr_zh.t_river_basin (id_rb, name, geom, id_climate_class, id_river_flow) VALUES 
 (

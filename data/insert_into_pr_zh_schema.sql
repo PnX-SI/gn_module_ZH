@@ -1,5 +1,15 @@
 BEGIN;
 
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+SET search_path = pr_zh, public, pg_catalog;
+
+
 INSERT INTO pr_zh.bib_cb VALUES
 ('1','P',false),
 ('2','P',false),

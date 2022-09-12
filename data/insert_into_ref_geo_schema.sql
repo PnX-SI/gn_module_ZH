@@ -1,5 +1,14 @@
 BEGIN;
 
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+SET search_path = ref_geo, public, pg_catalog;
+
 
 CREATE TABLE IF NOT EXISTS ref_geo.insee_regions (
     insee_reg varchar(2) NOT NULL, 
