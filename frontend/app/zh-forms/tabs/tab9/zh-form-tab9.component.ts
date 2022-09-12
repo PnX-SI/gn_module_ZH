@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Input, Output } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { Subscription } from "rxjs";
 
 import { ZhDataService } from "../../../services/zh-data.service";

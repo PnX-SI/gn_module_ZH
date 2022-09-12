@@ -1,5 +1,3 @@
-// TODO importer des interfaces déjà faites ailleurs
-
 export interface EvaluationModel {
   fonctions: FonctionsEtValeursMajeures;
   interet: InteretPatrimonialMajeur;

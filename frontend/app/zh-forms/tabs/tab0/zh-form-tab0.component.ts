@@ -2,7 +2,7 @@ import { Component, EventEmitter, HostListener, Input, OnInit, Output } from "@a
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { Subscription } from "rxjs";
-import { GeoJSON, Layer } from "leaflet";
+import { GeoJSON } from "leaflet";
 import * as L from "leaflet";
 import { MapService } from "@geonature_common/map/map.service";
 import { IDropdownSettings } from "ng-multiselect-dropdown";

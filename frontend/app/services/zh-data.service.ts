@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { BehaviorSubject, pipe } from "rxjs";
+import { BehaviorSubject } from "rxjs";
 import { map } from "rxjs/operators";
 import { AppConfig } from "@geonature_config/app.config";
 import { DetailsModel } from "../zh-details/models/zh-details.model";

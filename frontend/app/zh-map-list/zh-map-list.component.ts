@@ -11,8 +11,6 @@ import { Subscription } from "rxjs/Subscription";
 import { GlobalSubService } from "@geonature/services/global-sub.service";
 import { ToastrService } from "ngx-toastr";
 import { ErrorTranslatorService } from "../services/error-translator.service";
-import geobuf from "geobuf";
-import Pbf from "pbf";
 import "leaflet.vectorgrid";
 import { PbfService } from "../services/pbf.service";
 

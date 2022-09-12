@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
-import { FormGroup, FormBuilder } from "@angular/forms";
+import { FormGroup } from "@angular/forms";
 
 @Component({
   selector: "zh-search-input",
