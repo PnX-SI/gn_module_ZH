@@ -18,7 +18,16 @@ type Data = {
   styleUrls: ["./zh-hierarchy-search-table.component.scss"],
 })
 export class ZhHierarchySearchTableComponent implements OnInit {
-  @Input() riverBasin: RiverBasin;
+  private _riverBasin: RiverBasin;
+
+  @Input() set riverBasin(value: RiverBasin) {
+    this._riverBasin = value;
+    this.setNotesAndFields();
+  }
+  get riverBasin(): RiverBasin {
+    return this._riverBasin;
+  }
+
   @Input() form: FormGroup;
 
   public localForm: FormGroup;
@@ -71,6 +80,10 @@ export class ZhHierarchySearchTableComponent implements OnInit {
 
   ngOnInit() {
     this.createForm();
+    this.setNotesAndFields();
+  }
+
+  setNotesAndFields() {
     if (this.riverBasin) {
       this._zhService
         .getHierarchyFields(this.riverBasin.code)
