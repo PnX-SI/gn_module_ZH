@@ -1,5 +1,4 @@
 import { Component, OnInit, AfterViewInit, Output, EventEmitter } from "@angular/core";
-import { Subscription } from "rxjs";
 import { leafletDrawOption } from "@geonature_common/map/leaflet-draw.options";
 import { ModuleConfig } from "../../module.config";
 import { MapService } from "@geonature_common/map/map.service";

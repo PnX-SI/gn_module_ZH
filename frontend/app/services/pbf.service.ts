@@ -1,6 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Observable, of } from "rxjs";
-import { map, tap } from "rxjs/operators";
+import { Observable } from "rxjs";
 import { ZhDataService } from "../services/zh-data.service";
 import * as L from "leaflet";
 import geobuf from "geobuf";
