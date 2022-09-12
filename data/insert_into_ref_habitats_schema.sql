@@ -1,5 +1,14 @@
 BEGIN;
 
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+SET search_path = ref_habitats, public, pg_catalog;
+
 
 INSERT INTO ref_habitats.bib_list_habitat(list_name)
 SELECT 'Liste des habitats humides selon la nomenclature CORINE Biotopes'

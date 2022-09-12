@@ -1,4 +1,30 @@
+-- Création du schéma "pr_zh"
+
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+
 CREATE SCHEMA IF NOT EXISTS pr_zh;
+
+SET search_path = pr_zh, pg_catalog, public;
+SET default_with_oids = false;
+
+
+----------------
+---EXTENSIONS---
+----------------
+
+CREATE EXTENSION IF NOT EXISTS "unaccent";
+
+
+-----------------------------------
+--TABLES, PRIMARY KEYS, SEQUENCES--
+-----------------------------------
 
 CREATE SEQUENCE pr_zh.bib_actions_id_action_seq START WITH 1 INCREMENT BY 1;
 
@@ -652,6 +678,13 @@ CREATE  TABLE pr_zh.cor_rule_nomenc (
 
 COMMENT ON TABLE pr_zh.cor_rule_nomenc IS 'correspondance between hierarchy rules and cd_nomenclatures (through nomenclature ids) used for rule evaluation';
 
+
+---------------
+--FOREIGN KEY--
+---------------
+
+ALTER TABLE pr_zh.bib_note_types ADD CONSTRAINT fk_bib_note_types FOREIGN KEY ( id_knowledge ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
+
 ALTER TABLE pr_zh.cor_impact_list ADD CONSTRAINT fk_cor_activity_id_impact FOREIGN KEY ( id_cor_impact_types ) REFERENCES pr_zh.cor_impact_types( id_cor_impact_types )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_impact_list ADD CONSTRAINT fk_id_impact_list FOREIGN KEY ( id_impact_list ) REFERENCES pr_zh.t_activity( id_impact_list )  ON UPDATE CASCADE ON DELETE CASCADE;
@@ -659,6 +692,8 @@ ALTER TABLE pr_zh.cor_impact_list ADD CONSTRAINT fk_id_impact_list FOREIGN KEY (
 ALTER TABLE pr_zh.cor_impact_types ADD CONSTRAINT fk_cor_impact_types_id_impact FOREIGN KEY ( id_impact ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_impact_types ADD CONSTRAINT fk_cor_impact_types_id_impact_type FOREIGN KEY ( id_impact_type ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.cor_item_value ADD CONSTRAINT fk_cor_item_value_t_items FOREIGN KEY ( attribute_id ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_lim_list ADD CONSTRAINT fk_cor_zh_lim_t_nomenclatures FOREIGN KEY ( id_lim ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
@@ -681,6 +716,10 @@ ALTER TABLE pr_zh.cor_rb_ref ADD CONSTRAINT fk_cor_zh_ref_t_zh FOREIGN KEY ( id_
 ALTER TABLE pr_zh.cor_rb_ref ADD CONSTRAINT fk_cor_rb_ref_t_references FOREIGN KEY ( id_ref ) REFERENCES pr_zh.t_references( id_reference )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_rule_nomenc ADD CONSTRAINT fk_cor_rule_nomenc_qualif_id FOREIGN KEY (qualif_id) REFERENCES ref_nomenclatures.t_nomenclatures (id_nomenclature) MATCH SIMPLE ON UPDATE CASCADE ON DELETE NO ACTION;
+
+ALTER TABLE pr_zh.cor_rule_nomenc ADD CONSTRAINT fk_cor_rule_nomenc_nomenc_id FOREIGN KEY ( nomenc_id ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.cor_rule_nomenc ADD CONSTRAINT fk_cor_rule_nomenc_rule_id FOREIGN KEY ( rule_id ) REFERENCES pr_zh.t_rules( rule_id )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_sdage_sage ADD CONSTRAINT fk_cor_sdage FOREIGN KEY ( id_sdage ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
@@ -718,6 +757,12 @@ ALTER TABLE pr_zh.cor_zh_lim_fs ADD CONSTRAINT fk_cor_zh_lim_fs_t_zh FOREIGN KEY
 
 ALTER TABLE pr_zh.cor_zh_notes ADD CONSTRAINT fk_cor_zh_notes_attribute_id FOREIGN KEY (attribute_id) REFERENCES ref_nomenclatures.t_nomenclatures (id_nomenclature) MATCH SIMPLE ON UPDATE CASCADE ON DELETE NO ACTION;
 
+ALTER TABLE pr_zh.cor_zh_notes ADD CONSTRAINT fk_cor_zh_note_t_zh FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh )  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.cor_zh_notes ADD CONSTRAINT fk_cor_zh_note_cor_rb_rules FOREIGN KEY ( cor_rule_id ) REFERENCES pr_zh.cor_rb_rules( cor_rule_id )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.cor_rb_rules ADD CONSTRAINT fk_cor_rb_items_t_items FOREIGN KEY ( rule_id ) REFERENCES pr_zh.t_rules( rule_id )  ON UPDATE CASCADE;
+
 ALTER TABLE pr_zh.cor_zh_protection ADD CONSTRAINT fk_cor_zh_protection_t_zh FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh ) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.cor_zh_protection ADD CONSTRAINT fk_cor_zh_protection_id_protection FOREIGN KEY ( id_protection ) REFERENCES pr_zh.cor_protection_level_type( id_protection )  ON UPDATE CASCADE;
@@ -742,6 +787,8 @@ ALTER TABLE pr_zh.t_activity ADD CONSTRAINT fk_t_activity_t_zh FOREIGN KEY ( id_
 
 ALTER TABLE pr_zh.t_activity ADD CONSTRAINT fk_t_activity_position_t_nomenclatures FOREIGN KEY ( id_position ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
+ALTER TABLE pr_zh.t_cor_qualif ADD CONSTRAINT fk_t_cor_qualif_id_qualification FOREIGN KEY ( id_qualification ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
+
 ALTER TABLE pr_zh.t_functions ADD CONSTRAINT fk_t_functions_t_nomenclatures_qualification FOREIGN KEY ( id_qualification ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.t_functions ADD CONSTRAINT fk_t_functions_t_nomenclatures_knowledge FOREIGN KEY ( id_knowledge ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
@@ -765,6 +812,18 @@ ALTER TABLE pr_zh.t_inflow ADD CONSTRAINT fk_t_inflow_id_zh FOREIGN KEY ( id_zh 
 ALTER TABLE pr_zh.t_instruments ADD CONSTRAINT fk_t_instruments FOREIGN KEY ( id_instrument ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.t_instruments ADD CONSTRAINT fk_t_instruments_t_zh FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh ) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.t_items ADD CONSTRAINT fk_t_items_rule FOREIGN KEY ( cor_rule_id ) REFERENCES pr_zh.cor_rb_rules( cor_rule_id )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.t_items ADD CONSTRAINT fk_t_items_attribute FOREIGN KEY ( attribute_id ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.t_items ADD CONSTRAINT fk_t_items_bib_note_types FOREIGN KEY ( note_type_id ) REFERENCES pr_zh.bib_note_types( note_id )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.t_rules ADD CONSTRAINT fk_t_items_pane FOREIGN KEY ( pane_id ) REFERENCES pr_zh.bib_hier_panes( pane_id )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.t_rules ADD CONSTRAINT fk_t_items_cat FOREIGN KEY ( cat_id ) REFERENCES pr_zh.bib_hier_categories( cat_id )  ON UPDATE CASCADE;
+
+ALTER TABLE pr_zh.t_rules ADD CONSTRAINT fk_t_items_subcat FOREIGN KEY ( subcat_id ) REFERENCES pr_zh.bib_hier_subcategories( subcat_id )  ON UPDATE CASCADE;
 
 ALTER TABLE pr_zh.t_management_plans ADD CONSTRAINT fk_t_management_plan_id_nature FOREIGN KEY ( id_nature ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
 
@@ -822,9 +881,85 @@ ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_id_media FOREIGN KEY ( main_pict_i
 
 ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_id_strat_gestion FOREIGN KEY (id_strat_gestion) REFERENCES ref_nomenclatures.t_nomenclatures (id_nomenclature) MATCH SIMPLE ON UPDATE CASCADE ON DELETE NO ACTION;
 
-ALTER TABLE pr_zh.cor_zh_notes ADD CONSTRAINT fk_cor_zh_note_t_zh FOREIGN KEY ( id_zh ) REFERENCES pr_zh.t_zh( id_zh )  ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE pr_zh.cor_zh_notes ADD CONSTRAINT fk_cor_zh_note_cor_rb_rules FOREIGN KEY ( cor_rule_id ) REFERENCES pr_zh.cor_rb_rules( cor_rule_id )  ON UPDATE CASCADE;
+-------------
+--FUNCTIONS--
+-------------
+
+CREATE OR REPLACE VIEW pr_zh.all_rb_rules AS (
+SELECT 
+	rb.name,
+	rb_rules.cor_rule_id,
+	rb_rules.rule_id,
+	(SELECT label FROM pr_zh.bib_hier_panes WHERE pane_id = rules.pane_id) AS VOLET,
+	(SELECT label FROM pr_zh.bib_hier_categories WHERE cat_id = rules.cat_id) AS RUBRIQUE,
+	(SELECT label FROM pr_zh.bib_hier_subcategories WHERE subcat_id = rules.subcat_id) AS SOUSRUBRIQUE,
+	(SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE id_nomenclature = items.attribute_id) AS id_attribut,
+	(SELECT label_default FROM ref_nomenclatures.t_nomenclatures WHERE id_nomenclature = items.attribute_id) AS attribut,
+	items.note AS note,
+    items.note_type_id as note_type_id,
+	(SELECT mnemonique FROM ref_nomenclatures.t_nomenclatures WHERE id_nomenclature = (SELECT id_knowledge FROM pr_zh.bib_note_types WHERE note_id = items.note_type_id)) AS note_type
+FROM pr_zh.t_river_basin rb
+RIGHT JOIN pr_zh.cor_rb_rules rb_rules ON rb.id_rb = rb_rules.rb_id
+LEFT JOIN pr_zh.t_rules rules ON rules.rule_id = rb_rules.rule_id
+LEFT JOIN pr_zh.t_items items ON items.cor_rule_id = rb_rules.cor_rule_id
+);
+
+
+CREATE OR REPLACE FUNCTION pr_zh.get_cat_note_without_subcats(
+	category_id integer
+	)
+    RETURNS TABLE(rb_id integer, note integer) 
+    LANGUAGE 'plpgsql'
+
+AS $$
+BEGIN
+   RETURN QUERY
+SELECT 
+	rb.id_rb AS id_rb,
+	max(items.note::integer) FILTER (WHERE rules.cat_id = category_id) AS note
+FROM pr_zh.t_river_basin rb
+RIGHT JOIN pr_zh.cor_rb_rules rb_rules ON rb.id_rb = rb_rules.rb_id
+JOIN pr_zh.t_rules rules ON rules.rule_id = rb_rules.rule_id
+LEFT JOIN pr_zh.t_items items ON items.cor_rule_id = rb_rules.cor_rule_id
+GROUP BY rb.id_rb;
+
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION pr_zh.get_cat_note_with_subcats(
+	category_id integer
+	)
+    RETURNS TABLE(rb_id integer, note integer) 
+    LANGUAGE 'plpgsql'
+
+AS $$
+BEGIN
+   RETURN QUERY
+
+SELECT 
+	id_rb,
+	SUM(max_note)::integer
+FROM (		
+		SELECT
+			rb.id_rb AS id_rb,
+			MAX(items.note) FILTER (WHERE rules.cat_id = category_id) AS max_note
+		FROM pr_zh.t_river_basin rb
+		RIGHT JOIN pr_zh.cor_rb_rules rb_rules ON rb.id_rb = rb_rules.rb_id
+		RIGHT JOIN pr_zh.t_rules rules ON rules.rule_id = rb_rules.rule_id
+		LEFT JOIN pr_zh.t_items items ON items.cor_rule_id = rb_rules.cor_rule_id
+		WHERE id_rb > 0
+		GROUP BY rb.id_rb,rules.subcat_id
+	) q1
+GROUP BY id_rb;
+END;
+$$;
+
+
+-------------
+----VIEWS----
+-------------
 
 CREATE OR REPLACE VIEW pr_zh.vertebrates AS
 	WITH 
@@ -1105,100 +1240,6 @@ CREATE OR REPLACE VIEW pr_zh.flora AS
 			OR (bdc_statut.statut_type in ('Liste rouge', 'Réglementation', 'Protection', 'Directives européennes') and bdc_statut.cd_sig = 'TERFXFR')
 		)
 		GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, taxref.cd_nom, bdc_statut.statut_type, bdc_statut.article, bdc_statut.statut, bdc_statut.doc_url, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;
-
-ALTER TABLE pr_zh.cor_rb_rules ADD CONSTRAINT fk_cor_rb_items_t_items FOREIGN KEY ( rule_id ) REFERENCES pr_zh.t_rules( rule_id )  ON UPDATE CASCADE;
-
-ALTER TABLE pr_zh.t_items ADD CONSTRAINT fk_t_items_rule FOREIGN KEY ( cor_rule_id ) REFERENCES pr_zh.cor_rb_rules( cor_rule_id )  ON UPDATE CASCADE;
-
-ALTER TABLE pr_zh.t_items ADD CONSTRAINT fk_t_items_attribute FOREIGN KEY ( attribute_id ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
-
-ALTER TABLE pr_zh.t_items ADD CONSTRAINT fk_t_items_bib_note_types FOREIGN KEY ( note_type_id ) REFERENCES pr_zh.bib_note_types( note_id )  ON UPDATE CASCADE;
-
-ALTER TABLE pr_zh.t_rules ADD CONSTRAINT fk_t_items_pane FOREIGN KEY ( pane_id ) REFERENCES pr_zh.bib_hier_panes( pane_id )  ON UPDATE CASCADE;
-
-ALTER TABLE pr_zh.t_rules ADD CONSTRAINT fk_t_items_cat FOREIGN KEY ( cat_id ) REFERENCES pr_zh.bib_hier_categories( cat_id )  ON UPDATE CASCADE;
-
-ALTER TABLE pr_zh.t_rules ADD CONSTRAINT fk_t_items_subcat FOREIGN KEY ( subcat_id ) REFERENCES pr_zh.bib_hier_subcategories( subcat_id )  ON UPDATE CASCADE;
-
-ALTER TABLE pr_zh.cor_item_value ADD CONSTRAINT fk_cor_item_value_t_items FOREIGN KEY ( attribute_id ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
-
-ALTER TABLE pr_zh.t_cor_qualif ADD CONSTRAINT fk_t_cor_qualif_id_qualification FOREIGN KEY ( id_qualification ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
-
-ALTER TABLE pr_zh.bib_note_types ADD CONSTRAINT fk_bib_note_types FOREIGN KEY ( id_knowledge ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
-
-ALTER TABLE pr_zh.cor_rule_nomenc ADD CONSTRAINT fk_cor_rule_nomenc_nomenc_id FOREIGN KEY ( nomenc_id ) REFERENCES ref_nomenclatures.t_nomenclatures( id_nomenclature )  ON UPDATE CASCADE;
-
-ALTER TABLE pr_zh.cor_rule_nomenc ADD CONSTRAINT fk_cor_rule_nomenc_rule_id FOREIGN KEY ( rule_id ) REFERENCES pr_zh.t_rules( rule_id )  ON UPDATE CASCADE;
-
-CREATE OR REPLACE VIEW pr_zh.all_rb_rules AS (
-SELECT 
-	rb.name,
-	rb_rules.cor_rule_id,
-	rb_rules.rule_id,
-	(SELECT label FROM pr_zh.bib_hier_panes WHERE pane_id = rules.pane_id) AS VOLET,
-	(SELECT label FROM pr_zh.bib_hier_categories WHERE cat_id = rules.cat_id) AS RUBRIQUE,
-	(SELECT label FROM pr_zh.bib_hier_subcategories WHERE subcat_id = rules.subcat_id) AS SOUSRUBRIQUE,
-	(SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE id_nomenclature = items.attribute_id) AS id_attribut,
-	(SELECT label_default FROM ref_nomenclatures.t_nomenclatures WHERE id_nomenclature = items.attribute_id) AS attribut,
-	items.note AS note,
-    items.note_type_id as note_type_id,
-	(SELECT mnemonique FROM ref_nomenclatures.t_nomenclatures WHERE id_nomenclature = (SELECT id_knowledge FROM pr_zh.bib_note_types WHERE note_id = items.note_type_id)) AS note_type
-FROM pr_zh.t_river_basin rb
-RIGHT JOIN pr_zh.cor_rb_rules rb_rules ON rb.id_rb = rb_rules.rb_id
-LEFT JOIN pr_zh.t_rules rules ON rules.rule_id = rb_rules.rule_id
-LEFT JOIN pr_zh.t_items items ON items.cor_rule_id = rb_rules.cor_rule_id
-);
-
-
-CREATE OR REPLACE FUNCTION pr_zh.get_cat_note_without_subcats(
-	category_id integer
-	)
-    RETURNS TABLE(rb_id integer, note integer) 
-    LANGUAGE 'plpgsql'
-
-AS $$
-BEGIN
-   RETURN QUERY
-SELECT 
-	rb.id_rb AS id_rb,
-	max(items.note::integer) FILTER (WHERE rules.cat_id = category_id) AS note
-FROM pr_zh.t_river_basin rb
-RIGHT JOIN pr_zh.cor_rb_rules rb_rules ON rb.id_rb = rb_rules.rb_id
-JOIN pr_zh.t_rules rules ON rules.rule_id = rb_rules.rule_id
-LEFT JOIN pr_zh.t_items items ON items.cor_rule_id = rb_rules.cor_rule_id
-GROUP BY rb.id_rb;
-
-END;
-$$;
-
-
-CREATE OR REPLACE FUNCTION pr_zh.get_cat_note_with_subcats(
-	category_id integer
-	)
-    RETURNS TABLE(rb_id integer, note integer) 
-    LANGUAGE 'plpgsql'
-
-AS $$
-BEGIN
-   RETURN QUERY
-
-SELECT 
-	id_rb,
-	SUM(max_note)::integer
-FROM (		
-		SELECT
-			rb.id_rb AS id_rb,
-			MAX(items.note) FILTER (WHERE rules.cat_id = category_id) AS max_note
-		FROM pr_zh.t_river_basin rb
-		RIGHT JOIN pr_zh.cor_rb_rules rb_rules ON rb.id_rb = rb_rules.rb_id
-		RIGHT JOIN pr_zh.t_rules rules ON rules.rule_id = rb_rules.rule_id
-		LEFT JOIN pr_zh.t_items items ON items.cor_rule_id = rb_rules.cor_rule_id
-		WHERE id_rb > 0
-		GROUP BY rb.id_rb,rules.subcat_id
-	) q1
-GROUP BY id_rb;
-END;
-$$;
 
 
 CREATE OR REPLACE VIEW pr_zh.rb_notes_summary AS (
