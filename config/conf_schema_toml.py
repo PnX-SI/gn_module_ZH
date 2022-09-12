@@ -125,10 +125,12 @@ allowed_extensions = [".pdf", ".jpg"]
 
 max_pdf_size = 1.5  # Mo
 
+# image size (not only jpg)
 max_jpg_size = 0.5  # Mo
 
 filename_validated = False
 
+# if False, add target extension in 'allowed_extensions' list
 fileformat_validated = False
 
 file_path = "static"
