@@ -16,7 +16,7 @@ Connaître son profil utilisateur (expert ou consultant) pour que l'administrate
 
 &nbsp;
 
-![accueil ecran](doc/ecran_accueil.png)
+<kbd>![accueil ecran](doc/ecran_accueil.png)</kbd>
 <figcaption align = "center"><b>Ecran d'accueil du module</b></figcaption>
 
 &nbsp;
@@ -24,9 +24,9 @@ Connaître son profil utilisateur (expert ou consultant) pour que l'administrate
 L'écran d'accueil est constitué d'une carte et de la liste des zones humides. Un clic sur le polygone d'une ZH sur la carte met en surbrillance à droite la ZH correspondante dans la liste (et inversement avec en plus un zoom sur le polygone concerné).  
 
 La liste des zones humides inclut 3 boutons : 
-- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/pen-to-square.svg" width="20" height="20"> pour modifier/terminer la saisie de la zone humide (si droits utilisateur expert / et en fonction des droits donnés dans le module admin) 
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/pen-to-square.svg" width="20" height="20"> pour modifier/terminer la saisie de la zone humide (si droits utilisateur expert - et en fonction des droits donnés dans le module admin) 
 - <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/circle-info.svg" width="20" height="20"> pour accéder la fiche complète d'information de la ZH 
-- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/trash-can.svg" width="20" height="20"> pour supprimer une ZH (si droits utilisateur expert / et en fonction des droits donnés dans le module admin) 
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/trash-can.svg" width="20" height="20"> pour supprimer une ZH (si droits utilisateur expert - et en fonction des droits donnés dans le module admin) 
 
 La liste permet par défaut l'affichage des 100 dernières ZH saisies/modifiées dans le but d'améliorer les performances. Si l'utilisateur a besoin d'accéder à plus de ZH, il est nécessaire d'en faire la demande à l'administrateur pour qu'il puisse changer le nombre de ligne (100 par défaut) dans le fichier de configuration du module.  
 
@@ -59,7 +59,7 @@ Il est possible de cliquer sur le bouton “réinitialiser” pour supprimer tou
 
 &nbsp;
 
-![filtres](doc/filtres.png)
+<kbd>![filtres](doc/filtres.png)</kbd>
 <figcaption align = "center"><b>A droite de l'écran se trouve la liste des zones humides résultants des filtres appliqués </b></figcaption>
 
 &nbsp;
@@ -84,7 +84,7 @@ En bas à droite de chaque onglet se trouvent des boutons "quitter" et "enregist
 
 L'utilisateur peut enregistrer sa saisie à tout moment en cliquant sur le bouton "enregistrer". S'il change d'onglet sans enregistrer alors qu'il a fait une modification, une pop-up demande confirmation à l'utilisateur : 
 
-![save_modif](doc/save_modif.png)
+<kbd>![save_modif](doc/save_modif.png)</kbd>
 
 
 &nbsp;
@@ -105,7 +105,7 @@ La seule contrainte de navigation se trouve lorsque l'utilisateur clique sur "aj
 
 L'utilisateur peut cliquer sur le bouton "quitter" à tout moment. Une pop-up de confirmation s'ouvre pour demander l'action à suivre : retourner sur la liste des ZH ou aller dans sa fiche complète.
 
-![redirection](doc/redirection.png)
+<kbd>![redirection](doc/redirection.png)</kbd>
 
 Si l'utilisateur quitte la saisie avant d'avoir enregistré les informations de l'onglet 'Carte', aucune ZH n'est créée. A partir du moment où l'utilisateur a enregistré les infos minimales dans l'onglet 'Carte', l'utilisateur peut quitter à tout moment et la ZH apparaîtra (même si incomplète) au sein de la liste des autres ZH, sur la page d'accueil.  
 
@@ -125,7 +125,7 @@ Il permet de saisir les informations minimales requises pour la création d'une 
 
 - Contour de la zone humide
 
-![carte_tab](doc/carte_tab.png)
+<kbd>![carte_tab](doc/carte_tab.png)</kbd>
 
 &nbsp;
 
@@ -133,13 +133,13 @@ Il permet de saisir les informations minimales requises pour la création d'une 
 
 - Le bouton  en haut à gauche de la carte permet de dessiner les contours de la zone humide sur la carte. Il faut que le dernier point du tracé corresponde au 1er point pour terminer le tracé.  
 
-- Il est possible de dessiner le contour de la ZH en plusieurs parties (= multiples polygones) si nécessaire (voir polygones en vert dans l'illustration ci-dessus).  
+- Il est possible de dessiner le contour de la ZH en plusieurs parties (= multiples polygones) si nécessaire.
 
 - Pour faciliter le tracé de la zone humide : 
   - Un bouton "afficher toutes les zones humides sur la carte" permet d'afficher en bleu toutes les zones humides déjà saisies dans le module.  
   - Si le tracé de la ZH intersecte une ZH déjà existante, le tracé de la nouvelle ZH sera automatiquement rogné de l'intersection lors de l'enregistrement. 
 
-![intersection](doc/intersection.png)
+<kbd>![intersection](doc/intersection.png)</kbd>
 <figcaption align = "center"><b>A gauche, tracé d'une nouvelle ZH (en vert) qui recouvre en partie une ZH déjà existante (en bleu). A droite, la partie commune a automatiquement été rognée de la nouvelle ZH lors de l'enregistrement.   </b></figcaption>
 
 &nbsp;
@@ -148,7 +148,7 @@ Il est possible de modifier le tracé du polygone en cliquant sur le bouton "éd
 
 _Important : ne pas oublier de cliquer sur "save" une fois la modification du tracé faite, sinon la modification ne sera pas prise en compte lorsque l'utilisateur cliquera sur le bouton "enregistrer"._
 
-![save_contour](doc/save_contour.png)
+<kbd>![save_contour](doc/save_contour.png)</kbd>
 
 &nbsp;
 
@@ -214,13 +214,13 @@ Si aucune espèce respectant les critères n'a été observée dans la ZH, un me
 
 &nbsp;
 
-![taxons](doc/taxons.png)
+<kbd>![taxons](doc/taxons.png)</kbd>
 
 &nbsp;
 
 La liste des espèces est fournie par 3 fichiers csv (1 pour la flore, 1 pour la faune invertébrée, 1 pour la faune vertébrée). Les fichiers peuvent être téléchargés directement sous le bouton 'Générer la liste des espèces' et sont également automatiquement disponibles dans l'onglet 8. Chaque clic sur le bouton génère les fichiers, ce qui permet à l'expert de voir l'évolution des espèces sur la zone concernée à travers le temps. 
 
-![ressources_taxons](doc/ressources_taxons.png)
+<kbd>![ressources_taxons](doc/ressources_taxons.png)</kbd>
 <figcaption align = "center"><b>Les csv sont listés automatiquement dans l'onglet 8 </b></figcaption>
 
 Ces fichiers permettent à l'expert de remplir les autres champs de la partie "Faune et flore patrimoniale" : Flore – nombre d'espèces, Faune vertébrée – nombre d'espèces, Faune invertébrée – nombre d'espèces. 
@@ -236,7 +236,7 @@ Ces fichiers permettent à l'expert de remplir les autres champs de la partie "F
 - Principaux statuts 
 - Zonage des documents d'urbanisme : possibilité pour chaque commune intersectéeant dans par la ZH de renseigner un type de document communal, avec pour chacun, plusieurs types de classements
 
-![tab6](doc/tab6.png)
+<kbd>![tab6](doc/tab6.png)</kbd>
 
 &nbsp;
 
@@ -246,7 +246,7 @@ Onglet de synthèse et de proposition d'actions où sont reportées certaines in
 
 La liste de propositions d'actions ne peut pas être modifiée par l'utilisateur l'expert. L'administrateur se charge des modifications nécessaires dans la table concernée en BDD sur demande de l'utilisateur.  
 
-![tab7](doc/tab7.png)
+<kbd>![tab7](doc/tab7.png)</kbd>
 
 &nbsp;
 
@@ -268,7 +268,7 @@ Lors de l'upload, l'utilisateur doit également indiquer le titre et l'auteur du
 
 &nbsp;
 
-![tab8](doc/tab8.png)
+<kbd>![tab8](doc/tab8.png)</kbd>
 
 &nbsp;
 
@@ -294,7 +294,7 @@ Pour faciliter la consultation, un bouton <img src="https://raw.githubuserconten
 
 &nbsp;
 
-![fiche_complete](doc/fiche_complete.png)
+<kbd>![fiche_complete](doc/fiche_complete.png)</kbd>
 
 &nbsp;
 
