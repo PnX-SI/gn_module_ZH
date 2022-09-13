@@ -86,7 +86,10 @@ rm -rf /home/\`whoami\`/geonature/external_modules/zones_humides
 ```
 &nbsp;
 
-## **Hierarchisation**
+## **Documentation**
 
-- Consulter [ici](/doc/hierarchy.md) la documentation d'implémentation des règles de hiérarchisation en base de données
-- {- Mettre le lien quand sera dispo : Consulter [ici](https://geonature.fr/documents/) le pdf contenant la méthodologie complète de hiérarchisation -}
+- [Utilisateur](/doc/user.md)
+- [Administrateur](/doc/admin.md)
+- Hiérarchisation : 
+  - Consulter [ici](/doc/hierarchy.md) la documentation d'implémentation des règles de hiérarchisation en base de données
+  - Consulter (pas encore disponible) [ici](https://geonature.fr/documents/) le pdf contenant la méthodologie complète de hiérarchisation
