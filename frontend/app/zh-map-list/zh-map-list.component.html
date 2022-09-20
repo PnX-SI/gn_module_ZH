@@ -4,7 +4,7 @@
       <zh-search
         [data]="metaData"
         (onClose)="drawer.close()"
-        (onSearch)="filterZh($event)"
+        (onSearch)="filterZh(_searchService.getJson())"
       ></zh-search>
     </mat-drawer>
     <mat-drawer-content>
@@ -66,6 +66,8 @@
               [scrollbarH]="false"
               [selected]="mapListService.selectedRow"
               [selectionType]="'single'"
+              [sorts]="sorts"
+              [messages]="{emptyMessage: 'Aucune zone humide trouvée'}"
               (page)="onChangePage($event)"
               (select)="mapListService.onRowSelect($event)"
               (sort)="onColumnSort($event)"
@@ -105,7 +107,7 @@
                     aria-haspopup="true"
                     aria-expanded="false"
                     matTooltip="Afficher toutes les zones humides"
-                    (click)="this.filterZh({})"
+                    (click)="displayAllZh()"
                   >
                   </i>
                 </ng-template>

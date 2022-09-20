@@ -27,6 +27,7 @@ import { CancelButtonComponent } from "./zh-forms/cancelButton/cancelButton.comp
 import { ZhFormTab8Component } from "./zh-forms/tabs/tab8/zh-form-tab8.component";
 import { ErrorTranslatorService } from "./services/error-translator.service";
 import { ZhSearchModule } from "./zh-search/zh-search.module";
+import { SearchFormService } from "./services/zh-search.service";
 
 // my module routing
 const routes: Routes = [
@@ -62,7 +63,13 @@ const routes: Routes = [
     ZhDetailsModule,
     ZhSearchModule,
   ],
-  providers: [ZhDataService, MapListService, DatepickerI18n, ErrorTranslatorService],
+  providers: [
+    ZhDataService,
+    MapListService,
+    DatepickerI18n,
+    ErrorTranslatorService,
+    SearchFormService,
+  ],
   bootstrap: [ZhMapListComponent],
 })
 export class GeonatureModule {}

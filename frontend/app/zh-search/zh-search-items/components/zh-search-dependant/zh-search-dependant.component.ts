@@ -28,7 +28,7 @@ export class ZhSearchDependantComponent implements OnInit {
     primaryKey: "code",
     enableFilterSelectAll: false,
     selectAllText: "Tout sélectionner",
-    unSelectAllText: "Tout désélectionner",
+    unSelectAllText: "Tout déselectionner",
     searchPlaceholderText: "Rechercher",
     disabled: true,
   };
