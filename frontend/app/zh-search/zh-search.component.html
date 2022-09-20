@@ -11,21 +11,21 @@
     <div class="card-body">
       <zh-search-input
         label="Bassin versant"
-        [form]="searchForm.get('basin')"
+        [form]="_searchService.searchForm.get('basin')"
         [data]="basins"
         (onSelected)="onBasinSelected($event)"
       >
       </zh-search-input>
       <zh-search-dependant
         label="Zones hydrographiques"
-        [form]="searchForm.get('zones')"
+        [form]="_searchService.searchForm.get('zones')"
         [inputData]="hydrographicZones"
       >
       </zh-search-dependant>
       <hr />
       <zh-search-input
         label="Département"
-        [form]="searchForm.get('departement')"
+        [form]="_searchService.searchForm.get('departement')"
         [displayCode]="true"
         [data]="departements"
         (onSelected)="onDepartmentSelected($event)"
@@ -34,18 +34,18 @@
       <zh-search-dependant
         label="Communes"
         [inputData]="communes"
-        [form]="searchForm.get('communes')"
+        [form]="_searchService.searchForm.get('communes')"
       >
       </zh-search-dependant>
       <hr />
-      <zh-search-code [form]="searchForm.get('nameorcode')"> </zh-search-code>
+      <zh-search-code [form]="_searchService.searchForm.get('nameorcode')"> </zh-search-code>
       <hr />
-      <zh-search-sdage [data]="data?.SDAGE" [form]="searchForm.get('sdage')"> </zh-search-sdage>
+      <zh-search-sdage [data]="data?.SDAGE" [form]="_searchService.searchForm.get('sdage')"> </zh-search-sdage>
       <hr />
-      <zh-search-ensemble [data]="data?.BIB_SITE_SPACE" [form]="searchForm.get('ensemble')">
+      <zh-search-ensemble [data]="data?.BIB_SITE_SPACE" [form]="_searchService.searchForm.get('ensemble')">
       </zh-search-ensemble>
       <hr />
-      <zh-search-area [form]="searchForm.get('ha_area')"> </zh-search-area>
+      <zh-search-area [form]="_searchService.searchForm.get('ha_area')"> </zh-search-area>
       <hr />
 
       <div class="row">
@@ -95,13 +95,13 @@
     </div>
   </div>
   <div *ngIf="advancedSearchToggled" class="card">
-    <zh-advanced-search [data]="data" [form]="advancedForm"></zh-advanced-search>
+    <zh-advanced-search [data]="data" [form]="_searchService.advancedForm"></zh-advanced-search>
   </div>
   <div *ngIf="hierarchySearchToggled" class="card">
     <zh-hierarchy-search
-      [riverBasin]="searchForm.get('basin')"
-      [zones]="searchForm.get('zones')"
-      [form]="hierarchyForm.get('hierarchy')"
+      [riverBasin]="_searchService.searchForm.get('basin')"
+      [zones]="_searchService.searchForm.get('zones')"
+      [form]="_searchService.hierarchyForm.get('hierarchy')"
     ></zh-hierarchy-search>
   </div>
 </div>

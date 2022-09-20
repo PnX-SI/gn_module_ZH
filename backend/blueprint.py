@@ -120,7 +120,9 @@ def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
                 desc_query = desc(desc_query)
             query = query.order_by(desc_query)
 
-        data = query.limit(limit).offset(page * limit).all()
+        # Order by id because there can be ambiguity in order_by(col) depending
+        # on the column so add on order_by id makes it clearer
+        data = query.order_by(TZH.id_zh).limit(limit).offset(page * limit).all()
 
         is_ref_geo = check_ref_geo_schema()
 

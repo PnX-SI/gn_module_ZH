@@ -1,5 +1,5 @@
 import { Component, HostListener, OnInit, OnDestroy, AfterViewInit } from "@angular/core";
-import * as L from "leaflet";
+
 import { MapListService } from "@geonature_common/map-list/map-list.service";
 import { MapService } from "@geonature_common/map/map.service";
 import { ModuleConfig } from "../module.config";
@@ -13,6 +13,10 @@ import { ToastrService } from "ngx-toastr";
 import { ErrorTranslatorService } from "../services/error-translator.service";
 import "leaflet.vectorgrid";
 import { PbfService } from "../services/pbf.service";
+import { SearchFormService } from "../services/zh-search.service";
+
+const DEFAULT_ORDER: string = "desc";
+const DEFAULT_ORDER_BY: string = "update_date";
 
 @Component({
   selector: "zh-map-list",
@@ -29,7 +33,10 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
   public rowPerPage: number;
   public cardContentHeight: number;
   public moduleSub: Subscription;
+  public sorts: any = [];
   private metaData: any = [];
+  private order: string = DEFAULT_ORDER;
+  private orderby: string = DEFAULT_ORDER_BY;
 
   constructor(
     public mapListService: MapListService,
@@ -40,10 +47,12 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     public globalSub: GlobalSubService,
     private _commonService: CommonService,
     private _toastr: ToastrService,
-    private _error: ErrorTranslatorService
+    private _error: ErrorTranslatorService,
+    private _searchService: SearchFormService
   ) {}
 
   ngOnInit() {
+    this._searchService.initForm();
     this.mapListService.zoomOnLayer = true;
     //config
     this.zhConfig = ModuleConfig;
@@ -147,14 +156,14 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onChangePage(event) {
-    this.mapListService.setTablePage(event, this.apiEndPoint);
+    this.filterZh(this._searchService.getJson(), { offset: event.offset });
   }
 
   onColumnSort(event) {
-    this.mapListService.setHttpParam("orderby", event.column.prop);
-    this.mapListService.setHttpParam("order", event.newValue);
-    this.mapListService.deleteHttpParam("offset");
-    this.mapListService.refreshData(this.apiEndPoint, "set");
+    this.order = event.newValue;
+    this.orderby = event.column.prop;
+    this.sorts = event.sorts;
+    this.filterZh(this._searchService.getJson());
   }
 
   displayAuthorName(element) {
@@ -255,11 +264,16 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  filterZh(filtered) {
+  filterZh(filtered, params = {}) {
     const ms = this.mapListService;
     ms.isLoading = true;
     this._zhService
-      .search(filtered, { limit: this.rowPerPage })
+      .search(filtered, {
+        limit: this.rowPerPage,
+        order: this.order,
+        orderby: this.orderby,
+        ...params,
+      })
       .toPromise()
       .then((res: any) => {
         ms.page.totalElements = res.total;
@@ -283,6 +297,14 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     const layers = Object.keys(this.mapListService.layerDict);
     this.mapListService.zoomOnSeveralSelectedLayers(this._mapService.getMap(), layers);
+  }
+
+  displayAllZh() {
+    this._searchService.reset();
+    this.order = DEFAULT_ORDER;
+    this.orderby = DEFAULT_ORDER_BY;
+    this.sorts = [];
+    this.filterZh({});
   }
 
   ngOnDestroy() {
