@@ -452,6 +452,7 @@ class Item:
             for nomenc in DB.session.query(BibNomenclaturesTypes, TNomenclatures)
             .join(BibNomenclaturesTypes)
             .filter(BibNomenclaturesTypes.mnemonique == "FONCTIONS_QUALIF")
+            .order_by(TNomenclatures.id_nomenclature)
             .all()
         ]
 
