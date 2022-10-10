@@ -40,12 +40,18 @@ export class PbfService {
       rendererFactory: L.canvas.tile,
       vectorTileLayerStyles: {
         sliced: function (properties, zoom) {
+          let opacity = 0.8;
+          if (zoom > 11) {
+            opacity = 0;
+          }
+
           return {
-            fillColor: "#FFEDA0",
-            fillOpacity: 1,
-            color: "black",
-            opacity: 1,
-            weight: 1,
+            fillColor: "#800080",
+            fillOpacity: 0.5,
+            color: "#800080",
+            opacity: opacity,
+            weight: 2,
+            fill: true,
           };
         },
       },

@@ -119,7 +119,7 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
           .on(
             "click",
             function (e) {
-              var properties = e.layer.properties;
+              const properties = e.layer.properties;
               this.filterZh({ id_zh: properties.id_zh });
             }.bind(this)
           )
