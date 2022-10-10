@@ -1185,35 +1185,35 @@ INSERT INTO pr_zh.cor_sdage_sage VALUES
 -- insert into hierarchy tables
 
 INSERT INTO pr_zh.bib_hier_panes VALUES
-(1, 'valeur patrimoniale'),
-(2, 'priorité d''invervention');
+(1, 'Valeur globale'),
+(2, 'Priorité d''invervention');
  
 
 INSERT INTO pr_zh.bib_hier_categories VALUES
-(1, 'cat1', 'type de zone humide'),
-(2, 'cat2', 'interêt patrimonial'),
-(3, 'cat3', 'fonctions écologiques (connectivité / corridor écologique)'),
-(4, 'cat4', 'fonctions hydrologiques / biogéochimiques'),
-(5, 'cat5', 'valeurs socio-économiques'),
-(6, 'cat6', 'statut et gestion'),
-(7, 'cat7', 'état fonctionnel'),
-(8, 'cat8', 'menaces');
+(1, 'cat1', 'Type de zone humide'),
+(2, 'cat2', 'Interêt patrimonial'),
+(3, 'cat3', 'Fonctions écologiques (connectivité / corridor écologique)'),
+(4, 'cat4', 'Fonctions hydrologiques / biogéochimiques'),
+(5, 'cat5', 'Valeurs socio-économiques'),
+(6, 'cat6', 'Statut et gestion'),
+(7, 'cat7', 'État fonctionnel'),
+(8, 'cat8', 'Menaces');
 
 
 INSERT INTO pr_zh.bib_hier_subcategories VALUES
-(1, 'habitats humides'),
-(2, 'flore'),
-(3, 'faune - vertébrés'),
-(4, 'faune - invertébrés'),
-(5, 'stockage / rétention (protection crue, ruissellement, érosion)'),
-(6, 'filtration des flux de matières (épuration de l''eau)'),
-(7, 'soutien d''étiage (recharge nappe et cours d''eau)'),
-(8, 'loisirs et pédagogie'),
-(9, 'production'),
-(10, 'statut'),
-(11, 'gestion conservatoire'),
-(12, 'hydrologique / biogéochimique'),
-(13, 'biologique / écologique');
+(1, 'Habitats humides'),
+(2, 'Flore'),
+(3, 'Faune - vertébrés'),
+(4, 'Faune - invertébrés'),
+(5, 'Stockage / rétention (protection crue, ruissellement, érosion)'),
+(6, 'Filtration des flux de matières (épuration de l''eau)'),
+(7, 'Soutien d''étiage (recharge nappe et cours d''eau)'),
+(8, 'Loisirs et pédagogie'),
+(9, 'Production'),
+(10, 'Statut'),
+(11, 'Gestion conservatoire'),
+(12, 'Hydrologique / biogéochimique'),
+(13, 'Biologique / écologique');
 
 
 INSERT INTO pr_zh.bib_note_types VALUES

@@ -8,16 +8,31 @@ from sqlalchemy.orm.exc import NoResultFound
 from utils_flask_sqla.generic import GenericQuery
 
 from .api_error import ZHApiError
+from .constants import HIERARCHY_GLOBAL_MARKS
 from .forms import post_note
 from .geometry import get_main_rb
+from .model.hierarchy import GlobalItem
 from .model.zh import ZH
-from .model.zh_schema import (TZH, BibHierCategories, BibHierSubcategories,
-                              BibNoteTypes, CorItemValue,
-                              CorProtectionLevelType, CorRbRules,
-                              CorRuleNomenc, CorZhProtection, CorZhRb,
-                              RbNotesSummary, TCorQualif, TFunctions, TItems,
-                              TManagementPlans, TManagementStructures,
-                              TRiverBasin, TRules)
+from .model.zh_schema import (
+    TZH,
+    BibHierCategories,
+    BibHierSubcategories,
+    BibNoteTypes,
+    CorItemValue,
+    CorProtectionLevelType,
+    CorRbRules,
+    CorRuleNomenc,
+    CorZhProtection,
+    CorZhRb,
+    RbNotesSummary,
+    TCorQualif,
+    TFunctions,
+    TItems,
+    TManagementPlans,
+    TManagementStructures,
+    TRiverBasin,
+    TRules,
+)
 
 
 class Item:
@@ -1180,6 +1195,9 @@ def get_all_hierarchy_fields(id_rb: int):
 
     notes = [note for note in results.get("items", [])]
 
+    if len(notes) == 0:
+        return notes
+
     # TODO: to optimize with recursive function
     fields = {"categories": []}
     for name, items in groupby(notes, lambda note: note["volet"]):
@@ -1193,5 +1211,17 @@ def get_all_hierarchy_fields(id_rb: int):
                     {"name": subsubname, "subcategory": []}
                 )
         fields["categories"].append(temp)
+
+    for mark in HIERARCHY_GLOBAL_MARKS:
+        for i, attribut in enumerate(mark.attributes):
+            notes.append(
+                GlobalItem(
+                    volet=mark.volet,
+                    rubrique=mark.rubrique,
+                    sous_rubrique=mark.sous_rubrique,
+                    attribut=attribut,
+                    id_attribut=i,
+                ).dict()
+            )
     fields["items"] = notes
     return fields

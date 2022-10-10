@@ -1,5 +1,5 @@
 <ng-container *ngIf="fields?.length > 0; else noFields">
-  <div class="row">
+  <div class="row mb-2">
     <div class="col-12">
       <span class="mr-1">OU</span>
       <mat-slide-toggle
@@ -12,7 +12,8 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-4">
+    <div class="pr-0 col-lg-4 col-6">
+      <h5>Rubrique</h5>
       <select
         class="form-control form-control-sm"
         [formControl]="localForm?.controls.field"
@@ -36,7 +37,8 @@
         </ng-container>
       </select>
     </div>
-    <div class="col-3">
+    <div class="pr-0 col-lg-3 col-6">
+      <h5>Attribut</h5>
       <angular2-multiselect
         [data]="attributes"
         [formControl]="localForm.controls.attributes"
@@ -45,7 +47,8 @@
       >
       </angular2-multiselect>
     </div>
-    <div class="col-3">
+    <div class="pr-0 col-lg-3 col-6">
+      <h5>Connaissance</h5>
       <angular2-multiselect
         [data]="knowledges"
         [formControl]="localForm.controls.knowledges"
@@ -53,8 +56,9 @@
       >
       </angular2-multiselect>
     </div>
-    <div class="col-2">
+    <div class="pr-0 col-lg-2 col-6">
       <button
+        class="mt-4"
         mat-raised-button
         color="primary"
         (click)="onAddFilter()"
