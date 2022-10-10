@@ -3,12 +3,25 @@ import unicodedata
 from geonature.core.ref_geo.models import BibAreasTypes, LAreas
 from geonature.utils.env import DB
 from pypnnomenclature.models import TNomenclatures
-from sqlalchemy import desc, func, or_
+from sqlalchemy import and_, desc, func, or_
 from sqlalchemy.sql.expression import select
+from utils_flask_sqla.generic import GenericQuery
 
 from .api_error import ZHApiError
+from .constants import (
+    COR_RUB,
+    COR_VOLET,
+    INT_PAT_COR_ATTR_PERC,
+    OTHER_COR_ATTR_PERC,
+    STATUS_COR_ATTR_PERC,
+    VOLET1,
+    VOLET2,
+)
 from .model.zh_schema import (
     TZH,
+    BibHierCategories,
+    BibHierPanes,
+    CorRbRules,
     CorZhNotes,
     TFunctions,
     THydroArea,
@@ -16,6 +29,7 @@ from .model.zh_schema import (
     TManagementStructures,
     TOwnership,
     TRiverBasin,
+    TRules,
 )
 
 
@@ -89,8 +103,8 @@ def main_search(query, json):
 
     # --- Hierarchy search
     hierarchy = json.get("hierarchy")
-    if hierarchy is not None:
-        query = filter_hierarchy(query, hierarchy)
+    if hierarchy is not None and basin is not None:
+        query = filter_hierarchy(query, json=hierarchy, basin=basin[0].get("name"))
 
     return query
 
@@ -311,7 +325,9 @@ def filter_evaluations(query, json: dict):
     return query
 
 
-def filter_hierarchy(query, json: dict):
+def filter_hierarchy(query, json: dict, basin: str):
+    global_notes = get_global_notes(basin)
+
     and_ = json.get("and", False)
     hierarchy = json.get("hierarchy")
     if hierarchy is None:
@@ -321,9 +337,15 @@ def filter_hierarchy(query, json: dict):
         knowledges = hier.get("knowledges")
         if knowledges is None:
             attributes = hier.get("attributes", [])
-            subquery = generate_attributes_subqquery(attributes=attributes)
+            # Little trick to know if the attribute is a GlobalMark or not
+            if any(attribute.get("cor_rule_id") is None for attribute in attributes):
+                subquery = generate_global_attributes_subquery(
+                    attributes=attributes, global_notes=global_notes
+                )
+            else:
+                subquery = generate_attributes_subquery(attributes=attributes)
         else:
-            subquery = generate_attributes_subqquery(attributes=knowledges)
+            subquery = generate_attributes_subquery(attributes=knowledges)
 
         filters.append(TZH.id_zh.in_(subquery))
     if not and_:
@@ -333,7 +355,147 @@ def filter_hierarchy(query, json: dict):
     return query
 
 
-def generate_attributes_subqquery(attributes: list):
+def get_global_notes(basin: str):
+    if basin is None:
+        raise AttributeError("Basin must not be None")
+    query = GenericQuery(
+        DB=DB,
+        tableName="rb_notes_summary",
+        schemaName="pr_zh",
+        filters={"bassin_versant": basin},
+        limit=1,
+    )
+
+    results = query.return_query()
+
+    return [note for note in results.get("items", [])][0]
+
+
+def generate_global_attributes_subquery(attributes: list, global_notes: dict):
+    """
+    Generates the subquery taking care only on "GlobalMarks"
+    """
+    subquery = DB.session.query(CorZhNotes.id_zh)
+    note_query = func.sum(CorZhNotes.note)
+
+    subquery = subquery.join(CorRbRules, CorRbRules.cor_rule_id == CorZhNotes.cor_rule_id).join(
+        TRules, TRules.rule_id == CorRbRules.rule_id
+    )
+    volet = attributes[0].get("volet")
+    rub = attributes[0].get("rubrique")
+    attribute_list = [attribute.get("attribut") for attribute in attributes]
+
+    if rub is None:
+        subquery = generate_volet(
+            subquery=subquery,
+            volet=volet,
+            attribute_list=attribute_list,
+            global_notes=global_notes,
+            note_query=note_query,
+        )
+    else:
+        subquery = generate_rub(
+            subquery=subquery,
+            rub=rub,
+            attribute_list=attribute_list,
+            global_notes=global_notes,
+            note_query=note_query,
+        )
+
+    return subquery.group_by(CorZhNotes.id_zh).subquery()
+
+
+def generate_volet(subquery, volet: str, attribute_list: list, global_notes: dict, note_query):
+    if volet.lower() in [VOLET1.lower(), VOLET2.lower()]:
+        subquery = subquery.join(BibHierPanes, BibHierPanes.pane_id == TRules.pane_id).filter(
+            BibHierPanes.label == volet
+        )
+        subquery = generate_volet_subquery(
+            subquery=subquery,
+            volet=volet,
+            attribute_list=attribute_list,
+            global_notes=global_notes,
+            note_query=note_query,
+        )
+    else:
+        raise AttributeError(volet)
+
+    return subquery
+
+
+def generate_volet_subquery(subquery, volet, attribute_list: list, global_notes: dict, note_query):
+    """
+    Subquery for "volet"
+    """
+    volet_nb = COR_VOLET[volet]
+    max_note = global_notes[volet_nb]
+    and_query = []
+    for attribute in attribute_list:
+        min_, max_ = (item * max_note / 100.0 for item in OTHER_COR_ATTR_PERC[attribute])
+        and_query.append(and_(note_query > min_, note_query <= max_))
+
+    # Necessary to have "having" instead of "filter" by because we cannot have a "filter" with
+    # a "func" inside it (which is the case with the note_query)
+    return subquery.having(or_(*and_query))
+
+
+def generate_rub(subquery, rub: str, attribute_list: list, global_notes: dict, note_query):
+    subquery = subquery.join(BibHierCategories, BibHierCategories.cat_id == TRules.cat_id).filter(
+        BibHierCategories.label == rub
+    )
+    # Takes care of the several attributes choosen by the user.
+    # All the and queries on func.sum are compiled into and_query to be able to put an "or"
+    # between each of them
+    and_query = []
+
+    # TODO: to make more generic...
+    if rub.lower() == "statut et gestion":
+        rub_nb = COR_RUB[rub]
+        max_note = global_notes[rub_nb]
+        for attribute in attribute_list:
+            min_, max_ = (item * max_note / 100 for item in STATUS_COR_ATTR_PERC[attribute])
+            and_query.append(and_(note_query > min_, note_query <= max_))
+    elif rub.lower() == "interêt patrimonial":
+        rub_nb = COR_RUB[rub]
+        max_note = global_notes[rub_nb]
+        for attribute in attribute_list:
+            min_, max_ = (item * max_note / 100 for item in INT_PAT_COR_ATTR_PERC[attribute])
+            and_query.append(and_(note_query > min_, note_query <= max_))
+    elif rub.lower() in ["valeurs socio-économiques", "état fonctionnel"]:
+        for attribute in attribute_list:
+            if attribute in ["Non évalué", "Non évaluées"]:
+                # subquery = subquery.filter(CorZhNotes.note == 10)
+                and_query.append(note_query == 20)
+            elif attribute in ["Pas ou peu dégradé", "Nulles à faibles"]:
+                and_query.append(and_(note_query != 20, note_query >= 0, note_query <= 25))
+            elif attribute in ["Partiellement dégradé", "Moyennes"]:
+                and_query.append(and_(note_query > 25, note_query <= 50))
+            elif attribute in ["Dégradé", "Fortes"]:
+                and_query.append(and_(note_query > 50, note_query <= 75))
+            elif attribute in ["Très dégradé", "Très fortes"]:
+                and_query.append(and_(note_query > 75, note_query <= 100))
+            else:
+                raise AttributeError(attribute)
+    elif rub.lower() in ["fonctions hydrologiques / biogéochimiques"]:
+        for attribute in attribute_list:
+            if attribute in ["Non évaluées"]:
+                and_query.append(note_query == 45)
+            elif attribute in ["Nulles à faibles"]:
+                and_query.append(and_(note_query >= 0, note_query <= 33))
+            elif attribute in ["Moyennes"]:
+                and_query.append(and_(note_query != 45, note_query > 33, note_query <= 66))
+            elif attribute in ["Fortes"]:
+                and_query.append(and_(note_query > 66, note_query <= 100))
+            else:
+                raise AttributeError(attribute)
+    else:
+        raise AttributeError(rub)
+
+    # Necessary to have having instead of filter as specified before
+    return subquery.having(or_(*and_query))
+
+
+def generate_attributes_subquery(attributes: list):
     subquery = DB.session.query(CorZhNotes.id_zh)
     attribute_ids = []
     note_type_ids = []

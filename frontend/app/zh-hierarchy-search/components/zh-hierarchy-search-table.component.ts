@@ -31,8 +31,8 @@ export class ZhHierarchySearchTableComponent implements OnInit {
   @Input() form: FormGroup;
 
   public localForm: FormGroup;
-  public fields: HierarchyField[];
-  public notes: Note[];
+  public fields: HierarchyField[] = [];
+  public notes: Note[] = [];
   public filteredNotes: Note[] = [];
   public attributes: Note[] = [];
   public knowledges: Note[] = [];
@@ -93,7 +93,10 @@ export class ZhHierarchySearchTableComponent implements OnInit {
           this.notes = result.items;
         })
         // TODO: catch error
-        .catch(() => {})
+        .catch(() => {
+          this.fields = [];
+          this.notes = [];
+        })
         .finally(() => {});
     }
   }

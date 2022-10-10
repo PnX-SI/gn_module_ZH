@@ -1096,6 +1096,8 @@ def post_note(id_zh, cor_rule_id, note, attribute_id, note_type_id):
         if element:
             if element.note != note:
                 element.note = note
+                element.attribute_id = attribute_id
+                element.note_type_id = note_type_id
                 DB.session.flush()
         else:
             DB.session.add(

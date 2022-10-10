@@ -886,24 +886,45 @@ ALTER TABLE pr_zh.t_zh ADD CONSTRAINT fk_t_zh_id_strat_gestion FOREIGN KEY (id_s
 --FUNCTIONS--
 -------------
 
-CREATE OR REPLACE VIEW pr_zh.all_rb_rules AS (
-SELECT 
-	rb.name,
-	rb_rules.cor_rule_id,
-	rb_rules.rule_id,
-	(SELECT label FROM pr_zh.bib_hier_panes WHERE pane_id = rules.pane_id) AS VOLET,
-	(SELECT label FROM pr_zh.bib_hier_categories WHERE cat_id = rules.cat_id) AS RUBRIQUE,
-	(SELECT label FROM pr_zh.bib_hier_subcategories WHERE subcat_id = rules.subcat_id) AS SOUSRUBRIQUE,
-	(SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE id_nomenclature = items.attribute_id) AS id_attribut,
-	(SELECT label_default FROM ref_nomenclatures.t_nomenclatures WHERE id_nomenclature = items.attribute_id) AS attribut,
-	items.note AS note,
-    items.note_type_id as note_type_id,
-	(SELECT mnemonique FROM ref_nomenclatures.t_nomenclatures WHERE id_nomenclature = (SELECT id_knowledge FROM pr_zh.bib_note_types WHERE note_id = items.note_type_id)) AS note_type
-FROM pr_zh.t_river_basin rb
-RIGHT JOIN pr_zh.cor_rb_rules rb_rules ON rb.id_rb = rb_rules.rb_id
-LEFT JOIN pr_zh.t_rules rules ON rules.rule_id = rb_rules.rule_id
-LEFT JOIN pr_zh.t_items items ON items.cor_rule_id = rb_rules.cor_rule_id
-);
+CREATE OR REPLACE VIEW pr_zh.all_rb_rules
+AS SELECT rb.id_rb,
+    rb.name,
+    rb_rules.cor_rule_id,
+    rb_rules.rule_id,
+    bhp."label"  AS volet,
+    bhc."label"  AS rubrique,
+    bhs."label"  AS sousrubrique,
+    tn.id_nomenclature AS id_attribut,
+    tn.label_default AS attribut,
+    items.note,
+    items.note_type_id,
+    ( SELECT t_nomenclatures.mnemonique
+           FROM ref_nomenclatures.t_nomenclatures
+          WHERE t_nomenclatures.id_nomenclature = (( SELECT bib_note_types.id_knowledge
+                   FROM pr_zh.bib_note_types
+                  WHERE bib_note_types.note_id = items.note_type_id))) AS note_type
+   FROM pr_zh.t_river_basin rb
+     RIGHT JOIN pr_zh.cor_rb_rules rb_rules ON rb.id_rb = rb_rules.rb_id
+     LEFT JOIN pr_zh.t_rules rules ON rules.rule_id = rb_rules.rule_id
+     LEFT JOIN pr_zh.t_items items ON items.cor_rule_id = rb_rules.cor_rule_id
+     LEFT JOIN ref_nomenclatures.t_nomenclatures tn ON tn.id_nomenclature = items.attribute_id
+     LEFT JOIN pr_zh.bib_hier_panes bhp ON bhp.pane_id = rules.pane_id
+     LEFT JOIN pr_zh.bib_hier_categories bhc ON bhc.cat_id = rules.cat_id
+     LEFT JOIN pr_zh.bib_hier_subcategories bhs ON bhs.subcat_id = rules.subcat_id
+  ORDER BY rb_rules.cor_rule_id, bhc.label, bhs.label, (
+        CASE
+            WHEN tn.label_default::text ~~ 'Aucun%'::text THEN '0'::character varying
+            WHEN tn.label_default::text ~~ 'Faible%'::text THEN 'a'::character varying
+            WHEN tn.label_default::text ~~ 'Non évalué%'::text THEN 'b'::character varying
+            WHEN tn.label_default::text ~~ 'Nul% à faible'::text THEN 'c'::character varying
+            WHEN tn.label_default::text ~~ 'Pas ou peu menacée'::text THEN 'c'::character varying
+            WHEN tn.label_default::text ~~ 'Moyen%'::text THEN 'd'::character varying
+            WHEN tn.label_default::text ~~ 'Modérément menacée'::text THEN 'd'::character varying
+            WHEN tn.label_default::text ~~ 'Fort%'::text THEN 'e'::character varying
+            WHEN tn.label_default::text ~~ 'Très Fort%'::text THEN 'f'::character varying
+            WHEN tn.label_default::text ~~ '>3'::text THEN 'f'::character varying
+            ELSE tn.label_default
+        END);
 
 
 CREATE OR REPLACE FUNCTION pr_zh.get_cat_note_without_subcats(
