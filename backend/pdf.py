@@ -64,7 +64,7 @@ def multi_to_polys(multi):
     return tuple(polys)
 
 
-def get_layer(small_layer_nb=0, area=None, threshold=None):
+def get_layer(large_layer_nb=0, small_layer_nb=0, area=None, threshold=None):
     """
     Returns the correct layer depending on the threshold
     """
@@ -80,12 +80,12 @@ def get_layer(small_layer_nb=0, area=None, threshold=None):
     )
 
     if area is None:
-        return base_map(0)
+        return base_map(large_layer_nb)
     if threshold is None:
-        return base_map(0)
+        return base_map(large_layer_nb)
     if area < threshold:
         return base_map(small_layer_nb)
-    return base_map(0)
+    return base_map(large_layer_nb)
 
 
 def gen_pdf(id_zh, dataset, filename="rapport.pdf"):
@@ -103,7 +103,10 @@ def gen_pdf(id_zh, dataset, filename="rapport.pdf"):
         area = float(dataset["description"]["presentation"]["area"])
         threshold = dataset["config"]["pdf_layer_threashold_ha"]
         layer_nb = dataset["config"]["pdf_layer_number"]
-        layer = get_layer(small_layer_nb=layer_nb, area=area, threshold=threshold)
+        small_layer_nb = dataset["config"]["pdf_small_layer_number"]
+        layer = get_layer(
+            large_layer_nb=layer_nb, small_layer_nb=small_layer_nb, area=area, threshold=threshold
+        )
         dataset["map"] = gen_map(coordinates, url_template=layer)
     except Exception as e:
         print(f"Cannot generate the map inside the pdf ({e})... Continuing")
