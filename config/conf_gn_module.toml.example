@@ -1,1 +1,142 @@
 # Fichier listant les paramètres du module et leurs valeurs par défaut
+
+# Colonnes par défaut du tableau de la page d'accueil des Zones Humides
+default_map_list_conf = [
+    { prop = "main_name", name = "Nom principal"},
+    { prop = "code", name = "Code"},
+    { prop = "sdage", name = "Typologie SDAGE", sortable = true},
+    { prop = "bassin_versant", name = "Bassin versant", sortable = true}
+]
+
+# Colonnes par défaut du tableau de la page d'accueil des Zones Humides
+available_maplist_column = [
+    {prop = "main_name", name= "Nom principal"},
+    {prop = "code", name= "Code"},
+    {prop = "sdage", name= "Typologie SDAGE", sortable = true},
+    {prop = "bassin_versant", name= "Bassin versant", sortable = true},
+    {prop = "delims", name= "Critères délimitation (de la zh)", sortable = true},
+    {prop = "create_date", name= "Date de création"},
+    {prop = "author", name= "Auteur"},
+    {prop = "organism", name= "Organisme"},
+    {prop = "update_date", name= "Date de modification"},
+    {prop = "update_author", name= "Auteur dernière modification"},
+    {prop = "update_organism", name= "Organisme de dernière modification"}
+]
+
+# Liste des nomenclatures utilisées. En général à laisser par défaut
+nomenclatures = [
+    'SDAGE-SAGE', 'SDAGE', 'CORINE_BIO', 'CRIT_DELIM', 'CRIT_DELIM', 'CRIT_DEF_ESP_FCT',
+    'OCCUPATION_SOLS', 'ACTIV_HUM', 'LOCALISATION', 'IMPACTS', 'EVAL_GLOB_MENACES',
+    'STATUT_PROPRIETE', 'TYP_DOC_COMM', 'PLAN_GESTION', 'PROTECTIONS', "INSTRU_CONTRAC_FINANC",
+    'ENTREE_EAU', 'SORTIE_EAU', 'PERMANENCE_ENTREE', 'PERMANENCE_SORTIE', 'SUBMERSION_FREQ',
+    'SUBMERSION_ETENDUE', 'TYPE_CONNEXION', 'FONCTIONNALITE_HYDRO', 'FONCTIONNALITE_BIO',
+    'FONCTIONS_HYDRO', 'FONCTIONS_BIO', 'INTERET_PATRIM', 'VAL_SOC_ECO',
+    'FONCTIONS_QUALIF', 'FONCTIONS_CONNAISSANCE', 'ETAT_CONSERVATION',
+    'NIVEAU_PRIORITE', 'STRAT_GESTION'
+]
+
+# Référentiels géographiques disponibles et utilisées pour 
+# les inventaires (visibles sur la fiche complète)
+# pour ajouter un référentiel :
+# - créer dans ref_geo.bib_areas_types la ligne correspondante au référentiel si celui n'est pas déjà répertorié
+# - reporter le type_code du référentiel dans "type_code_ref_geo" et mettre "active"=True dans conf_schema_toml.py
+
+ref_geo_referentiels = [
+    {
+        zh_name = "ZNIEFF Terre Type 1",
+        type_code_ref_geo = "ZNIEFF1",
+        active = true
+    },
+    {
+        zh_name = "ZNIEFF Terre Type 2",
+        type_code_ref_geo = "ZNIEFF2",
+        active = true
+    },
+    {
+        zh_name = "RAMSAR",
+        type_code_ref_geo = "SRAM",
+        active = true
+    },
+    {
+        zh_name = "Natura 2000 – Directive « Habitats, faune, flore »",
+        type_code_ref_geo = "SIC",
+        active = true
+    },
+    {
+        zh_name = "Natura 2000 – Directive « Oiseaux » (ZPS)",
+        type_code_ref_geo = "ZPS",
+        active = true
+    },
+    {
+        zh_name = "Site de l’observatoire national des zones humides",
+        type_code_ref_geo = "",
+        active = false
+    }
+]
+
+# Renseigne le nom de la table permettant de remonter les observations
+# de vertebrés effectuées à l'intérieur de la zones humide
+vertebrates_view_name = {
+    schema_name = "pr_zh",
+    table_name = "vertebrates",
+    category = "vertebrates"
+}
+
+# Renseigne le nom de la table permettant de remonter les observations
+# d'invertebrés effectuées à l'intérieur de la zones humide
+invertebrates_view_name = {
+    schema_name = "pr_zh",
+    table_name = "invertebrates",
+    category = "invertebrates"
+}
+
+# Renseigne le nom de la table permettant de remonter les observations
+# de flore effectuées à l'intérieur de la zones humide
+flora_view_name = {
+    schema_name = "pr_zh",
+    table_name = "flora",
+    category = "flora"
+}
+
+# Extensions autorisées pour le téléversement
+allowed_extensions = ['.pdf', '.jpg']
+
+# Taille max des fichiers pdf téléversés
+max_pdf_size = 1.5  # Mo
+
+# Taille max des fichiers jpg téléversés
+max_jpg_size = 0.5  # Mo
+
+# Si le nom doit être validé ou non avec le format suivant :
+# (<ZH_Code>_<un_nombre_arbitraire>.jpg)
+filename_validated = true
+
+# Si le format du fichier doit être validé
+fileformat_validated = true
+
+# Chemin à partir de la racine du module où seront stockés les
+# téléversements
+file_path = "static"
+
+# Name of the source of species data (tab5)
+species_source_name = 'GeoNature'
+
+# -- Configuration relative à la génération de la fiche de synthèse pdf
+# Limite de superficie de la zone humide en dessous de laquelle
+# la couche définie par pdf_small_layer_number sera utilisée
+pdf_layer_threashold_ha = 1000
+# Numéro de la couche (dans la configuration de GeoNature) utilisée
+# par défaut dans la génération du pdf.
+# Attention ! Commence à 0
+pdf_layer_number = 0
+# Numéro de la couche (dans la configuration de GeoNature) utilisée
+# lorsque la superficie de la Zone Humide est inférieure à 
+# pdf_layer_threashold_ha
+# Attention ! Commence à 0
+pdf_small_layer_number = 0
+# Nom de l'image (dans le dossier static) qui sera utilisée comme 
+# pied de page
+# Si None => ne sera pas affichée
+pdf_last_page_img = 'entree_sortie.svg'
+# Titre du document
+pdf_title = 'Inventaire des zones humides'

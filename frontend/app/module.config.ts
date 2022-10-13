@@ -1,6 +1,6 @@
 export const ModuleConfig = {
- "FRONTEND_PATH": "/home/geonatureadmin/geonature/external_modules/zones_humides/frontend",
- "ID_MODULE": 10,
+ "FRONTEND_PATH": "/home/geonatureadmin/geonature/dev/GeoNature/external_modules/zones_humides/frontend",
+ "ID_MODULE": 64,
  "MODULE_CODE": "ZONES_HUMIDES",
  "MODULE_URL": "/zones_humides",
  "allowed_extensions": [
@@ -77,8 +77,8 @@ export const ModuleConfig = {
   }
  ],
  "file_path": "static",
- "fileformat_validated": true,
- "filename_validated": true,
+ "fileformat_validated": false,
+ "filename_validated": false,
  "flora_view_name": {
   "category": "flora",
   "schema_name": "pr_zh",
@@ -90,7 +90,7 @@ export const ModuleConfig = {
   "table_name": "invertebrates"
  },
  "max_jpg_size": 0.5,
- "max_pdf_size": 100.0,
+ "max_pdf_size": 1.5,
  "module_dir_name": "gn_module_zones_humides",
  "nomenclatures": [
   "SDAGE-SAGE",
@@ -127,9 +127,10 @@ export const ModuleConfig = {
   "NIVEAU_PRIORITE",
   "STRAT_GESTION"
  ],
- "pdf_last_page_img": "entree_sortie.svg",
- "pdf_layer_number": 0,
- "pdf_layer_threashold_ha": 1000,
+ "pdf_last_page_img": "",
+ "pdf_layer_number": 1,
+ "pdf_layer_threashold_ha": 1000.0,
+ "pdf_small_layer_number": 2,
  "pdf_title": "Inventaire des zones humides",
  "ref_geo_referentiels": [
   {
