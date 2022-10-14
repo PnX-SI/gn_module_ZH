@@ -7,7 +7,7 @@
         mat-raised-button
         color="secondary"
         class="uppercase"
-        [routerLink]="['/zones_humides']"
+        (click)="onReturn()"
       >
         <mat-icon> west </mat-icon> Retour
       </button>
@@ -38,7 +38,7 @@
         mat-raised-button
         color="accent"
         class="uppercase"
-        [routerLink]="['/zones_humides/forms', zhId]"
+        (click)="onModify(zhId)"
       >
         Modifier
       </button>

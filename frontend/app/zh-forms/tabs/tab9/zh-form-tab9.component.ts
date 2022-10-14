@@ -13,6 +13,7 @@ import { TabsService } from "../../../services/tabs.service";
 export class ZhFormTab9Component implements OnInit {
   private $_currentZhSub: Subscription;
   public $_fromChangeSub: Subscription;
+  public $_getTabChangeSub: Subscription;
   public currentZh: any;
 
   constructor(
@@ -22,7 +23,7 @@ export class ZhFormTab9Component implements OnInit {
   ) {}
 
   ngOnInit() {
-    this._tabService.getTabChange().subscribe((tabPosition: number) => {
+    this.$_getTabChangeSub = this._tabService.getTabChange().subscribe((tabPosition: number) => {
       if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
       if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
       if (tabPosition == 9) {
@@ -39,5 +40,11 @@ export class ZhFormTab9Component implements OnInit {
         this.hierarchy.getHierarchy(zh.id);
       }
     });
+  }
+
+  //keep this code and propagate it to other tabs
+  ngOnDestroy() {
+    if (this.$_getTabChangeSub) this.$_getTabChangeSub.unsubscribe();
+    if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
   }
 }
