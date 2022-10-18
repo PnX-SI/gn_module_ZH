@@ -181,6 +181,7 @@ export class ZhFormTab5Component implements OnInit {
   public submitted: boolean;
   private $_currentZhSub: Subscription;
   private $_fromChangeSub: Subscription;
+  private $_getTabChangeSub: Subscription;
   public currentZh: any;
   posted: boolean;
   public taxaLoading: boolean;
@@ -199,7 +200,7 @@ export class ZhFormTab5Component implements OnInit {
   ngOnInit() {
     this.getMetaData();
     this.initForms();
-    this._tabService.getTabChange().subscribe((tabPosition: number) => {
+    this.$_getTabChangeSub = this._tabService.getTabChange().subscribe((tabPosition: number) => {
       if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
       if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
       if (tabPosition == 5) {
@@ -1172,5 +1173,11 @@ export class ZhFormTab5Component implements OnInit {
     this.corineBioTable.sort((a, b) =>
       a.corinBio.CB_code > b.corinBio.CB_code ? 1 : b.corinBio.CB_code > a.corinBio.CB_code ? -1 : 0
     );
+  }
+  
+  //keep this code and propagate it to other tabs
+  ngOnDestroy() {
+    if (this.$_getTabChangeSub) this.$_getTabChangeSub.unsubscribe();
+    if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
   }
 }

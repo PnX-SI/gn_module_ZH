@@ -1,6 +1,7 @@
 import { Component, EventEmitter, OnInit, Input, Output } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
+import { Subscription } from "rxjs";
 
 import { ToastrService } from "ngx-toastr";
 
@@ -23,6 +24,10 @@ export class ZhFormTab8Component implements OnInit {
   @Input() public formMetaData: any;
   @Output() public canChangeTab = new EventEmitter<boolean>();
   @Output() nextTab = new EventEmitter<number>();
+
+  private $_getTabChangeSub: Subscription;
+  private $_currentZhSub: Subscription;
+
   public zh: any;
   public config = ModuleConfig;
   public formTab8: FormGroup;
@@ -62,7 +67,7 @@ export class ZhFormTab8Component implements OnInit {
   ) {}
 
   ngOnInit() {
-    this._tabService.getTabChange().subscribe((tabPosition: number) => {
+    this.$_getTabChangeSub = this._tabService.getTabChange().subscribe((tabPosition: number) => {
       if (tabPosition == 8) {
         this.getCurrentZh();
       }
@@ -127,7 +132,7 @@ export class ZhFormTab8Component implements OnInit {
   }
 
   getCurrentZh() {
-    this._dataService.currentZh.subscribe((zh: any) => {
+    this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
         this.zh = zh;
         this.initForms();
@@ -271,5 +276,11 @@ export class ZhFormTab8Component implements OnInit {
 
   displayError(error: string) {
     this._toastr.error(error);
+  }
+
+  //keep this code and propagate it to other tabs
+  ngOnDestroy() {
+    if (this.$_getTabChangeSub) this.$_getTabChangeSub.unsubscribe();
+    if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
   }
 }

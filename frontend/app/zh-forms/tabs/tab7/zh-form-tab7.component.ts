@@ -32,6 +32,7 @@ export class ZhFormTab7Component implements OnInit {
   public functionsComment: any;
   public menacesComment: any;
   private $_currentZhSub: Subscription;
+  private $_getTabChangeSub: Subscription;
   public actionTable: any[] = [];
   public currentZh: any;
   default_prio_level: string = "Non définie";
@@ -150,7 +151,7 @@ export class ZhFormTab7Component implements OnInit {
 
   ngOnInit() {
     this.initForms();
-    this._tabService.getTabChange().subscribe((tabPosition: number) => {
+    this.$_getTabChangeSub = this._tabService.getTabChange().subscribe((tabPosition: number) => {
       if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
       if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
       if (tabPosition == 7) {
@@ -494,5 +495,11 @@ export class ZhFormTab7Component implements OnInit {
     action.sort(function (a, b) {
       return sortingArr.indexOf(a.priority.mnemonique) - sortingArr.indexOf(b.priority.mnemonique);
     });
+  }
+
+  //keep this code and propagate it to other tabs
+  ngOnDestroy() {
+    if (this.$_getTabChangeSub) this.$_getTabChangeSub.unsubscribe();
+    if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
   }
 }

@@ -4,6 +4,7 @@ import { ZhDataService } from "../../services/zh-data.service";
 import { CommonService } from "@geonature_common/service/common.service";
 import { Router } from "@angular/router";
 import { ErrorTranslatorService } from "../../services/error-translator.service";
+import { TabsService } from "../../services/tabs.service";
 
 @Component({
   selector: "zh-details-header",
@@ -21,7 +22,8 @@ export class HeaderComponent {
     private router: Router,
     private _zhService: ZhDataService,
     private _commonService: CommonService,
-    private _error: ErrorTranslatorService
+    private _error: ErrorTranslatorService,
+    private _tabService: TabsService
   ) {}
 
   onOpen(modal) {
@@ -82,5 +84,20 @@ export class HeaderComponent {
       },
       () => (this.loadingPdf = false)
     );
+  }
+
+  resetTabService() {
+    // Set the next tab so that this._tabService.tabChange is 0
+    this._tabService.setTabChange(0);
+  }
+
+  onModify(zhId) {
+    this.resetTabService()
+    this.router.navigate([`/zones_humides/forms/${zhId}`]);
+  }
+
+  onReturn() {
+    this.resetTabService()
+    this.router.navigate([`/zones_humides`]);
   }
 }

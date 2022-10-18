@@ -60,6 +60,7 @@ export class ZhFormTab6Component implements OnInit {
   private tempID: any;
   private $_currentZhSub: Subscription;
   private $_fromChangeSub: Subscription;
+  private $_getTabChangeSub: Subscription;
   public selectedItems = [];
   default_status: string = "Indéterminé";
 
@@ -171,7 +172,7 @@ export class ZhFormTab6Component implements OnInit {
     this.getMetaData();
     this.initForms();
 
-    this._tabService.getTabChange().subscribe((tabPosition: number) => {
+    this.$_getTabChangeSub = this._tabService.getTabChange().subscribe((tabPosition: number) => {
       if (tabPosition == 6) {
         this.getCurrentZh();
         if (this.$_fromChangeSub != undefined) this.$_fromChangeSub.unsubscribe();
@@ -1041,5 +1042,11 @@ export class ZhFormTab6Component implements OnInit {
         ? -1
         : 0
     );
+  }
+
+  //keep this code and propagate it to other tabs
+  ngOnDestroy() {
+    if (this.$_getTabChangeSub) this.$_getTabChangeSub.unsubscribe();
+    if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
   }
 }
