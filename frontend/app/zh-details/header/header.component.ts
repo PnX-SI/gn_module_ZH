@@ -92,12 +92,12 @@ export class HeaderComponent {
   }
 
   onModify(zhId) {
-    this.resetTabService()
+    this.resetTabService();
     this.router.navigate([`/zones_humides/forms/${zhId}`]);
   }
 
   onReturn() {
-    this.resetTabService()
+    this.resetTabService();
     this.router.navigate([`/zones_humides`]);
   }
 }

@@ -10,11 +10,11 @@ from flask import Blueprint, Response, jsonify, request, send_file, session
 from flask.helpers import send_file
 from geojson import FeatureCollection
 from geonature.core.gn_commons.models import TMedias
+
 # import des fonctions utiles depuis le sous-module d'authentification
 from geonature.core.gn_permissions import decorators as permissions
 from geonature.core.gn_permissions.tools import get_or_fetch_user_cruved
-from geonature.core.ref_geo.models import (BibAreasTypes, LAreas,
-                                           LiMunicipalities)
+from geonature.core.ref_geo.models import BibAreasTypes, LAreas, LiMunicipalities
 from geonature.utils.config import config
 from geonature.utils.env import DB, ROOT_DIR
 from geonature.utils.utilssqlalchemy import json_resp
@@ -26,29 +26,60 @@ from utils_flask_sqla.generic import GenericQuery
 from utils_flask_sqla.response import json_resp_accept_empty_list
 
 from .api_error import ZHApiError
-from .forms import (create_zh, post_file_info, update_actions,
-                    update_activities, update_corine_biotopes,
-                    update_corine_landcover, update_delim, update_fct_delim,
-                    update_functions, update_hab_heritages, update_inflow,
-                    update_instruments, update_managements, update_outflow,
-                    update_ownerships, update_protections, update_refs,
-                    update_tzh, update_urban_docs, update_zh_tab0,
-                    update_zh_tab6)
+from .forms import (
+    create_zh,
+    post_file_info,
+    update_actions,
+    update_activities,
+    update_corine_biotopes,
+    update_corine_landcover,
+    update_delim,
+    update_fct_delim,
+    update_functions,
+    update_hab_heritages,
+    update_inflow,
+    update_instruments,
+    update_managements,
+    update_outflow,
+    update_ownerships,
+    update_protections,
+    update_refs,
+    update_tzh,
+    update_urban_docs,
+    update_zh_tab0,
+    update_zh_tab6,
+)
+
 # from .forms import *
 from .geometry import set_area, set_geom
 from .hierarchy import Hierarchy, get_all_hierarchy_fields
 from .model.cards import Card
 from .model.repositories import ZhRepository
 from .model.zh import ZH
-from .model.zh_schema import (TZH, BibActions, BibOrganismes, BibSiteSpace,
-                              CorLimList, CorZhArea, CorZhRef, THydroArea,
-                              TReferences, TRiverBasin)
+from .model.zh_schema import (
+    TZH,
+    BibActions,
+    BibOrganismes,
+    BibSiteSpace,
+    CorLimList,
+    CorZhArea,
+    CorZhRef,
+    THydroArea,
+    TReferences,
+    TRiverBasin,
+)
 from .nomenclatures import get_ch, get_nomenc
 from .pdf import gen_pdf
 from .search import main_search
 from .upload import upload_process
-from .utils import (check_ref_geo_schema, delete_file, get_file_path,
-                    get_last_pdf_export, get_main_picture_id, get_user_cruved)
+from .utils import (
+    check_ref_geo_schema,
+    delete_file,
+    get_file_path,
+    get_last_pdf_export,
+    get_main_picture_id,
+    get_user_cruved,
+)
 
 blueprint = Blueprint("pr_zh", __name__, "../static", template_folder="templates")
 
@@ -579,8 +610,10 @@ def get_all_photos(id_zh: int):
         .filter(TZH.id_zh == id_zh)
         .all()
     )
-    api_uri = urljoin(f"{config['API_ENDPOINT']}/",
-                      f"{blueprint.config['MODULE_CODE'].lower()}/{blueprint.config['file_path']}/")
+    api_uri = urljoin(
+        f"{config['API_ENDPOINT']}/",
+        f"{blueprint.config['MODULE_CODE'].lower()}/{blueprint.config['file_path']}/",
+    )
     return [
         {"url": urljoin(api_uri, Path(media[-1]).name)}
         for media in sorted(q_medias, key=lambda x: x[0] != x[1])

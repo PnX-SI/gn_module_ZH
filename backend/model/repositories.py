@@ -1,6 +1,7 @@
 from geonature.utils.env import DB
 from werkzeug.exceptions import NotFound
 
+
 class ZhRepository:
     """
     Repository: classe permettant l'acces au données

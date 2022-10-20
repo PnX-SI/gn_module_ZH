@@ -1,10 +1,9 @@
 from itertools import groupby
 
-from geonature.core.ref_geo.models import LAreas, BibAreasTypes
+from geonature.core.ref_geo.models import BibAreasTypes, LAreas
 from geonature.utils.env import DB
 from pypn_habref_api.models import Habref
 from pypnnomenclature.models import TNomenclatures
-
 
 from ..api_error import ZHApiError
 from ..hierarchy import Hierarchy
@@ -12,17 +11,17 @@ from ..nomenclatures import get_corine_biotope
 from .zh import ZH
 from .zh_schema import (
     TZH,
-    CorZhArea,
     BibActions,
-    CorUrbanTypeRange,
     BibOrganismes,
-    CorZhHydro,
-    THydroArea,
+    CorChStatus,
     CorImpactTypes,
     CorProtectionLevelType,
-    CorChStatus,
+    CorUrbanTypeRange,
+    CorZhArea,
+    CorZhHydro,
+    CorZhRb,
+    THydroArea,
     TRiverBasin,
-    CorZhRb
 )
 
 

@@ -1,24 +1,21 @@
 import geoalchemy2
 from flask import Blueprint
-
+from geoalchemy2.types import Geography
+from geonature.core.ref_geo.models import BibAreasTypes, LAreas, LiMunicipalities
+from geonature.utils.env import DB
+from pypn_habref_api.models import CorespHab, Habref
+from pypnnomenclature.models import BibNomenclaturesTypes, TNomenclatures
+from pypnusershub.db.models import User
+from pypnusershub.db.tools import InsufficientRightsError
 from sqlalchemy import ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property, relationship
 from sqlalchemy.sql import and_, cast, func, select
 
-from geoalchemy2.types import Geography
-from geonature.core.ref_geo.models import (BibAreasTypes, LAreas,
-                                           LiMunicipalities)
-from geonature.utils.env import DB
-from pypn_habref_api.models import CorespHab, Habref
-from pypnnomenclature.models import BibNomenclaturesTypes, TNomenclatures
-from pypnusershub.db.models import User
-from pypnusershub.db.tools import InsufficientRightsError
 # méthode de sérialisation
 from utils_flask_sqla.serializers import serializable
 from utils_flask_sqla_geo.serializers import geoserializable
-
 
 blueprint = Blueprint("pr_zh", __name__)
 
@@ -98,7 +95,7 @@ class Nomenclatures(TNomenclatures):
         q = TNomenclatures.query.filter_by(
             id_type=select([func.ref_nomenclatures.get_id_nomenclature_type(bib_mnemo)])
         )
-        if bib_mnemo == 'SDAGE':
+        if bib_mnemo == "SDAGE":
             q = q.order_by(TNomenclatures.id_nomenclature)
         return q.all()
 

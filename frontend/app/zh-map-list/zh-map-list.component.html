@@ -67,7 +67,7 @@
               [selected]="mapListService.selectedRow"
               [selectionType]="'single'"
               [sorts]="sorts"
-              [messages]="{emptyMessage: 'Aucune zone humide trouvée'}"
+              [messages]="{ emptyMessage: 'Aucune zone humide trouvée' }"
               (page)="onChangePage($event)"
               (select)="mapListService.onRowSelect($event)"
               (sort)="onColumnSort($event)"

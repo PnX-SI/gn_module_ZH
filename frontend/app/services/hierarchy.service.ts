@@ -67,7 +67,7 @@ export class HierarchyService {
   setItems(data) {
     if (data == null) {
       this.items = [];
-      return
+      return;
     }
     this.rb_name = data.river_basin_name;
 
