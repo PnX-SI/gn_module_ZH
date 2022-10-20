@@ -1174,7 +1174,7 @@ export class ZhFormTab5Component implements OnInit {
       a.corinBio.CB_code > b.corinBio.CB_code ? 1 : b.corinBio.CB_code > a.corinBio.CB_code ? -1 : 0
     );
   }
-  
+
   //keep this code and propagate it to other tabs
   ngOnDestroy() {
     if (this.$_getTabChangeSub) this.$_getTabChangeSub.unsubscribe();

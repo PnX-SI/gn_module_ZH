@@ -89,7 +89,7 @@ export class ZhFormTab0Component implements OnInit {
         data = data.setOpacity(0);
         this.geomLayers.push(data.addTo(this._mapService.map));
       });
-    this._pbfService.setPaneBackground(this._mapService.map)
+    this._pbfService.setPaneBackground(this._mapService.map);
   }
 
   intiTab() {

@@ -40,9 +40,13 @@
       <hr />
       <zh-search-code [form]="_searchService.searchForm.get('nameorcode')"> </zh-search-code>
       <hr />
-      <zh-search-sdage [data]="data?.SDAGE" [form]="_searchService.searchForm.get('sdage')"> </zh-search-sdage>
+      <zh-search-sdage [data]="data?.SDAGE" [form]="_searchService.searchForm.get('sdage')">
+      </zh-search-sdage>
       <hr />
-      <zh-search-ensemble [data]="data?.BIB_SITE_SPACE" [form]="_searchService.searchForm.get('ensemble')">
+      <zh-search-ensemble
+        [data]="data?.BIB_SITE_SPACE"
+        [form]="_searchService.searchForm.get('ensemble')"
+      >
       </zh-search-ensemble>
       <hr />
       <zh-search-area [form]="_searchService.searchForm.get('ha_area')"> </zh-search-area>
