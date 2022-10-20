@@ -1,6 +1,22 @@
 # **MODULE ZONES HUMIDES DE GEONATURE**
 
-&nbsp;
+## **Documentation**
+
+- [Utilisateur](/doc/user.md)
+- [Administrateur](/doc/admin.md)
+- Hiérarchisation : 
+  - Consulter [ici](/doc/hierarchy.md) la documentation d'implémentation des règles de hiérarchisation en base de données
+  - Consulter (pas encore disponible) [ici](https://geonature.fr/documents/) le pdf contenant la méthodologie complète de hiérarchisation
+
+## **Requis**
+
+Pour que la fonctionnalité d'export de PDF, fonctionne il est nécessaire d'installer sur Debian 11 le paquet suivant :
+`sudo apt install libgdk-pixbuf2.0-dev` (lancer un `sudo apt update` peut être nécessaire).
+
+Cela est dû à la version de la lirairie Python `weasyprint` qui requiert ce paquet. Cela sera résolu quand cette librairie sera mise à jour car, dans les dernières versions, cette dépendance n'est plus requise.
+
+Ne pas oublier de redémarrer GeoNature : 
+`sudo systemctl restart geonature`
 
 ## **Installation**
 
@@ -43,8 +59,6 @@ geonature update_module_configuration zones_humides
 
 Voir [ici](/doc/admin.md) pour documentation des paramètres de configuration du module pour les administrateurs
 
-&nbsp;
-
 ## **Désinstallation**
 
 - Exécuter la commande GeoNature de désactivation de module
@@ -77,25 +91,3 @@ sudo psql -h localhost -p $SQL_PORT -U $GEONAT_USER -d $GEONAT_DB -b -f "/home/`
 rm -rf /home/`whoami`/gn_module_ZH
 rm -rf /home/`whoami`/geonature/external_modules/zones_humides
 ```
-
-&nbsp;
-
-## ** Requis **
-
-Pour que la fonctionnalité d'export de PDF, fonctionne il est nécessaire d'installer sur Debian 11 le paquet suivant :
-`sudo apt install libgdk-pixbuf2.0-dev` (lancer un `sudo apt update` peut être nécessaire).
-
-Cela est dû à la version de la lirairie Python `weasyprint` qui requiert ce paquet. Cela sera résolu quand cette librairie sera mise à jour car, dans les dernières versions, cette dépendance n'est plus requise.
-
-Ne pas oublier de redémarrer GeoNature : 
-`sudo systemctl restart geonature`
-
-&nbsp;
-
-## **Documentation**
-
-- [Utilisateur](/doc/user.md)
-- [Administrateur](/doc/admin.md)
-- Hiérarchisation : 
-  - Consulter [ici](/doc/hierarchy.md) la documentation d'implémentation des règles de hiérarchisation en base de données
-  - Consulter (pas encore disponible) [ici](https://geonature.fr/documents/) le pdf contenant la méthodologie complète de hiérarchisation
