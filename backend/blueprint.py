@@ -579,7 +579,8 @@ def get_all_photos(id_zh: int):
         .filter(TZH.id_zh == id_zh)
         .all()
     )
-    api_uri = urljoin(config["API_ENDPOINT"], f"{blueprint.config['MODULE_CODE'].lower()}/static/")
+    api_uri = urljoin(f"{config['API_ENDPOINT']}/",
+                      f"{blueprint.config['MODULE_CODE'].lower()}/{blueprint.config['file_path']}/")
     return [
         {"url": urljoin(api_uri, Path(media[-1]).name)}
         for media in sorted(q_medias, key=lambda x: x[0] != x[1])
