@@ -41,9 +41,6 @@ export class PbfService {
       vectorTileLayerStyles: {
         sliced: function (properties, zoom) {
           let opacity = 0.8;
-          if (zoom > 11) {
-            opacity = 0;
-          }
 
           return {
             fillColor: "#800080",
