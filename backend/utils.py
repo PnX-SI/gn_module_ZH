@@ -20,7 +20,7 @@ def get_main_picture_id(id_zh, media_list=None):
     main_pict_id = DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().main_pict_id
     if main_pict_id is None and media_list is not None and len(media_list) > 0:
         id_media = media_list[0].id_media
-        DB.session.query(TZH).update({TZH.main_pict_id: id_media})
+        DB.session.query(TZH).filter(TZH.id_zh == id_zh).update({TZH.main_pict_id: id_media})
         DB.session.commit()
         main_pict_id = id_media
     return main_pict_id
