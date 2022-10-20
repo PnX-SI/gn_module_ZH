@@ -30,7 +30,7 @@ Le paramètre _default_map_list_conf_ contient la liste des colonnes affichées 
 
 &nbsp;
 
-<kbd>![columns](doc/show_columns.png)</kbd>
+![columns](show_columns.png)
 
 &nbsp;
 
@@ -87,7 +87,7 @@ Le script _data/script_create_taxon_view.sh_ permet d’aider la génération de
 
 &nbsp;
 
-<kbd>![columns](doc/taxons.png)</kbd>
+![columns](taxons.png)
 
 &nbsp;
 
