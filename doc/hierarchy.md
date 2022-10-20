@@ -56,13 +56,13 @@ Pour plus de détails méthodologiques et théoriques sur la hiérarchisation de
 
 &nbsp;
 
-![image hierarchy](doc/hierarchy.png)
+![image hierarchy](hierarchy.png)
 
 ### **Tables et modèle de données**
 
 Onze tables du schéma pr_zh sont dédiées au fonctionnement de la hiérarchisation dans la base de données GeoNature. Parmi elles, 4 sont destinées à être remplies par l’administrateur pour implémenter les règles de hiérarchisation des différents bassins versants. Les autres tables n’ont pas vocation à être modifiées quel que soit le système de hiérarchisation et le bassin versant concerné.
 
-![image mcd](doc/mcd.png)
+![image mcd](mcd.png)
 
 #### _Les tables non concernées par l'implémentation des règles par l'administrateur :_
 
