@@ -23,7 +23,7 @@ Ne pas oublier de redémarrer GeoNature :
 - Définir le nom de la branche
 
 ```bash
-BRANCHNAME='master'
+BRANCHNAME='main'
 ```
 
 - Copier le dépôt
