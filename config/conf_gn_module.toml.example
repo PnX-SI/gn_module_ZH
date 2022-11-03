@@ -76,27 +76,15 @@ ref_geo_referentiels = [
 
 # Renseigne le nom de la table permettant de remonter les observations
 # de vertebrés effectuées à l'intérieur de la zones humide
-vertebrates_view_name = {
-    schema_name = "pr_zh",
-    table_name = "vertebrates",
-    category = "vertebrates"
-}
+vertebrates_view_name = { schema_name = "pr_zh", table_name = "vertebrates", category = "vertebrates" }
 
 # Renseigne le nom de la table permettant de remonter les observations
 # d'invertebrés effectuées à l'intérieur de la zones humide
-invertebrates_view_name = {
-    schema_name = "pr_zh",
-    table_name = "invertebrates",
-    category = "invertebrates"
-}
+invertebrates_view_name = { schema_name = "pr_zh", table_name = "invertebrates", category = "invertebrates" }
 
 # Renseigne le nom de la table permettant de remonter les observations
 # de flore effectuées à l'intérieur de la zones humide
-flora_view_name = {
-    schema_name = "pr_zh",
-    table_name = "flora",
-    category = "flora"
-}
+flora_view_name = { schema_name = "pr_zh", table_name = "flora", category = "flora" }
 
 # Extensions autorisées pour le téléversement
 allowed_extensions = ['.pdf', '.jpg']
