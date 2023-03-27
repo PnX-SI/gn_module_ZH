@@ -196,10 +196,10 @@
               généré
             </div>
           </ng-template>
-          <ng-container *ngIf="_filesService.filterByExtension('csv').length > 0">
+          <ng-container *ngIf="_filesService.filterByExtension(['csv']).length > 0">
             <zh-table
               [tableCols]="fileTableCol"
-              [data]="_filesService.filterByExtension('csv')"
+              [data]="_filesService.filterByExtension(['csv'])"
               [downloadable]="true"
               (onDownload)="_filesService.downloadFile($event)"
             ></zh-table>

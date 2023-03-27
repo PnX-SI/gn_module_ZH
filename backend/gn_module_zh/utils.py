@@ -2,7 +2,8 @@ import os
 import sys
 
 from geonature.core.gn_commons.models import TMedias
-from geonature.core.gn_permissions.tools import get_or_fetch_user_cruved
+from geonature.core.gn_permissions.tools import get_scopes_by_action
+
 from geonature.utils.env import DB, ROOT_DIR
 from pypnnomenclature.models import TNomenclatures
 from sqlalchemy.orm import Query
@@ -104,12 +105,11 @@ def check_ref_geo_schema():
         )
 
 
-def get_user_cruved(info_role, session):
-    user = info_role
-    user_cruved = get_or_fetch_user_cruved(
-        session=session, id_role=info_role.id_role, module_code="ZONES_HUMIDES"
+def get_user_cruved():
+    user_cruved = get_scopes_by_action(
+        module_code="ZONES_HUMIDES"
     )
-    return (user, user_cruved)
+    return user_cruved
 
 
 def get_extension(file_name):

@@ -5,7 +5,7 @@ import uuid
 
 import sqlalchemy.exc as exc
 from geonature.core.gn_commons.models import BibTablesLocation, TMedias
-from geonature.core.ref_geo.models import BibAreasTypes, LAreas
+from ref_geo.models import BibAreasTypes, LAreas
 from geonature.utils.env import DB
 from pypnnomenclature.models import TNomenclatures
 from sqlalchemy import and_, func

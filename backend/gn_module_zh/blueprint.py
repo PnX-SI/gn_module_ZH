@@ -6,15 +6,15 @@ from pathlib import Path
 from urllib.parse import urljoin
 
 import sqlalchemy.exc as exc
-from flask import Blueprint, Response, jsonify, request, send_file, session
+from flask import Blueprint, Response, jsonify, request, send_file, g
 from flask.helpers import send_file
 from geojson import FeatureCollection
 from geonature.core.gn_commons.models import TMedias
 
 # import des fonctions utiles depuis le sous-module d'authentification
 from geonature.core.gn_permissions import decorators as permissions
-from geonature.core.gn_permissions.tools import get_or_fetch_user_cruved
-from geonature.core.ref_geo.models import BibAreasTypes, LAreas, LiMunicipalities
+from geonature.core.gn_permissions.tools import get_scopes_by_action
+from ref_geo.models import BibAreasTypes, LAreas, LiMunicipalities
 from geonature.utils.config import config
 from geonature.utils.env import DB, ROOT_DIR
 from geonature.utils.utilssqlalchemy import json_resp
@@ -86,7 +86,7 @@ blueprint = Blueprint("pr_zh", __name__, "../static", template_folder="templates
 
 # Route pour afficher liste des zones humides
 @blueprint.route("", methods=["GET", "POST"])
-@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@permissions.check_cruved_scope("R", get_scope=True, module_code="ZONES_HUMIDES")
 @json_resp
 def get_zh(info_role):
     try:
@@ -126,8 +126,8 @@ def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
     try:
         # Pour obtenir le nombre de résultat de la requete sans le LIMIT
         nb_results_without_limit = query.count()
-
-        user, user_cruved = get_user_cruved(info_role=info_role, session=session)
+        user = info_role
+        user_cruved = get_user_cruved()
 
         if orderby in TZH.__table__.columns:
             col = getattr(TZH, orderby, None)
@@ -185,9 +185,9 @@ def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
 
 # Route pour afficher liste des zones humides
 @blueprint.route("/check_ref_geo", methods=["GET"])
-@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
 @json_resp
-def check_ref_geo(info_role):
+def check_ref_geo():
     try:
         # check if municipalities and dep in ref_geo
         return {"check_ref_geo": check_ref_geo_schema()}, 200
@@ -204,14 +204,14 @@ def check_ref_geo(info_role):
 
 
 @blueprint.route("/<int:id_zh>", methods=["GET"])
-@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
 @json_resp
-def get_zh_by_id(id_zh, info_role):
+def get_zh_by_id(id_zh):
     """Get zh form data by id"""
     try:
         zh = ZH(id_zh)
-        user, user_cruved = get_user_cruved(session=session, info_role=info_role)
-        if zh.zh.user_is_allowed_to(user, user_cruved["R"]):
+        user_cruved = get_user_cruved()
+        if zh.zh.user_is_allowed_to(g.current_user, user_cruved["R"]):
             return zh.__repr__()
 
         raise ZHApiError(message="user_not_allowed", details="You are not allowed to see this zh")
@@ -237,14 +237,14 @@ def get_zh_by_id(id_zh, info_role):
 
 
 @blueprint.route("/<int:id_zh>/complete_card", methods=["GET"])
-@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
 @json_resp
-def get_complete_info(id_zh, info_role):
+def get_complete_info(id_zh):
     """Get zh complete info"""
     try:
         zh = ZH(id_zh)
-        user, user_cruved = get_user_cruved(session=session, info_role=info_role)
-        if zh.zh.user_is_allowed_to(user, user_cruved["R"]):
+        user_cruved = get_user_cruved()
+        if zh.zh.user_is_allowed_to(g.ucrrent_user, user_cruved["R"]):
             # get other referentials needed for the module from the config file
             return get_complete_card(id_zh)
         raise ZHApiError(message="user_not_allowed", details="You are not allowed to see this zh")
@@ -276,9 +276,9 @@ def get_complete_card(id_zh: int) -> Card:
 
 
 @blueprint.route("/eval/<int:id_zh>", methods=["GET"])
-@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
 @json_resp
-def get_zh_eval(id_zh, info_role):
+def get_zh_eval(id_zh):
     """Get zh form data by id"""
     try:
         zh_eval = ZH(id_zh).get_eval()
@@ -299,9 +299,9 @@ def get_zh_eval(id_zh, info_role):
 
 
 @blueprint.route("/municipalities/<int:id_zh>", methods=["GET"])
-@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
 @json_resp
-def get_municipalities(id_zh, info_role):
+def get_municipalities(id_zh):
     """Get municipalities list"""
     try:
         if not CorZhArea.get_municipalities_info(id_zh):
@@ -333,9 +333,9 @@ def get_municipalities(id_zh, info_role):
 
 
 @blueprint.route("/forms", methods=["GET"])
-@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
 @json_resp
-def get_tab(info_role):
+def get_tab():
     """Get form metadata for all tabs"""
     try:
         metadata = get_nomenc(blueprint.config["nomenclatures"])
@@ -358,9 +358,9 @@ def get_tab(info_role):
 
 
 @blueprint.route("/forms/cahierhab/<string:lb_code>", methods=["GET"])
-@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
 @json_resp
-def get_cahier_hab(info_role, lb_code):
+def get_cahier_hab(lb_code):
     """Get cahier hab list from corine biotope lb_code"""
     try:
         return get_ch(lb_code)
@@ -439,9 +439,9 @@ def get_json():
 
 
 @blueprint.route("/geometries", methods=["GET"])
-@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
 @json_resp
-def get_geometries(info_role):
+def get_geometries():
     """Get list of all zh geometries (contours)"""
     try:
         if not DB.session.query(TZH).all():
@@ -469,9 +469,9 @@ def get_geometries(info_role):
 
 
 @blueprint.route("/references/autocomplete", methods=["GET"])
-@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
 @json_resp
-def get_ref_autocomplete(info_role):
+def get_ref_autocomplete():
     try:
         params = request.args
         search_title = params.get("search_title")
@@ -505,9 +505,9 @@ def get_ref_autocomplete(info_role):
 
 
 @blueprint.route("/<int:id_zh>/files", methods=["GET"])
-@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
 @json_resp_accept_empty_list
-def get_file_list(id_zh, info_role):
+def get_file_list(id_zh):
     """get a list of the zh files contained in static repo"""
     try:
         # FIXME: to optimize... See relationships and lazy join with sqlalchemy
@@ -541,8 +541,8 @@ def get_file_list(id_zh, info_role):
 
 
 @blueprint.route("files/<int:id_media>", methods=["DELETE"])
-@permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
-def delete_one_file(id_media, info_role):
+@permissions.check_cruved_scope("C", module_code="ZONES_HUMIDES")
+def delete_one_file(id_media):
     """delete file by id_media in TMedias and static directory"""
     try:
         delete_file(id_media)
@@ -557,8 +557,8 @@ def delete_one_file(id_media, info_role):
 
 
 @blueprint.route("files/<int:id_media>", methods=["GET"])
-@permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
-def download_file(id_media, info_role):
+@permissions.check_cruved_scope("C", module_code="ZONES_HUMIDES")
+def download_file(id_media):
     """download file by id_media in static directory"""
     try:
         return send_file(get_file_path(id_media), as_attachment=True)
@@ -571,8 +571,8 @@ def download_file(id_media, info_role):
 
 
 @blueprint.route("<int:id_zh>/main_pict/<int:id_media>", methods=["PATCH"])
-@permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
-def post_main_pict(id_zh, id_media, info_role):
+@permissions.check_cruved_scope("C", module_code="ZONES_HUMIDES")
+def post_main_pict(id_zh, id_media):
     """post main picture id in tzh"""
     try:
         # FIXME: after insert+after update on t_zh => update_date=dt.now()
@@ -621,12 +621,12 @@ def get_all_photos(id_zh: int):
 
 
 @blueprint.route("/form/<int:id_tab>", methods=["POST", "PATCH"])
-@permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
+@permissions.check_cruved_scope("C", module_code="ZONES_HUMIDES")
 @json_resp
-def get_tab_data(id_tab, info_role):
+def get_tab_data(id_tab):
     """Post zh data"""
     form_data = request.json or {}
-    form_data["update_author"] = info_role.id_role
+    form_data["update_author"] = g.current_user.id_role
     form_data["update_date"] = dt.now()
 
     try:
@@ -785,20 +785,20 @@ def get_tab_data(id_tab, info_role):
         )
     except ZHApiError as e:
         raise ZHApiError(message=str(e.message), details=str(e.details))
-    except Exception as e:
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="post_tab_form_error", details=str(exc_type) + ": " + str(e.with_traceback(tb))
-        )
+    # except Exception as e:
+    #     exc_type, value, tb = sys.exc_info()
+    #     raise ZHApiError(
+    #         message="post_tab_form_error", details=str(exc_type) + ": " + str(e.with_traceback(tb))
+    #     )
     finally:
         DB.session.rollback()
         DB.session.close()
 
 
 @blueprint.route("files/<int:id_media>", methods=["PATCH"])
-@permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
+@permissions.check_cruved_scope("C", module_code="ZONES_HUMIDES")
 @json_resp
-def patch_file(id_media, info_role):
+def patch_file(id_media):
     """edit file upload from tab8"""
     try:
         ALLOWED_EXTENSIONS = blueprint.config["allowed_extensions"]
@@ -835,9 +835,9 @@ def patch_file(id_media, info_role):
 
 
 @blueprint.route("/<int:id_zh>", methods=["DELETE"])
-@permissions.check_cruved_scope("D", True, module_code="ZONES_HUMIDES")
+@permissions.check_cruved_scope("D", module_code="ZONES_HUMIDES")
 @json_resp
-def deleteOneZh(id_zh, info_role):
+def deleteOneZh(id_zh):
     """Delete one zh
 
     :params int id_zh: ID of th*e zh to delete
@@ -862,7 +862,7 @@ def deleteOneZh(id_zh, info_role):
         for media in q_medias:
             delete_file(media.id_media)
 
-        zhRepository.delete(id_zh, info_role)
+        zhRepository.delete(id_zh, g.current_user)
         DB.session.commit()
 
         return {"message": "delete with success"}, 200
@@ -883,15 +883,15 @@ def handle_geonature_zh_api(error):
 
 
 @blueprint.route("/<int:id_zh>/taxa")
-@permissions.check_cruved_scope("C", True, module_code="ZONES_HUMIDES")
-def write_csv(id_zh, info_role):
+@permissions.check_cruved_scope("C", module_code="ZONES_HUMIDES")
+def write_csv(id_zh):
     try:
         names = []
         FILE_PATH = blueprint.config["file_path"]
         MODULE_NAME = blueprint.config["MODULE_CODE"].lower()
         zh_code = DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().code
         # author name
-        user = DB.session.query(User).filter(User.id_role == info_role.id_role).one()
+        user = DB.session.query(User).filter(User.id_role == g.current_user.id_role).one()
         author = user.prenom_role + " " + user.nom_role
         for i in ["vertebrates_view_name", "invertebrates_view_name", "flora_view_name"]:
             query = GenericQuery(
@@ -975,23 +975,22 @@ def write_csv(id_zh, info_role):
 
 
 @blueprint.route("/user/cruved", methods=["GET"])
-@permissions.check_cruved_scope("R", True)
+@permissions.check_cruved_scope("R")
 @json_resp
-def returnUserCruved(info_role):
+def returnUserCruved():
     # récupérer le CRUVED complet de l'utilisateur courant
-    print(info_role)
-    user_cruved = get_or_fetch_user_cruved(
-        session=session, id_role=info_role.id_role, module_code=blueprint.config["MODULE_CODE"]
+    user_cruved = get_scopes_by_action(
+        module_code=blueprint.config["MODULE_CODE"]
     )
     return user_cruved
 
 
 @blueprint.route("/user/rights/<int:id_zh>", methods=["GET"])
-@permissions.check_cruved_scope("R", True)
-def userRights(id_zh, info_role):
-    user, user_cruved = get_user_cruved(info_role, session)
+@permissions.check_cruved_scope("R")
+def userRights(id_zh):
+    user_cruved = get_user_cruved()
     zh = ZH(id_zh).zh
-    return {k: zh.user_is_allowed_to(user, user_cruved[k]) for k in user_cruved.keys()}
+    return {k: zh.user_is_allowed_to(g.current_user, user_cruved[k]) for k in user_cruved.keys()}
 
 
 @blueprint.route("/export_pdf/<int:id_zh>", methods=["GET"])
@@ -1093,9 +1092,9 @@ def get_hydro_zones_from_bassin() -> dict:
 
 
 @blueprint.route("/<int:id_zh>/hierarchy", methods=["GET"])
-@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
 @json_resp
-def get_hierarchy(id_zh, info_role):
+def get_hierarchy(id_zh):
     """Get zh note"""
     try:
         hierarchy = Hierarchy(id_zh).__str__()
@@ -1113,7 +1112,7 @@ def get_hierarchy(id_zh, info_role):
 
 
 @blueprint.route("/hierarchy/fields/<int:id_rb>", methods=["GET"])
-@permissions.check_cruved_scope("R", True, module_code="ZONES_HUMIDES")
+@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
 @json_resp
-def get_hierarchy_fields(id_rb, info_role):
+def get_hierarchy_fields(id_rb):
     return get_all_hierarchy_fields(id_rb=id_rb)

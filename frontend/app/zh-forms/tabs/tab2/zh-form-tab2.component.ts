@@ -15,7 +15,7 @@ export class ZhFormTab2Component implements OnInit, AfterViewInit {
   @Input() formMetaData;
   @Output() canChangeTab = new EventEmitter<boolean>();
   @Output() nextTab = new EventEmitter<number>();
-  private currentZh: any;
+  public currentZh: any;
   public $_currentZhSub: Subscription;
   public $_fromChangeSub: Subscription;
   public formTab2: FormGroup;

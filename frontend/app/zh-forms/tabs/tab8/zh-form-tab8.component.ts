@@ -55,7 +55,7 @@ export class ZhFormTab8Component implements OnInit {
   ];
 
   public corFilesExt: FilesExt[] = [];
-  public imageFiles = {};
+  public imageFiles: any = {};
 
   constructor(
     private fb: FormBuilder,

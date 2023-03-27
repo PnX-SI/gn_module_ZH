@@ -31,7 +31,7 @@ export class ZhSearchComponent implements OnInit {
     private _toastr: ToastrService,
     private _error: ErrorTranslatorService,
     public ngbModal: NgbModal,
-    private _searchService: SearchFormService
+    public _searchService: SearchFormService
   ) {}
 
   ngOnInit() {

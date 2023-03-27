@@ -24,7 +24,7 @@ export class ZhFormTab0Component implements OnInit {
   @Output() activeTabs = new EventEmitter<boolean>();
   @Output() canChangeTab = new EventEmitter<boolean>();
   @Output() nextTab = new EventEmitter<number>();
-  private _currentZh: any = null;
+  public _currentZh: any = null;
   public form: FormGroup;
   public cardContentHeight: number;
   public critDelim: any;
@@ -33,7 +33,7 @@ export class ZhFormTab0Component implements OnInit {
   public dropdownSettings: IDropdownSettings;
   public $_geojsonSub: Subscription;
   public $_currentZhSub: Subscription;
-  private geometry: GeoJSON;
+  private geometry: any;
   private currentLayer: any;
   public submitted = false;
   public posted = false;
@@ -122,7 +122,7 @@ export class ZhFormTab0Component implements OnInit {
           // Clears the layers before adding the geometry to
           // prevent having the same superimposed layers...
           this._mapService.leafletDrawFeatureGroup.clearLayers();
-          const layer = L.geoJSON(this.geometry, {
+          const layer = L.geoJSON(this.geometry as any, {
             onEachFeature: (feature, layer) => {
               this._mapService.leafletDrawFeatureGroup.addLayer(layer);
             },

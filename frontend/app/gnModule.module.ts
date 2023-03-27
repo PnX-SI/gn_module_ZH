@@ -54,10 +54,9 @@ const routes: Routes = [
     CancelButtonComponent,
   ],
   imports: [
-    CommonModule,
     GN2CommonModule,
+    CommonModule,
     RouterModule.forChild(routes),
-    NgbModule.forRoot(),
     NgMultiSelectDropDownModule.forRoot(),
     NgbModule,
     ZhDetailsModule,
