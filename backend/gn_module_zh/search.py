@@ -1,6 +1,6 @@
 import unicodedata
 
-from geonature.core.ref_geo.models import BibAreasTypes, LAreas
+from ref_geo.models import BibAreasTypes, LAreas
 from geonature.utils.env import DB
 from pypnnomenclature.models import TNomenclatures
 from sqlalchemy import and_, desc, func, or_

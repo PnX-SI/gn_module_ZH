@@ -194,7 +194,7 @@ export class ZhFormTab5Component implements OnInit {
     private _modalService: ModalService,
     private _error: ErrorTranslatorService,
     private _tabService: TabsService,
-    private _filesService: FilesService
+    public _filesService: FilesService
   ) {}
 
   ngOnInit() {

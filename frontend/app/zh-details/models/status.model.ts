@@ -5,6 +5,7 @@ export interface StatutsModel {
   autre_inventaire: AutreInventaires[]; //boolean
   statuts: string[];
   zonage: Zonage[];
+  autre_etude: string;
 }
 
 interface AutreInventaires {

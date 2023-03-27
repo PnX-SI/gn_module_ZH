@@ -1,9 +1,10 @@
 export interface DelimitationModel {
-  delitmitation_zone: Criteres;
+  delimitation_zone: Criteres;
   delimitation_fonctions: Criteres;
+  basin: any;
 }
 
 interface Criteres {
   critere: string[];
-  remarque: null | string;
+  remark: null | string;
 }

@@ -1,0 +1,3 @@
+MODULE_CODE = "ZONES_HUMIDES"
+MODULE_PICTO = "fa-tint"
+ALEMBIC_BRANCH = "zones_humides"

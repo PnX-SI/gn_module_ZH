@@ -8,7 +8,7 @@ import { ZhHierarchySearchTableComponent } from "./components/zh-hierarchy-searc
 import { ZhDetailsModule } from "../zh-details/zh-details.module";
 import { CapitalizePipe } from "../pipes/capitalize.pipe";
 
-const routes: Routes = [{ path: "/hierarchy_search", component: ZhHierarchySearchComponent }];
+const routes: Routes = [{ path: "hierarchy_search", component: ZhHierarchySearchComponent }];
 
 @NgModule({
   declarations: [ZhHierarchySearchComponent, ZhHierarchySearchTableComponent, CapitalizePipe],

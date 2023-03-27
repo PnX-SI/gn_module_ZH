@@ -14,6 +14,7 @@ import { ErrorTranslatorService } from "../services/error-translator.service";
 import "leaflet.vectorgrid";
 import { PbfService } from "../services/pbf.service";
 import { SearchFormService } from "../services/zh-search.service";
+import { filter } from "rxjs/operators";
 
 const DEFAULT_ORDER: string = "desc";
 const DEFAULT_ORDER_BY: string = "update_date";
@@ -34,7 +35,7 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
   public cardContentHeight: number;
   public moduleSub: Subscription;
   public sorts: any = [];
-  private metaData: any = [];
+  public metaData: any = [];
   private order: string = DEFAULT_ORDER;
   private orderby: string = DEFAULT_ORDER_BY;
 
@@ -48,7 +49,7 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     private _commonService: CommonService,
     private _toastr: ToastrService,
     private _error: ErrorTranslatorService,
-    private _searchService: SearchFormService
+    public _searchService: SearchFormService
   ) {}
 
   ngOnInit() {
@@ -74,9 +75,9 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     );
     // get user cruved
     this.moduleSub = this.globalSub.currentModuleSub
+      .pipe(filter((mod) => mod))
       // filter undefined or null
-      .filter((mod) => mod)
-      .subscribe((mod) => {
+      .subscribe((mod: any) => {
         this.userCruved = mod.cruved;
       });
 

@@ -30,6 +30,10 @@ export class DatepickerI18n extends NgbDatepickerI18n {
   getWeekLabel(): string {
     return I18N_VALUES[this._i18n.language].weekLabel;
   }
+  getWeekdayLabel(): string {
+    return I18N_VALUES[this._i18n.language].weekdayLabel;
+  }
+
   getMonthShortName(month: number): string {
     return I18N_VALUES[this._i18n.language].months[month - 1];
   }

@@ -1,7 +1,7 @@
 import geoalchemy2
 from flask import Blueprint
 from geoalchemy2.types import Geography
-from geonature.core.ref_geo.models import BibAreasTypes, LAreas, LiMunicipalities
+from ref_geo.models import BibAreasTypes, LAreas, LiMunicipalities
 from geonature.utils.env import DB
 from pypn_habref_api.models import CorespHab, Habref
 from pypnnomenclature.models import BibNomenclaturesTypes, TNomenclatures
@@ -59,7 +59,7 @@ class ZhModel(DB.Model):
             return True
         return False
 
-    def get_zh_if_allowed(self, user):
+    def get_zh_if_allowed(self, user, action):
         """
         Return the zh if the user is allowed
         params:
@@ -69,7 +69,7 @@ class ZhModel(DB.Model):
             return self
 
         raise InsufficientRightsError(
-            ('User "{}" cannot "{}" this current zh').format(user.id_role, user.code_action),
+            ('User "{}" cannot "{}" this current zh').format(user.id_role),
             403,
         )
 

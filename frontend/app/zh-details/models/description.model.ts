@@ -1,7 +1,8 @@
 export interface DescriptionModel {
   presentation: Presentation;
-  espace: Espace;
+  espace: Espace[];
   usage: Usage;
+  basin: any;
 }
 
 interface Presentation {
@@ -9,6 +10,8 @@ interface Presentation {
   typologie_locale: string;
   corine_biotope: Corine[];
   remarques: null | string;
+  area: any;
+  ef_area: any;
 }
 
 interface Espace {
@@ -18,7 +21,7 @@ interface Espace {
 interface Usage {
   activities: Activities[];
   evaluation_menaces: string;
-  Remarques: null | string;
+  remarques: null | string;
 }
 
 interface Corine {

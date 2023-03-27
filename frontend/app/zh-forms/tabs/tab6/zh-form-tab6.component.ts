@@ -30,7 +30,7 @@ export class ZhFormTab6Component implements OnInit {
   @Output() public canChangeTab = new EventEmitter<boolean>();
   @Output() nextTab = new EventEmitter<number>();
   // FIXME: only used for URL path... Must be a better way to do this..
-  private config = ModuleConfig;
+  public config = ModuleConfig;
   public formTab6: FormGroup;
   public statusForm: FormGroup;
   public instrumentForm: FormGroup;

@@ -4,21 +4,24 @@ import { ZhDataService } from "../services/zh-data.service";
 import * as L from "leaflet";
 import geobuf from "geobuf";
 import Pbf from "pbf";
+import "leaflet.vectorgrid";
+/// <reference path="leaflet.vectorgrid.d.ts"/>
 
 @Injectable({
   providedIn: "root",
 })
 export class PbfService {
   public res: ArrayBuffer;
-  public vector: L.vectorGrid;
+  public vector: any;
 
   constructor(private _zhService: ZhDataService) {}
 
-  getPbf(currentMap: L.map): Observable<L.vectorGrid> {
+  // FIXME : return Observable<L.vectorGrid>
+  getPbf(currentMap: L.Map): Observable<any> {
     if (!currentMap.getPane("zhPane")) {
       currentMap.createPane("zhPane");
     }
-    return this._zhService.getPbf().map(
+    return (this._zhService.getPbf() as any).map(
       async (result) => {
         const res = await result["arrayBuffer"]();
         const pbf = new Pbf(res);
@@ -31,13 +34,14 @@ export class PbfService {
     );
   }
 
-  setPaneBackground(currentMap: L.map): void {
+  setPaneBackground(currentMap: L.Map): void {
     currentMap.getPane("zhPane").style.zIndex = "200";
   }
 
-  setVectorGrid(geojson): L.vectorGrid {
-    const vector = L.vectorGrid.slicer(geojson, {
-      rendererFactory: L.canvas.tile,
+  // FIXME : return a L.vectorGrid
+  setVectorGrid(geojson) {
+    const vector = (L as any).vectorGrid.slicer(geojson, {
+      rendererFactory: (L as any).canvas.tile,
       vectorTileLayerStyles: {
         sliced: function (properties, zoom) {
           let opacity = 0.8;

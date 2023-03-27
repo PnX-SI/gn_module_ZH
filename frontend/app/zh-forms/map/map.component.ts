@@ -40,6 +40,8 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit {
         this._mapService.currentExtend.zoom
       );
     }
+    console.log(L.Draw);
+
     this._mapService.map.off(L.Draw.Event.DRAWSTART);
     this._mapService.map.on(L.Draw.Event.CREATED, (e) => {
       this.onDrawStop(e);

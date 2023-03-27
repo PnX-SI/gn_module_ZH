@@ -22,7 +22,7 @@ export class RessourcesComponent {
 
   public corFilesExt: FilesExt[] = [];
 
-  constructor(private _filesService: FilesService) {}
+  constructor(public _filesService: FilesService) {}
 
   ngOnInit() {
     this._filesService

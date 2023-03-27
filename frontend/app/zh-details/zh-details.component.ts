@@ -52,13 +52,13 @@ export class ZhDetailsComponent implements OnInit, AfterViewInit {
       (data: DetailsModel) => {
         this.onError = false;
         this.zhDetails = data;
-        let geojson: GeoJSON = {
-          geometry: data.geometry,
+        let geojson = {
+          geometry: (data as any).geometry,
           properties: { idZh: this.id_zh },
           type: "Feature",
         };
         setTimeout(() => {
-          let layer = L.geoJSON(geojson).addTo(this._mapService.map);
+          let layer = L.geoJSON(geojson as any).addTo(this._mapService.map);
           this._mapService.map.fitBounds(layer.getBounds());
         }, 0);
       },
