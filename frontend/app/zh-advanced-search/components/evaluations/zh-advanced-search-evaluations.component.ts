@@ -23,7 +23,8 @@ export class ZhAdvancedSearchEvaluationsComponent implements OnInit {
       primaryKey: "id_nomenclature",
       searchPlaceholderText: "Rechercher",
       enableSearchFilter: true,
-      autoPosition: true,
+      autoPosition: false,
+      position: "bottom"
     };
   }
 
