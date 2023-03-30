@@ -69,8 +69,6 @@ def update_tzh(data):
 
 
 def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referentiels):
-
-    try:
         uuid_id_lim_list = uuid.uuid4()
         post_cor_lim_list(uuid_id_lim_list, form_data["critere_delim"])
 
@@ -140,20 +138,6 @@ def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referenti
 
         DB.session.flush()
         return new_zh.id_zh
-    except ZHApiError:
-        raise
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="create_zh_post_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
-            )
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="create_zh_post_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
 
 
 def post_cor_lim_list(uuid_lim, criteria):

@@ -81,15 +81,15 @@ export class ZhFormTab0Component implements OnInit {
     this.geomLayers = [];
     this.removeLayers();
     // Here so that the mapService is already initialized
-    this._pbfService
-      .getPbf(this._mapService.map)
-      .toPromise()
-      .then((data) => {
-        // Do not show the data on the map by default
-        data = data.setOpacity(0);
-        this.geomLayers.push(data.addTo(this._mapService.map));
-      });
-    this._pbfService.setPaneBackground(this._mapService.map);
+    // this._pbfService
+    //   .getPbf(this._mapService.map)
+    //   .toPromise()
+    //   .then((data) => {
+    //     // Do not show the data on the map by default
+    //     data = data.setOpacity(0);
+    //     this.geomLayers.push(data.addTo(this._mapService.map));
+    //   });
+    // this._pbfService.setPaneBackground(this._mapService.map);
   }
 
   intiTab() {

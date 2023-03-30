@@ -10,7 +10,7 @@ import * as L from "leaflet";
   templateUrl: "map.component.html",
 })
 export class ZhFormMapComponent implements OnInit, AfterViewInit {
-  public leafletDrawOptions: any;
+  public leafletDrawOptions = leafletDrawOption;
   public zhConfig = ModuleConfig;
   public geometry: any = null;
   public editedGeometry: any = null;
@@ -23,10 +23,15 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     // overight the leaflet draw object to set options
     // examples: enable circle =>  leafletDrawOption.draw.circle = true;
-    leafletDrawOption.draw.marker = false;
-    leafletDrawOption.draw.polyline = false;
+    leafletDrawOption.draw.marker = true;
+    leafletDrawOption.draw.circle = true;
+    leafletDrawOption.draw.polyline = true;
     leafletDrawOption.edit.remove = true;
+    leafletDrawOption.draw.polygon = true;
+    // leafletDrawOption.position = "topright";
     this.leafletDrawOptions = leafletDrawOption;
+    console.log(leafletDrawOption);
+
     // set the input for the marker component
     // set the coord only when load data and when its edition mode (id_releve)
     // after the marker component does it by itself whith the ouput
@@ -34,25 +39,23 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    if (this._mapService.currentExtend) {
-      this._mapService.map.setView(
-        this._mapService.currentExtend.center,
-        this._mapService.currentExtend.zoom
-      );
-    }
-    console.log(L.Draw);
-
-    this._mapService.map.off(L.Draw.Event.DRAWSTART);
-    this._mapService.map.on(L.Draw.Event.CREATED, (e) => {
-      this.onDrawStop(e);
-    });
-    this._mapService.map.off(L.Draw.Event.EDITED);
-    this._mapService.map.on(L.Draw.Event.EDITSTART, (e) => {
-      this.onBeginEdit(e);
-    });
-    this._mapService.map.on(L.Draw.Event.EDITED, (e) => {
-      this.onEdit(e);
-    });
+    // if (this._mapService.currentExtend) {
+    //   this._mapService.map.setView(
+    //     this._mapService.currentExtend.center,
+    //     this._mapService.currentExtend.zoom
+    //   );
+    // }
+    // this._mapService.map.off(L.Draw.Event.DRAWSTART);
+    // this._mapService.map.on(L.Draw.Event.CREATED, (e) => {
+    //   this.onDrawStop(e);
+    // });
+    // this._mapService.map.off(L.Draw.Event.EDITED);
+    // this._mapService.map.on(L.Draw.Event.EDITSTART, (e) => {
+    //   this.onBeginEdit(e);
+    // });
+    // this._mapService.map.on(L.Draw.Event.EDITED, (e) => {
+    //   this.onEdit(e);
+    // });
   }
 
   onDrawn(e) {
