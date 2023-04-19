@@ -1,5 +1,14 @@
 # Changelog
 
+
+## 1.1.0 (2022-10-03)
+
+- installer le module (sans la partie BDD) :
+  geonature install-gn-module <chemin vers module> ZONES-HUMIDES --upgrade-db
+- stamper la version suivante : 
+  geonature db stamp 01cb1aaa2062
+  geonature db upgrade zones_humides@head
+
 ## 1.0.0 (2022-10-03)
 
 **🚀 Première release 🚀**
