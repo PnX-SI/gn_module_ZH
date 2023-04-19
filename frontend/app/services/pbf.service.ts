@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
 import { ZhDataService } from "../services/zh-data.service";
 import * as L from "leaflet";
 import geobuf from "geobuf";
@@ -21,15 +22,15 @@ export class PbfService {
     if (!currentMap.getPane("zhPane")) {
       currentMap.createPane("zhPane");
     }
-    return (this._zhService.getPbf() as any).map(
-      async (result) => {
+    return this._zhService.getPbf().pipe(
+      map(async (result) => {
         const res = await result["arrayBuffer"]();
         const pbf = new Pbf(res);
         const vector = await this.setVectorGrid(geobuf.decode(pbf));
         this.res = res;
         this.vector = vector;
         return vector;
-      }
+      })
       // To prevent : Property 'arrayBuffer' does not exist on type 'Blob'
     );
   }

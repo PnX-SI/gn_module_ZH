@@ -42,7 +42,9 @@ export class ZhSearchDependantComponent implements OnInit {
       this.enable();
       this._inputData = value;
     } else {
-      this.form.reset();
+      if (this.form) {
+        this.form.reset();
+      }
       this.disable();
     }
   }
