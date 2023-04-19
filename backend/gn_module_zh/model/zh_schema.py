@@ -41,11 +41,11 @@ class ZhModel(DB.Model):
         peu ou non agir sur une donnée
         """
         # Si l'utilisateur n'a pas de droit d'accès aux données
-        if level == "0" or level not in ("1", "2", "3"):
+        if level == 0 or level not in (1, 2, 3):
             return False
 
         # Si l'utilisateur à le droit d'accéder à toutes les données
-        if level == "3":
+        if level == 3:
             return True
 
         # Si l'utilisateur est propriétaire de la données
@@ -55,7 +55,7 @@ class ZhModel(DB.Model):
         # Si l'utilisateur appartient à un organisme
         # qui a un droit sur la données et
         # que son niveau d'accès est 2 ou 3
-        if self.user_is_in_dataset_actor(user) and level in ("2", "3"):
+        if self.user_is_in_dataset_actor(user) and level in (2, 3):
             return True
         return False
 
