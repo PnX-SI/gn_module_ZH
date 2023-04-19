@@ -223,10 +223,6 @@ export class ZhFormTab0Component implements OnInit {
           },
           (error) => {
             this.posted = false;
-            var msg: string = "Impossible de créer la zone humide : ";
-            const frontMsg: string = this._error.getFrontError(
-              error.error.message || error.error.name
-            );
             // Not really good, but must filter error id to remove the
             // geometry or not
             if (this._error.getErrorId(error.error.message) == GEOM_CONTAINED_ID) {
@@ -235,10 +231,6 @@ export class ZhFormTab0Component implements OnInit {
                 this._mapService.leafletDrawFeatureGroup
               );
             }
-            msg += frontMsg;
-            this._toastr.error(msg, "", {
-              positionClass: "toast-top-right",
-            });
           }
         );
       }
