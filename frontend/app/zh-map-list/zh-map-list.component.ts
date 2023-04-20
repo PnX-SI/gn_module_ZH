@@ -2,7 +2,7 @@ import { Component, HostListener, OnInit, OnDestroy, AfterViewInit } from "@angu
 
 import { MapListService } from "@geonature_common/map-list/map-list.service";
 import { MapService } from "@geonature_common/map/map.service";
-import { ConfigService } from '@geonature/services/config.service';
+import { ConfigService } from "@geonature/services/config.service";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import * as moment from "moment";
 import { ZhDataService } from "../services/zh-data.service";
@@ -48,8 +48,8 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     private _commonService: CommonService,
     private _toastr: ToastrService,
     private _error: ErrorTranslatorService,
-    public _searchService: SearchFormService
-    public config : ConfigService
+    public _searchService: SearchFormService,
+    public config: ConfigService
   ) {}
 
   ngOnInit() {

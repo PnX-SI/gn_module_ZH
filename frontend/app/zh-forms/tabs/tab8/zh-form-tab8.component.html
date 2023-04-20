@@ -66,15 +66,15 @@
   <div class="modal-body">
     <div
       *ngIf="
-        config["ZONES_HUMIDES"]?.filename_validated ||
-        config["ZONES_HUMIDES"]?.filename_validated ||
-        config["ZONES_HUMIDES"]?.max_pdf_size ||
-        config["ZONES_HUMIDES"]?.max_jpg_size
+        config['ZONES_HUMIDES']?.filename_validated ||
+        config['ZONES_HUMIDES']?.filename_validated ||
+        config['ZONES_HUMIDES']?.max_pdf_size ||
+        config['ZONES_HUMIDES']?.max_jpg_size
       "
       class="flex-container alert alert-info"
     >
       <ul>
-        <li *ngIf="config["ZONES_HUMIDES"]?.fileformat_validated">
+        <li *ngIf="config['ZONES_HUMIDES']?.fileformat_validated">
           <ng-container>
             <span
               >Seules les extensions suivantes sont acceptées :
@@ -84,7 +84,7 @@
             ><br />
           </ng-container>
         </li>
-        <li *ngIf="config["ZONES_HUMIDES"]?.filename_validated">
+        <li *ngIf="config['ZONES_HUMIDES']?.filename_validated">
           <ng-container>
             <span
               >Pour les images, le format doit être le suivant :
@@ -92,7 +92,7 @@
             ><br />
           </ng-container>
         </li>
-        <li *ngIf="config["ZONES_HUMIDES"]?.max_pdf_size">
+        <li *ngIf="config['ZONES_HUMIDES']?.max_pdf_size">
           <ng-container>
             <span
               >La taille maximale des fichiers pdf est de <b>{{ config["ZONES_HUMIDES"].max_pdf_size }}Mo</b></span
@@ -106,7 +106,7 @@
             ><br />
           </ng-container>
         </li>
-        <li *ngIf="config["ZONES_HUMIDES"]?.fileformat_validated">
+        <li *ngIf="config['ZONES_HUMIDES']?.fileformat_validated">
           <ng-container>
             Apposer une signature numérique visible sur la photographie indiquant : © / Année de
             prise de vue / Sigle de l'organisme / 1er lettre du prénom de l'auteur / Nom de l'auteur
