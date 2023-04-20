@@ -34,7 +34,7 @@ Ne pas oublier de redémarrer GeoNature :
 
   ```
   source ~/geonature/backend/venv/bin/activate
-  geonature install-gn-module ~/gn_module_ZH zones_humides
+  geonature install-gn-module ~/gn_module_ZH ZONES_HUMIDES
   deactivate
   sudo systemctl restart geonature
   ```
@@ -71,7 +71,7 @@ Voir [ici](/doc/admin.md) la documentation des paramètres de configuration du m
 
   ```
   source ~/geonature/backend/venv/bin/activate
-  geonature install-gn-module ~/gn_module_ZH zones_humides
+  geonature install-gn-module ~/gn_module_ZH ZONES_HUMIDES
   sudo systemctl restart geonature
   ```
 
@@ -82,7 +82,7 @@ Voir [ici](/doc/admin.md) la documentation des paramètres de configuration du m
 ```bash
 cd /home/`whoami`/geonature/backend
 source venv/bin/activate
-geonature deactivate_gn_module zones_humides
+geonature deactivate_gn_module ZONES_HUMIDES
 ```
 
 - Suppression des données dans plusieurs tables de la base de données
