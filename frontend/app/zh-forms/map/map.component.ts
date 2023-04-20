@@ -1,6 +1,5 @@
 import { Component, OnInit, AfterViewInit, Output, EventEmitter } from "@angular/core";
 import { leafletDrawOption } from "@geonature_common/map/leaflet-draw.options";
-import { ModuleConfig } from "../../module.config";
 import { MapService } from "@geonature_common/map/map.service";
 
 import * as L from "leaflet";
@@ -11,7 +10,6 @@ import * as L from "leaflet";
 })
 export class ZhFormMapComponent implements OnInit, AfterViewInit {
   public leafletDrawOptions: any;
-  public zhConfig = ModuleConfig;
   public geometry: any = null;
   public editedGeometry: any = null;
   @Output() draw = new EventEmitter<any>();

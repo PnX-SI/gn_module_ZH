@@ -2,10 +2,10 @@ import { Component, EventEmitter, OnInit, Input, Output } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 import { Subscription } from "rxjs";
+import { ConfigService } from "@geonature/services/config.service";
 
 import { ToastrService } from "ngx-toastr";
 
-import { ModuleConfig } from "../../../module.config";
 import { ZhDataService } from "../../../services/zh-data.service";
 import { fileSizeValidator } from "../../../validators/fileSizeValidator";
 import { fileNameValidator } from "../../../validators/fileNameValidator";
@@ -29,7 +29,6 @@ export class ZhFormTab8Component implements OnInit {
   private $_currentZhSub: Subscription;
 
   public zh: any;
-  public config = ModuleConfig;
   public formTab8: FormGroup;
   public fileForm: FormGroup;
   public fileToUpload: File | null = null;
@@ -63,7 +62,8 @@ export class ZhFormTab8Component implements OnInit {
     private _dataService: ZhDataService,
     private _toastr: ToastrService,
     private _filesService: FilesService,
-    private _tabService: TabsService
+    private _tabService: TabsService,
+    public config: ConfigService
   ) {}
 
   ngOnInit() {
@@ -86,15 +86,18 @@ export class ZhFormTab8Component implements OnInit {
 
   getValidators() {
     let validators = [Validators.required];
-    if (this.config.fileformat_validated) {
+    if (this.config["ZONES_HUMIDES"]["fileformat_validated"]) {
       validators.push(fileFormatValidator(this.fileTypeAccepted));
     }
-    if (this.config.filename_validated) {
+    if (this.config["ZONES_HUMIDES"]["fileformat_validated"]) {
       validators.push(fileNameValidator(this.zh.properties.code));
     }
 
     validators.push(
-      fileSizeValidator(this.config.max_jpg_size * 1000, this.config.max_pdf_size * 1000)
+      fileSizeValidator(
+        this.config["ZONES_HUMIDES"]["max_jpg_size"] * 1000,
+        this.config["ZONES_HUMIDES"]["max_pdf_size"] * 1000
+      )
     );
 
     return validators;

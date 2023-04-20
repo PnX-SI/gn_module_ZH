@@ -2,7 +2,7 @@ import { Component, HostListener, OnInit, OnDestroy, AfterViewInit } from "@angu
 
 import { MapListService } from "@geonature_common/map-list/map-list.service";
 import { MapService } from "@geonature_common/map/map.service";
-import { ModuleConfig } from "../module.config";
+import { ConfigService } from '@geonature/services/config.service';
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import * as moment from "moment";
 import { ZhDataService } from "../services/zh-data.service";
@@ -30,7 +30,6 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
   public availableColumns: Array<any>;
   public idName: string;
   public apiEndPoint: string;
-  public zhConfig: any;
   public rowPerPage: number;
   public cardContentHeight: number;
   public moduleSub: Subscription;
@@ -50,15 +49,15 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     private _toastr: ToastrService,
     private _error: ErrorTranslatorService,
     public _searchService: SearchFormService
+    public config : ConfigService
   ) {}
 
   ngOnInit() {
     this._searchService.initForm();
     this.mapListService.zoomOnLayer = true;
     //config
-    this.zhConfig = ModuleConfig;
     this.idName = "id_zh";
-    this.apiEndPoint = this.zhConfig.MODULE_URL;
+    this.apiEndPoint = this.config["ZONES_HUMIDES"]["MODULE_URL"];
     this._zhService.checkRefGeo().subscribe(
       (status) => {
         if (!status.check_ref_geo) {
@@ -83,9 +82,9 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // parameters for maplist
     // columns to be default displayed
-    this.mapListService.displayColumns = this.zhConfig.default_maplist_columns;
+    this.mapListService.displayColumns = this.config["ZONES_HUMIDES"].default_maplist_columns;
     // columns available for display
-    this.mapListService.availableColumns = this.zhConfig.available_maplist_column;
+    this.mapListService.availableColumns = this.config["ZONES_HUMIDES"].available_maplist_column;
 
     this.mapListService.idName = this.idName;
     // FETCH THE DATA
