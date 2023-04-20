@@ -1,7 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { StatutsModel } from "../models/status.model";
-import { ModuleConfig } from "../../module.config";
-
+import { ConfigService } from "@geonature/services/config.service";
 @Component({
   selector: "zh-details-statuts",
   templateUrl: "./statuts.component.html",
@@ -9,7 +8,6 @@ import { ModuleConfig } from "../../module.config";
 })
 export class StatutsComponent implements OnInit {
   @Input() data: StatutsModel;
-  public config = ModuleConfig;
   public table: any;
 
   readonly urbanColSize: string = "15%";
@@ -45,6 +43,9 @@ export class StatutsComponent implements OnInit {
     { name: "duree", label: "Durée (années)" },
     { name: "remark", label: "Remarques" },
   ];
+  constructor(public config: ConfigService) {
+    console.log(config);
+  }
 
   ngOnInit() {
     var groupBy = function (xs, key) {

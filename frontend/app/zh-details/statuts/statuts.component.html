@@ -40,7 +40,7 @@
         </legend>
         <table class="table mb-4">
           <tbody>
-            <ng-container *ngFor="let geo of config?.ref_geo_referentiels">
+            <ng-container *ngFor="let geo of config['ZONES_HUMIDES']['ref_geo_referentiels']">
               <tr *ngIf="geo.active">
                 <td>{{ geo.zh_name }}</td>
                 <td>

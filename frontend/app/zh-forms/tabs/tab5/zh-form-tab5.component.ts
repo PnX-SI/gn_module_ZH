@@ -10,7 +10,6 @@ import { ModalService } from "../../../services/modal.service";
 import { TaxaFile } from "./zh-form-tab5.models";
 import { ErrorTranslatorService } from "../../../services/error-translator.service";
 import { FilesService } from "../../../services/files.service";
-import { ModuleConfig } from "../../../module.config";
 
 @Component({
   selector: "zh-form-tab5",
@@ -45,7 +44,6 @@ export class ZhFormTab5Component implements OnInit {
   public interetPatTable: any[] = [];
   public valSocEcoTable: any[] = [];
   public corineBioTable: any[] = [];
-  public config = ModuleConfig;
   default_qualification: string = "Non évaluée";
   default_knowledge: string = "Lacunaire ou nulle";
   default_preservation_state: string = "Non évaluée";
