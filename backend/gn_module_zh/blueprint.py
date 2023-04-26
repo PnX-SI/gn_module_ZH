@@ -771,7 +771,7 @@ def deleteOneZh(id_zh):
     zhRepository.delete(id_zh, g.current_user, user_cruved)
     DB.session.commit()
 
-    return jsonify({"message": "delete with success"})
+    return {"message": "delete with success"}
 
 
 @blueprint.errorhandler(ZHApiError)
