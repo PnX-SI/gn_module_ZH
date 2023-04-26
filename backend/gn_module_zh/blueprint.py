@@ -329,8 +329,7 @@ def get_pbf():
     """
     query = DB.session.execute(sql)
     row = query.first()
-    if row["pbf"]:
-        return Response(bytes(row["pbf"]) if row["pbf"] else bytes(), mimetype="application/protobuf")
+    return Response(bytes(row["pbf"]) if row["pbf"] else bytes(), mimetype="application/protobuf")
 
 
 @blueprint.route("/pbf/complete", methods=["GET"])
