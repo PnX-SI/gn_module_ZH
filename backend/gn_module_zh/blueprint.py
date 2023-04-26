@@ -766,7 +766,9 @@ def deleteOneZh(id_zh):
     for media in q_medias:
         delete_file(media.id_media)
 
-    zhRepository.delete(id_zh, g.current_user)
+    user_cruved = get_scopes_by_action(module_code=blueprint.config["ZONES_HUMIDES"])
+    
+    zhRepository.delete(id_zh, g.current_user, user_cruved)
     DB.session.commit()
 
     return jsonify({"message": "delete with success"})
