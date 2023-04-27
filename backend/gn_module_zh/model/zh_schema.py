@@ -59,13 +59,13 @@ class ZhModel(DB.Model):
             return True
         return False
 
-    def get_zh_if_allowed(self, user, action):
+    def get_zh_if_allowed(self, user, action, level):
         """
         Return the zh if the user is allowed
         params:
             user: object from TRole
         """
-        if self.user_is_allowed_to(user, user.value_filter):
+        if self.user_is_allowed_to(user, level):
             return self
 
         raise InsufficientRightsError(

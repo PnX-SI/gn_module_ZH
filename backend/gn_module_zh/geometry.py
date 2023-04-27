@@ -41,7 +41,7 @@ def set_geom(geometry, id_zh=None):
                 raise BadRequest("La ZH est entièrement dans une ZH existante")
             intersect = DB.session.query(func.ST_Difference(polygon_geom, zh_geom))
             polygon = DB.session.query(
-                func.ST_GeomFromText(to_shape(intersect.scalar()).to_wkt())
+                func.ST_GeomFromText(to_shape(intersect.scalar()))
             ).one()[0]
     return {"polygon": polygon, "is_intersected": is_intersected}
 

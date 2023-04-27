@@ -329,8 +329,7 @@ def get_pbf():
     """
     query = DB.session.execute(sql)
     row = query.first()
-    if row["pbf"]:
-        return Response(bytes(row["pbf"]), mimetype="application/protobuf")
+    return Response(bytes(row["pbf"]) if row["pbf"] else bytes(), mimetype="application/protobuf")
 
 
 @blueprint.route("/pbf/complete", methods=["GET"])
@@ -766,10 +765,12 @@ def deleteOneZh(id_zh):
     for media in q_medias:
         delete_file(media.id_media)
 
-    zhRepository.delete(id_zh, g.current_user)
+    user_cruved = get_scopes_by_action(module_code=blueprint.config["MODULE_CODE"])
+    
+    zhRepository.delete(id_zh, g.current_user, user_cruved)
     DB.session.commit()
 
-    return jsonify({"message": "delete with success"})
+    return {"message": "delete with success"}
 
 
 @blueprint.errorhandler(ZHApiError)

@@ -109,13 +109,14 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
         this._mapService.currentExtend.center,
         this._mapService.currentExtend.zoom
       );
-    }
-    // Load all geoms
-    this._pbfService
+    }   
+      // Load all geoms
+      this._pbfService
       .getPbf(this._mapService.map)
       .toPromise()
-      .then((data) =>
-        data
+      .then((data) => {
+        if (data == null) return
+        return data
           .on(
             "click",
             function (e) {
@@ -124,7 +125,7 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
             }.bind(this)
           )
           .addTo(this._mapService.map)
-      );
+      });
   }
 
   @HostListener("window:resize", ["$event"])

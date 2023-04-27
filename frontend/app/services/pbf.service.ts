@@ -25,6 +25,7 @@ export class PbfService {
     return this._zhService.getPbf().pipe(
       map(async (result) => {
         const res = await result["arrayBuffer"]();
+        if (res.byteLength === 0) return null
         const pbf = new Pbf(res);
         const vector = await this.setVectorGrid(geobuf.decode(pbf));
         this.res = res;
