@@ -19,13 +19,12 @@ from geonature.core.gn_permissions.tools import get_scopes_by_action
 from ref_geo.models import BibAreasTypes, LAreas, LiMunicipalities
 from geonature.utils.config import config
 from geonature.utils.env import DB, ROOT_DIR, BACKEND_DIR
-from geonature.utils.utilssqlalchemy import json_resp
 from pypnnomenclature.models import TNomenclatures
 from pypnusershub.db.models import Organisme, User
 from sqlalchemy import desc, func, text
 from sqlalchemy.orm import aliased
 from utils_flask_sqla.generic import GenericQuery
-from utils_flask_sqla.response import json_resp_accept_empty_list
+from utils_flask_sqla.response import json_resp_accept_empty_list, json_resp
 
 from .api_error import ZHApiError
 from .forms import (
