@@ -1,10 +1,10 @@
-import { Component, OnInit, Input } from "@angular/core";
-import { ZhDataService } from "../../services/zh-data.service";
-import { ToastrService } from "ngx-toastr";
-import { ErrorTranslatorService } from "../../services/error-translator.service";
-import { FormGroup, FormBuilder, FormArray } from "@angular/forms";
-import { HierarchyField, HierarchyFields, Note, RiverBasin } from "../../models/hierarchy";
-import { TableColumn } from "../../commonComponents/table/table-interface";
+import { Component, OnInit, Input } from '@angular/core';
+import { ZhDataService } from '../../services/zh-data.service';
+import { ToastrService } from 'ngx-toastr';
+import { ErrorTranslatorService } from '../../services/error-translator.service';
+import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
+import { HierarchyField, HierarchyFields, Note, RiverBasin } from '../../models/hierarchy';
+import { TableColumn } from '../../commonComponents/table/table-interface';
 
 type Data = {
   kownledges: string[];
@@ -13,9 +13,9 @@ type Data = {
 };
 
 @Component({
-  selector: "zh-hierarchy-search-table",
-  templateUrl: "./zh-hierarchy-search-table.component.html",
-  styleUrls: ["./zh-hierarchy-search-table.component.scss"],
+  selector: 'zh-hierarchy-search-table',
+  templateUrl: './zh-hierarchy-search-table.component.html',
+  styleUrls: ['./zh-hierarchy-search-table.component.scss'],
 })
 export class ZhHierarchySearchTableComponent implements OnInit {
   private _riverBasin: RiverBasin;
@@ -38,32 +38,32 @@ export class ZhHierarchySearchTableComponent implements OnInit {
   public knowledges: Note[] = [];
   public mainSettings = {
     enableCheckAll: false,
-    text: "Sélectionner",
-    searchPlaceholderText: "Rechercher",
+    text: 'Sélectionner',
+    searchPlaceholderText: 'Rechercher',
     enableSearchFilter: true,
     disabled: false,
     singleSelection: true,
-    noDataLabel: "Aucune donnée disponible",
+    noDataLabel: 'Aucune donnée disponible',
     minSelectionLimit: 1,
   };
   public attributesSettings = {
     ...this.mainSettings,
-    labelKey: "attribut",
-    primaryKey: "id_attribut",
+    labelKey: 'attribut',
+    primaryKey: 'id_attribut',
   };
   public knowledgeSettings = {
     ...this.mainSettings,
-    labelKey: "note_type",
-    primaryKey: "note_type",
+    labelKey: 'note_type',
+    primaryKey: 'note_type',
   };
 
   public columns: TableColumn[] = [
-    { name: "field", label: "Rubrique" },
-    { name: "attributes", label: "Attribut", subarr: { name: "attribut" } },
+    { name: 'field', label: 'Rubrique' },
+    { name: 'attributes', label: 'Attribut', subarr: { name: 'attribut' } },
     {
-      name: "knowledges",
-      label: "Connaissance",
-      subarr: { name: "note_type" },
+      name: 'knowledges',
+      label: 'Connaissance',
+      subarr: { name: 'note_type' },
     },
   ];
 
@@ -75,7 +75,7 @@ export class ZhHierarchySearchTableComponent implements OnInit {
   ) {}
 
   get data() {
-    return this.form.controls["hierarchy"] as FormArray;
+    return this.form.controls['hierarchy'] as FormArray;
   }
 
   ngOnInit() {
@@ -120,8 +120,8 @@ export class ZhHierarchySearchTableComponent implements OnInit {
   }
 
   fieldChanged(event) {
-    this.localForm.controls["attributes"].reset();
-    this.localForm.controls["knowledges"].reset();
+    this.localForm.controls['attributes'].reset();
+    this.localForm.controls['knowledges'].reset();
 
     const filteredNotes = this.notes.filter(
       (item) =>
@@ -132,7 +132,7 @@ export class ZhHierarchySearchTableComponent implements OnInit {
 
     // Creates kind of a Set to have unique objects
     this.attributes = filteredNotes.filter(
-      (v, i, a) => a.findIndex((v2) => ["attribut"].every((k) => v2[k] === v[k])) === i
+      (v, i, a) => a.findIndex((v2) => ['attribut'].every((k) => v2[k] === v[k])) === i
     );
 
     //FIXME: problem here
@@ -151,10 +151,10 @@ export class ZhHierarchySearchTableComponent implements OnInit {
     };
 
     if (this.attributes.length > 0) {
-      this.localForm.controls["attributes"].setValue([this.attributes[0]]);
+      this.localForm.controls['attributes'].setValue([this.attributes[0]]);
     }
     if (this.knowledges.length > 0) {
-      this.localForm.controls["knowledges"].setValue([this.knowledges[0]]);
+      this.localForm.controls['knowledges'].setValue([this.knowledges[0]]);
     }
   }
 
@@ -170,7 +170,7 @@ export class ZhHierarchySearchTableComponent implements OnInit {
   attributesChanged(event) {
     this.knowledges = this.getKnowledge(event);
     if (this.knowledges.length > 0) {
-      this.localForm.controls["knowledges"].setValue([this.knowledges[0]]);
+      this.localForm.controls['knowledges'].setValue([this.knowledges[0]]);
     }
   }
 

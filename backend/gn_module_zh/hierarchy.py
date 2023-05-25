@@ -256,9 +256,7 @@ class Item:
                 qualif = (
                     DB.session.query(CorRbRules, TItems, CorItemValue)
                     .join(TItems, TItems.cor_rule_id == CorRbRules.cor_rule_id)
-                    .join(
-                        CorItemValue, TItems.attribute_id == CorItemValue.attribute_id
-                    )
+                    .join(CorItemValue, TItems.attribute_id == CorItemValue.attribute_id)
                     .filter(
                         and_(
                             CorRbRules.rb_id == self.rb_id,
@@ -384,18 +382,14 @@ class Item:
         try:
             return [
                 getattr(q_.TNomenclatures, "id_nomenclature")
-                for q_ in DB.session.query(
-                    CorZhProtection, CorProtectionLevelType, TNomenclatures
-                )
+                for q_ in DB.session.query(CorZhProtection, CorProtectionLevelType, TNomenclatures)
                 .join(
                     CorProtectionLevelType,
-                    CorZhProtection.id_protection
-                    == CorProtectionLevelType.id_protection,
+                    CorZhProtection.id_protection == CorProtectionLevelType.id_protection,
                 )
                 .join(
                     TNomenclatures,
-                    TNomenclatures.id_nomenclature
-                    == CorProtectionLevelType.id_protection_status,
+                    TNomenclatures.id_nomenclature == CorProtectionLevelType.id_protection_status,
                 )
                 .filter(CorZhProtection.id_zh == self.id_zh)
                 .all()
@@ -516,9 +510,7 @@ class Item:
             combination = self.__get_combination()
             # set qualif_id
             qualif_id = getattr(
-                DB.session.query(TCorQualif)
-                .filter(TCorQualif.combination == combination)
-                .first(),
+                DB.session.query(TCorQualif).filter(TCorQualif.combination == combination).first(),
                 "id_qualification",
             )
             return qualif_id
@@ -539,9 +531,7 @@ class Item:
 
     def __get_tzh_val(self, field):
         try:
-            return getattr(
-                DB.session.query(TZH).filter(TZH.id_zh == self.id_zh).one(), field
-            )
+            return getattr(DB.session.query(TZH).filter(TZH.id_zh == self.id_zh).one(), field)
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
@@ -664,10 +654,7 @@ class Item:
             if self.active:
                 if self.abb == "hab":
                     is_carto = (
-                        DB.session.query(TZH)
-                        .filter(TZH.id_zh == self.id_zh)
-                        .one()
-                        .is_carto_hab
+                        DB.session.query(TZH).filter(TZH.id_zh == self.id_zh).one().is_carto_hab
                     )
                     if is_carto:
                         return 3
@@ -745,8 +732,7 @@ class Item:
 
                 # count good knowledge ids in user selected functions
                 selected_functions_ids = [
-                    getattr(function.TFunctions, "id_knowledge")
-                    for function in selected_functions
+                    getattr(function.TFunctions, "id_knowledge") for function in selected_functions
                 ]
                 count = self.__get_count(selected_functions_ids, high_know_id)
                 if count >= 2:
@@ -1207,11 +1193,7 @@ class Hierarchy(ZH):
 
     def __check_if_rules(self):
         try:
-            if (
-                not DB.session.query(CorRbRules)
-                .filter(CorRbRules.rb_id == self.rb_id)
-                .first()
-            ):
+            if not DB.session.query(CorRbRules).filter(CorRbRules.rb_id == self.rb_id).first():
                 raise ZHApiError(
                     message="no_rb_rules",
                     details="no existing rules for the river basin",
@@ -1229,9 +1211,7 @@ class Hierarchy(ZH):
 
     @staticmethod
     def get_denom(rb_id, col_name):
-        rb_name = (
-            DB.session.query(TRiverBasin).filter(TRiverBasin.id_rb == rb_id).one().name
-        )
+        rb_name = DB.session.query(TRiverBasin).filter(TRiverBasin.id_rb == rb_id).one().name
         return getattr(
             DB.session.query(RbNotesSummary)
             .filter(RbNotesSummary.bassin_versant == rb_name)

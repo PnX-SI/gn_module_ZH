@@ -277,7 +277,6 @@ def filter_statuts(query, json: dict):
 
 
 def filter_plans(query, json: dict):
-
     ids_plans = [f.get("id_nomenclature") for f in json.get("plans", [])]
 
     if ids_plans and all(id_ is not None for id_ in ids_plans):

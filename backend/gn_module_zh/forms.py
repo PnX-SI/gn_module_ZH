@@ -53,12 +53,10 @@ def update_tzh(data):
             DB.session.flush()
 
 
-
 # tab 0
 
 
 def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referentiels):
-
     # try:
     uuid_id_lim_list = uuid.uuid4()
     post_cor_lim_list(uuid_id_lim_list, form_data["critere_delim"])
@@ -128,6 +126,8 @@ def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referenti
 
     DB.session.flush()
     return new_zh.id_zh
+
+
 # except ZHApiError:
 #     raise
 # except Exception as e:
@@ -626,7 +626,6 @@ def post_inflow(id_zh, inflows):
 
 
 def post_functions(id_zh, functions):
-
     for function in functions:
         DB.session.add(
             TFunctions(
@@ -797,7 +796,9 @@ def post_instruments(id_zh, instruments):
             TInstruments(
                 id_instrument=instrument["id_instrument"],
                 id_zh=id_zh,
-                instrument_date=datetime.datetime.strptime(instrument["instrument_date"], "%d/%m/%Y"),
+                instrument_date=datetime.datetime.strptime(
+                    instrument["instrument_date"], "%d/%m/%Y"
+                ),
             )
         )
         DB.session.flush()

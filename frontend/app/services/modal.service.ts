@@ -1,12 +1,12 @@
-import { Injectable } from "@angular/core";
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { Injectable } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 /*
 
 */
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class ModalService {
   constructor(public ngbModal: NgbModal) {}
@@ -19,8 +19,8 @@ export class ModalService {
     }
     this.ngbModal.open(modal, {
       centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
+      size: 'lg',
+      windowClass: 'bib-modal',
     });
   }
 

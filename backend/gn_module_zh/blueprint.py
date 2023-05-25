@@ -204,9 +204,7 @@ def get_zh_by_id(id_zh):
     if zh.zh.user_is_allowed_to(g.current_user, user_cruved["R"]):
         return zh.__repr__()
     else:
-        raise Forbidden(
-            f"User is not allowed to read ZH {zh.zh.main_name} - {zh.zh.code}"
-        )
+        raise Forbidden(f"User is not allowed to read ZH {zh.zh.main_name} - {zh.zh.code}")
 
 
 @blueprint.route("/<int:id_zh>/complete_card", methods=["GET"])
@@ -223,9 +221,7 @@ def get_complete_info(id_zh):
 
 
 def get_complete_card(id_zh: int) -> Card:
-    ref_geo_config = [
-        ref for ref in blueprint.config["ref_geo_referentiels"] if ref["active"]
-    ]
+    ref_geo_config = [ref for ref in blueprint.config["ref_geo_referentiels"] if ref["active"]]
     return Card(id_zh, "full", ref_geo_config).__repr__()
 
 
@@ -342,9 +338,7 @@ def get_pbf():
     """
     query = DB.session.execute(sql)
     row = query.first()
-    return Response(
-        bytes(row["pbf"]) if row["pbf"] else bytes(), mimetype="application/protobuf"
-    )
+    return Response(bytes(row["pbf"]) if row["pbf"] else bytes(), mimetype="application/protobuf")
 
 
 @blueprint.route("/pbf/complete", methods=["GET"])
@@ -441,9 +435,7 @@ def get_ref_autocomplete():
         )
 
         search_title = search_title.replace(" ", "%")
-        q = q.filter(TReferences.title.ilike("%" + search_title + "%")).order_by(
-            desc("idx_trgm")
-        )
+        q = q.filter(TReferences.title.ilike("%" + search_title + "%")).order_by(desc("idx_trgm"))
 
         limit = request.args.get("limit", 20)
 
@@ -679,16 +671,10 @@ def get_tab_data(id_tab):
         return jsonify({"id_zh": form_data["id_zh"]})
 
     if id_tab == 5:
-        update_functions(
-            form_data["id_zh"], form_data["fonctions_hydro"], "FONCTIONS_HYDRO"
-        )
-        update_functions(
-            form_data["id_zh"], form_data["fonctions_bio"], "FONCTIONS_BIO"
-        )
+        update_functions(form_data["id_zh"], form_data["fonctions_hydro"], "FONCTIONS_HYDRO")
+        update_functions(form_data["id_zh"], form_data["fonctions_bio"], "FONCTIONS_BIO")
 
-        update_functions(
-            form_data["id_zh"], form_data["interet_patrim"], "INTERET_PATRIM"
-        )
+        update_functions(form_data["id_zh"], form_data["interet_patrim"], "INTERET_PATRIM")
 
         update_functions(form_data["id_zh"], form_data["val_soc_eco"], "VAL_SOC_ECO")
         update_tzh(form_data)
@@ -797,9 +783,7 @@ def deleteOneZh(id_zh):
 
     # delete files in TMedias and repos
     zh_uuid = DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().zh_uuid
-    q_medias = (
-        DB.session.query(TMedias).filter(TMedias.unique_id_media == zh_uuid).all()
-    )
+    q_medias = DB.session.query(TMedias).filter(TMedias.unique_id_media == zh_uuid).all()
     for media in q_medias:
         delete_file(media.id_media)
 
@@ -846,9 +830,7 @@ def write_csv(id_zh):
                     "Nom Scientifique": row.get("scientific_name"),
                     "Nom vernaculaire": row.get("vernac_name"),
                     "Types de Statuts": row.get("statut_type"),
-                    "Statuts d’évaluation, de protection et de menace": row.get(
-                        "statut"
-                    ),
+                    "Statuts d’évaluation, de protection et de menace": row.get("statut"),
                     "Article": row.get("article"),
                     "Lien Article": row.get("doc_url"),
                     "Nombre d'observations": row.get("obs_nb"),
@@ -909,10 +891,7 @@ def returnUserCruved():
 def userRights(id_zh):
     user_cruved = get_user_cruved()
     zh = ZH(id_zh).zh
-    return {
-        k: zh.user_is_allowed_to(g.current_user, user_cruved[k])
-        for k in user_cruved.keys()
-    }
+    return {k: zh.user_is_allowed_to(g.current_user, user_cruved[k]) for k in user_cruved.keys()}
 
 
 @blueprint.route("/export_pdf/<int:id_zh>", methods=["GET"])
@@ -951,9 +930,7 @@ def download(id_zh: int):
 def departments():
     query = (
         DB.session.query(LAreas)
-        .with_entities(
-            LAreas.area_name, LAreas.area_code, LAreas.id_type, BibAreasTypes.type_code
-        )
+        .with_entities(LAreas.area_name, LAreas.area_code, LAreas.id_type, BibAreasTypes.type_code)
         .join(BibAreasTypes, LAreas.id_type == BibAreasTypes.id_type)
         .filter(BibAreasTypes.type_code == "DEP")
         .filter(LAreas.enable)
@@ -985,9 +962,7 @@ def get_area_from_department() -> dict:
 @blueprint.route("/bassins", methods=["GET"])
 @json_resp
 def bassins():
-    query = DB.session.query(TRiverBasin).with_entities(
-        TRiverBasin.id_rb, TRiverBasin.name
-    )
+    query = DB.session.query(TRiverBasin).with_entities(TRiverBasin.id_rb, TRiverBasin.name)
     resp = query.order_by(TRiverBasin.name).all()
     return [{"code": r.id_rb, "name": r.name} for r in resp]
 

@@ -1,18 +1,18 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { Subscription, of, Observable } from "rxjs";
-import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from "rxjs/operators";
-import { ToastrService } from "ngx-toastr";
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { ZhDataService } from "../../../services/zh-data.service";
-import { AppConfig } from "@geonature_config/app.config";
-import { TabsService } from "../../../services/tabs.service";
-import { ErrorTranslatorService } from "../../../services/error-translator.service";
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Subscription, of, Observable } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from 'rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ZhDataService } from '../../../services/zh-data.service';
+import { AppConfig } from '@geonature_config/app.config';
+import { TabsService } from '../../../services/tabs.service';
+import { ErrorTranslatorService } from '../../../services/error-translator.service';
 
 @Component({
-  selector: "zh-form-tab1",
-  templateUrl: "./zh-form-tab1.component.html",
-  styleUrls: ["./zh-form-tab1.component.scss"],
+  selector: 'zh-form-tab1',
+  templateUrl: './zh-form-tab1.component.html',
+  styleUrls: ['./zh-form-tab1.component.scss'],
 })
 export class ZhFormTab1Component implements OnInit {
   @Input() formMetaData;
@@ -35,9 +35,9 @@ export class ZhFormTab1Component implements OnInit {
   public patchBib: boolean = false;
   public autocompleteBib: string;
   public cols = [
-    { name: "title", label: "Titre du document" },
-    { name: "authors", label: "Auteurs" },
-    { name: "pub_year", label: "Année de parution" },
+    { name: 'title', label: 'Titre du document' },
+    { name: 'authors', label: 'Auteurs' },
+    { name: 'pub_year', label: 'Année de parution' },
   ];
 
   constructor(
@@ -93,13 +93,13 @@ export class ZhFormTab1Component implements OnInit {
   }
 
   onFormValueChanges(): void {
-    this.generalInfoForm.get("is_id_site_space").valueChanges.subscribe((val: Boolean) => {
+    this.generalInfoForm.get('is_id_site_space').valueChanges.subscribe((val: Boolean) => {
       if (val == true) {
-        this.generalInfoForm.get("id_site_space").enable();
+        this.generalInfoForm.get('id_site_space').enable();
         this.hasSiteSpace = true;
       } else if (val == false) {
         this.hasSiteSpace = false;
-        this.generalInfoForm.get("id_site_space").reset();
+        this.generalInfoForm.get('id_site_space').reset();
       }
     });
   }
@@ -154,8 +154,8 @@ export class ZhFormTab1Component implements OnInit {
             this._dataService.setCurrentZh(zh);
             this.posted = false;
             this.canChangeTab.emit(true);
-            this._toastr.success("Vos données sont bien enregistrées", "", {
-              positionClass: "toast-top-right",
+            this._toastr.success('Vos données sont bien enregistrées', '', {
+              positionClass: 'toast-top-right',
             });
             this.nextTab.emit(2);
           });
@@ -163,8 +163,8 @@ export class ZhFormTab1Component implements OnInit {
         (error) => {
           this.posted = false;
           const frontMsg: string = this._error.getFrontError(error.error.message);
-          this._toastr.error(frontMsg, "", {
-            positionClass: "toast-top-right",
+          this._toastr.error(frontMsg, '', {
+            positionClass: 'toast-top-right',
           });
         }
       );

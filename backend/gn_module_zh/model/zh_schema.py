@@ -82,8 +82,7 @@ class ZhModel(DB.Model):
             - user_cruved: object return by cruved_for_user_in_app(user)
         """
         return {
-            action: self.user_is_allowed_to(user, level)
-            for action, level in user_cruved.items()
+            action: self.user_is_allowed_to(user, level) for action, level in user_cruved.items()
         }
 
 
@@ -129,9 +128,7 @@ class BibSiteSpace(DB.Model):
     @staticmethod
     def get_bib_site_spaces():
         bib_site_spaces = DB.session.query(BibSiteSpace).all()
-        bib_site_spaces_list = [
-            bib_site_space.as_dict() for bib_site_space in bib_site_spaces
-        ]
+        bib_site_spaces_list = [bib_site_space.as_dict() for bib_site_space in bib_site_spaces]
         return bib_site_spaces_list
 
 
@@ -146,18 +143,14 @@ class BibOrganismes(DB.Model):
 
     @staticmethod
     def get_abbrevation(id_org):
-        org = (
-            DB.session.query(BibOrganismes).filter(BibOrganismes.id_org == id_org).one()
-        )
+        org = DB.session.query(BibOrganismes).filter(BibOrganismes.id_org == id_org).one()
         return org.abbrevation
 
     @staticmethod
     def get_bib_organisms(org_type):
         bib_organismes = DB.session.query(BibOrganismes).all()
         if org_type == "operator":
-            return [
-                bib_org.as_dict() for bib_org in bib_organismes if bib_org.is_op_org
-            ]
+            return [bib_org.as_dict() for bib_org in bib_organismes if bib_org.is_op_org]
         elif org_type == "management_structure":
             return [bib_org.as_dict() for bib_org in bib_organismes]
         else:
@@ -169,9 +162,7 @@ class CorLimList(DB.Model):
     __tablename__ = "cor_lim_list"
     __table_args__ = {"schema": "pr_zh"}
     id_lim_list = DB.Column(UUID(as_uuid=True), primary_key=True)
-    id_lim = DB.Column(
-        DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), primary_key=True
-    )
+    id_lim = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), primary_key=True)
 
     def get_lims_by_id(id):
         return DB.session.query(CorLimList).filter(CorLimList.id_lim_list == id).all()
@@ -196,14 +187,10 @@ class TZH(ZhModel):
     create_date = DB.Column(DB.DateTime)
     update_date = DB.Column(DB.DateTime)
     geom = DB.Column(geoalchemy2.Geometry("GEOMETRY", 4326), nullable=False)
-    id_lim_list = DB.Column(
-        UUID(as_uuid=True), ForeignKey(CorLimList.id_lim_list), nullable=False
-    )
+    id_lim_list = DB.Column(UUID(as_uuid=True), ForeignKey(CorLimList.id_lim_list), nullable=False)
     remark_lim = DB.Column(DB.Unicode)
     remark_lim_fs = DB.Column(DB.Unicode)
-    id_sdage = DB.Column(
-        DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), nullable=False
-    )
+    id_sdage = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), nullable=False)
     id_sage = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature))
     remark_pres = DB.Column(DB.Unicode)
     v_habref = DB.Column(DB.Unicode)
@@ -262,13 +249,9 @@ class TZH(ZhModel):
         primaryjoin=(TNomenclatures.id_nomenclature == id_sdage),
     )
 
-    authors = DB.relationship(
-        User, lazy="joined", primaryjoin=(User.id_role == create_author)
-    )
+    authors = DB.relationship(User, lazy="joined", primaryjoin=(User.id_role == create_author))
 
-    coauthors = DB.relationship(
-        User, lazy="joined", primaryjoin=(User.id_role == update_author)
-    )
+    coauthors = DB.relationship(User, lazy="joined", primaryjoin=(User.id_role == update_author))
 
     def get_geofeature(self, recursif=True, relationships=()):
         return self.as_geofeature(
@@ -279,12 +262,7 @@ class TZH(ZhModel):
 
     @staticmethod
     def get_site_space_name(id):
-        return (
-            DB.session.query(BibSiteSpace)
-            .filter(BibSiteSpace.id_site_space == id)
-            .one()
-            .name
-        )
+        return DB.session.query(BibSiteSpace).filter(BibSiteSpace.id_site_space == id).one().name
 
     @staticmethod
     def get_tzh_by_id(id):
@@ -346,10 +324,7 @@ class CorZhArea(DB.Model):
     @staticmethod
     def get_id_type(mnemo):
         return (
-            DB.session.query(BibAreasTypes)
-            .filter(BibAreasTypes.type_name == mnemo)
-            .one()
-            .id_type
+            DB.session.query(BibAreasTypes).filter(BibAreasTypes.type_name == mnemo).one().id_type
         )
 
     @staticmethod
@@ -393,9 +368,7 @@ class CorZhArea(DB.Model):
         return [
             DB.session.query(CorZhArea, LAreas, TZH)
             .join(LAreas)
-            .filter(
-                CorZhArea.id_zh == id_zh, LAreas.id_type == id_type, TZH.id_zh == id_zh
-            )
+            .filter(CorZhArea.id_zh == id_zh, LAreas.id_type == id_type, TZH.id_zh == id_zh)
             .all()
             for id_type in id_types
         ]
@@ -445,9 +418,7 @@ class CorZhFctArea(DB.Model):
     __tablename__ = "cor_zh_fct_area"
     __table_args__ = {"schema": "pr_zh"}
     id_zh = DB.Column(DB.Integer, ForeignKey(TZH.id_zh), primary_key=True)
-    id_fct_area = DB.Column(
-        DB.Integer, ForeignKey(TFctArea.id_fct_area), primary_key=True
-    )
+    id_fct_area = DB.Column(DB.Integer, ForeignKey(TFctArea.id_fct_area), primary_key=True)
 
 
 @serializable
@@ -465,9 +436,7 @@ class TReferences(DB.Model):
 class CorZhRef(DB.Model):
     __tablename__ = "cor_zh_ref"
     __table_args__ = {"schema": "pr_zh"}
-    id_ref = DB.Column(
-        DB.Integer, ForeignKey(TReferences.id_reference), primary_key=True
-    )
+    id_ref = DB.Column(DB.Integer, ForeignKey(TReferences.id_reference), primary_key=True)
     id_zh = DB.Column(DB.Integer, ForeignKey(TZH.id_zh), primary_key=True)
 
     @staticmethod
@@ -485,20 +454,14 @@ class CorZhLimFs(DB.Model):
     __tablename__ = "cor_zh_lim_fs"
     __table_args__ = {"schema": "pr_zh"}
     id_zh = DB.Column(DB.Integer, ForeignKey(TZH.id_zh), primary_key=True)
-    id_lim_fs = DB.Column(
-        DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), primary_key=True
-    )
+    id_lim_fs = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), primary_key=True)
 
 
 class CorSdageSage(DB.Model):
     __tablename__ = "cor_sdage_sage"
     __table_args__ = {"schema": "pr_zh"}
-    id_sdage = DB.Column(
-        DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), primary_key=True
-    )
-    id_sage = DB.Column(
-        DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), primary_key=True
-    )
+    id_sdage = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), primary_key=True)
+    id_sage = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), primary_key=True)
 
     @staticmethod
     def get_id_sdage_list():
@@ -509,9 +472,7 @@ class CorSdageSage(DB.Model):
     def get_sage_by_id(id):
         return (
             DB.session.query(CorSdageSage, TNomenclatures)
-            .join(
-                TNomenclatures, TNomenclatures.id_nomenclature == CorSdageSage.id_sage
-            )
+            .join(TNomenclatures, TNomenclatures.id_nomenclature == CorSdageSage.id_sage)
             .filter(CorSdageSage.id_sdage == id)
             .all()
         )
@@ -545,9 +506,7 @@ class BibCb(DB.Model):
         )
         # get all cd_hab_entre corresponding to cd_hab_sortie
         q_cd_hab_entre = (
-            DB.session.query(CorespHab)
-            .filter(CorespHab.cd_hab_sortie == cd_hab_sortie)
-            .all()
+            DB.session.query(CorespHab).filter(CorespHab.cd_hab_sortie == cd_hab_sortie).all()
         )
         # get list of cd_hab_entre/lb_code/lb_hab_fr for each cahier habitat
         ch = []
@@ -579,9 +538,7 @@ class CorImpactTypes(DB.Model):
     __tablename__ = "cor_impact_types"
     __table_args__ = {"schema": "pr_zh"}
     id_cor_impact_types = DB.Column(DB.Integer, primary_key=True)
-    id_impact = DB.Column(
-        DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), nullable=False
-    )
+    id_impact = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), nullable=False)
     id_impact_type = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature))
     active = DB.Column(DB.Integer, nullable=False)
 
@@ -631,9 +588,7 @@ class CorMainFct(DB.Model):
     def get_functions(nomenc_ids):
         return (
             DB.session.query(CorMainFct, TNomenclatures)
-            .join(
-                TNomenclatures, TNomenclatures.id_nomenclature == CorMainFct.id_function
-            )
+            .join(TNomenclatures, TNomenclatures.id_nomenclature == CorMainFct.id_function)
             .filter(CorMainFct.active)
             .filter(CorMainFct.id_function.in_(nomenc_ids))
             .all()
@@ -643,9 +598,7 @@ class CorMainFct(DB.Model):
     def get_all_functions(nomenc_ids):
         return (
             DB.session.query(CorMainFct, TNomenclatures)
-            .join(
-                TNomenclatures, TNomenclatures.id_nomenclature == CorMainFct.id_function
-            )
+            .join(TNomenclatures, TNomenclatures.id_nomenclature == CorMainFct.id_function)
             .filter(CorMainFct.id_function.in_(nomenc_ids))
             .all()
         )
@@ -659,9 +612,7 @@ class CorMainFct(DB.Model):
     def get_function_by_main_function(id_main):
         return (
             DB.session.query(CorMainFct, TNomenclatures)
-            .join(
-                TNomenclatures, TNomenclatures.id_nomenclature == CorMainFct.id_function
-            )
+            .join(TNomenclatures, TNomenclatures.id_nomenclature == CorMainFct.id_function)
             .filter(and_(CorMainFct.id_main_function == id_main, CorMainFct.active))
             .all()
         )
@@ -688,9 +639,7 @@ class CorZhCb(DB.Model):
 class CorZhCorineCover(DB.Model):
     __tablename__ = "cor_zh_corine_cover"
     __table_args__ = {"schema": "pr_zh"}
-    id_cover = DB.Column(
-        DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), primary_key=True
-    )
+    id_cover = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), primary_key=True)
     id_zh = DB.Column(DB.Integer, ForeignKey(TZH.id_zh), primary_key=True)
 
 
@@ -746,9 +695,7 @@ class TOutflow(DB.Model):
 class TInflow(DB.Model):
     __tablename__ = "t_inflow"
     __table_args__ = {"schema": "pr_zh"}
-    id_inflow = DB.Column(
-        DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), primary_key=True
-    )
+    id_inflow = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), primary_key=True)
     id_zh = DB.Column(DB.Integer, ForeignKey(TZH.id_zh), primary_key=True)
     id_permanance = DB.Column(
         DB.Integer,
@@ -787,17 +734,13 @@ class TFunctions(DB.Model):
         if is_eval:
             qualif_ids = [
                 nomenclature.id_nomenclature
-                for nomenclature in Nomenclatures.get_nomenclature_info(
-                    "FONCTIONS_QUALIF"
-                )
+                for nomenclature in Nomenclatures.get_nomenclature_info("FONCTIONS_QUALIF")
                 if nomenclature.mnemonique in eval_qualification
             ]
         else:
             qualif_ids = [
                 nomenclature.id_nomenclature
-                for nomenclature in Nomenclatures.get_nomenclature_info(
-                    "FONCTIONS_QUALIF"
-                )
+                for nomenclature in Nomenclatures.get_nomenclature_info("FONCTIONS_QUALIF")
             ]
 
         return (
@@ -867,12 +810,8 @@ class TUrbanPlanningDocs(DB.Model):
 class CorZhDocRange(DB.Model):
     __tablename__ = "cor_zh_doc_range"
     __table_args__ = {"schema": "pr_zh"}
-    id_doc = DB.Column(
-        DB.Integer, ForeignKey(TUrbanPlanningDocs.id_doc), primary_key=True
-    )
-    id_cor = DB.Column(
-        DB.Integer, ForeignKey(CorUrbanTypeRange.id_cor), primary_key=True
-    )
+    id_doc = DB.Column(DB.Integer, ForeignKey(TUrbanPlanningDocs.id_doc), primary_key=True)
+    id_cor = DB.Column(DB.Integer, ForeignKey(CorUrbanTypeRange.id_cor), primary_key=True)
 
 
 class CorProtectionLevelType(DB.Model):
@@ -882,9 +821,7 @@ class CorProtectionLevelType(DB.Model):
     id_protection_status = DB.Column(
         DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), nullable=False
     )
-    id_protection_type = DB.Column(
-        DB.Integer, ForeignKey(TNomenclatures.id_nomenclature)
-    )
+    id_protection_type = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature))
     id_protection_level = DB.Column(
         DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), nullable=False
     )
@@ -908,13 +845,9 @@ class BibActions(DB.Model):
 class TActions(DB.Model):
     __tablename__ = "t_actions"
     __table_args__ = {"schema": "pr_zh"}
-    id_action = DB.Column(
-        DB.Integer, ForeignKey(BibActions.id_action), primary_key=True
-    )
+    id_action = DB.Column(DB.Integer, ForeignKey(BibActions.id_action), primary_key=True)
     id_zh = DB.Column(DB.Integer, ForeignKey(TZH.id_zh), primary_key=True)
-    id_priority_level = DB.Column(
-        DB.Integer, ForeignKey(TNomenclatures.id_nomenclature)
-    )
+    id_priority_level = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature))
     remark = DB.Column(DB.Unicode(length=2000))
 
 
@@ -931,9 +864,7 @@ class TInstruments(DB.Model):
 class TOwnership(DB.Model):
     __tablename__ = "t_ownership"
     __table_args__ = {"schema": "pr_zh"}
-    id_status = DB.Column(
-        DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), primary_key=True
-    )
+    id_status = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), primary_key=True)
     id_zh = DB.Column(DB.Integer, ForeignKey(TZH.id_zh), primary_key=True)
     remark = DB.Column(DB.Unicode(length=2000))
 
@@ -999,9 +930,7 @@ class BibNoteTypes(DB.Model):
     __tablename__ = "bib_note_types"
     __table_args__ = {"schema": "pr_zh"}
     note_id = DB.Column(DB.Integer, primary_key=True)
-    id_knowledge = DB.Column(
-        DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), nullable=True
-    )
+    id_knowledge = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), nullable=True)
 
 
 class TRules(DB.Model):
@@ -1070,9 +999,7 @@ class CorRuleNomenc(DB.Model):
     __tablename__ = "cor_rule_nomenc"
     __table_args__ = {"schema": "pr_zh"}
     rule_id = DB.Column(DB.Integer, ForeignKey(TRules.rule_id), primary_key=True)
-    nomenc_id = DB.Column(
-        DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), primary_key=True
-    )
+    nomenc_id = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), primary_key=True)
     qualif_id = DB.Column(DB.Integer)
 
 
@@ -1080,9 +1007,7 @@ class CorZhNotes(DB.Model):
     __tablename__ = "cor_zh_notes"
     __table_args__ = {"schema": "pr_zh"}
     id_zh = DB.Column(DB.Integer, ForeignKey(TZH.id_zh), primary_key=True)
-    cor_rule_id = DB.Column(
-        DB.Integer, ForeignKey(CorRbRules.cor_rule_id), primary_key=True
-    )
+    cor_rule_id = DB.Column(DB.Integer, ForeignKey(CorRbRules.cor_rule_id), primary_key=True)
     note = DB.Column(DB.Float)
     attribute_id = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature))
     note_type_id = DB.Column(DB.Integer, ForeignKey(BibNoteTypes.note_id))

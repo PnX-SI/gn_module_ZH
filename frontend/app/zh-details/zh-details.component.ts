@@ -1,20 +1,20 @@
-import { Component, HostListener, OnInit, AfterViewInit, ViewChild } from "@angular/core";
-import { MatAccordion } from "@angular/material/expansion";
-import { ActivatedRoute } from "@angular/router";
-import { MapService } from "@geonature_common/map/map.service";
-import { ZhDataService } from "../services/zh-data.service";
-import { ErrorTranslatorService } from "../services/error-translator.service";
-import { Rights } from "../models/rights";
-import { ToastrService } from "ngx-toastr";
-import { GeoJSON } from "leaflet";
-import * as L from "leaflet";
+import { Component, HostListener, OnInit, AfterViewInit, ViewChild } from '@angular/core';
+import { MatAccordion } from '@angular/material/expansion';
+import { ActivatedRoute } from '@angular/router';
+import { MapService } from '@geonature_common/map/map.service';
+import { ZhDataService } from '../services/zh-data.service';
+import { ErrorTranslatorService } from '../services/error-translator.service';
+import { Rights } from '../models/rights';
+import { ToastrService } from 'ngx-toastr';
+import { GeoJSON } from 'leaflet';
+import * as L from 'leaflet';
 
-import { DetailsModel } from "./models/zh-details.model";
+import { DetailsModel } from './models/zh-details.model';
 
 @Component({
-  selector: "zh-details",
-  templateUrl: "./zh-details.component.html",
-  styleUrls: ["./zh-details.component.scss"],
+  selector: 'zh-details',
+  templateUrl: './zh-details.component.html',
+  styleUrls: ['./zh-details.component.scss'],
 })
 export class ZhDetailsComponent implements OnInit, AfterViewInit {
   @ViewChild(MatAccordion) accordion: MatAccordion;
@@ -34,7 +34,7 @@ export class ZhDetailsComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit() {
-    this.id_zh = this._route.snapshot.params["id"];
+    this.id_zh = this._route.snapshot.params['id'];
     this.getRights(this.id_zh);
     this.getData();
   }
@@ -55,7 +55,7 @@ export class ZhDetailsComponent implements OnInit, AfterViewInit {
         let geojson = {
           geometry: (data as any).geometry,
           properties: { idZh: this.id_zh },
-          type: "Feature",
+          type: 'Feature',
         };
         setTimeout(() => {
           let layer = L.geoJSON(geojson as any).addTo(this._mapService.map);
@@ -65,8 +65,8 @@ export class ZhDetailsComponent implements OnInit, AfterViewInit {
       (error) => {
         this.onError = true;
         const frontMsg: string = this._error.getFrontError(error.error.message);
-        this._toastr.error(frontMsg, "", {
-          positionClass: "toast-top-right",
+        this._toastr.error(frontMsg, '', {
+          positionClass: 'toast-top-right',
         });
       }
     );
@@ -82,15 +82,15 @@ export class ZhDetailsComponent implements OnInit, AfterViewInit {
     }
   }
 
-  @HostListener("window:resize", ["$event"])
+  @HostListener('window:resize', ['$event'])
   onResize(event) {
     this.calcCardContentHeight();
   }
 
   calcCardContentHeight() {
     let wH = window.innerHeight;
-    let tbH = document.getElementById("app-toolbar")
-      ? document.getElementById("app-toolbar").offsetHeight
+    let tbH = document.getElementById('app-toolbar')
+      ? document.getElementById('app-toolbar').offsetHeight
       : 0;
 
     let height = wH - (tbH + 40);

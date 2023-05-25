@@ -1,24 +1,24 @@
-import { Component, EventEmitter, OnInit, Input, Output } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
-import { Subscription } from "rxjs";
-import { ConfigService } from "@geonature/services/config.service";
+import { Component, EventEmitter, OnInit, Input, Output } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
+import { ConfigService } from '@geonature/services/config.service';
 
-import { ToastrService } from "ngx-toastr";
+import { ToastrService } from 'ngx-toastr';
 
-import { ZhDataService } from "../../../services/zh-data.service";
-import { fileSizeValidator } from "../../../validators/fileSizeValidator";
-import { fileNameValidator } from "../../../validators/fileNameValidator";
-import { fileFormatValidator } from "../../../validators/fileFormatValidator";
+import { ZhDataService } from '../../../services/zh-data.service';
+import { fileSizeValidator } from '../../../validators/fileSizeValidator';
+import { fileNameValidator } from '../../../validators/fileNameValidator';
+import { fileFormatValidator } from '../../../validators/fileFormatValidator';
 
-import { FilesService } from "../../../services/files.service";
-import { TabsService } from "../../../services/tabs.service";
-import { FilesExt, ZhFile } from "../../../models/files";
+import { FilesService } from '../../../services/files.service';
+import { TabsService } from '../../../services/tabs.service';
+import { FilesExt, ZhFile } from '../../../models/files';
 
 @Component({
-  selector: "zh-form-tab8",
-  templateUrl: "./zh-form-tab8.component.html",
-  styleUrls: ["./zh-form-tab8.component.scss"],
+  selector: 'zh-form-tab8',
+  templateUrl: './zh-form-tab8.component.html',
+  styleUrls: ['./zh-form-tab8.component.scss'],
 })
 export class ZhFormTab8Component implements OnInit {
   @Input() public formMetaData: any;
@@ -42,15 +42,15 @@ export class ZhFormTab8Component implements OnInit {
   public posted: boolean;
   public submitted: boolean;
 
-  public fileTypeAccepted: string[] = ["application/pdf", "image/jpeg"];
+  public fileTypeAccepted: string[] = ['application/pdf', 'image/jpeg'];
 
   public fileTableCol = [
     {
-      name: "title_fr",
-      label: "Titre du document",
+      name: 'title_fr',
+      label: 'Titre du document',
     },
-    { name: "author", label: "Auteur" },
-    { name: "description_fr", label: "Résumé" },
+    { name: 'author', label: 'Auteur' },
+    { name: 'description_fr', label: 'Résumé' },
   ];
 
   public corFilesExt: FilesExt[] = [];
@@ -86,17 +86,17 @@ export class ZhFormTab8Component implements OnInit {
 
   getValidators() {
     let validators = [Validators.required];
-    if (this.config["ZONES_HUMIDES"]["fileformat_validated"]) {
+    if (this.config['ZONES_HUMIDES']['fileformat_validated']) {
       validators.push(fileFormatValidator(this.fileTypeAccepted));
     }
-    if (this.config["ZONES_HUMIDES"]["fileformat_validated"]) {
+    if (this.config['ZONES_HUMIDES']['fileformat_validated']) {
       validators.push(fileNameValidator(this.zh.properties.code));
     }
 
     validators.push(
       fileSizeValidator(
-        this.config["ZONES_HUMIDES"]["max_jpg_size"] * 1000,
-        this.config["ZONES_HUMIDES"]["max_pdf_size"] * 1000
+        this.config['ZONES_HUMIDES']['max_jpg_size'] * 1000,
+        this.config['ZONES_HUMIDES']['max_pdf_size'] * 1000
       )
     );
 
@@ -110,17 +110,17 @@ export class ZhFormTab8Component implements OnInit {
     this.handleImages();
     this.corFilesExt = [
       {
-        name: "Fichiers PDF",
+        name: 'Fichiers PDF',
         files: this.getFilesByExtensions(EXT_PDF),
         editable: true,
       },
       {
-        name: "Fichiers CSV",
+        name: 'Fichiers CSV',
         files: this.getFilesByExtensions(EXT_CSV),
         editable: false,
       },
       {
-        name: "Autres fichiers",
+        name: 'Autres fichiers',
         files: this.getOtherFiles(EXT_PDF.concat(EXT_IMAGES, EXT_CSV)),
         editable: false,
       },
@@ -129,7 +129,7 @@ export class ZhFormTab8Component implements OnInit {
 
   handleImages() {
     this.imageFiles = {
-      name: "Photos",
+      name: 'Photos',
       files: this.getFilesByExtensions(this._filesService.EXT_IMAGES),
     };
   }
@@ -173,7 +173,7 @@ export class ZhFormTab8Component implements OnInit {
   fillForm(filepath: string, title: string, author: string, summary: string) {
     const filename: string = this._filesService.getFileNameFromPath(filepath);
     // Set empty file, to be checked in PATCH
-    this.fileToUpload = new File([""], filename);
+    this.fileToUpload = new File([''], filename);
     this.fileForm.patchValue({
       title: title,
       author: author,
@@ -182,7 +182,7 @@ export class ZhFormTab8Component implements OnInit {
     // FIXME: Bug in Angular7, need to use timeout for this method
     // https://github.com/angular/angular/issues/19170
     setTimeout(() => {
-      this.fileForm.get("file").setErrors(null);
+      this.fileForm.get('file').setErrors(null);
     }, 1);
   }
 
@@ -210,8 +210,8 @@ export class ZhFormTab8Component implements OnInit {
   onOpenModal(modal) {
     this.activeModal = this.ngbModal.open(modal, {
       centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
+      size: 'lg',
+      windowClass: 'bib-modal',
     });
 
     this.activeModal.result.then().finally(() => {
@@ -228,12 +228,12 @@ export class ZhFormTab8Component implements OnInit {
 
   fillUploadForm(patchFile: boolean = true): FormData {
     const uploadForm = new FormData();
-    uploadForm.append("id_zh", this.zh.id);
-    uploadForm.append("title", this.fileForm.value.title);
-    uploadForm.append("author", this.fileForm.value.author);
-    uploadForm.append("summary", this.fileForm.value.summary);
+    uploadForm.append('id_zh', this.zh.id);
+    uploadForm.append('title', this.fileForm.value.title);
+    uploadForm.append('author', this.fileForm.value.author);
+    uploadForm.append('summary', this.fileForm.value.summary);
     if (patchFile) {
-      uploadForm.append("file", this.fileToUpload, this.fileToUpload.name);
+      uploadForm.append('file', this.fileToUpload, this.fileToUpload.name);
     }
     return uploadForm;
   }

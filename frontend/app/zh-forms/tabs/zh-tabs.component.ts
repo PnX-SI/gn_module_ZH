@@ -1,15 +1,15 @@
-import { Component, HostListener, OnInit, ViewChild } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
-import { ZhDataService } from "../../services/zh-data.service";
-import { MatTabGroup } from "@angular/material/tabs";
-import { CruvedStoreService } from "@geonature_common/service/cruved-store.service";
-import { NgbModalConfig, NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { TabsService } from "../../services/tabs.service";
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { ZhDataService } from '../../services/zh-data.service';
+import { MatTabGroup } from '@angular/material/tabs';
+import { CruvedStoreService } from '@geonature_common/service/cruved-store.service';
+import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { TabsService } from '../../services/tabs.service';
 
 @Component({
-  selector: "zh-tabs",
-  templateUrl: "./zh-tabs.component.html",
-  styleUrls: ["./zh-tabs.component.scss"],
+  selector: 'zh-tabs',
+  templateUrl: './zh-tabs.component.html',
+  styleUrls: ['./zh-tabs.component.scss'],
 })
 export class ZhTabsComponent implements OnInit {
   public cardContentHeight: number;
@@ -19,8 +19,8 @@ export class ZhTabsComponent implements OnInit {
   public currentTab = 0;
   public clickedTabIndex = 0;
   public formMetaData: any;
-  @ViewChild("tabs") tabs: MatTabGroup;
-  @ViewChild("tabsChangeModal") tabsChangeModal: any;
+  @ViewChild('tabs') tabs: MatTabGroup;
+  @ViewChild('tabsChangeModal') tabsChangeModal: any;
 
   canChangeTab: boolean = false;
   repeatTab: boolean = false;
@@ -35,11 +35,11 @@ export class ZhTabsComponent implements OnInit {
     private config: NgbModalConfig,
     public _cruvedStore: CruvedStoreService
   ) {
-    config.backdrop = "static";
+    config.backdrop = 'static';
   }
 
   ngOnInit() {
-    this.id_zh = this._route.snapshot.params["id"];
+    this.id_zh = this._route.snapshot.params['id'];
     this.getMetaDataForms();
     if (this.id_zh) {
       this.getZhById(this.id_zh);
@@ -81,14 +81,14 @@ export class ZhTabsComponent implements OnInit {
 
   calcCardContentHeight() {
     let wH = window.innerHeight;
-    let tbH = document.getElementById("app-toolbar")
-      ? document.getElementById("app-toolbar").offsetHeight
+    let tbH = document.getElementById('app-toolbar')
+      ? document.getElementById('app-toolbar').offsetHeight
       : 0;
     let height = wH - (tbH + 80);
     this.cardContentHeight = height >= 350 ? height : 350;
   }
 
-  @HostListener("window:resize", ["$event"])
+  @HostListener('window:resize', ['$event'])
   onResize(event) {
     this.calcCardContentHeight();
   }
