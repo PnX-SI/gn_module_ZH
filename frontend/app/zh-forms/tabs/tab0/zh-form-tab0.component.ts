@@ -86,8 +86,10 @@ export class ZhFormTab0Component implements OnInit {
       .toPromise()
       .then((data) => {
         // Do not show the data on the map by default
-        data = data.setOpacity(0);
-        this.geomLayers.push(data.addTo(this._mapService.map));
+        if (data) {
+          data = data.setOpacity(0);
+          this.geomLayers.push(data.addTo(this._mapService.map));
+        }
       });
     this._pbfService.setPaneBackground(this._mapService.map);
   }

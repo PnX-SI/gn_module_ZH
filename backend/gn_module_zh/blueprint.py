@@ -83,7 +83,7 @@ from .utils import (
     get_user_cruved,
 )
 
-blueprint = Blueprint("pr_zh", __name__, "../static", template_folder="templates")
+blueprint = Blueprint("pr_zh", __name__, "./static", template_folder="templates")
 
 
 # Route pour afficher liste des zones humides
@@ -107,18 +107,23 @@ def get_zh(scope):
     page = parameters.get("offset", 0, int)
     orderby = parameters.get("orderby", "update_date", str)
     order = parameters.get("order", "desc", str)
-    
+
     if request.is_json:
         q = main_search(q, request.json)
 
     return get_all_zh(
-        info_role=g.current_user, query=q, limit=limit, page=page, orderby=orderby, order=order
+        info_role=g.current_user,
+        query=q,
+        limit=limit,
+        page=page,
+        orderby=orderby,
+        order=order,
     )
 
 
 def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
     # try:
-        # Pour obtenir le nombre de résultat de la requete sans le LIMIT
+    # Pour obtenir le nombre de résultat de la requete sans le LIMIT
     nb_results_without_limit = query.count()
     user = info_role
     user_cruved = get_user_cruved()
@@ -157,14 +162,16 @@ def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
         feature["properties"]["rights"] = releve_cruved
         featureCollection.append(feature)
 
-    return jsonify({
-        "total": nb_results_without_limit,
-        "total_filtered": len(data),
-        "page": page,
-        "limit": limit,
-        "items": FeatureCollection(featureCollection),
-        "check_ref_geo": is_ref_geo,
-    })
+    return jsonify(
+        {
+            "total": nb_results_without_limit,
+            "total_filtered": len(data),
+            "page": page,
+            "limit": limit,
+            "items": FeatureCollection(featureCollection),
+            "check_ref_geo": is_ref_geo,
+        }
+    )
 
 
 # Route pour afficher liste des zones humides
@@ -198,8 +205,9 @@ def get_zh_by_id(id_zh):
     if zh.zh.user_is_allowed_to(g.current_user, user_cruved["R"]):
         return zh.__repr__()
     else:
-        raise Forbidden(f"User is not allowed to read ZH {zh.zh.main_name} - {zh.zh.code}" )
-
+        raise Forbidden(
+            f"User is not allowed to read ZH {zh.zh.main_name} - {zh.zh.code}"
+        )
 
 
 @blueprint.route("/<int:id_zh>/complete_card", methods=["GET"])
@@ -216,7 +224,9 @@ def get_complete_info(id_zh):
 
 
 def get_complete_card(id_zh: int) -> Card:
-    ref_geo_config = [ref for ref in blueprint.config["ref_geo_referentiels"] if ref["active"]]
+    ref_geo_config = [
+        ref for ref in blueprint.config["ref_geo_referentiels"] if ref["active"]
+    ]
     return Card(id_zh, "full", ref_geo_config).__repr__()
 
 
@@ -232,12 +242,14 @@ def get_zh_eval(id_zh):
         exc_type, value, tb = sys.exc_info()
         if e.__class__.__name__ == "NoResultFound":
             raise ZHApiError(
-                message="is_zh_id_exists", details=str(exc_type) + ": " + str(e.with_traceback(tb))
+                message="is_zh_id_exists",
+                details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
         if e.__class__.__name__ == "ZHApiError":
             raise ZHApiError(message=str(e.message), details=str(e.details))
         raise ZHApiError(
-            message="get_zh_eval_error", details=str(exc_type) + ": " + str(e.with_traceback(tb))
+            message="get_zh_eval_error",
+            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
         )
     finally:
         DB.session.close()
@@ -265,7 +277,8 @@ def get_municipalities(id_zh):
         exc_type, value, tb = sys.exc_info()
         if e.__class__.__name__ == "NoResultFound":
             raise ZHApiError(
-                message="is_zh_id_exists", details=str(exc_type) + ": " + str(e.with_traceback(tb))
+                message="is_zh_id_exists",
+                details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
         if e.__class__.__name__ == "ZHApiError":
             raise ZHApiError(message=str(e.message), details=str(e.details))
@@ -296,7 +309,8 @@ def get_tab():
         if e.__class__.__name__ == "ZHApiError":
             raise ZHApiError(message=str(e.message), details=str(e.details))
         raise ZHApiError(
-            message="get_tab_data_error", details=str(exc_type) + ": " + str(e.with_traceback(tb))
+            message="get_tab_data_error",
+            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
         )
     finally:
         DB.session.close()
@@ -329,8 +343,9 @@ def get_pbf():
     """
     query = DB.session.execute(sql)
     row = query.first()
-    if row["pbf"]:
-        return Response(bytes(row["pbf"]), mimetype="application/protobuf")
+    return Response(
+        bytes(row["pbf"]) if row["pbf"] else bytes(), mimetype="application/protobuf"
+    )
 
 
 @blueprint.route("/pbf/complete", methods=["GET"])
@@ -427,7 +442,9 @@ def get_ref_autocomplete():
         )
 
         search_title = search_title.replace(" ", "%")
-        q = q.filter(TReferences.title.ilike("%" + search_title + "%")).order_by(desc("idx_trgm"))
+        q = q.filter(TReferences.title.ilike("%" + search_title + "%")).order_by(
+            desc("idx_trgm")
+        )
 
         limit = request.args.get("limit", 20)
         print(q)
@@ -479,7 +496,8 @@ def get_file_list(id_zh):
     except Exception as e:
         exc_type, value, tb = sys.exc_info()
         raise ZHApiError(
-            message="get_file_list_error", details=str(exc_type) + ": " + str(e.with_traceback(tb))
+            message="get_file_list_error",
+            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
         )
     finally:
         DB.session.close()
@@ -549,7 +567,10 @@ def get_all_photos(id_zh: int):
     q_medias = (
         DB.session.query(TZH.main_pict_id, TMedias.id_media, TMedias.media_path)
         .join(TZH, TZH.zh_uuid == TMedias.unique_id_media)
-        .join(TNomenclatures, TNomenclatures.id_nomenclature == TMedias.id_nomenclature_media_type)
+        .join(
+            TNomenclatures,
+            TNomenclatures.id_nomenclature == TMedias.id_nomenclature_media_type,
+        )
         .order_by(TMedias.meta_update_date.desc())
         .filter(TNomenclatures.label_default == "Photo")
         .filter(TZH.id_zh == id_zh)
@@ -579,7 +600,9 @@ def get_tab_data(id_tab):
         # set name
         if form_data["main_name"] == "":
             raise ZHApiError(
-                message="empty_field_error", details="empty main name field", status_code=400
+                message="empty_field_error",
+                details="empty main name field",
+                status_code=400,
             )
 
         # select active geo refs in config
@@ -658,10 +681,16 @@ def get_tab_data(id_tab):
         return jsonify({"id_zh": form_data["id_zh"]})
 
     if id_tab == 5:
-        update_functions(form_data["id_zh"], form_data["fonctions_hydro"], "FONCTIONS_HYDRO")
-        update_functions(form_data["id_zh"], form_data["fonctions_bio"], "FONCTIONS_BIO")
+        update_functions(
+            form_data["id_zh"], form_data["fonctions_hydro"], "FONCTIONS_HYDRO"
+        )
+        update_functions(
+            form_data["id_zh"], form_data["fonctions_bio"], "FONCTIONS_BIO"
+        )
 
-        update_functions(form_data["id_zh"], form_data["interet_patrim"], "INTERET_PATRIM")
+        update_functions(
+            form_data["id_zh"], form_data["interet_patrim"], "INTERET_PATRIM"
+        )
 
         update_functions(form_data["id_zh"], form_data["val_soc_eco"], "VAL_SOC_ECO")
         update_tzh(form_data)
@@ -692,21 +721,27 @@ def get_tab_data(id_tab):
         ALLOWED_EXTENSIONS = blueprint.config["allowed_extensions"]
         MAX_PDF_SIZE = blueprint.config["max_pdf_size"]
         MAX_JPG_SIZE = blueprint.config["max_jpg_size"]
-        FILE_PATH = Path(BACKEND_DIR,  config["MEDIA_FOLDER"], "attachments", "medias")
+        FILE_PATH = Path(BACKEND_DIR, config["MEDIA_FOLDER"], "attachments")
         MODULE_NAME = blueprint.config["MODULE_CODE"].lower()
 
         upload_resp = upload_process(
-            request, ALLOWED_EXTENSIONS, MAX_PDF_SIZE, MAX_JPG_SIZE, FILE_PATH, MODULE_NAME
+            request,
+            ALLOWED_EXTENSIONS,
+            MAX_PDF_SIZE,
+            MAX_JPG_SIZE,
+            FILE_PATH,
+            MODULE_NAME,
         )
 
         DB.session.commit()
 
-        return jsonify({
-            "media_path": upload_resp["media_path"],
-            "secured_file_name": upload_resp["secured_file_name"],
-            "id_media": upload_resp["id_media"],
-        })
-
+        return jsonify(
+            {
+                "media_path": upload_resp["media_path"],
+                "secured_file_name": upload_resp["secured_file_name"],
+                "id_media": upload_resp["id_media"],
+            }
+        )
 
 
 @blueprint.route("files/<int:id_media>", methods=["PATCH"])
@@ -732,11 +767,13 @@ def patch_file(id_media):
 
     DB.session.commit()
 
-    return jsonify({
-        "media_path": upload_resp["media_path"],
-        "secured_file_name": upload_resp["secured_file_name"],
-        "id_media": upload_resp["id_media"],
-    })
+    return jsonify(
+        {
+            "media_path": upload_resp["media_path"],
+            "secured_file_name": upload_resp["secured_file_name"],
+            "id_media": upload_resp["id_media"],
+        }
+    )
 
 
 @blueprint.route("/<int:id_zh>", methods=["DELETE"])
@@ -762,14 +799,18 @@ def deleteOneZh(id_zh):
 
     # delete files in TMedias and repos
     zh_uuid = DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().zh_uuid
-    q_medias = DB.session.query(TMedias).filter(TMedias.unique_id_media == zh_uuid).all()
+    q_medias = (
+        DB.session.query(TMedias).filter(TMedias.unique_id_media == zh_uuid).all()
+    )
     for media in q_medias:
         delete_file(media.id_media)
 
-    zhRepository.delete(id_zh, g.current_user)
+    user_cruved = get_scopes_by_action(module_code=blueprint.config["MODULE_CODE"])
+
+    zhRepository.delete(id_zh, g.current_user, user_cruved)
     DB.session.commit()
 
-    return jsonify({"message": "delete with success"})
+    return {"message": "delete with success"}
 
 
 @blueprint.errorhandler(ZHApiError)
@@ -807,7 +848,9 @@ def write_csv(id_zh):
                     "Nom Scientifique": row.get("scientific_name"),
                     "Nom vernaculaire": row.get("vernac_name"),
                     "Types de Statuts": row.get("statut_type"),
-                    "Statuts d’évaluation, de protection et de menace": row.get("statut"),
+                    "Statuts d’évaluation, de protection et de menace": row.get(
+                        "statut"
+                    ),
                     "Article": row.get("article"),
                     "Lien Article": row.get("doc_url"),
                     "Nombre d'observations": row.get("obs_nb"),
@@ -859,9 +902,7 @@ def write_csv(id_zh):
 @json_resp
 def returnUserCruved():
     # récupérer le CRUVED complet de l'utilisateur courant
-    user_cruved = get_scopes_by_action(
-        module_code=blueprint.config["MODULE_CODE"]
-    )
+    user_cruved = get_scopes_by_action(module_code=blueprint.config["MODULE_CODE"])
     return user_cruved
 
 
@@ -870,7 +911,10 @@ def returnUserCruved():
 def userRights(id_zh):
     user_cruved = get_user_cruved()
     zh = ZH(id_zh).zh
-    return {k: zh.user_is_allowed_to(g.current_user, user_cruved[k]) for k in user_cruved.keys()}
+    return {
+        k: zh.user_is_allowed_to(g.current_user, user_cruved[k])
+        for k in user_cruved.keys()
+    }
 
 
 @blueprint.route("/export_pdf/<int:id_zh>", methods=["GET"])
@@ -909,7 +953,9 @@ def download(id_zh: int):
 def departments():
     query = (
         DB.session.query(LAreas)
-        .with_entities(LAreas.area_name, LAreas.area_code, LAreas.id_type, BibAreasTypes.type_code)
+        .with_entities(
+            LAreas.area_name, LAreas.area_code, LAreas.id_type, BibAreasTypes.type_code
+        )
         .join(BibAreasTypes, LAreas.id_type == BibAreasTypes.id_type)
         .filter(BibAreasTypes.type_code == "DEP")
         .filter(LAreas.enable)
@@ -941,7 +987,9 @@ def get_area_from_department() -> dict:
 @blueprint.route("/bassins", methods=["GET"])
 @json_resp
 def bassins():
-    query = DB.session.query(TRiverBasin).with_entities(TRiverBasin.id_rb, TRiverBasin.name)
+    query = DB.session.query(TRiverBasin).with_entities(
+        TRiverBasin.id_rb, TRiverBasin.name
+    )
     resp = query.order_by(TRiverBasin.name).all()
     return [{"code": r.id_rb, "name": r.name} for r in resp]
 
@@ -958,7 +1006,8 @@ def get_hydro_zones_from_bassin() -> dict:
             .join(
                 TRiverBasin,
                 func.ST_Contains(
-                    func.ST_SetSRID(TRiverBasin.geom, 4326), func.ST_SetSRID(THydroArea.geom, 4326)
+                    func.ST_SetSRID(TRiverBasin.geom, 4326),
+                    func.ST_SetSRID(THydroArea.geom, 4326),
                 ),
             )
         )
@@ -976,7 +1025,6 @@ def get_hierarchy(id_zh):
     """Get zh note"""
     hierarchy = Hierarchy(id_zh).__str__()
     return hierarchy
-
 
 
 @blueprint.route("/hierarchy/fields/<int:id_rb>", methods=["GET"])
