@@ -447,7 +447,6 @@ def get_ref_autocomplete():
         )
 
         limit = request.args.get("limit", 20)
-        print(q)
 
         data = q.limit(limit).all()
         if data:
