@@ -32,7 +32,6 @@ setuptools.setup(
             "config_schema = gn_module_zh.conf_schema_toml:GnModuleSchemaConf",
             "alembic_branch = gn_module_zh:ALEMBIC_BRANCH",
             "migrations = gn_module_zh:migrations",
-
         ],
     },
     classifiers=[
