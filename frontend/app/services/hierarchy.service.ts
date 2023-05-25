@@ -47,13 +47,9 @@ export class HierarchyService {
       (error) => {
         this.isLoading = false;
         this.items = [];
-        if (error.status === 400 || error.status === 500) {
-          const frontError: string = this._error.getFrontError(error.error.message);
-          const timeOut: number = 10000;
-          this._toastr.error(frontError, "", {
-            positionClass: "toast-top-right",
+        if (error.status === 404) {
+          this._toastr.warning("La ZH n'est présente dans aucun bassin versant", "", {
             closeButton: true,
-            timeOut: timeOut,
           });
         }
       },

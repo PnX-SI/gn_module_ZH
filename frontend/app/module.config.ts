@@ -1,9 +1,10 @@
 export const ModuleConfig = {
- "MODULE_CODE": "GN_MODULE_ZH",
- "MODULE_URL": "/gn_module_zh",
+ "MODULE_CODE": "ZONES_HUMIDES",
+ "MODULE_URL": "/zones_humides",
  "allowed_extensions": [
   ".pdf",
-  ".jpg"
+  ".jpg",
+  ".png"
  ],
  "available_maplist_column": [
   {

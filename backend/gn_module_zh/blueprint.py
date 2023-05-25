@@ -1020,11 +1020,10 @@ def get_hydro_zones_from_bassin() -> dict:
 
 @blueprint.route("/<int:id_zh>/hierarchy", methods=["GET"])
 @permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
-@json_resp
 def get_hierarchy(id_zh):
     """Get zh note"""
-    hierarchy = Hierarchy(id_zh).__str__()
-    return hierarchy
+    hierarchy = Hierarchy(id_zh)
+    return hierarchy.as_dict()
 
 
 @blueprint.route("/hierarchy/fields/<int:id_rb>", methods=["GET"])

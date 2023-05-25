@@ -1,5 +1,7 @@
 import sys
 from itertools import groupby
+from werkzeug.exceptions import NotFound
+
 
 from geonature.utils.env import DB
 from pypnnomenclature.models import BibNomenclaturesTypes, TNomenclatures
@@ -52,7 +54,8 @@ class Item:
     def __get_rule_id(self, abb):
         try:
             return getattr(
-                DB.session.query(TRules).filter(TRules.abbreviation == abb).one(), "rule_id"
+                DB.session.query(TRules).filter(TRules.abbreviation == abb).one(),
+                "rule_id",
             )
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
@@ -67,7 +70,12 @@ class Item:
         try:
             q_rule = (
                 DB.session.query(CorRbRules)
-                .filter(and_(CorRbRules.rb_id == self.rb_id, CorRbRules.rule_id == self.rule_id))
+                .filter(
+                    and_(
+                        CorRbRules.rb_id == self.rb_id,
+                        CorRbRules.rule_id == self.rule_id,
+                    )
+                )
                 .first()
             )
             if q_rule:
@@ -88,7 +96,10 @@ class Item:
                 return getattr(
                     DB.session.query(CorRbRules)
                     .filter(
-                        and_(CorRbRules.rb_id == self.rb_id, CorRbRules.rule_id == self.rule_id)
+                        and_(
+                            CorRbRules.rb_id == self.rb_id,
+                            CorRbRules.rule_id == self.rule_id,
+                        )
                     )
                     .one(),
                     "cor_rule_id",
@@ -107,7 +118,8 @@ class Item:
             DB.session.query(TNomenclatures)
             .filter(
                 and_(
-                    TNomenclatures.id_type == id_type, TNomenclatures.cd_nomenclature == cd_nomenc
+                    TNomenclatures.id_type == id_type,
+                    TNomenclatures.cd_nomenclature == cd_nomenc,
                 )
             )
             .first(),
@@ -126,7 +138,14 @@ class Item:
         ]
 
     def __get_nomenc_ids(self):
-        if self.abb in ["protection", "epuration", "support", "eco", "pedagogy", "production"]:
+        if self.abb in [
+            "protection",
+            "epuration",
+            "support",
+            "eco",
+            "pedagogy",
+            "production",
+        ]:
             return self.__get_nomencs(self.abb)
         elif self.abb == "status":
             return {
@@ -182,7 +201,9 @@ class Item:
                 return self.__get_id_nomenc(self.__get_id_type("HIERARCHY"), "mauvais")
         except ZHApiError as e:
             raise ZHApiError(
-                message=str(e.message), details=str(e.details), status_code=e.status_code
+                message=str(e.message),
+                details=str(e.details),
+                status_code=e.status_code,
             )
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
@@ -213,7 +234,9 @@ class Item:
                 return self.__get_tzh_val("id_thread")
         except ZHApiError as e:
             raise ZHApiError(
-                message=str(e.message), details=str(e.details), status_code=e.status_code
+                message=str(e.message),
+                details=str(e.details),
+                status_code=e.status_code,
             )
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
@@ -233,11 +256,21 @@ class Item:
                 qualif = (
                     DB.session.query(CorRbRules, TItems, CorItemValue)
                     .join(TItems, TItems.cor_rule_id == CorRbRules.cor_rule_id)
-                    .join(CorItemValue, TItems.attribute_id == CorItemValue.attribute_id)
-                    .filter(
-                        and_(CorRbRules.rb_id == self.rb_id, CorRbRules.rule_id == self.rule_id)
+                    .join(
+                        CorItemValue, TItems.attribute_id == CorItemValue.attribute_id
                     )
-                    .filter(and_(CorItemValue.val_min.__le__(nb), CorItemValue.val_max.__ge__(nb)))
+                    .filter(
+                        and_(
+                            CorRbRules.rb_id == self.rb_id,
+                            CorRbRules.rule_id == self.rule_id,
+                        )
+                    )
+                    .filter(
+                        and_(
+                            CorItemValue.val_min.__le__(nb),
+                            CorItemValue.val_max.__ge__(nb),
+                        )
+                    )
                     .first()
                 )
             except Exception as e:
@@ -249,7 +282,9 @@ class Item:
             return qualif.TItems.attribute_id
         except ZHApiError as e:
             raise ZHApiError(
-                message=str(e.message), details=str(e.details), status_code=e.status_code
+                message=str(e.message),
+                details=str(e.details),
+                status_code=e.status_code,
             )
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
@@ -284,7 +319,9 @@ class Item:
 
         except ZHApiError as e:
             raise ZHApiError(
-                message=str(e.message), details=str(e.details), status_code=e.status_code
+                message=str(e.message),
+                details=str(e.details),
+                status_code=e.status_code,
             )
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
@@ -330,7 +367,9 @@ class Item:
                 )
         except ZHApiError as e:
             raise ZHApiError(
-                message=str(e.message), details=str(e.details), status_code=e.status_code
+                message=str(e.message),
+                details=str(e.details),
+                status_code=e.status_code,
             )
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
@@ -345,21 +384,27 @@ class Item:
         try:
             return [
                 getattr(q_.TNomenclatures, "id_nomenclature")
-                for q_ in DB.session.query(CorZhProtection, CorProtectionLevelType, TNomenclatures)
+                for q_ in DB.session.query(
+                    CorZhProtection, CorProtectionLevelType, TNomenclatures
+                )
                 .join(
                     CorProtectionLevelType,
-                    CorZhProtection.id_protection == CorProtectionLevelType.id_protection,
+                    CorZhProtection.id_protection
+                    == CorProtectionLevelType.id_protection,
                 )
                 .join(
                     TNomenclatures,
-                    TNomenclatures.id_nomenclature == CorProtectionLevelType.id_protection_status,
+                    TNomenclatures.id_nomenclature
+                    == CorProtectionLevelType.id_protection_status,
                 )
                 .filter(CorZhProtection.id_zh == self.id_zh)
                 .all()
             ]
         except ZHApiError as e:
             raise ZHApiError(
-                message=str(e.message), details=str(e.details), status_code=e.status_code
+                message=str(e.message),
+                details=str(e.details),
+                status_code=e.status_code,
             )
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
@@ -378,7 +423,10 @@ class Item:
             # get selected functions
             q_ = (
                 DB.session.query(TFunctions, TNomenclatures)
-                .join(TNomenclatures, TNomenclatures.id_nomenclature == TFunctions.id_function)
+                .join(
+                    TNomenclatures,
+                    TNomenclatures.id_nomenclature == TFunctions.id_function,
+                )
                 .filter(TFunctions.id_zh == self.id_zh)
                 .filter(TNomenclatures.id_nomenclature.in_(nomenc_ids))
                 .all()
@@ -386,7 +434,9 @@ class Item:
             return q_
         except ZHApiError as e:
             raise ZHApiError(
-                message=str(e.message), details=str(e.details), status_code=e.status_code
+                message=str(e.message),
+                details=str(e.details),
+                status_code=e.status_code,
             )
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
@@ -466,13 +516,17 @@ class Item:
             combination = self.__get_combination()
             # set qualif_id
             qualif_id = getattr(
-                DB.session.query(TCorQualif).filter(TCorQualif.combination == combination).first(),
+                DB.session.query(TCorQualif)
+                .filter(TCorQualif.combination == combination)
+                .first(),
                 "id_qualification",
             )
             return qualif_id
         except ZHApiError as e:
             raise ZHApiError(
-                message=str(e.message), details=str(e.details), status_code=e.status_code
+                message=str(e.message),
+                details=str(e.details),
+                status_code=e.status_code,
             )
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
@@ -485,7 +539,9 @@ class Item:
 
     def __get_tzh_val(self, field):
         try:
-            return getattr(DB.session.query(TZH).filter(TZH.id_zh == self.id_zh).one(), field)
+            return getattr(
+                DB.session.query(TZH).filter(TZH.id_zh == self.id_zh).one(), field
+            )
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
@@ -504,7 +560,13 @@ class Item:
                     return self.__get_qualif_heritage()
                 if self.abb == "eco":
                     return self.__get_qualif_eco()
-                if self.abb in ["protection", "epuration", "support", "pedagogy", "production"]:
+                if self.abb in [
+                    "protection",
+                    "epuration",
+                    "support",
+                    "pedagogy",
+                    "production",
+                ]:
                     return self.__get_qualif_cat4_cat5()
                 if self.abb == "status":
                     return self.__get_qualif_status()
@@ -516,7 +578,9 @@ class Item:
                     return self.__get_qualif_val()
         except ZHApiError as e:
             raise ZHApiError(
-                message=str(e.message), details=str(e.details), status_code=e.status_code
+                message=str(e.message),
+                details=str(e.details),
+                status_code=e.status_code,
             )
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
@@ -531,7 +595,10 @@ class Item:
         try:
             cd_id_nature_naturaliste = getattr(
                 DB.session.query(BibNomenclaturesTypes, TNomenclatures)
-                .join(TNomenclatures, TNomenclatures.id_type == BibNomenclaturesTypes.id_type)
+                .join(
+                    TNomenclatures,
+                    TNomenclatures.id_type == BibNomenclaturesTypes.id_type,
+                )
                 .filter(
                     and_(
                         BibNomenclaturesTypes.mnemonique == "PLAN_GESTION",
@@ -579,7 +646,9 @@ class Item:
                 )
         except ZHApiError as e:
             raise ZHApiError(
-                message=str(e.message), details=str(e.details), status_code=e.status_code
+                message=str(e.message),
+                details=str(e.details),
+                status_code=e.status_code,
             )
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
@@ -595,7 +664,10 @@ class Item:
             if self.active:
                 if self.abb == "hab":
                     is_carto = (
-                        DB.session.query(TZH).filter(TZH.id_zh == self.id_zh).one().is_carto_hab
+                        DB.session.query(TZH)
+                        .filter(TZH.id_zh == self.id_zh)
+                        .one()
+                        .is_carto_hab
                     )
                     if is_carto:
                         return 3
@@ -643,7 +715,9 @@ class Item:
                     return 1
         except ZHApiError as e:
             raise ZHApiError(
-                message=str(e.message), details=str(e.details), status_code=e.status_code
+                message=str(e.message),
+                details=str(e.details),
+                status_code=e.status_code,
             )
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
@@ -671,7 +745,8 @@ class Item:
 
                 # count good knowledge ids in user selected functions
                 selected_functions_ids = [
-                    getattr(function.TFunctions, "id_knowledge") for function in selected_functions
+                    getattr(function.TFunctions, "id_knowledge")
+                    for function in selected_functions
                 ]
                 count = self.__get_count(selected_functions_ids, high_know_id)
                 if count >= 2:
@@ -680,7 +755,9 @@ class Item:
                     return 2
         except ZHApiError as e:
             raise ZHApiError(
-                message=str(e.message), details=str(e.details), status_code=e.status_code
+                message=str(e.message),
+                details=str(e.details),
+                status_code=e.status_code,
             )
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
@@ -698,7 +775,10 @@ class Item:
                 TManagementPlans,
                 TManagementStructures.id_structure == TManagementPlans.id_structure,
             )
-            .join(TNomenclatures, TNomenclatures.id_nomenclature == TManagementPlans.id_nature)
+            .join(
+                TNomenclatures,
+                TNomenclatures.id_nomenclature == TManagementPlans.id_nature,
+            )
             .filter(
                 and_(
                     TManagementStructures.id_zh == self.id_zh,
@@ -735,7 +815,9 @@ class Item:
                 return qualif_id
         except ZHApiError as e:
             raise ZHApiError(
-                message=str(e.message), details=str(e.details), status_code=e.status_code
+                message=str(e.message),
+                details=str(e.details),
+                status_code=e.status_code,
             )
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
@@ -774,7 +856,9 @@ class Item:
                 return note
         except ZHApiError as e:
             raise ZHApiError(
-                message=str(e.message), details=str(e.details), status_code=e.status_code
+                message=str(e.message),
+                details=str(e.details),
+                status_code=e.status_code,
             )
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
@@ -1082,6 +1166,8 @@ class Hierarchy(ZH):
     def __init__(self, id_zh):
         self.id_zh = id_zh
         self.rb_id = self.__get_rb()
+        if not self.rb_id:
+            raise NotFound("The ZH is not in a river basin")
         self.is_rules = self.__check_if_rules()
         self.volet1 = Volet1(self.id_zh, self.rb_id)
         self.volet2 = Volet2(self.id_zh, self.rb_id)
@@ -1106,39 +1192,29 @@ class Hierarchy(ZH):
             return None
 
     def __get_rb(self):
-        try:
-            q_rb = ZH.get_data_by_id(CorZhRb, self.id_zh)
-            if not q_rb:
-                raise ZHApiError(
-                    message="no_river_basin",
-                    details="zh is not part of any river basin",
-                    status_code=400,
-                )
-            if len(q_rb) > 1:
-                return get_main_rb(q_rb)
-            return (
-                DB.session.query(CorZhRb, TRiverBasin)
-                .join(TRiverBasin)
-                .filter(CorZhRb.id_zh == self.id_zh)
-                .one()
-                .TRiverBasin.id_rb
-            )
-        except ZHApiError:
-            raise
-        except Exception as e:
-            exc_type, value, tb = sys.exc_info()
-            raise ZHApiError(
-                message="Hierarchy class: get_rb_error",
-                details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-            )
-        finally:
-            DB.session.close()
+        q_rb = ZH.get_data_by_id(CorZhRb, self.id_zh)
+        if not q_rb:
+            return None
+        if len(q_rb) > 1:
+            return get_main_rb(q_rb)
+        return (
+            DB.session.query(CorZhRb, TRiverBasin)
+            .join(TRiverBasin)
+            .filter(CorZhRb.id_zh == self.id_zh)
+            .one()
+            .TRiverBasin.id_rb
+        )
 
     def __check_if_rules(self):
         try:
-            if not DB.session.query(CorRbRules).filter(CorRbRules.rb_id == self.rb_id).first():
+            if (
+                not DB.session.query(CorRbRules)
+                .filter(CorRbRules.rb_id == self.rb_id)
+                .first()
+            ):
                 raise ZHApiError(
-                    message="no_rb_rules", details="no existing rules for the river basin"
+                    message="no_rb_rules",
+                    details="no existing rules for the river basin",
                 )
         except ZHApiError:
             raise
@@ -1153,7 +1229,9 @@ class Hierarchy(ZH):
 
     @staticmethod
     def get_denom(rb_id, col_name):
-        rb_name = DB.session.query(TRiverBasin).filter(TRiverBasin.id_rb == rb_id).one().name
+        rb_name = (
+            DB.session.query(TRiverBasin).filter(TRiverBasin.id_rb == rb_id).one().name
+        )
         return getattr(
             DB.session.query(RbNotesSummary)
             .filter(RbNotesSummary.bassin_versant == rb_name)
@@ -1174,7 +1252,7 @@ class Hierarchy(ZH):
                 details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
 
-    def __str__(self):
+    def as_dict(self):
         return {
             "river_basin_name": DB.session.query(TRiverBasin)
             .filter(TRiverBasin.id_rb == self.rb_id)
@@ -1189,7 +1267,11 @@ class Hierarchy(ZH):
 
 def get_all_hierarchy_fields(id_rb: int):
     query = GenericQuery(
-        DB=DB, tableName="all_rb_rules", schemaName="pr_zh", filters={"id_rb": id_rb}, limit=-1
+        DB=DB,
+        tableName="all_rb_rules",
+        schemaName="pr_zh",
+        filters={"id_rb": id_rb},
+        limit=-1,
     )
 
     results = query.return_query()
