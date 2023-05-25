@@ -896,7 +896,7 @@ def write_csv(id_zh):
 
 
 @blueprint.route("/user/cruved", methods=["GET"])
-@permissions.check_cruved_scope("R")
+@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
 @json_resp
 def returnUserCruved():
     # récupérer le CRUVED complet de l'utilisateur courant
@@ -905,7 +905,7 @@ def returnUserCruved():
 
 
 @blueprint.route("/user/rights/<int:id_zh>", methods=["GET"])
-@permissions.check_cruved_scope("R")
+@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
 def userRights(id_zh):
     user_cruved = get_user_cruved()
     zh = ZH(id_zh).zh
