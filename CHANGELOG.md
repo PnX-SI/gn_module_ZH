@@ -10,10 +10,13 @@ Nécessite la version 2.12.0 (ou plus) de GeoNature.
 - Packaging du module (#7)
 - Gestion de la BDD du module avec Alembic
 - Externalisation du RefGeo
+- Corrections et refactorisation diverses
 
 **🐛 Corrections**
 
 - Définition du SRID des champs de géométrie dans la BDD (#13)
+- Correction du fonctionnement quand le module ne contient encore aucune zone humide (#10)
+- Correction du fichier d'exemple de configuration (#9)
 
 **⚠️ Notes de version**
 
