@@ -90,7 +90,7 @@ export class SearchFormService {
     // Since everything is a form group:
     Object.keys(values).forEach((key) => {
       let value = values[key];
-      if (value && value.length > 0) {
+      if (value) {
         if (value instanceof Array) {
           if (value.length !== 0) {
             value = value.filter((item) => item !== null);
