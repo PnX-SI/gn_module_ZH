@@ -833,7 +833,7 @@ def write_csv(id_zh):
             DB=DB,
             tableName=blueprint.config[i]["table_name"],
             schemaName=blueprint.config[i]["schema_name"],
-            filters={"id_zh": id_zh},
+            filters={"id_zh": id_zh, "orderby": "id_zh"},
             limit=-1,
         )
         results = query.return_query().get("items", [])
@@ -868,8 +868,8 @@ def write_csv(id_zh):
                 + current_date.strftime("%Y-%m-%d-%H:%M:%S")
                 + ".csv"
             )
-            media_path = Path("external_modules", MODULE_NAME, FILE_PATH, name_file)
-            full_name = ROOT_DIR / media_path
+            media_path = Path(config["MEDIA_FOLDER"], "attachments", name_file)
+            full_name = BACKEND_DIR / media_path
             names.append(str(full_name))
             with open(full_name, "w", encoding="utf-8-sig", newline="") as f:
                 writer = csv.DictWriter(f, delimiter=";", fieldnames=rows[0].keys())

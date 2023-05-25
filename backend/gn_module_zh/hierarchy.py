@@ -1270,7 +1270,7 @@ def get_all_hierarchy_fields(id_rb: int):
         DB=DB,
         tableName="all_rb_rules",
         schemaName="pr_zh",
-        filters={"id_rb": id_rb},
+        filters={"id_rb": id_rb, "orderby": "name"},
         limit=-1,
     )
 

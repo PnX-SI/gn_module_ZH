@@ -1047,7 +1047,7 @@ class Card(ZH):
         self.evaluation = Evaluation()
         try:
             self.hierarchy = Hierarchy(id_zh)
-        except NotFound:
+        except (NotFound, ZHApiError):
             self.hierarchy = None
 
     def get_properties(self):

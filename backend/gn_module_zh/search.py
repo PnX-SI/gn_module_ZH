@@ -362,7 +362,7 @@ def get_global_notes(basin: str):
         DB=DB,
         tableName="rb_notes_summary",
         schemaName="pr_zh",
-        filters={"bassin_versant": basin},
+        filters={"bassin_versant": basin, "orderby": "bassin_versant"},
         limit=1,
     )
 
