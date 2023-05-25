@@ -28,8 +28,7 @@ def upload_process(
     # upoad file - including post to t_medias
     upload_file = upload(
         request, extensions, pdf_size, jpg_size, upload_path, module_name, id_media
-    )  
-    print(upload_file)
+    )
 
     # checks if error in user file or user http request:
     if "error" in upload_file:
