@@ -765,7 +765,7 @@ def post_managements(id_zh, managements):
                         )
                         .one()
                         .id_structure,
-                        plan_date=plan["plan_date"],
+                        plan_date=datetime.datetime.strptime(plan["plan_date"], "%d/%m/%Y"),
                         duration=plan["duration"],
                         remark=plan["remark"],
                     )
@@ -797,7 +797,7 @@ def post_instruments(id_zh, instruments):
             TInstruments(
                 id_instrument=instrument["id_instrument"],
                 id_zh=id_zh,
-                instrument_date=instrument["instrument_date"],
+                instrument_date=datetime.datetime.strptime(instrument["instrument_date"], "%d/%m/%Y"),
             )
         )
         DB.session.flush()
