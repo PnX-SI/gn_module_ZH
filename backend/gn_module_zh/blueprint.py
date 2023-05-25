@@ -83,7 +83,7 @@ from .utils import (
     get_user_cruved,
 )
 
-blueprint = Blueprint("pr_zh", __name__, "../static", template_folder="templates")
+blueprint = Blueprint("pr_zh", __name__, "./static", template_folder="templates")
 
 
 # Route pour afficher liste des zones humides
@@ -691,7 +691,7 @@ def get_tab_data(id_tab):
         ALLOWED_EXTENSIONS = blueprint.config["allowed_extensions"]
         MAX_PDF_SIZE = blueprint.config["max_pdf_size"]
         MAX_JPG_SIZE = blueprint.config["max_jpg_size"]
-        FILE_PATH = Path(BACKEND_DIR,  config["MEDIA_FOLDER"], "attachments", "medias")
+        FILE_PATH = Path(BACKEND_DIR,  config["MEDIA_FOLDER"], "attachments")
         MODULE_NAME = blueprint.config["MODULE_CODE"].lower()
 
         upload_resp = upload_process(
