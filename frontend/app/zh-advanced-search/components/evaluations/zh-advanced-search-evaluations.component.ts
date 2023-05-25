@@ -24,7 +24,7 @@ export class ZhAdvancedSearchEvaluationsComponent implements OnInit {
       searchPlaceholderText: 'Rechercher',
       enableSearchFilter: true,
       autoPosition: false,
-      position: "bottom"
+      position: 'bottom',
     };
   }
 
