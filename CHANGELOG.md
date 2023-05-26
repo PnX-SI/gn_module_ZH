@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.0 (2023-05-26)
+## 1.1.0 - Taillefer (2023-05-26)
 
 Nécessite la version 2.12.0 (ou plus) de GeoNature.
 
@@ -30,9 +30,14 @@ Nécessite la version 2.12.0 (ou plus) de GeoNature.
   geonature db upgrade zones_humides@head
   ```
 
-## 1.0.0 (2022-10-03)
+**📝 Contributeurs**
 
-**🚀 Première release 🚀**
+Cette version a été réalisée grâce à la contribution du Parc national des Écrins et de Natural Solutions.  
+Merci à @TheoLechemia, @mvergez, @JulienCorny, @cen-cgeier et @camillemonchicourt.
+
+## 1.0.0 - Camargue (2022-10-03)
+
+**🚀 Première release**
 
 Version fonctionnelle permettant :
 - La création de nouvelles zones humides
@@ -46,3 +51,11 @@ Version fonctionnelle permettant :
 - L'export au format pdf d'une fiche descriptive synthétique
 - L'export au format csv des espèces à statut (évaluation/protection/menace) 
   observées dans le périmètre de la zone humide.
+
+**⚠️ Notes de version**
+
+Compatible avec les versions 2.9.1 et 2.9.2 de GeoNature
+
+**Financements**
+
+Cette première version a été commandée par le [PNR du Luberon](https://www.parcduluberon.fr/) au nom du [SIT interparcs PACA](http://geo.pnrpaca.org/), financée par le [PNR du Luberon](https://www.parcduluberon.fr/), le [PNR de la Sainte-Baume](https://www.pnr-saintebaume.fr/) et [Natural Solutions](https://www.natural-solutions.eu/), et réalisée par [Natural Solutions](https://www.natural-solutions.eu/).
