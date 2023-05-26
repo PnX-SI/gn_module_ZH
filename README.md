@@ -77,26 +77,13 @@ Voir [ici](/doc/admin.md) la documentation des paramètres de configuration du m
 
 ## **Désinstallation**
 
-- Exécuter la commande GeoNature de désactivation de module
+- Suppression des données dans plusieurs tables de la base de données
 
 ```bash
 cd /home/`whoami`/geonature/backend
 source venv/bin/activate
-geonature deactivate_gn_module ZONES_HUMIDES
-```
-
-- Suppression des données dans plusieurs tables de la base de données
-
-```bash
-SQL_PORT=5432
-GEONAT_USER=geonatadmin
-GEONAT_DB=geonature2db
-```
-
-{- Attention, commandes irréversibles de suppression de données en base de données (à faire uniquement si vous êtes certain de savoir ce que vous faites !) -}
-
-```bash
-sudo psql -h localhost -p $SQL_PORT -U $GEONAT_USER -d $GEONAT_DB -b -f "/home/`whoami`/gn_module_ZH/data/desinstall.sql"
+geonature db downgrade zones_humides@base
+pip uninstall gn_module_zh
 ```
 
 - Suppression des répertoires sur le serveur
@@ -105,5 +92,5 @@ sudo psql -h localhost -p $SQL_PORT -U $GEONAT_USER -d $GEONAT_DB -b -f "/home/`
 
 ```bash
 rm -rf /home/`whoami`/gn_module_ZH
-rm -rf /home/`whoami`/geonature/external_modules/zones_humides
+rm -rf /home/`whoami`/geonature/frontend/external_modules/zones_humides
 ```
