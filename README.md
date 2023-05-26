@@ -88,8 +88,6 @@ pip uninstall gn_module_zh
 
 - Suppression des répertoires sur le serveur
 
-{- Attention, commandes irréversibles de suppression de fichiers sur le serveur (à faire uniquement si vous êtes certain de savoir ce que vous faites !) -}
-
 ```bash
 rm -rf /home/`whoami`/gn_module_ZH
 rm -rf /home/`whoami`/geonature/frontend/external_modules/zones_humides
