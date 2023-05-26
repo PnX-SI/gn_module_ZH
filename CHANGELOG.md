@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.0 (2022-10-03)
+## 1.1.0 (2023-05-26)
 
 Nécessite la version 2.12.0 (ou plus) de GeoNature.
 
@@ -17,6 +17,8 @@ Nécessite la version 2.12.0 (ou plus) de GeoNature.
 - Définition du SRID des champs de géométrie dans la BDD (#13)
 - Correction du fonctionnement quand le module ne contient encore aucune zone humide (#10)
 - Correction du fichier d'exemple de configuration (#9)
+- Correction du moteur de recherche multi-critères dans la recherche sur les bassins versants (#14)
+- Correction du menu déroulant du filtre sur les menaces (#19)
 
 **⚠️ Notes de version**
 
