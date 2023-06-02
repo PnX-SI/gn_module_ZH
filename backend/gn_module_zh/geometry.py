@@ -12,7 +12,10 @@ from .model.zh_schema import TZH, CorZhRb, TRiverBasin
 def set_geom(geometry, id_zh=None):
     if not id_zh:
         id_zh = 0
-    polygon = DB.session.query(func.ST_GeomFromGeoJSON(str(geometry))).one()[0]
+    # SetSRID for POSTGIS < 3.0 compat
+    polygon = DB.session.query(
+        func.ST_SetSRID(func.ST_GeomFromGeoJSON(str(geometry)), 4326)
+    ).one()[0]
     q_zh = (
         DB.session.query(TZH)
         .filter(
