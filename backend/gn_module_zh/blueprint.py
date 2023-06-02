@@ -631,7 +631,7 @@ def get_tab_data(id_tab):
                 form_data,
                 geom["polygon"],
                 area,
-                g.currrent_user,
+                g.current_user,
                 form_data["update_date"],
                 active_geo_refs,
             )
