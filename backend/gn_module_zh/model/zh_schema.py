@@ -1,7 +1,7 @@
 import geoalchemy2
 from flask import Blueprint
 from geoalchemy2.types import Geography
-from geonature.core.ref_geo.models import BibAreasTypes, LAreas, LiMunicipalities
+from ref_geo.models import BibAreasTypes, LAreas, LiMunicipalities
 from geonature.utils.env import DB
 from pypn_habref_api.models import CorespHab, Habref
 from pypnnomenclature.models import BibNomenclaturesTypes, TNomenclatures
@@ -41,11 +41,11 @@ class ZhModel(DB.Model):
         peu ou non agir sur une donnée
         """
         # Si l'utilisateur n'a pas de droit d'accès aux données
-        if level == "0" or level not in ("1", "2", "3"):
+        if level == 0 or level not in (1, 2, 3):
             return False
 
         # Si l'utilisateur à le droit d'accéder à toutes les données
-        if level == "3":
+        if level == 3:
             return True
 
         # Si l'utilisateur est propriétaire de la données
@@ -55,21 +55,21 @@ class ZhModel(DB.Model):
         # Si l'utilisateur appartient à un organisme
         # qui a un droit sur la données et
         # que son niveau d'accès est 2 ou 3
-        if self.user_is_in_dataset_actor(user) and level in ("2", "3"):
+        if self.user_is_in_dataset_actor(user) and level in (2, 3):
             return True
         return False
 
-    def get_zh_if_allowed(self, user):
+    def get_zh_if_allowed(self, user, action, level):
         """
         Return the zh if the user is allowed
         params:
             user: object from TRole
         """
-        if self.user_is_allowed_to(user, user.value_filter):
+        if self.user_is_allowed_to(user, level):
             return self
 
         raise InsufficientRightsError(
-            ('User "{}" cannot "{}" this current zh').format(user.id_role, user.code_action),
+            ('User "{}" cannot "{}" this current zh').format(user.id_role),
             403,
         )
 
@@ -87,7 +87,6 @@ class ZhModel(DB.Model):
 
 
 class Nomenclatures(TNomenclatures):
-
     __abstract__ = True
 
     @staticmethod
@@ -105,10 +104,14 @@ class DefaultsNomenclaturesValues(DB.Model):
     __tablename__ = "defaults_nomenclatures_value"
     __table_args__ = {"schema": "ref_nomenclatures"}
     mnemonique_type = DB.Column(
-        DB.Unicode(length=255), ForeignKey(BibNomenclaturesTypes.mnemonique), primary_key=True
+        DB.Unicode(length=255),
+        ForeignKey(BibNomenclaturesTypes.mnemonique),
+        primary_key=True,
     )
     id_organism = DB.Column(
-        DB.Integer, ForeignKey("utilisateurs.bib_organismes.id_organisme"), primary_key=True
+        DB.Integer,
+        ForeignKey("utilisateurs.bib_organismes.id_organisme"),
+        primary_key=True,
     )
     id_nomenclature = DB.Column(
         DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), nullable=False
@@ -241,7 +244,9 @@ class TZH(ZhModel):
     area = DB.Column(DB.Float)
 
     sdage = DB.relationship(
-        TNomenclatures, lazy="joined", primaryjoin=(TNomenclatures.id_nomenclature == id_sdage)
+        TNomenclatures,
+        lazy="joined",
+        primaryjoin=(TNomenclatures.id_nomenclature == id_sdage),
     )
 
     authors = DB.relationship(User, lazy="joined", primaryjoin=(User.id_role == create_author))
@@ -541,7 +546,10 @@ class CorImpactTypes(DB.Model):
     def get_impacts():
         return (
             DB.session.query(CorImpactTypes, TNomenclatures)
-            .join(TNomenclatures, TNomenclatures.id_nomenclature == CorImpactTypes.id_impact)
+            .join(
+                TNomenclatures,
+                TNomenclatures.id_nomenclature == CorImpactTypes.id_impact,
+            )
             .filter(CorImpactTypes.active)
             .all()
         )

@@ -1,6 +1,6 @@
 import unicodedata
 
-from geonature.core.ref_geo.models import BibAreasTypes, LAreas
+from ref_geo.models import BibAreasTypes, LAreas
 from geonature.utils.env import DB
 from pypnnomenclature.models import TNomenclatures
 from sqlalchemy import and_, desc, func, or_
@@ -277,7 +277,6 @@ def filter_statuts(query, json: dict):
 
 
 def filter_plans(query, json: dict):
-
     ids_plans = [f.get("id_nomenclature") for f in json.get("plans", [])]
 
     if ids_plans and all(id_ is not None for id_ in ids_plans):
@@ -362,7 +361,7 @@ def get_global_notes(basin: str):
         DB=DB,
         tableName="rb_notes_summary",
         schemaName="pr_zh",
-        filters={"bassin_versant": basin},
+        filters={"bassin_versant": basin, "orderby": "bassin_versant"},
         limit=1,
     )
 

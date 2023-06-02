@@ -1,16 +1,16 @@
-import { Component, EventEmitter, OnInit, Input, Output } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { ToastrService } from "ngx-toastr";
-import { Subscription } from "rxjs";
-import { ZhDataService } from "../../../services/zh-data.service";
-import { TabsService } from "../../../services/tabs.service";
-import { ErrorTranslatorService } from "../../../services/error-translator.service";
+import { Component, EventEmitter, OnInit, Input, Output } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ToastrService } from 'ngx-toastr';
+import { Subscription } from 'rxjs';
+import { ZhDataService } from '../../../services/zh-data.service';
+import { TabsService } from '../../../services/tabs.service';
+import { ErrorTranslatorService } from '../../../services/error-translator.service';
 
 @Component({
-  selector: "zh-form-tab7",
-  templateUrl: "./zh-form-tab7.component.html",
-  styleUrls: ["./zh-form-tab7.component.scss"],
+  selector: 'zh-form-tab7',
+  templateUrl: './zh-form-tab7.component.html',
+  styleUrls: ['./zh-form-tab7.component.scss'],
 })
 export class ZhFormTab7Component implements OnInit {
   @Input() public formMetaData: any;
@@ -35,101 +35,101 @@ export class ZhFormTab7Component implements OnInit {
   private $_getTabChangeSub: Subscription;
   public actionTable: any[] = [];
   public currentZh: any;
-  default_prio_level: string = "Non définie";
+  default_prio_level: string = 'Non définie';
 
-  readonly qualifSize: string = "10%";
-  readonly knowledgeSize: string = "15%";
+  readonly qualifSize: string = '10%';
+  readonly knowledgeSize: string = '15%';
 
   public hydroFctTableCol = [
     {
-      name: "function",
-      label: "Principales fonctions hydrologiques / biogéochimiques",
-      subcell: { name: "mnemonique" },
+      name: 'function',
+      label: 'Principales fonctions hydrologiques / biogéochimiques',
+      subcell: { name: 'mnemonique' },
     },
     {
-      name: "qualification",
-      label: "Qualifications",
-      subcell: { name: "mnemonique" },
+      name: 'qualification',
+      label: 'Qualifications',
+      subcell: { name: 'mnemonique' },
       size: this.qualifSize,
     },
     {
-      name: "knowledge",
-      label: "Connaissance",
-      subcell: { name: "mnemonique" },
+      name: 'knowledge',
+      label: 'Connaissance',
+      subcell: { name: 'mnemonique' },
       size: this.knowledgeSize,
     },
   ];
 
   public bioFctTableCol = [
     {
-      name: "function",
-      label: "Principales fonctions biologiques / écologiques",
-      subcell: { name: "mnemonique" },
+      name: 'function',
+      label: 'Principales fonctions biologiques / écologiques',
+      subcell: { name: 'mnemonique' },
     },
     {
-      name: "qualification",
-      label: "Qualifications",
-      subcell: { name: "mnemonique" },
+      name: 'qualification',
+      label: 'Qualifications',
+      subcell: { name: 'mnemonique' },
       size: this.qualifSize,
     },
     {
-      name: "knowledge",
-      label: "Connaissance",
-      subcell: { name: "mnemonique" },
+      name: 'knowledge',
+      label: 'Connaissance',
+      subcell: { name: 'mnemonique' },
       size: this.knowledgeSize,
     },
   ];
 
   public patrimTableCol = [
     {
-      name: "function",
-      label: "Principaux intérêts patrimoniaux",
-      subcell: { name: "mnemonique" },
+      name: 'function',
+      label: 'Principaux intérêts patrimoniaux',
+      subcell: { name: 'mnemonique' },
     },
     {
-      name: "qualification",
-      label: "Qualifications",
-      subcell: { name: "mnemonique" },
+      name: 'qualification',
+      label: 'Qualifications',
+      subcell: { name: 'mnemonique' },
       size: this.qualifSize,
     },
     {
-      name: "knowledge",
-      label: "Connaissance",
-      subcell: { name: "mnemonique" },
+      name: 'knowledge',
+      label: 'Connaissance',
+      subcell: { name: 'mnemonique' },
       size: this.knowledgeSize,
     },
   ];
 
   public actionTableCol = [
     {
-      name: "action",
-      label: "Propositions d’actions",
-      subcell: { name: "name" },
+      name: 'action',
+      label: 'Propositions d’actions',
+      subcell: { name: 'name' },
     },
     {
-      name: "priority",
-      label: "Niveau de priorité",
-      subcell: { name: "mnemonique" },
+      name: 'priority',
+      label: 'Niveau de priorité',
+      subcell: { name: 'mnemonique' },
     },
-    { name: "remark", label: "Remarques" },
+    { name: 'remark', label: 'Remarques' },
   ];
 
   public socEcoTableCol = [
     {
-      name: "function",
-      label: "Principales valeurs socio-economiques",
-      subcell: { name: "mnemonique" },
+      name: 'function',
+      label: 'Principales valeurs socio-economiques',
+      subcell: { name: 'mnemonique' },
     },
     {
-      name: "qualification",
-      label: "Qualifications",
-      subcell: { name: "mnemonique" },
+      name: 'qualification',
+      label: 'Qualifications',
+      subcell: { name: 'mnemonique' },
       size: this.qualifSize,
     },
     {
-      name: "knowledge",
-      label: "Connaissance",
-      subcell: { name: "mnemonique" },
+      name: 'knowledge',
+      label: 'Connaissance',
+      subcell: { name: 'mnemonique' },
       size: this.knowledgeSize,
     },
   ];
@@ -161,13 +161,13 @@ export class ZhFormTab7Component implements OnInit {
     this.dropdownSettings = {
       enableFilterSelectAll: false,
       enableCheckAll: false,
-      text: "Selectionner",
-      labelKey: "name",
-      primaryKey: "id_action",
-      searchPlaceholderText: "Rechercher",
+      text: 'Selectionner',
+      labelKey: 'name',
+      primaryKey: 'id_action',
+      searchPlaceholderText: 'Rechercher',
       enableSearchFilter: true,
       singleSelection: true,
-      noDataLabel: "Toutes les propositions disponibles ont déjà été renseignées dans le tableau",
+      noDataLabel: 'Toutes les propositions disponibles ont déjà été renseignées dans le tableau',
     };
   }
 
@@ -219,13 +219,13 @@ export class ZhFormTab7Component implements OnInit {
           this.socEcoData = [];
           if (evalZh.fonctions_bio && evalZh.fonctions_bio.length > 0) {
             evalZh.fonctions_bio.forEach((fctBio: any) => {
-              let namefctBio = this.formMetaData["FONCTIONS_BIO_all"].find(
+              let namefctBio = this.formMetaData['FONCTIONS_BIO_all'].find(
                 (item: any) => item.id_nomenclature == fctBio.id_function
               );
-              let nameQaulif = this.formMetaData["FONCTIONS_QUALIF"].find(
+              let nameQaulif = this.formMetaData['FONCTIONS_QUALIF'].find(
                 (item: any) => item.id_nomenclature == fctBio.id_qualification
               );
-              let nameKnowledge = this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+              let nameKnowledge = this.formMetaData['FONCTIONS_CONNAISSANCE'].find(
                 (item: any) => item.id_nomenclature == fctBio.id_knowledge
               );
               this.bioFctData.push({
@@ -237,13 +237,13 @@ export class ZhFormTab7Component implements OnInit {
           }
           if (evalZh.fonctions_hydro && evalZh.fonctions_hydro.length > 0) {
             evalZh.fonctions_hydro.forEach((fctBio: any) => {
-              let namefctHydro = this.formMetaData["FONCTIONS_HYDRO_all"].find(
+              let namefctHydro = this.formMetaData['FONCTIONS_HYDRO_all'].find(
                 (item: any) => item.id_nomenclature == fctBio.id_function
               );
-              let nameQaulif = this.formMetaData["FONCTIONS_QUALIF"].find(
+              let nameQaulif = this.formMetaData['FONCTIONS_QUALIF'].find(
                 (item: any) => item.id_nomenclature == fctBio.id_qualification
               );
-              let nameKnowledge = this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+              let nameKnowledge = this.formMetaData['FONCTIONS_CONNAISSANCE'].find(
                 (item: any) => item.id_nomenclature == fctBio.id_knowledge
               );
               this.hydroFctData.push({
@@ -255,13 +255,13 @@ export class ZhFormTab7Component implements OnInit {
           }
           if (evalZh.interet_patrim && evalZh.interet_patrim.length > 0) {
             evalZh.interet_patrim.forEach((fctBio: any) => {
-              let namePatrim = this.formMetaData["INTERET_PATRIM_all"].find(
+              let namePatrim = this.formMetaData['INTERET_PATRIM_all'].find(
                 (item: any) => item.id_nomenclature == fctBio.id_function
               );
-              let nameQaulif = this.formMetaData["FONCTIONS_QUALIF"].find(
+              let nameQaulif = this.formMetaData['FONCTIONS_QUALIF'].find(
                 (item: any) => item.id_nomenclature == fctBio.id_qualification
               );
-              let nameKnowledge = this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+              let nameKnowledge = this.formMetaData['FONCTIONS_CONNAISSANCE'].find(
                 (item: any) => item.id_nomenclature == fctBio.id_knowledge
               );
               this.patrimData.push({
@@ -273,13 +273,13 @@ export class ZhFormTab7Component implements OnInit {
           }
           if (evalZh.val_soc_eco && evalZh.val_soc_eco.length > 0) {
             evalZh.val_soc_eco.forEach((socEco: any) => {
-              let nameSocEco = this.formMetaData["VAL_SOC_ECO"].find(
+              let nameSocEco = this.formMetaData['VAL_SOC_ECO'].find(
                 (item: any) => item.id_nomenclature == socEco.id_function
               );
-              let nameQaulif = this.formMetaData["FONCTIONS_QUALIF"].find(
+              let nameQaulif = this.formMetaData['FONCTIONS_QUALIF'].find(
                 (item: any) => item.id_nomenclature == socEco.id_qualification
               );
-              let nameKnowledge = this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+              let nameKnowledge = this.formMetaData['FONCTIONS_CONNAISSANCE'].find(
                 (item: any) => item.id_nomenclature == socEco.id_knowledge
               );
               this.socEcoData.push({
@@ -290,17 +290,17 @@ export class ZhFormTab7Component implements OnInit {
             });
           }
           if (evalZh.id_thread) {
-            this.evalZh.thread = this.formMetaData["EVAL_GLOB_MENACES"].find(
+            this.evalZh.thread = this.formMetaData['EVAL_GLOB_MENACES'].find(
               (item: any) => item.id_nomenclature == evalZh.id_thread
             );
           }
           if (evalZh.id_diag_bio) {
-            this.evalZh.diag_bio = this.formMetaData["FONCTIONNALITE_BIO"].find(
+            this.evalZh.diag_bio = this.formMetaData['FONCTIONNALITE_BIO'].find(
               (item: any) => item.id_nomenclature == evalZh.id_diag_bio
             );
           }
           if (evalZh.id_diag_hydro) {
-            this.evalZh.diag_hydro = this.formMetaData["FONCTIONNALITE_HYDRO"].find(
+            this.evalZh.diag_hydro = this.formMetaData['FONCTIONNALITE_HYDRO'].find(
               (item: any) => item.id_nomenclature == evalZh.id_diag_hydro
             );
           }
@@ -318,7 +318,7 @@ export class ZhFormTab7Component implements OnInit {
           this.currentZh.properties.actions.forEach((action: any) => {
             actionTable.push({
               action: this.actionInput.find((item: any) => item.id_action == action.id_action),
-              priority: this.formMetaData["NIVEAU_PRIORITE"].find(
+              priority: this.formMetaData['NIVEAU_PRIORITE'].find(
                 (item: any) => item.id_nomenclature == action.id_priority_level
               ),
               remark: action.remark,
@@ -337,21 +337,21 @@ export class ZhFormTab7Component implements OnInit {
   // open the add action modal
   onAddAction(event: any, modal: any) {
     this.getMetaData();
-    this.actionForm.controls["priority"].setValue(
-      this.formMetaData["NIVEAU_PRIORITE"].find((item) => {
+    this.actionForm.controls['priority'].setValue(
+      this.formMetaData['NIVEAU_PRIORITE'].find((item) => {
         if (item.mnemonique == this.default_prio_level) {
           return item;
         }
       })
     );
     this.patchModal = false;
-    this.addModalBtnLabel = "Ajouter";
+    this.addModalBtnLabel = 'Ajouter';
     this.modalTitle = "Ajout d'une proposition d'action";
     event.stopPropagation();
     const modalRef = this.ngbModal.open(modal, {
       centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
+      size: 'lg',
+      windowClass: 'bib-modal',
     });
     modalRef.result.then().finally(() => {
       this.actionForm.reset();
@@ -359,7 +359,7 @@ export class ZhFormTab7Component implements OnInit {
   }
 
   onDeSelectAllActions() {
-    this.actionForm.get("action").reset();
+    this.actionForm.get('action').reset();
   }
 
   // add a new action to action array
@@ -396,11 +396,11 @@ export class ZhFormTab7Component implements OnInit {
   onEditAction(modal: any, action: any) {
     this.getMetaData(action);
     this.patchModal = true;
-    this.addModalBtnLabel = "Modifier";
+    this.addModalBtnLabel = 'Modifier';
     this.modalTitle = "Modifier la proposition d'action";
 
     // init inputs object type
-    const selectedPriority = this.formMetaData["NIVEAU_PRIORITE"].find(
+    const selectedPriority = this.formMetaData['NIVEAU_PRIORITE'].find(
       (item: any) => item.id_nomenclature == action.priority.id_nomenclature
     );
     // patch form values
@@ -413,8 +413,8 @@ export class ZhFormTab7Component implements OnInit {
 
     const modalRef = this.ngbModal.open(modal, {
       centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
+      size: 'lg',
+      windowClass: 'bib-modal',
     });
     modalRef.result.then().finally(() => {
       this.actionForm.reset();
@@ -473,8 +473,8 @@ export class ZhFormTab7Component implements OnInit {
             this._dataService.setCurrentZh(zh);
             this.posted = false;
             this.canChangeTab.emit(true);
-            this._toastr.success("Vos données sont bien enregistrées", "", {
-              positionClass: "toast-top-right",
+            this._toastr.success('Vos données sont bien enregistrées', '', {
+              positionClass: 'toast-top-right',
             });
             this.nextTab.emit(8);
           });
@@ -482,8 +482,8 @@ export class ZhFormTab7Component implements OnInit {
         (error) => {
           this.posted = false;
           const frontMsg: string = this._error.getFrontError(error.error.message);
-          this._toastr.error(frontMsg, "", {
-            positionClass: "toast-top-right",
+          this._toastr.error(frontMsg, '', {
+            positionClass: 'toast-top-right',
           });
         }
       );
@@ -491,7 +491,7 @@ export class ZhFormTab7Component implements OnInit {
   }
 
   sortAction(action) {
-    const sortingArr = this.formMetaData["NIVEAU_PRIORITE"].map((item) => item.mnemonique);
+    const sortingArr = this.formMetaData['NIVEAU_PRIORITE'].map((item) => item.mnemonique);
     action.sort(function (a, b) {
       return sortingArr.indexOf(a.priority.mnemonique) - sortingArr.indexOf(b.priority.mnemonique);
     });

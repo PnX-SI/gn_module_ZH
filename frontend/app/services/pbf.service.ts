@@ -1,58 +1,64 @@
-import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
-import { ZhDataService } from "../services/zh-data.service";
-import * as L from "leaflet";
-import geobuf from "geobuf";
-import Pbf from "pbf";
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { ZhDataService } from '../services/zh-data.service';
+import * as L from 'leaflet';
+import geobuf from 'geobuf';
+import Pbf from 'pbf';
+import 'leaflet.vectorgrid';
+/// <reference path="leaflet.vectorgrid.d.ts"/>
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class PbfService {
   public res: ArrayBuffer;
-  public vector: L.vectorGrid;
+  public vector: any;
 
   constructor(private _zhService: ZhDataService) {}
 
-  getPbf(currentMap: L.map): Observable<L.vectorGrid> {
-    if (!currentMap.getPane("zhPane")) {
-      currentMap.createPane("zhPane");
+  // FIXME : return Observable<L.vectorGrid>
+  getPbf(currentMap: L.Map): Observable<any> {
+    if (!currentMap.getPane('zhPane')) {
+      currentMap.createPane('zhPane');
     }
-    return this._zhService.getPbf().map(
-      async (result) => {
-        const res = await result["arrayBuffer"]();
+    return this._zhService.getPbf().pipe(
+      map(async (result) => {
+        const res = await result['arrayBuffer']();
+        if (res.byteLength === 0) return null;
         const pbf = new Pbf(res);
         const vector = await this.setVectorGrid(geobuf.decode(pbf));
         this.res = res;
         this.vector = vector;
         return vector;
-      }
+      })
       // To prevent : Property 'arrayBuffer' does not exist on type 'Blob'
     );
   }
 
-  setPaneBackground(currentMap: L.map): void {
-    currentMap.getPane("zhPane").style.zIndex = "200";
+  setPaneBackground(currentMap: L.Map): void {
+    currentMap.getPane('zhPane').style.zIndex = '200';
   }
 
-  setVectorGrid(geojson): L.vectorGrid {
-    const vector = L.vectorGrid.slicer(geojson, {
-      rendererFactory: L.canvas.tile,
+  // FIXME : return a L.vectorGrid
+  setVectorGrid(geojson) {
+    const vector = (L as any).vectorGrid.slicer(geojson, {
+      rendererFactory: (L as any).canvas.tile,
       vectorTileLayerStyles: {
         sliced: function (properties, zoom) {
           let opacity = 0.8;
 
           return {
-            fillColor: "#800080",
+            fillColor: '#800080',
             fillOpacity: 0.5,
-            color: "#800080",
+            color: '#800080',
             opacity: opacity,
             weight: 2,
             fill: true,
           };
         },
       },
-      pane: "zhPane",
+      pane: 'zhPane',
       interactive: true,
       maxZoom: 18,
       indexMaxZoom: 5,

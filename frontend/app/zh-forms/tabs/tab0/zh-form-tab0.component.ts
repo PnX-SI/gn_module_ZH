@@ -1,30 +1,30 @@
-import { Component, EventEmitter, HostListener, Input, OnInit, Output } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { Router } from "@angular/router";
-import { Subscription } from "rxjs";
-import { GeoJSON } from "leaflet";
-import * as L from "leaflet";
-import { MapService } from "@geonature_common/map/map.service";
-import { IDropdownSettings } from "ng-multiselect-dropdown";
-import { ToastrService } from "ngx-toastr";
-import { ZhDataService } from "../../../services/zh-data.service";
-import { TabsService } from "../../../services/tabs.service";
-import { ErrorTranslatorService } from "../../../services/error-translator.service";
-import { PbfService } from "../../../services/pbf.service";
+import { Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { GeoJSON } from 'leaflet';
+import * as L from 'leaflet';
+import { MapService } from '@geonature_common/map/map.service';
+import { IDropdownSettings } from 'ng-multiselect-dropdown';
+import { ToastrService } from 'ngx-toastr';
+import { ZhDataService } from '../../../services/zh-data.service';
+import { TabsService } from '../../../services/tabs.service';
+import { ErrorTranslatorService } from '../../../services/error-translator.service';
+import { PbfService } from '../../../services/pbf.service';
 
 const GEOM_CONTAINED_ID = 1;
 
 @Component({
-  selector: "zh-form-tab0",
-  templateUrl: "./zh-form-tab0.component.html",
-  styleUrls: ["./zh-form-tab0.component.scss"],
+  selector: 'zh-form-tab0',
+  templateUrl: './zh-form-tab0.component.html',
+  styleUrls: ['./zh-form-tab0.component.scss'],
 })
 export class ZhFormTab0Component implements OnInit {
   @Input() formMetaData;
   @Output() activeTabs = new EventEmitter<boolean>();
   @Output() canChangeTab = new EventEmitter<boolean>();
   @Output() nextTab = new EventEmitter<number>();
-  private _currentZh: any = null;
+  public _currentZh: any = null;
   public form: FormGroup;
   public cardContentHeight: number;
   public critDelim: any;
@@ -33,7 +33,7 @@ export class ZhFormTab0Component implements OnInit {
   public dropdownSettings: IDropdownSettings;
   public $_geojsonSub: Subscription;
   public $_currentZhSub: Subscription;
-  private geometry: GeoJSON;
+  private geometry: any;
   private currentLayer: any;
   public submitted = false;
   public posted = false;
@@ -55,9 +55,9 @@ export class ZhFormTab0Component implements OnInit {
   ngOnInit() {
     this.dropdownSettings = {
       singleSelection: false,
-      idField: "id_nomenclature",
-      textField: "mnemonique",
-      searchPlaceholderText: "Rechercher",
+      idField: 'id_nomenclature',
+      textField: 'mnemonique',
+      searchPlaceholderText: 'Rechercher',
       enableCheckAll: false,
       allowSearchFilter: true,
     };
@@ -86,8 +86,10 @@ export class ZhFormTab0Component implements OnInit {
       .toPromise()
       .then((data) => {
         // Do not show the data on the map by default
-        data = data.setOpacity(0);
-        this.geomLayers.push(data.addTo(this._mapService.map));
+        if (data) {
+          data = data.setOpacity(0);
+          this.geomLayers.push(data.addTo(this._mapService.map));
+        }
       });
     this._pbfService.setPaneBackground(this._mapService.map);
   }
@@ -122,7 +124,7 @@ export class ZhFormTab0Component implements OnInit {
           // Clears the layers before adding the geometry to
           // prevent having the same superimposed layers...
           this._mapService.leafletDrawFeatureGroup.clearLayers();
-          const layer = L.geoJSON(this.geometry, {
+          const layer = L.geoJSON(this.geometry as any, {
             onEachFeature: (feature, layer) => {
               this._mapService.leafletDrawFeatureGroup.addLayer(layer);
             },
@@ -138,8 +140,8 @@ export class ZhFormTab0Component implements OnInit {
 
   calcCardContentHeight() {
     let wH = window.innerHeight;
-    let tbH = document.getElementById("app-toolbar")
-      ? document.getElementById("app-toolbar").offsetHeight
+    let tbH = document.getElementById('app-toolbar')
+      ? document.getElementById('app-toolbar').offsetHeight
       : 0;
     let height = wH - (tbH + 81);
     this.cardContentHeight = height >= 350 ? height : 350;
@@ -151,7 +153,7 @@ export class ZhFormTab0Component implements OnInit {
     }
   }
 
-  @HostListener("window:resize", ["$event"])
+  @HostListener('window:resize', ['$event'])
   onResize(event) {
     this.calcCardContentHeight();
   }
@@ -161,7 +163,7 @@ export class ZhFormTab0Component implements OnInit {
       id_org: [null, Validators.required],
       main_name: [null, Validators.required],
       critere_delim: [null, Validators.required],
-      sdage: ["", Validators.required],
+      sdage: ['', Validators.required],
     });
     this.form.valueChanges.subscribe(() => {
       this.canChangeTab.emit(false);
@@ -190,7 +192,7 @@ export class ZhFormTab0Component implements OnInit {
         });
         this.posted = true;
         if (this._currentZh) {
-          formToPost["id_zh"] = Number(this._currentZh.properties.id_zh);
+          formToPost['id_zh'] = Number(this._currentZh.properties.id_zh);
         }
         this._dataService.postDataForm(formToPost, 0).subscribe(
           (data) => {
@@ -205,28 +207,24 @@ export class ZhFormTab0Component implements OnInit {
               this._dataService.setCurrentZh(zh);
               this.activeTabs.emit(true);
               this.canChangeTab.emit(true);
-              var msg: string = "Vos données sont bien enregistrées";
+              var msg: string = 'Vos données sont bien enregistrées';
               var timeOut: number = 5000;
               if (data.is_intersected) {
                 timeOut = 10000; // stay a little bit longer
                 msg +=
-                  "<br>La géométrie a été découpée car elle intersectait une autre zone humide";
+                  '<br>La géométrie a été découpée car elle intersectait une autre zone humide';
               }
-              this._toastr.success(msg, "", {
+              this._toastr.success(msg, '', {
                 enableHtml: true,
                 timeOut: timeOut, // to be sure the user sees
                 closeButton: true,
-                positionClass: "toast-top-right",
+                positionClass: 'toast-top-right',
               });
               this.nextTab.emit(1);
             });
           },
           (error) => {
             this.posted = false;
-            var msg: string = "Impossible de créer la zone humide : ";
-            const frontMsg: string = this._error.getFrontError(
-              error.error.message || error.error.name
-            );
             // Not really good, but must filter error id to remove the
             // geometry or not
             if (this._error.getErrorId(error.error.message) == GEOM_CONTAINED_ID) {
@@ -235,16 +233,12 @@ export class ZhFormTab0Component implements OnInit {
                 this._mapService.leafletDrawFeatureGroup
               );
             }
-            msg += frontMsg;
-            this._toastr.error(msg, "", {
-              positionClass: "toast-top-right",
-            });
           }
         );
       }
     } else {
-      this._toastr.error("Veuillez tracer une zone humide sur la carte", "", {
-        positionClass: "toast-top-right",
+      this._toastr.error('Veuillez tracer une zone humide sur la carte', '', {
+        positionClass: 'toast-top-right',
       });
     }
   }
@@ -275,14 +269,14 @@ export class ZhFormTab0Component implements OnInit {
 
   onCancel() {
     this.form.reset();
-    this._router.navigate(["zones_humides"]);
+    this._router.navigate(['zones_humides']);
   }
 
   removeLayers() {
     this.geomLayers = [];
     if (this._mapService.map) {
       this._mapService.map.eachLayer((layer: any) => {
-        if (layer.geomTag && layer.geomTag === "allGeom") {
+        if (layer.geomTag && layer.geomTag === 'allGeom') {
           this._mapService.map.removeLayer(layer);
         }
       });
@@ -290,9 +284,9 @@ export class ZhFormTab0Component implements OnInit {
   }
 
   getMetaData() {
-    this.idOrg = this.formMetaData["BIB_ORGANISMES"];
-    this.critDelim = this.formMetaData["CRIT_DELIM"];
-    this.sdage = this.formMetaData["SDAGE"];
+    this.idOrg = this.formMetaData['BIB_ORGANISMES'];
+    this.critDelim = this.formMetaData['CRIT_DELIM'];
+    this.sdage = this.formMetaData['SDAGE'];
   }
 
   ngOnDestroy() {
@@ -308,9 +302,9 @@ export class ZhFormTab0Component implements OnInit {
     let coordinates = [];
     features.forEach((element) => coordinates.push(element.geometry.coordinates));
     return {
-      type: "Feature",
+      type: 'Feature',
       geometry: {
-        type: "MultiPolygon",
+        type: 'MultiPolygon',
         coordinates: coordinates,
       },
       properties: null,
@@ -319,10 +313,10 @@ export class ZhFormTab0Component implements OnInit {
 
   getPolygonFeature(coordinates) {
     return {
-      type: "Feature",
+      type: 'Feature',
       properties: {},
       geometry: {
-        type: "Polygon",
+        type: 'Polygon',
         coordinates: coordinates,
       },
     };
@@ -335,15 +329,15 @@ export class ZhFormTab0Component implements OnInit {
     let features = [];
     // We can have a multipolygon and a polygon here.
     // It can be checked with their coordinates
-    if (geometry.coordinates.length > 1 && geometry.type !== "Polygon") {
+    if (geometry.coordinates.length > 1 && geometry.type !== 'Polygon') {
       geometry.coordinates.forEach((coord) => features.push(this.getPolygonFeature(coord)));
-    } else if (geometry.coordinates.length === 1 && geometry.type !== "Polygon") {
+    } else if (geometry.coordinates.length === 1 && geometry.type !== 'Polygon') {
       features.push(this.getPolygonFeature(geometry.coordinates[0]));
     } else {
       features.push(this.getPolygonFeature(geometry.coordinates));
     }
     return {
-      type: "FeatureCollection",
+      type: 'FeatureCollection',
       features: features,
     };
   }

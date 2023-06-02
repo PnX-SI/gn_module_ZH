@@ -1,8 +1,8 @@
-import { Injectable } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { Injectable } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class SearchFormService {
   private _advancedForm: FormGroup;
@@ -90,7 +90,7 @@ export class SearchFormService {
     // Since everything is a form group:
     Object.keys(values).forEach((key) => {
       let value = values[key];
-      if (value !== null && value !== []) {
+      if (value) {
         if (value instanceof Array) {
           if (value.length !== 0) {
             value = value.filter((item) => item !== null);

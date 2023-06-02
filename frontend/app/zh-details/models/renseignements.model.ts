@@ -27,6 +27,8 @@ interface Identification {
 
 interface Auteur {
   auteur: string;
+  organism: string;
+  coorganism: string;
   auteur_modif: string;
   date: string;
   date_modif: string;

@@ -1,33 +1,33 @@
-import { Injectable } from "@angular/core";
-import { throwError } from "rxjs";
-import { map, catchError } from "rxjs/operators";
-import { saveAs } from "file-saver";
-import { ToastrService } from "ngx-toastr";
+import { Injectable } from '@angular/core';
+import { throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { saveAs } from 'file-saver';
+import { ToastrService } from 'ngx-toastr';
 
-import { ZhDataService } from "./zh-data.service";
-import { ZhFile, ZhFiles } from "../models/files";
-import { ErrorTranslatorService } from "./error-translator.service";
+import { ZhDataService } from './zh-data.service';
+import { ZhFile, ZhFiles } from '../models/files';
+import { ErrorTranslatorService } from './error-translator.service';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class FilesService {
   public files: ZhFile[] = [];
-  public EXT_CSV = ["csv"];
-  public EXT_PDF = ["pdf"];
+  public EXT_CSV = ['csv'];
+  public EXT_PDF = ['pdf'];
   public EXT_IMAGES = [
-    "png",
-    "tif",
-    "tiff",
-    "wbmp",
-    "ico",
-    "jng",
-    "bmp",
-    "svg",
-    "webp",
-    "gif",
-    "jpeg",
-    "jpg",
+    'png',
+    'tif',
+    'tiff',
+    'wbmp',
+    'ico',
+    'jng',
+    'bmp',
+    'svg',
+    'webp',
+    'gif',
+    'jpeg',
+    'jpg',
   ];
   constructor(
     private _dataService: ZhDataService,
@@ -39,7 +39,7 @@ export class FilesService {
   // so that they can be separated in the html
   filterByExtension(extensions: string[]): ZhFile[] {
     return this.files.filter((file) =>
-      extensions.includes(file.media_path.split(".").slice(-1)[0].toLocaleLowerCase())
+      extensions.includes(file.media_path.split('.').slice(-1)[0].toLocaleLowerCase())
     );
   }
 
@@ -47,7 +47,7 @@ export class FilesService {
   // respect the extensions provided
   unfilterByExtension(extensions: string[]): ZhFile[] {
     return this.files.filter(
-      (file) => !extensions.includes(file.media_path.split(".").slice(-1)[0].toLocaleLowerCase())
+      (file) => !extensions.includes(file.media_path.split('.').slice(-1)[0].toLocaleLowerCase())
     );
   }
 
@@ -90,7 +90,7 @@ export class FilesService {
   deleteFile(idMedia: number) {
     return this._dataService.deleteFile(idMedia).pipe(
       map(() => {
-        this.displayInfo("Fichier supprimé avec succès");
+        this.displayInfo('Fichier supprimé avec succès');
       }),
       catchError((error) => {
         const frontMsg: string = this._error.getFrontError(error.error.message);
@@ -103,7 +103,7 @@ export class FilesService {
   changeMainPhoto(zhId: number, idMedia: number) {
     return this._dataService.postMainPicture(zhId, idMedia).pipe(
       map(() => {
-        this.displayInfo("Photo principale changée avec succès");
+        this.displayInfo('Photo principale changée avec succès');
       }),
       catchError((error) => {
         const frontMsg: string = this._error.getFrontError(error.error.message);
@@ -133,7 +133,7 @@ export class FilesService {
   postFile(uploadForm) {
     return this._dataService.postDataForm(uploadForm, 8).pipe(
       map(() => {
-        this.displayInfo("Fichier téléversé avec succès !");
+        this.displayInfo('Fichier téléversé avec succès !');
       }),
       catchError((error) => {
         const frontMsg: string = this._error.getFrontError(error.error.message);
@@ -146,7 +146,7 @@ export class FilesService {
   patchFile(fileIdToPatch: number, uploadForm: FormData) {
     return this._dataService.patchFile(fileIdToPatch, uploadForm).pipe(
       map(() => {
-        this.displayInfo("Fichier téléversé avec succès !");
+        this.displayInfo('Fichier téléversé avec succès !');
       }),
       catchError((error) => {
         const frontMsg: string = this._error.getFrontError(error.error.message);

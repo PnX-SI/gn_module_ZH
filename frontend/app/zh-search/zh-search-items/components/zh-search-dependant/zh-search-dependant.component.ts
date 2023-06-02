@@ -1,5 +1,5 @@
-import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
-import { FormGroup } from "@angular/forms";
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 
 type inputDataType = {
   name: string;
@@ -7,12 +7,12 @@ type inputDataType = {
 };
 
 @Component({
-  selector: "zh-search-dependant",
-  templateUrl: "./zh-search-dependant.component.html",
-  styleUrls: ["./zh-search-dependant.component.scss"],
+  selector: 'zh-search-dependant',
+  templateUrl: './zh-search-dependant.component.html',
+  styleUrls: ['./zh-search-dependant.component.scss'],
 })
 export class ZhSearchDependantComponent implements OnInit {
-  @Input() label: string = "";
+  @Input() label: string = '';
   @Input() form: FormGroup;
   @Input() set inputData(value: inputDataType[]) {
     this._inputData = value;
@@ -23,13 +23,13 @@ export class ZhSearchDependantComponent implements OnInit {
   public dataForm: FormGroup;
   public dropdownSettings = {
     enableSearchFilter: true,
-    text: "",
-    labelKey: "name",
-    primaryKey: "code",
+    text: '',
+    labelKey: 'name',
+    primaryKey: 'code',
     enableFilterSelectAll: false,
-    selectAllText: "Tout sélectionner",
-    unSelectAllText: "Tout déselectionner",
-    searchPlaceholderText: "Rechercher",
+    selectAllText: 'Tout sélectionner',
+    unSelectAllText: 'Tout déselectionner',
+    searchPlaceholderText: 'Rechercher',
     disabled: true,
   };
 
@@ -42,7 +42,9 @@ export class ZhSearchDependantComponent implements OnInit {
       this.enable();
       this._inputData = value;
     } else {
-      this.form.reset();
+      if (this.form) {
+        this.form.reset();
+      }
       this.disable();
     }
   }

@@ -1,4 +1,4 @@
-import { FormControl } from "@angular/forms";
+import { FormControl } from '@angular/forms';
 export function fileFormatValidator(formats: string[]) {
   return function (control: FormControl) {
     const file: File = control.value;

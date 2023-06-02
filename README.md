@@ -20,74 +20,75 @@ Ne pas oublier de redémarrer GeoNature :
 
 ## **Installation**
 
-- Définir le nom de la branche
+- Télécharger puis renommer la version souhaitée du module :
 
-```bash
-BRANCHNAME='master'
-```
-
-- Copier le dépôt
-
-```bash
-cd /home/`whoami`
-git clone https://github.com/PnX-SI/gn_module_ZH.git
-cd /home/`whoami`/gn_module_ZH
-git checkout $BRANCHNAME
-```
+  ```
+  cd
+  wget https://github.com/PnX-SI/gn_module_ZH/archive/X.Y.Z.zip
+  unzip X.Y.Z.zip
+  rm X.Y.Z.zip
+  mv gn_module_ZH-X.Y.Z gn_module_ZH
+  ```
 
 - Exécuter la commande GeoNature d'installation de module
 
-```bash
-cd /home/`whoami`/geonature/backend
-source venv/bin/activate
-geonature install_gn_module /home/`whoami`/gn_module_ZH /zones_humides
-```
+  ```
+  source ~/geonature/backend/venv/bin/activate
+  geonature install-gn-module ~/gn_module_ZH ZONES_HUMIDES
+  deactivate
+  sudo systemctl restart geonature
+  ```
 
-- Facultatif : modifier les paramètres par défaut du module :
+Vous pouvez modifier la configuration du module en créant un fichier `zones_humides_config.toml` dans le dossier `config` de GeoNature, en vous inspirant 
+du fichier `zones_humides_config.toml.example` et en surcouchant uniquement les paramètres que vous souhaitez.
 
-```bash
-nano /home/`whoami`/gn_module_ZH/config/conf_schema_toml.py
-```
+Voir [ici](/doc/admin.md) la documentation des paramètres de configuration du module pour les administrateurs.
 
-Après avoir modifié le fichier de paramètres, faire une mise à jour :
+## **Mise à jour**
 
-```bash
-cd /home/`whoami`/geonature/backend
-source venv/bin/activate
-geonature update_module_configuration zones_humides
-```
+- Téléchargez la nouvelle version du module
 
-Voir [ici](/doc/admin.md) pour documentation des paramètres de configuration du module pour les administrateurs
+  ```
+  wget https://github.com/PnX-SI/gn_module_ZH/archive/X.Y.Z.zip
+  unzip X.Y.Z.zip
+  rm X.Y.Z.zip
+  ```
+
+- Renommez l'ancien et le nouveau répertoire
+
+  ```
+  mv ~/gn_module_ZH ~/gn_module_ZH_old
+  mv ~/gn_module_ZH-X.Y.Z ~/gn_module_ZH
+  ```
+
+- Si vous avez encore votre configuration du module dans le dossier `config` du module, copiez le vers le dossier de configuration centralisée de GeoNature :
+
+  ```
+  cp ~/gn_module_ZH_old/config/conf_gn_module.toml  ~/geonature/config/zones_humides_config.toml
+  ```
+
+- Lancez la mise à jour du module
+
+  ```
+  source ~/geonature/backend/venv/bin/activate
+  geonature install-gn-module ~/gn_module_ZH ZONES_HUMIDES
+  sudo systemctl restart geonature
+  ```
 
 ## **Désinstallation**
-
-- Exécuter la commande GeoNature de désactivation de module
-
-```bash
-cd /home/`whoami`/geonature/backend
-source venv/bin/activate
-geonature deactivate_gn_module zones_humides
-```
 
 - Suppression des données dans plusieurs tables de la base de données
 
 ```bash
-SQL_PORT=5432
-GEONAT_USER=geonatadmin
-GEONAT_DB=geonature2db
-```
-
-{- Attention, commandes irréversibles de suppression de données en base de données (à faire uniquement si vous êtes certain de savoir ce que vous faites !) -}
-
-```bash
-sudo psql -h localhost -p $SQL_PORT -U $GEONAT_USER -d $GEONAT_DB -b -f "/home/`whoami`/gn_module_ZH/data/desinstall.sql"
+cd /home/`whoami`/geonature/backend
+source venv/bin/activate
+geonature db downgrade zones_humides@base
+pip uninstall gn_module_zh
 ```
 
 - Suppression des répertoires sur le serveur
 
-{- Attention, commandes irréversibles de suppression de fichiers sur le serveur (à faire uniquement si vous êtes certain de savoir ce que vous faites !) -}
-
 ```bash
 rm -rf /home/`whoami`/gn_module_ZH
-rm -rf /home/`whoami`/geonature/external_modules/zones_humides
+rm -rf /home/`whoami`/geonature/frontend/external_modules/zones_humides
 ```

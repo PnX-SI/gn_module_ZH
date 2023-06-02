@@ -37,6 +37,8 @@ interface BilanMenaces {
 interface Strategie {
   propositions: Proposition[];
   commentaires: null | string;
+  strategie: null | string;
+  mgmt_strategy: any;
 }
 
 interface Proposition {

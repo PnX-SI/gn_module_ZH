@@ -15,7 +15,7 @@
   height: 100%;
 }
 
-:host /deep/ .trash-btn {
+:host ::ng-deep .trash-btn {
   position: relative;
   top: 28px;
   left: 5px;
@@ -28,13 +28,13 @@ ngx-datatable {
   // overflow-y: scroll;
 }
 
-:host /deep/ .ngx-datatable.material .datatable-footer .page-count {
+:host ::ng-deep .ngx-datatable.material .datatable-footer .page-count {
   padding: 5px;
   line-height: 1.2;
   height: 40px;
 }
 
-:host /deep/ .datatable-body-row.active .datatable-row-group {
+:host ::ng-deep .datatable-body-row.active .datatable-row-group {
   background-color: rgb(117, 227, 118) !important;
 }
 
@@ -43,7 +43,7 @@ ngx-datatable {
     0 1px 5px 0 rgba(0, 0, 0, 0.12) !important;
 }
 
-:host /deep/ .datatable-row-detail {
+:host ::ng-deep .datatable-row-detail {
   height: auto !important;
   font-size: 0.8em;
 }
@@ -62,4 +62,8 @@ ngx-datatable {
 
 label {
   margin-bottom: 0;
+}
+
+#map-list {
+  margin-right: 0px;
 }

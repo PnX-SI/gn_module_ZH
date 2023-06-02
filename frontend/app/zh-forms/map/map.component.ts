@@ -1,17 +1,15 @@
-import { Component, OnInit, AfterViewInit, Output, EventEmitter } from "@angular/core";
-import { leafletDrawOption } from "@geonature_common/map/leaflet-draw.options";
-import { ModuleConfig } from "../../module.config";
-import { MapService } from "@geonature_common/map/map.service";
+import { Component, OnInit, AfterViewInit, Output, EventEmitter } from '@angular/core';
+import { leafletDrawOption } from '@geonature_common/map/leaflet-draw.options';
+import { MapService } from '@geonature_common/map/map.service';
 
-import * as L from "leaflet";
+import * as L from 'leaflet';
 
 @Component({
-  selector: "zh-form-map",
-  templateUrl: "map.component.html",
+  selector: 'zh-form-map',
+  templateUrl: 'map.component.html',
 })
 export class ZhFormMapComponent implements OnInit, AfterViewInit {
   public leafletDrawOptions: any;
-  public zhConfig = ModuleConfig;
   public geometry: any = null;
   public editedGeometry: any = null;
   @Output() draw = new EventEmitter<any>();
@@ -40,6 +38,8 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit {
         this._mapService.currentExtend.zoom
       );
     }
+    console.log(L.Draw);
+
     this._mapService.map.off(L.Draw.Event.DRAWSTART);
     this._mapService.map.on(L.Draw.Event.CREATED, (e) => {
       this.onDrawStop(e);

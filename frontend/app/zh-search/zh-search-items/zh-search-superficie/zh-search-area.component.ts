@@ -1,5 +1,5 @@
-import { Component, OnInit, Input } from "@angular/core";
-import { FormGroup } from "@angular/forms";
+import { Component, OnInit, Input } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 
 type Symbol = {
   value: string;
@@ -7,9 +7,9 @@ type Symbol = {
 };
 
 @Component({
-  selector: "zh-search-area",
-  templateUrl: "./zh-search-area.component.html",
-  styleUrls: ["./zh-search-area.component.scss"],
+  selector: 'zh-search-area',
+  templateUrl: './zh-search-area.component.html',
+  styleUrls: ['./zh-search-area.component.scss'],
 })
 export class ZhSearchAreaComponent implements OnInit {
   @Input() form: FormGroup;
@@ -20,17 +20,17 @@ export class ZhSearchAreaComponent implements OnInit {
   ngOnInit() {
     this.symbols = [
       {
-        value: "",
-        text: "Aucun filtre",
+        value: '',
+        text: 'Aucun filtre',
       },
       {
-        value: "≥",
-        text: "Supérieur à",
+        value: '≥',
+        text: 'Supérieur à',
       },
-      { value: "=", text: "Égale à" },
+      { value: '=', text: 'Égale à' },
       {
-        value: "≤",
-        text: "Inférieur à",
+        value: '≤',
+        text: 'Inférieur à',
       },
     ];
   }

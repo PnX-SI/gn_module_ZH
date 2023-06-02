@@ -121,7 +121,7 @@ species_source_name = "GeoNature"
 
 # file settings :
 
-allowed_extensions = [".pdf", ".jpg"]
+allowed_extensions = [".pdf", ".jpg", ".png"]
 
 max_pdf_size = 1.5  # Mo
 

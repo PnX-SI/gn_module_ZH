@@ -1,18 +1,18 @@
-import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { ToastrService } from "ngx-toastr";
-import { HydrographicZone } from "../models/zones";
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ToastrService } from 'ngx-toastr';
+import { HydrographicZone } from '../models/zones';
 
-import { ErrorTranslatorService } from "../services/error-translator.service";
+import { ErrorTranslatorService } from '../services/error-translator.service';
 
-import { ZhDataService } from "../services/zh-data.service";
-import { SearchFormService } from "../services/zh-search.service";
+import { ZhDataService } from '../services/zh-data.service';
+import { SearchFormService } from '../services/zh-search.service';
 
 @Component({
-  selector: "zh-search",
-  templateUrl: "./zh-search.component.html",
-  styleUrls: ["./zh-search.component.scss"],
+  selector: 'zh-search',
+  templateUrl: './zh-search.component.html',
+  styleUrls: ['./zh-search.component.scss'],
 })
 export class ZhSearchComponent implements OnInit {
   @Input() data: any;
@@ -31,7 +31,7 @@ export class ZhSearchComponent implements OnInit {
     private _toastr: ToastrService,
     private _error: ErrorTranslatorService,
     public ngbModal: NgbModal,
-    private _searchService: SearchFormService
+    public _searchService: SearchFormService
   ) {}
 
   ngOnInit() {
@@ -60,7 +60,7 @@ export class ZhSearchComponent implements OnInit {
 
   onDepartmentSelected(event) {
     // Reset form
-    this._searchService.searchForm.get("communes").reset();
+    this._searchService.searchForm.get('communes').reset();
     // reset it for the select to be disabled
     this.communes = undefined;
     if (event && event.length > 0) {
@@ -74,7 +74,7 @@ export class ZhSearchComponent implements OnInit {
 
   onBasinSelected(event) {
     // Reset form
-    this._searchService.searchForm.get("zones").reset();
+    this._searchService.searchForm.get('zones').reset();
     // reset it for the select to be disabled
     this.hydrographicZones = undefined;
     if (event && event.length > 0) {

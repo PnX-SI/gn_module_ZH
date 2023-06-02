@@ -1,13 +1,13 @@
-import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
-import { BehaviorSubject } from "rxjs";
-import { map } from "rxjs/operators";
-import { AppConfig } from "@geonature_config/app.config";
-import { DetailsModel } from "../zh-details/models/zh-details.model";
-import { HierarchyModel } from "../zh-details/models/hierarchy.model";
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { AppConfig } from '@geonature_config/app.config';
+import { DetailsModel } from '../zh-details/models/zh-details.model';
+import { HierarchyModel } from '../zh-details/models/hierarchy.model';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class ZhDataService {
   private zh = new BehaviorSubject(null);
@@ -91,7 +91,7 @@ export class ZhDataService {
 
   downloadFile(mediaId: number) {
     return this._api.get(`${AppConfig.API_ENDPOINT}/zones_humides/files/${mediaId}`, {
-      responseType: "blob",
+      responseType: 'blob',
     });
   }
 
@@ -118,7 +118,7 @@ export class ZhDataService {
 
   getPdf(zhId: number) {
     return this._api.get(`${AppConfig.API_ENDPOINT}/zones_humides/export_pdf/${zhId}`, {
-      responseType: "blob",
+      responseType: 'blob',
     });
   }
 
@@ -153,7 +153,7 @@ export class ZhDataService {
 
   getPbf() {
     return this._api.get(`${AppConfig.API_ENDPOINT}/zones_humides/pbf`, {
-      responseType: "blob",
+      responseType: 'blob',
     });
   }
   getRights(idZh: number) {

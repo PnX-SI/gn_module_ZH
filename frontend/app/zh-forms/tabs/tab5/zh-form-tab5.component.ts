@@ -1,21 +1,20 @@
-import { Component, EventEmitter, OnInit, Input, Output } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { ToastrService } from "ngx-toastr";
-import { Subscription, Observable } from "rxjs";
-import { debounceTime, distinctUntilChanged, map } from "rxjs/operators";
-import { ZhDataService } from "../../../services/zh-data.service";
-import { TabsService } from "../../../services/tabs.service";
-import { ModalService } from "../../../services/modal.service";
-import { TaxaFile } from "./zh-form-tab5.models";
-import { ErrorTranslatorService } from "../../../services/error-translator.service";
-import { FilesService } from "../../../services/files.service";
-import { ModuleConfig } from "../../../module.config";
+import { Component, EventEmitter, OnInit, Input, Output } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ToastrService } from 'ngx-toastr';
+import { Subscription, Observable } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
+import { ZhDataService } from '../../../services/zh-data.service';
+import { TabsService } from '../../../services/tabs.service';
+import { ModalService } from '../../../services/modal.service';
+import { TaxaFile } from './zh-form-tab5.models';
+import { ErrorTranslatorService } from '../../../services/error-translator.service';
+import { FilesService } from '../../../services/files.service';
 
 @Component({
-  selector: "zh-form-tab5",
-  templateUrl: "./zh-form-tab5.component.html",
-  styleUrls: ["./zh-form-tab5.component.scss"],
+  selector: 'zh-form-tab5',
+  templateUrl: './zh-form-tab5.component.html',
+  styleUrls: ['./zh-form-tab5.component.scss'],
 })
 export class ZhFormTab5Component implements OnInit {
   @Input() public formMetaData: any;
@@ -45,135 +44,134 @@ export class ZhFormTab5Component implements OnInit {
   public interetPatTable: any[] = [];
   public valSocEcoTable: any[] = [];
   public corineBioTable: any[] = [];
-  public config = ModuleConfig;
-  default_qualification: string = "Non évaluée";
-  default_knowledge: string = "Lacunaire ou nulle";
-  default_preservation_state: string = "Non évaluée";
+  default_qualification: string = 'Non évaluée';
+  default_knowledge: string = 'Lacunaire ou nulle';
+  default_preservation_state: string = 'Non évaluée';
 
-  readonly functionSize: string = "30%";
-  readonly qualifSize: string = "10%";
-  readonly knowledgeSize: string = "10%";
+  readonly functionSize: string = '30%';
+  readonly qualifSize: string = '10%';
+  readonly knowledgeSize: string = '10%';
 
   public hydroFctTableCol = [
     {
-      name: "function",
-      label: "Fonctions hydrologiques / biogéochimiques",
-      subcell: { name: "mnemonique" },
+      name: 'function',
+      label: 'Fonctions hydrologiques / biogéochimiques',
+      subcell: { name: 'mnemonique' },
       size: this.functionSize,
     },
-    { name: "justification", label: "Justifications" },
+    { name: 'justification', label: 'Justifications' },
     {
-      name: "qualification",
-      label: "Qualifications",
-      subcell: { name: "mnemonique" },
+      name: 'qualification',
+      label: 'Qualifications',
+      subcell: { name: 'mnemonique' },
       size: this.qualifSize,
     },
     {
-      name: "knowledge",
-      label: "Connaissance",
-      subcell: { name: "mnemonique" },
+      name: 'knowledge',
+      label: 'Connaissance',
+      subcell: { name: 'mnemonique' },
       size: this.knowledgeSize,
     },
   ];
   public bioFctTableCol = [
     {
-      name: "function",
-      label: "Fonctions biologiques / écologiques",
-      subcell: { name: "mnemonique" },
+      name: 'function',
+      label: 'Fonctions biologiques / écologiques',
+      subcell: { name: 'mnemonique' },
       size: this.functionSize,
     },
-    { name: "justification", label: "Justifications" },
+    { name: 'justification', label: 'Justifications' },
     {
-      name: "qualification",
-      label: "Qualifications",
-      subcell: { name: "mnemonique" },
+      name: 'qualification',
+      label: 'Qualifications',
+      subcell: { name: 'mnemonique' },
       size: this.qualifSize,
     },
     {
-      name: "knowledge",
-      label: "Connaissance",
-      subcell: { name: "mnemonique" },
+      name: 'knowledge',
+      label: 'Connaissance',
+      subcell: { name: 'mnemonique' },
       size: this.knowledgeSize,
     },
   ];
 
   public interetsTableCol = [
     {
-      name: "function",
-      label: "Intérêts patrimoniaux",
-      subcell: { name: "mnemonique" },
+      name: 'function',
+      label: 'Intérêts patrimoniaux',
+      subcell: { name: 'mnemonique' },
       size: this.functionSize,
     },
-    { name: "justification", label: "Justifications" },
+    { name: 'justification', label: 'Justifications' },
     {
-      name: "qualification",
-      label: "Qualifications",
-      subcell: { name: "mnemonique" },
+      name: 'qualification',
+      label: 'Qualifications',
+      subcell: { name: 'mnemonique' },
       size: this.qualifSize,
     },
     {
-      name: "knowledge",
-      label: "Connaissance",
-      subcell: { name: "mnemonique" },
+      name: 'knowledge',
+      label: 'Connaissance',
+      subcell: { name: 'mnemonique' },
       size: this.knowledgeSize,
     },
   ];
 
   public corineTableCol = [
     {
-      name: "corinBio",
-      label: "Corine biotopes",
-      subcell: { name: "front_name" },
+      name: 'corinBio',
+      label: 'Corine biotopes',
+      subcell: { name: 'front_name' },
       size: this.functionSize,
     },
     {
-      name: "cahierHab",
+      name: 'cahierHab',
       label: "Cahier d'habitats",
-      subcell: { name: "front_name" },
+      subcell: { name: 'front_name' },
     },
     {
-      name: "cahierHab",
-      label: "Statut*",
-      subcell: { name: "priority" },
+      name: 'cahierHab',
+      label: 'Statut*',
+      subcell: { name: 'priority' },
     },
     {
-      name: "preservationState",
-      label: "État de conservation",
-      subcell: { name: "mnemonique" },
+      name: 'preservationState',
+      label: 'État de conservation',
+      subcell: { name: 'mnemonique' },
       size: this.qualifSize,
     },
-    { name: "habCover", label: "Recouvrement sur la ZH (%)", size: "5%" },
+    { name: 'habCover', label: 'Recouvrement sur la ZH (%)', size: '5%' },
   ];
 
   public socioEcoTableCol = [
     {
-      name: "function",
-      label: "Valeurs socio-économiques",
-      subcell: { name: "mnemonique" },
+      name: 'function',
+      label: 'Valeurs socio-économiques',
+      subcell: { name: 'mnemonique' },
       size: this.functionSize,
     },
-    { name: "justification", label: "Justifications" },
+    { name: 'justification', label: 'Justifications' },
     {
-      name: "qualification",
-      label: "Qualifications",
-      subcell: { name: "mnemonique" },
+      name: 'qualification',
+      label: 'Qualifications',
+      subcell: { name: 'mnemonique' },
       size: this.qualifSize,
     },
     {
-      name: "knowledge",
-      label: "Connaissance",
-      subcell: { name: "mnemonique" },
+      name: 'knowledge',
+      label: 'Connaissance',
+      subcell: { name: 'mnemonique' },
       size: this.knowledgeSize,
     },
   ];
 
   public fileTableCol = [
     {
-      name: "title_fr",
-      label: "Titre du document",
+      name: 'title_fr',
+      label: 'Titre du document',
     },
-    { name: "author", label: "Auteur" },
-    { name: "description_fr", label: "Résumé" },
+    { name: 'author', label: 'Auteur' },
+    { name: 'description_fr', label: 'Résumé' },
   ];
 
   private tempID: any;
@@ -194,7 +192,7 @@ export class ZhFormTab5Component implements OnInit {
     private _modalService: ModalService,
     private _error: ErrorTranslatorService,
     private _tabService: TabsService,
-    private _filesService: FilesService
+    public _filesService: FilesService
   ) {}
 
   ngOnInit() {
@@ -247,28 +245,28 @@ export class ZhFormTab5Component implements OnInit {
     this.corineBioForm = this.fb.group({
       corinBio: [null, Validators.required],
       preservationState: [null, Validators.required],
-      cahierHab: [{ value: "", disabled: true }, Validators.required],
+      cahierHab: [{ value: '', disabled: true }, Validators.required],
       habCover: [0, Validators.compose([Validators.min(0), Validators.max(100)])],
     });
   }
 
   // get metaData forms
   getMetaData() {
-    this.fctHydroInput = this.groupArrayByCategory(this.formMetaData["FONCTIONS_HYDRO"]);
+    this.fctHydroInput = this.groupArrayByCategory(this.formMetaData['FONCTIONS_HYDRO']);
     this.fctHydroInputForTables = this.groupArrayByCategory(
-      this.formMetaData["FONCTIONS_HYDRO_all"]
+      this.formMetaData['FONCTIONS_HYDRO_all']
     );
-    this.bioFctInput = this.groupArrayByCategory(this.formMetaData["FONCTIONS_BIO"]);
-    this.bioFctInputForTables = this.groupArrayByCategory(this.formMetaData["FONCTIONS_BIO_all"]);
-    this.interetPatInput = this.groupArrayByCategory(this.formMetaData["INTERET_PATRIM"]);
+    this.bioFctInput = this.groupArrayByCategory(this.formMetaData['FONCTIONS_BIO']);
+    this.bioFctInputForTables = this.groupArrayByCategory(this.formMetaData['FONCTIONS_BIO_all']);
+    this.interetPatInput = this.groupArrayByCategory(this.formMetaData['INTERET_PATRIM']);
     this.interetPatInputForTables = this.groupArrayByCategory(
-      this.formMetaData["INTERET_PATRIM_all"]
+      this.formMetaData['INTERET_PATRIM_all']
     );
     this.interetPatInputForTables = this.groupArrayByCategory(
-      this.formMetaData["INTERET_PATRIM_all"]
+      this.formMetaData['INTERET_PATRIM_all']
     );
-    this.valSocEcoInput = [...this.formMetaData["VAL_SOC_ECO"]];
-    this.corinBioMetaData = [...this.formMetaData["CORINE_BIO"]].filter(
+    this.valSocEcoInput = [...this.formMetaData['VAL_SOC_ECO']];
+    this.corinBioMetaData = [...this.formMetaData['CORINE_BIO']].filter(
       (corine) => corine.CB_is_ch == true
     );
   }
@@ -352,10 +350,10 @@ export class ZhFormTab5Component implements OnInit {
         function: this.interetPatInputForTables
           .flat()
           .find((item: any) => item.id_nomenclature == pat.id_function),
-        qualification: this.formMetaData["FONCTIONS_QUALIF"].find(
+        qualification: this.formMetaData['FONCTIONS_QUALIF'].find(
           (item: any) => item.id_nomenclature == pat.id_qualification
         ),
-        knowledge: this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+        knowledge: this.formMetaData['FONCTIONS_CONNAISSANCE'].find(
           (item: any) => item.id_nomenclature == pat.id_knowledge
         ),
         justification: pat.justification,
@@ -370,10 +368,10 @@ export class ZhFormTab5Component implements OnInit {
         function: this.valSocEcoInput
           .flat()
           .find((item: any) => item.id_nomenclature == valSoc.id_function),
-        qualification: this.formMetaData["FONCTIONS_QUALIF"].find(
+        qualification: this.formMetaData['FONCTIONS_QUALIF'].find(
           (item: any) => item.id_nomenclature == valSoc.id_qualification
         ),
-        knowledge: this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+        knowledge: this.formMetaData['FONCTIONS_CONNAISSANCE'].find(
           (item: any) => item.id_nomenclature == valSoc.id_knowledge
         ),
         justification: valSoc.justification,
@@ -388,10 +386,10 @@ export class ZhFormTab5Component implements OnInit {
         function: this.bioFctInputForTables
           .flat()
           .find((item: any) => item.id_nomenclature == bioFct.id_function),
-        qualification: this.formMetaData["FONCTIONS_QUALIF"].find(
+        qualification: this.formMetaData['FONCTIONS_QUALIF'].find(
           (item: any) => item.id_nomenclature == bioFct.id_qualification
         ),
-        knowledge: this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+        knowledge: this.formMetaData['FONCTIONS_CONNAISSANCE'].find(
           (item: any) => item.id_nomenclature == bioFct.id_knowledge
         ),
         justification: bioFct.justification,
@@ -406,10 +404,10 @@ export class ZhFormTab5Component implements OnInit {
         function: this.fctHydroInputForTables
           .flat()
           .find((item: any) => item.id_nomenclature == hydroFct.id_function),
-        qualification: this.formMetaData["FONCTIONS_QUALIF"].find(
+        qualification: this.formMetaData['FONCTIONS_QUALIF'].find(
           (item: any) => item.id_nomenclature == hydroFct.id_qualification
         ),
-        knowledge: this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+        knowledge: this.formMetaData['FONCTIONS_CONNAISSANCE'].find(
           (item: any) => item.id_nomenclature == hydroFct.id_knowledge
         ),
         justification: hydroFct.justification,
@@ -436,7 +434,7 @@ export class ZhFormTab5Component implements OnInit {
             corinBio: this.corinBioMetaData.find(
               (item: any) => item.CB_code == corineBio.id_corine_bio
             ),
-            preservationState: this.formMetaData["ETAT_CONSERVATION"].find(
+            preservationState: this.formMetaData['ETAT_CONSERVATION'].find(
               (item: any) => item.id_nomenclature == corineBio.id_preservation_state
             ),
             cahierHab: selectedCahierHab,
@@ -451,22 +449,22 @@ export class ZhFormTab5Component implements OnInit {
   // open the add fonction hydrologique modal
   onAddHydroFct(event: any, modal: any) {
     this.hydroFctForm.reset();
-    this.hydroFctForm.controls["qualification"].setValue(
-      this.formMetaData["FONCTIONS_QUALIF"].find((item) => {
+    this.hydroFctForm.controls['qualification'].setValue(
+      this.formMetaData['FONCTIONS_QUALIF'].find((item) => {
         if (item.mnemonique == this.default_qualification) {
           return item;
         }
       })
     );
-    this.hydroFctForm.controls["knowledge"].setValue(
-      this.formMetaData["FONCTIONS_CONNAISSANCE"].find((item) => {
+    this.hydroFctForm.controls['knowledge'].setValue(
+      this.formMetaData['FONCTIONS_CONNAISSANCE'].find((item) => {
         if (item.mnemonique == this.default_knowledge) {
           return item;
         }
       })
     );
     this.patchModal = false;
-    this.addModalBtnLabel = "Ajouter";
+    this.addModalBtnLabel = 'Ajouter';
     this.modalTitle = "Ajout d'une fonction hydrologique / biogéochimique";
     event.stopPropagation();
 
@@ -509,16 +507,16 @@ export class ZhFormTab5Component implements OnInit {
   // open the edit hydroFct modal
   onEditHydroFct(modal: any, hydroFct: any) {
     this.patchModal = true;
-    this.addModalBtnLabel = "Modifier";
-    this.modalTitle = "Modifier la fonction hydrologique / biogéochimique";
+    this.addModalBtnLabel = 'Modifier';
+    this.modalTitle = 'Modifier la fonction hydrologique / biogéochimique';
     // init inputs object type
     const selectedFunction = this.fctHydroInput
       .flat()
       .find((item: any) => item.id_nomenclature == hydroFct.function.id_nomenclature);
-    const selectedKnowledge = this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+    const selectedKnowledge = this.formMetaData['FONCTIONS_CONNAISSANCE'].find(
       (item: any) => item.id_nomenclature == hydroFct.knowledge.id_nomenclature
     );
-    const selectedQualif = this.formMetaData["FONCTIONS_QUALIF"].find(
+    const selectedQualif = this.formMetaData['FONCTIONS_QUALIF'].find(
       (item: any) => item.id_nomenclature == hydroFct.qualification.id_nomenclature
     );
 
@@ -560,22 +558,22 @@ export class ZhFormTab5Component implements OnInit {
   // open the add fonction biologique modal
   onAddBioFct(event: any, modal: any) {
     this.bioFctForm.reset();
-    this.bioFctForm.controls["qualification"].setValue(
-      this.formMetaData["FONCTIONS_QUALIF"].find((item) => {
+    this.bioFctForm.controls['qualification'].setValue(
+      this.formMetaData['FONCTIONS_QUALIF'].find((item) => {
         if (item.mnemonique == this.default_qualification) {
           return item;
         }
       })
     );
-    this.bioFctForm.controls["knowledge"].setValue(
-      this.formMetaData["FONCTIONS_CONNAISSANCE"].find((item) => {
+    this.bioFctForm.controls['knowledge'].setValue(
+      this.formMetaData['FONCTIONS_CONNAISSANCE'].find((item) => {
         if (item.mnemonique == this.default_knowledge) {
           return item;
         }
       })
     );
     this.patchModal = false;
-    this.addModalBtnLabel = "Ajouter";
+    this.addModalBtnLabel = 'Ajouter';
     this.modalTitle = "Ajout d'une fonction biologique / écologique";
     event.stopPropagation();
     this._modalService.open(
@@ -616,16 +614,16 @@ export class ZhFormTab5Component implements OnInit {
   // open the edit bioFct modal
   onEditBioFct(modal: any, bioFct: any) {
     this.patchModal = true;
-    this.addModalBtnLabel = "Modifier";
-    this.modalTitle = "Modifier la fonction biologique / écologique";
+    this.addModalBtnLabel = 'Modifier';
+    this.modalTitle = 'Modifier la fonction biologique / écologique';
     // init inputs object type
     const selectedFunction = this.bioFctInput
       .flat()
       .find((item: any) => item.id_nomenclature == bioFct.function.id_nomenclature);
-    const selectedKnowledge = this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+    const selectedKnowledge = this.formMetaData['FONCTIONS_CONNAISSANCE'].find(
       (item: any) => item.id_nomenclature == bioFct.knowledge.id_nomenclature
     );
-    const selectedQualif = this.formMetaData["FONCTIONS_QUALIF"].find(
+    const selectedQualif = this.formMetaData['FONCTIONS_QUALIF'].find(
       (item: any) => item.id_nomenclature == bioFct.qualification.id_nomenclature
     );
 
@@ -667,22 +665,22 @@ export class ZhFormTab5Component implements OnInit {
   // open the add fonction intérêt patrimonal modal
   onAddInteretPat(event: any, modal: any) {
     this.interetPatForm.reset();
-    this.interetPatForm.controls["qualification"].setValue(
-      this.formMetaData["FONCTIONS_QUALIF"].find((item) => {
+    this.interetPatForm.controls['qualification'].setValue(
+      this.formMetaData['FONCTIONS_QUALIF'].find((item) => {
         if (item.mnemonique == this.default_qualification) {
           return item;
         }
       })
     );
-    this.interetPatForm.controls["knowledge"].setValue(
-      this.formMetaData["FONCTIONS_CONNAISSANCE"].find((item) => {
+    this.interetPatForm.controls['knowledge'].setValue(
+      this.formMetaData['FONCTIONS_CONNAISSANCE'].find((item) => {
         if (item.mnemonique == this.default_knowledge) {
           return item;
         }
       })
     );
     this.patchModal = false;
-    this.addModalBtnLabel = "Ajouter";
+    this.addModalBtnLabel = 'Ajouter';
     this.modalTitle = "Ajout d'un intérêt patrimonal";
     event.stopPropagation();
     this._modalService.open(
@@ -725,16 +723,16 @@ export class ZhFormTab5Component implements OnInit {
   // open the edit interetPat modal
   onEditInteretPat(modal: any, interetPat: any) {
     this.patchModal = true;
-    this.addModalBtnLabel = "Modifier";
+    this.addModalBtnLabel = 'Modifier';
     this.modalTitle = "Modifier l'intérêt patrimonal";
     // init inputs object type
     const selectedFunction = this.interetPatInput
       .flat()
       .find((item: any) => item.id_nomenclature == interetPat.function.id_nomenclature);
-    const selectedKnowledge = this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+    const selectedKnowledge = this.formMetaData['FONCTIONS_CONNAISSANCE'].find(
       (item: any) => item.id_nomenclature == interetPat.knowledge.id_nomenclature
     );
-    const selectedQualif = this.formMetaData["FONCTIONS_QUALIF"].find(
+    const selectedQualif = this.formMetaData['FONCTIONS_QUALIF'].find(
       (item: any) => item.id_nomenclature == interetPat.qualification.id_nomenclature
     );
 
@@ -783,15 +781,15 @@ export class ZhFormTab5Component implements OnInit {
           const msg =
             "Aucun fichier n'a été généré car aucune espèce n'a été trouvée dans la zone humide";
           const timeOut: number = 10000;
-          this._toastr.error(msg, "", {
+          this._toastr.error(msg, '', {
             timeOut: timeOut, // to be sure the user sees the toast
             closeButton: true,
           });
         } else {
-          const files = res.file_names.map((file) => file.replace(/^.*[\\\/]/, ""));
-          const msg = `Les fichiers suivants ont été générés </br> ${files.join("</br>")}`;
+          const files = res.file_names.map((file) => file.replace(/^.*[\\\/]/, ''));
+          const msg = `Les fichiers suivants ont été générés </br> ${files.join('</br>')}`;
           const timeOut: number = 10000;
-          this._toastr.success(msg, "", {
+          this._toastr.success(msg, '', {
             timeOut: timeOut, // to be sure the user sees the toast
             closeButton: true,
             enableHtml: true,
@@ -799,14 +797,14 @@ export class ZhFormTab5Component implements OnInit {
         }
       })
       .catch((error) => {
-        let frontError: string = "";
+        let frontError: string = '';
         if (error.status === 404) {
-          frontError = "Erreur 404 : URL non trouvé";
+          frontError = 'Erreur 404 : URL non trouvé';
         } else {
           frontError = this._error.getFrontError(error ? error.error.message : null);
         }
-        this._toastr.error(frontError, "", {
-          positionClass: "toast-top-right",
+        this._toastr.error(frontError, '', {
+          positionClass: 'toast-top-right',
         });
       })
       .finally(() => {
@@ -820,22 +818,22 @@ export class ZhFormTab5Component implements OnInit {
 
   onAddValSocEco(event: any, modal: any) {
     this.valSocEcoForm.reset();
-    this.valSocEcoForm.controls["qualification"].setValue(
-      this.formMetaData["FONCTIONS_QUALIF"].find((item) => {
+    this.valSocEcoForm.controls['qualification'].setValue(
+      this.formMetaData['FONCTIONS_QUALIF'].find((item) => {
         if (item.mnemonique == this.default_qualification) {
           return item;
         }
       })
     );
-    this.valSocEcoForm.controls["knowledge"].setValue(
-      this.formMetaData["FONCTIONS_CONNAISSANCE"].find((item) => {
+    this.valSocEcoForm.controls['knowledge'].setValue(
+      this.formMetaData['FONCTIONS_CONNAISSANCE'].find((item) => {
         if (item.mnemonique == this.default_knowledge) {
           return item;
         }
       })
     );
     this.patchModal = false;
-    this.addModalBtnLabel = "Ajouter";
+    this.addModalBtnLabel = 'Ajouter';
     this.modalTitle = "Ajout d'une valeur socio-économique";
     event.stopPropagation();
     this._modalService.open(
@@ -877,16 +875,16 @@ export class ZhFormTab5Component implements OnInit {
   // open the edit valSocEco modal
   onEditValSocEco(modal: any, valSocEco: any) {
     this.patchModal = true;
-    this.addModalBtnLabel = "Modifier";
-    this.modalTitle = "Modifier une valeur socio-économique";
+    this.addModalBtnLabel = 'Modifier';
+    this.modalTitle = 'Modifier une valeur socio-économique';
     // init inputs object type
     const selectedFunction = this.valSocEcoInput
       .flat()
       .find((item: any) => item.id_nomenclature == valSocEco.function.id_nomenclature);
-    const selectedKnowledge = this.formMetaData["FONCTIONS_CONNAISSANCE"].find(
+    const selectedKnowledge = this.formMetaData['FONCTIONS_CONNAISSANCE'].find(
       (item: any) => item.id_nomenclature == valSocEco.knowledge.id_nomenclature
     );
-    const selectedQualif = this.formMetaData["FONCTIONS_QUALIF"].find(
+    const selectedQualif = this.formMetaData['FONCTIONS_QUALIF'].find(
       (item: any) => item.id_nomenclature == valSocEco.qualification.id_nomenclature
     );
 
@@ -929,21 +927,21 @@ export class ZhFormTab5Component implements OnInit {
   // open the add CorineBio modal
   onAddCorineBio(event: any, modal: any) {
     this.corineBioForm.reset();
-    this.corineBioForm.controls["preservationState"].setValue(
-      this.formMetaData["ETAT_CONSERVATION"].find((item) => {
+    this.corineBioForm.controls['preservationState'].setValue(
+      this.formMetaData['ETAT_CONSERVATION'].find((item) => {
         if (item.mnemonique == this.default_preservation_state) {
           return item;
         }
       })
     );
     this.patchModal = false;
-    this.addModalBtnLabel = "Ajouter";
+    this.addModalBtnLabel = 'Ajouter';
     this.modalTitle = "Ajout d'un habitat humide patrimonial";
     event.stopPropagation();
     this.ngbModal.open(modal, {
       centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
+      size: 'lg',
+      windowClass: 'bib-modal',
     });
   }
 
@@ -955,7 +953,7 @@ export class ZhFormTab5Component implements OnInit {
       this.sortCorineBio();
       this.ngbModal.dismissAll();
       this.corineBioForm.reset();
-      this.corineBioForm.get("cahierHab").disable();
+      this.corineBioForm.get('cahierHab').disable();
       this.canChangeTab.emit(false);
       this.modalFormSubmitted = false;
     }
@@ -970,14 +968,14 @@ export class ZhFormTab5Component implements OnInit {
   // open the edit corineBio modal
   onEditCorineBio(modal: any, corineBio: any) {
     this.patchModal = true;
-    this.addModalBtnLabel = "Modifier";
-    this.modalTitle = "Modifier un habitat humide patrimonial";
+    this.addModalBtnLabel = 'Modifier';
+    this.modalTitle = 'Modifier un habitat humide patrimonial';
     let selectedCahierHab;
     // init inputs object type
     const selectedCorin = this.corinBioMetaData.find(
       (item: any) => item.CB_code == corineBio.corinBio.CB_code
     );
-    const selectedState = this.formMetaData["ETAT_CONSERVATION"].find(
+    const selectedState = this.formMetaData['ETAT_CONSERVATION'].find(
       (item: any) => item.id_nomenclature == corineBio.preservationState.id_nomenclature
     );
     this._dataService.getHabitatByCorine(corineBio.corinBio.CB_code).subscribe((habitats: any) => {
@@ -990,7 +988,7 @@ export class ZhFormTab5Component implements OnInit {
           .some((e) => e.cd_hab === item.cd_hab && e.cd_hab !== selectedCahierHab.cd_hab);
         return item;
       });
-      this.corineBioForm.get("cahierHab").enable();
+      this.corineBioForm.get('cahierHab').enable();
       // patch form values
       this.corineBioForm.patchValue({
         corinBio: selectedCorin,
@@ -1001,8 +999,8 @@ export class ZhFormTab5Component implements OnInit {
       this.tempID = selectedCahierHab.cd_hab;
       this.ngbModal.open(modal, {
         centered: true,
-        size: "lg",
-        windowClass: "bib-modal",
+        size: 'lg',
+        windowClass: 'bib-modal',
       });
     });
   }
@@ -1052,7 +1050,7 @@ export class ZhFormTab5Component implements OnInit {
           .some((e) => e.cd_hab === item.cd_hab);
         return item;
       });
-      this.corineBioForm.get("cahierHab").enable();
+      this.corineBioForm.get('cahierHab').enable();
     });
   }
 
@@ -1142,8 +1140,8 @@ export class ZhFormTab5Component implements OnInit {
             this._dataService.setCurrentZh(zh);
             this.posted = false;
             this.canChangeTab.emit(true);
-            this._toastr.success("Vos données sont bien enregistrées", "", {
-              positionClass: "toast-top-right",
+            this._toastr.success('Vos données sont bien enregistrées', '', {
+              positionClass: 'toast-top-right',
             });
             this.nextTab.emit(6);
           });
@@ -1151,8 +1149,8 @@ export class ZhFormTab5Component implements OnInit {
         (error) => {
           this.posted = false;
           const frontMsg: string = this._error.getFrontError(error.error.message);
-          this._toastr.error(frontMsg, "", {
-            positionClass: "toast-top-right",
+          this._toastr.error(frontMsg, '', {
+            positionClass: 'toast-top-right',
           });
         }
       );
