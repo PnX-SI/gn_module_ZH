@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.0 - Taillefer (2023-05-26)
+## 1.1.0 - Taillefer (2023-06-02)
 
 Nécessite la version 2.12.0 (ou plus) de GeoNature.
 
@@ -23,7 +23,7 @@ Nécessite la version 2.12.0 (ou plus) de GeoNature.
 **⚠️ Notes de version**
 
 - Si vous mettez à jour le module indépendamment de GeoNature, suivez la procédure classique de mise à jour du module, mais sans exécuter les évolutions de la BDD dans un premier temps (`geonature install-gn-module ~/gn_module_ZH ZONES_HUMIDES --upgrade-db=false`)
-- Si vous mettez à jour le module en même que vous mettez à jour GeoNature, suivez la nouvelle procédure de mise à jour de GeoNature qui consiste uniquement à télécharger la nouvelle version du module, la dézipper, la renommer (ou uniquement de faire un `git pull` depuis le dossier du module si celui-ci a été installé avec git) puis lancer le script de migration de GeoNature qui se chargera de mettre à jour les modules en même temps
+- Si vous mettez à jour le module en même temps que vous mettez à jour GeoNature, suivez la nouvelle procédure de mise à jour de GeoNature qui consiste uniquement à télécharger la nouvelle version du module, la dézipper, la renommer (ou uniquement de faire un `git pull` depuis le dossier du module si celui-ci a été installé avec git) puis lancer le script de migration de GeoNature qui se chargera de mettre à jour les modules en même temps
 - Exécutez ensuite la commande suivante afin d’indiquer à Alembic que votre base de données est dans l'état de la version 1.0.0 et appliquer automatiquement les évolutions pour la passer dans l'état de la version 1.1.0 :
   ```
   geonature db stamp 01cb1aaa2062
