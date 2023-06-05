@@ -44,6 +44,7 @@ def upgrade():
         $$ LANGUAGE SQL STRICT IMMUTABLE;
     """
     )
+    op.execute("DROP MATERIALIZED VIEW IF EXISTS pr_zh.atlas_app")
     op.execute(
         """
         CREATE OR REPLACE VIEW pr_zh.atlas_app
