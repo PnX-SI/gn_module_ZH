@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 (2023-06-06)
+
+- Remplacement de la vue matérialisée `pr_zh.atlas_app` par une vue (utilisée par la route `/api/zones_humides/pbf/complete`) pour corriger et simplifier la mise à jour des données de l'[atlas des zones humides](https://github.com/PnX-SI/GeoNature-ZH-atlas) (#24)
+
 ## 1.1.0 - Taillefer (2023-06-02)
 
 Nécessite la version 2.12.0 (ou plus) de GeoNature.
