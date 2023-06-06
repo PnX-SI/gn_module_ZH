@@ -20,8 +20,9 @@ depends_on = None
 # - treats better the downgrade part by removing the slugify function
 #   used only for the view (thus this function need to be re-created)
 
+
 def upgrade():
-    # Recreate function here if it is dropped by the 
+    # Recreate function here if it is dropped by the
     op.execute(
         """
         CREATE OR REPLACE FUNCTION pr_zh.slugify("value" TEXT)
