@@ -37,8 +37,8 @@ def upgrade():
             (
                 VALUES
                      ('ZONES_HUMIDES', 'ALL', 'C', True, 'Créer des ZH')
-                    ,('ZONES_HUMIDES', 'ALL', 'R', True, 'Voir des ZH')
-                    ,('ZONES_HUMIDES', 'ALL', 'U', True, 'Modifier des ZH')
+                    ,('ZONES_HUMIDES', 'ALL', 'R', True, 'Voir les ZH')
+                    ,('ZONES_HUMIDES', 'ALL', 'U', True, 'Modifier les ZH')
                     ,('ZONES_HUMIDES', 'ALL', 'D', True, 'Supprimer des ZH')
             ) AS v (module_code, object_code, action_code, scope_filter, label)
         JOIN
