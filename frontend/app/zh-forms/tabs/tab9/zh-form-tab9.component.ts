@@ -1,14 +1,14 @@
-import { Component, OnInit } from "@angular/core";
-import { Subscription } from "rxjs";
+import { Component, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 
-import { ZhDataService } from "../../../services/zh-data.service";
-import { HierarchyService } from "../../../services/hierarchy.service";
-import { TabsService } from "../../../services/tabs.service";
+import { ZhDataService } from '../../../services/zh-data.service';
+import { HierarchyService } from '../../../services/hierarchy.service';
+import { TabsService } from '../../../services/tabs.service';
 
 @Component({
-  selector: "zh-form-tab9",
-  templateUrl: "./zh-form-tab9.component.html",
-  styleUrls: ["./zh-form-tab9.component.scss"],
+  selector: 'zh-form-tab9',
+  templateUrl: './zh-form-tab9.component.html',
+  styleUrls: ['./zh-form-tab9.component.scss'],
 })
 export class ZhFormTab9Component implements OnInit {
   private $_currentZhSub: Subscription;

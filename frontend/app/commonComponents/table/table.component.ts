@@ -1,13 +1,13 @@
-import { Component, Input } from "@angular/core";
-import { Output, EventEmitter } from "@angular/core";
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { Component, Input } from '@angular/core';
+import { Output, EventEmitter } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { TableColumn } from "./table-interface";
+import { TableColumn } from './table-interface';
 
 @Component({
-  selector: "zh-table",
-  templateUrl: "./table.component.html",
-  styleUrls: ["./table.component.scss"],
+  selector: 'zh-table',
+  templateUrl: './table.component.html',
+  styleUrls: ['./table.component.scss'],
 })
 export class TableComponent {
   constructor(public deleteModal: NgbModal) {}
@@ -17,7 +17,7 @@ export class TableComponent {
   @Input() bold_row_values: any = [];
   @Input() italic_row_values: any = [];
   @Input() color_col_name: string;
-  @Input() color_value: string = "";
+  @Input() color_value: string = '';
   @Input() deletable: boolean;
   @Input() editable: boolean;
   @Input() downloadable: boolean;
@@ -43,8 +43,8 @@ export class TableComponent {
     this.deleteModal
       .open(modal, {
         centered: true,
-        size: "lg",
-        windowClass: "bib-modal",
+        size: 'lg',
+        windowClass: 'bib-modal',
       })
       .result.then(
         () => {

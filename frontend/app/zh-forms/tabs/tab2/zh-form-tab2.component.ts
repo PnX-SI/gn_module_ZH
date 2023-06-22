@@ -1,15 +1,15 @@
-import { Component, EventEmitter, Input, OnInit, AfterViewInit, Output } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { ToastrService } from "ngx-toastr";
-import { Subscription } from "rxjs";
-import { ErrorTranslatorService } from "../../../services/error-translator.service";
-import { TabsService } from "../../../services/tabs.service";
-import { ZhDataService } from "../../../services/zh-data.service";
+import { Component, EventEmitter, Input, OnInit, AfterViewInit, Output } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
+import { Subscription } from 'rxjs';
+import { ErrorTranslatorService } from '../../../services/error-translator.service';
+import { TabsService } from '../../../services/tabs.service';
+import { ZhDataService } from '../../../services/zh-data.service';
 
 @Component({
-  selector: "zh-form-tab2",
-  templateUrl: "./zh-form-tab2.component.html",
-  styleUrls: ["./zh-form-tab2.component.scss"],
+  selector: 'zh-form-tab2',
+  templateUrl: './zh-form-tab2.component.html',
+  styleUrls: ['./zh-form-tab2.component.scss'],
 })
 export class ZhFormTab2Component implements OnInit, AfterViewInit {
   @Input() formMetaData;
@@ -36,9 +36,9 @@ export class ZhFormTab2Component implements OnInit, AfterViewInit {
   ngOnInit() {
     this.dropdownSettings = {
       singleSelection: false,
-      idField: "id_nomenclature",
-      textField: "mnemonique",
-      searchPlaceholderText: "Rechercher",
+      idField: 'id_nomenclature',
+      textField: 'mnemonique',
+      searchPlaceholderText: 'Rechercher',
       enableCheckAll: false,
       allowSearchFilter: true,
     };
@@ -128,8 +128,8 @@ export class ZhFormTab2Component implements OnInit, AfterViewInit {
             this._dataService.setCurrentZh(zh);
             this.posted = false;
             this.canChangeTab.emit(true);
-            this._toastr.success("Vos données sont bien enregistrées", "", {
-              positionClass: "toast-top-right",
+            this._toastr.success('Vos données sont bien enregistrées', '', {
+              positionClass: 'toast-top-right',
             });
             this.nextTab.emit(3);
           });
@@ -137,8 +137,8 @@ export class ZhFormTab2Component implements OnInit, AfterViewInit {
         (error) => {
           this.posted = false;
           const frontMsg: string = this._error.getFrontError(error.error.message);
-          this._toastr.error(frontMsg, "", {
-            positionClass: "toast-top-right",
+          this._toastr.error(frontMsg, '', {
+            positionClass: 'toast-top-right',
           });
         }
       );

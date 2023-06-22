@@ -1,12 +1,12 @@
-import { Component, Input } from "@angular/core";
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { Router } from "@angular/router";
-import { TabsService } from "../../services/tabs.service";
+import { Component, Input } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Router } from '@angular/router';
+import { TabsService } from '../../services/tabs.service';
 
 @Component({
-  selector: "zh-cancelButton",
-  templateUrl: "./cancelButton.component.html",
-  styleUrls: ["./cancelButton.component.scss"],
+  selector: 'zh-cancelButton',
+  templateUrl: './cancelButton.component.html',
+  styleUrls: ['./cancelButton.component.scss'],
 })
 export class CancelButtonComponent {
   @Input() zhId: number;
@@ -18,11 +18,11 @@ export class CancelButtonComponent {
 
   onCancel(modal: any) {
     if (!this.zhId) {
-      this.router.navigate(["/zones_humides"]);
+      this.router.navigate(['/zones_humides']);
     } else {
       this.ngbModal.open(modal, {
         centered: true,
-        windowClass: "bib-modal cancel-modal",
+        windowClass: 'bib-modal cancel-modal',
       });
     }
   }

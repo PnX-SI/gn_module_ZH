@@ -1,24 +1,24 @@
-import { Component, EventEmitter, OnInit, Input, Output } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { NgbDateParserFormatter, NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { NgbDatepickerI18n } from "@ng-bootstrap/ng-bootstrap";
+import { Component, EventEmitter, OnInit, Input, Output } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { NgbDateParserFormatter, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDatepickerI18n } from '@ng-bootstrap/ng-bootstrap';
 
-import { NgbDateFRParserFormatter } from "../../../services/dateFrFormatter";
-import { TabsService } from "../../../services/tabs.service";
-import { ModalService } from "../../../services/modal.service";
-import { ConfigService } from "@geonature/services/config.service";
+import { NgbDateFRParserFormatter } from '../../../services/dateFrFormatter';
+import { TabsService } from '../../../services/tabs.service';
+import { ModalService } from '../../../services/modal.service';
+import { ConfigService } from '@geonature/services/config.service';
 
-import { ToastrService } from "ngx-toastr";
-import { Subscription } from "rxjs";
-import { DatepickerI18n, I18n } from "../../../services/datepicker-i18n.service";
+import { ToastrService } from 'ngx-toastr';
+import { Subscription } from 'rxjs';
+import { DatepickerI18n, I18n } from '../../../services/datepicker-i18n.service';
 
-import { ZhDataService } from "../../../services/zh-data.service";
-import { ErrorTranslatorService } from "../../../services/error-translator.service";
+import { ZhDataService } from '../../../services/zh-data.service';
+import { ErrorTranslatorService } from '../../../services/error-translator.service';
 
 @Component({
-  selector: "zh-form-tab6",
-  templateUrl: "./zh-form-tab6.component.html",
-  styleUrls: ["./zh-form-tab6.component.scss"],
+  selector: 'zh-form-tab6',
+  templateUrl: './zh-form-tab6.component.html',
+  styleUrls: ['./zh-form-tab6.component.scss'],
   providers: [
     I18n,
     { provide: NgbDatepickerI18n, useClass: DatepickerI18n },
@@ -61,55 +61,55 @@ export class ZhFormTab6Component implements OnInit {
   private $_fromChangeSub: Subscription;
   private $_getTabChangeSub: Subscription;
   public selectedItems = [];
-  default_status: string = "Indéterminé";
+  default_status: string = 'Indéterminé';
 
-  readonly urbanColSize: string = "15%";
+  readonly urbanColSize: string = '15%';
 
   public statusTableCol = [
     {
-      name: "status",
-      label: "Statut",
-      subcell: { name: "mnemonique" },
-      size: "45%",
+      name: 'status',
+      label: 'Statut',
+      subcell: { name: 'mnemonique' },
+      size: '45%',
     },
-    { name: "remark", label: "Remarques" },
+    { name: 'remark', label: 'Remarques' },
   ];
 
   public instrumentTableCol = [
     {
-      name: "instrument",
-      label: "Instruments contractuels et financiers",
-      subcell: { name: "mnemonique" },
+      name: 'instrument',
+      label: 'Instruments contractuels et financiers',
+      subcell: { name: 'mnemonique' },
     },
-    { name: "instrument_date", label: "Date de mise en oeuvre" },
+    { name: 'instrument_date', label: 'Date de mise en oeuvre' },
   ];
 
   public urbanDocTableCol = [
     {
-      name: "area",
-      label: "Commune",
-      subcell: { name: "municipality_name" },
+      name: 'area',
+      label: 'Commune',
+      subcell: { name: 'municipality_name' },
       size: this.urbanColSize,
     },
     {
-      name: "urbanType",
-      label: "Type de document communal",
-      subcell: { name: "mnemonique" },
+      name: 'urbanType',
+      label: 'Type de document communal',
+      subcell: { name: 'mnemonique' },
       size: this.urbanColSize,
     },
     {
-      name: "typeClassement",
-      label: "Type de classement",
-      subcell: { name: "mnemonique" },
+      name: 'typeClassement',
+      label: 'Type de classement',
+      subcell: { name: 'mnemonique' },
       size: this.urbanColSize,
     },
-    { name: "remark", label: "Remarques" },
+    { name: 'remark', label: 'Remarques' },
   ];
   public planTableCol = [
-    { name: "plan", label: "Nature du plan de gestion" },
-    { name: "plan_date", label: "Date de réalisation" },
-    { name: "duration", label: "Durée (années)" },
-    { name: "remark", label: "Remarques" },
+    { name: 'plan', label: 'Nature du plan de gestion' },
+    { name: 'plan_date', label: 'Date de réalisation' },
+    { name: 'duration', label: 'Durée (années)' },
+    { name: 'remark', label: 'Remarques' },
   ];
 
   public dropdownSettings: any;
@@ -143,31 +143,31 @@ export class ZhFormTab6Component implements OnInit {
   ngOnInit() {
     this.multiselectTypeClassement = {
       singleSelection: false,
-      idField: "id_cor",
-      textField: "mnemonique",
-      searchPlaceholderText: "Rechercher",
+      idField: 'id_cor',
+      textField: 'mnemonique',
+      searchPlaceholderText: 'Rechercher',
       enableCheckAll: false,
       allowSearchFilter: true,
     };
     this.organismDropdownSettings = {
       enableSearchFilter: true,
       singleSelection: true,
-      text: "Sélectionner un organisme",
-      labelKey: "name",
-      primaryKey: "id_org",
+      text: 'Sélectionner un organisme',
+      labelKey: 'name',
+      primaryKey: 'id_org',
       enableFilterSelectAll: false,
-      noDataLabel: "Aucun organisme disponible",
+      noDataLabel: 'Aucun organisme disponible',
     };
     this.dropdownSettings = {
       enableCheckAll: false,
-      text: "Selectionner",
-      labelKey: "mnemonique_status",
-      primaryKey: "id_protection_status",
-      searchPlaceholderText: "Rechercher",
+      text: 'Selectionner',
+      labelKey: 'mnemonique_status',
+      primaryKey: 'id_protection_status',
+      searchPlaceholderText: 'Rechercher',
       enableSearchFilter: true,
-      groupBy: "category",
+      groupBy: 'category',
       autoposition: false,
-      position: "top",
+      position: 'top',
       maxHeight: 190,
     };
 
@@ -219,12 +219,12 @@ export class ZhFormTab6Component implements OnInit {
 
   // get metaData forms
   getMetaData() {
-    this.statusInput = this.formMetaData["STATUT_PROPRIETE"];
+    this.statusInput = this.formMetaData['STATUT_PROPRIETE'];
     // add disabled property to statusInput options list
     this.statusInput.map((item: any) => {
       item.disabled = false;
     });
-    this.instrumentInput = this.formMetaData["INSTRU_CONTRAC_FINANC"];
+    this.instrumentInput = this.formMetaData['INSTRU_CONTRAC_FINANC'];
     this.instrumentInput.map((item: any) => {
       item.disabled = false;
     });
@@ -248,7 +248,7 @@ export class ZhFormTab6Component implements OnInit {
             this.currentZh.properties.protections.length > 0
           ) {
             this.currentZh.properties.protections.forEach((element) => {
-              let protection = this.formMetaData["PROTECTIONS"].find(
+              let protection = this.formMetaData['PROTECTIONS'].find(
                 (item: any) => item.id_protection_status == element
               );
 
@@ -266,7 +266,7 @@ export class ZhFormTab6Component implements OnInit {
           ) {
             this.currentZh.properties.ownerships.forEach((owner: any) => {
               this.statusTable.push({
-                status: this.formMetaData["STATUT_PROPRIETE"].find(
+                status: this.formMetaData['STATUT_PROPRIETE'].find(
                   (item: any) => item.id_nomenclature == owner.id_status
                 ),
                 remark: owner.remark,
@@ -284,7 +284,7 @@ export class ZhFormTab6Component implements OnInit {
           ) {
             this.currentZh.properties.instruments.forEach((instrument: any) => {
               this.instrumentTable.push({
-                instrument: this.formMetaData["INSTRU_CONTRAC_FINANC"].find(
+                instrument: this.formMetaData['INSTRU_CONTRAC_FINANC'].find(
                   (item: any) => item.id_nomenclature == instrument.id_instrument
                 ),
                 instrument_date: instrument.instrument_date,
@@ -301,14 +301,14 @@ export class ZhFormTab6Component implements OnInit {
             this.currentZh.properties.managements.length > 0
           ) {
             this.currentZh.properties.managements.forEach((management: any) => {
-              let structure = this.formMetaData["BIB_MANAGEMENT_STRUCTURES"].find(
+              let structure = this.formMetaData['BIB_MANAGEMENT_STRUCTURES'].find(
                 (item: any) => item.id_org == management.structure
               );
               let plans = [];
               if (management.plans && management.plans.length > 0) {
                 management.plans.forEach((plan) => {
                   plans.push({
-                    plan: this.formMetaData["PLAN_GESTION"].find(
+                    plan: this.formMetaData['PLAN_GESTION'].find(
                       (item: any) => item.id_nomenclature == plan.id_nature
                     ),
                     plan_date: plan.plan_date,
@@ -331,7 +331,7 @@ export class ZhFormTab6Component implements OnInit {
             this.currentZh.properties.urban_docs.length > 0
           ) {
             this.currentZh.properties.urban_docs.forEach((doc: any) => {
-              let docType = this.formMetaData["TYP_DOC_COMM"].find(
+              let docType = this.formMetaData['TYP_DOC_COMM'].find(
                 (item: any) => item.id_nomenclature == doc.id_doc_type
               );
               let typeClassement = [];
@@ -342,14 +342,14 @@ export class ZhFormTab6Component implements OnInit {
                 });
               }
               let classementNames = typeClassement.map((item) => {
-                return item["mnemonique"];
+                return item['mnemonique'];
               });
               this.urbanDocTable.push({
                 area: this.municipalities.find((item: any) => item.id_area == doc.id_area),
                 urbanType: docType,
                 typeClassement: {
                   typeClassement: typeClassement,
-                  mnemonique: classementNames.join("\r\n"),
+                  mnemonique: classementNames.join('\r\n'),
                 },
                 remark: doc.remark,
               });
@@ -372,15 +372,15 @@ export class ZhFormTab6Component implements OnInit {
   // open the add status modal
   onAddStatus(event: any, modal: any) {
     this.statusForm.reset();
-    this.statusForm.controls["status"].setValue(
-      this.formMetaData["STATUT_PROPRIETE"].find((item) => {
+    this.statusForm.controls['status'].setValue(
+      this.formMetaData['STATUT_PROPRIETE'].find((item) => {
         if (item.mnemonique == this.default_status) {
           return item;
         }
       })
     );
     this.patchModal = false;
-    this.addModalBtnLabel = "Ajouter";
+    this.addModalBtnLabel = 'Ajouter';
     this.modalTitle = "Ajout d'un statut de propriété";
     event.stopPropagation();
     this._modalService.open(
@@ -432,8 +432,8 @@ export class ZhFormTab6Component implements OnInit {
   // open the edit status modal
   onEditStatus(modal: any, status: any) {
     this.patchModal = true;
-    this.addModalBtnLabel = "Modifier";
-    this.modalTitle = "Modifier le statut de propriété";
+    this.addModalBtnLabel = 'Modifier';
+    this.modalTitle = 'Modifier le statut de propriété';
     // init inputs object type
     const selectedStatus = this.statusInput.find(
       (item: any) => item.id_nomenclature == status.status.id_nomenclature
@@ -479,7 +479,7 @@ export class ZhFormTab6Component implements OnInit {
   onAddInstrument(event: any, modal: any) {
     this.instrumentForm.reset();
     this.patchModal = false;
-    this.addModalBtnLabel = "Ajouter";
+    this.addModalBtnLabel = 'Ajouter';
     this.modalTitle = "Ajout d'un instrument contractuel et financier";
     event.stopPropagation();
     this._modalService.open(
@@ -522,7 +522,7 @@ export class ZhFormTab6Component implements OnInit {
   // open the edit instrument modal
   onEditInstrument(modal: any, instrument: any) {
     this.patchModal = true;
-    this.addModalBtnLabel = "Modifier";
+    this.addModalBtnLabel = 'Modifier';
     this.modalTitle = "Modifier l'instrument contractuel et financier";
     // init inputs object type
     const selectedinstrument = this.instrumentInput.find(
@@ -568,16 +568,16 @@ export class ZhFormTab6Component implements OnInit {
   // open the add urbanDoc modal
   onAddUrbanDoc(event: any, modal: any) {
     this.patchModal = false;
-    this.addModalBtnLabel = "Ajouter";
+    this.addModalBtnLabel = 'Ajouter';
     this.modalTitle = "Ajout d'un zonage d'urbanisme";
     event.stopPropagation();
     const modalRef = this.ngbModal.open(modal, {
       centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
+      size: 'lg',
+      windowClass: 'bib-modal',
     });
-    let $_urbanTypeInputSub = this.urbanDocForm.get("urbanType").valueChanges.subscribe((val) => {
-      this.urbanDocForm.get("typeClassement").reset();
+    let $_urbanTypeInputSub = this.urbanDocForm.get('urbanType').valueChanges.subscribe((val) => {
+      this.urbanDocForm.get('typeClassement').reset();
       if (val) this.typeClassementInput = val.type_classement;
     });
 
@@ -600,11 +600,11 @@ export class ZhFormTab6Component implements OnInit {
       if (!itemExist) {
         if (formValues.typeClassement && formValues.typeClassement.length > 0) {
           let classementNames = formValues.typeClassement.map((item) => {
-            return item["mnemonique"];
+            return item['mnemonique'];
           });
           formValues.typeClassement = {
             typeClassement: formValues.typeClassement,
-            mnemonique: classementNames.join("\r\n"),
+            mnemonique: classementNames.join('\r\n'),
           };
         }
         this.urbanDocTable.push(formValues);
@@ -640,7 +640,7 @@ export class ZhFormTab6Component implements OnInit {
   // open the edit urbanDoc modal
   onEditUrbanDoc(modal: any, urbanDoc: any) {
     this.patchModal = true;
-    this.addModalBtnLabel = "Modifier";
+    this.addModalBtnLabel = 'Modifier';
     this.modalTitle = "Modifier le zonage d'urbanisme";
     // init inputs object type
     const selectedArea = this.municipalities.find(
@@ -657,14 +657,14 @@ export class ZhFormTab6Component implements OnInit {
       typeClassement: urbanDoc.typeClassement.typeClassement,
       remark: urbanDoc.remark,
     });
-    let $_urbanTypeInputSub = this.urbanDocForm.get("urbanType").valueChanges.subscribe((val) => {
-      this.urbanDocForm.get("typeClassement").reset();
+    let $_urbanTypeInputSub = this.urbanDocForm.get('urbanType').valueChanges.subscribe((val) => {
+      this.urbanDocForm.get('typeClassement').reset();
       if (val) this.typeClassementInput = val.type_classement;
     });
 
     this.tempID = urbanDoc.area.id_area;
     // manger disabled urbanDoc input items
-    let $_areaInputSub = this.urbanDocForm.get("area").valueChanges.subscribe(() => {
+    let $_areaInputSub = this.urbanDocForm.get('area').valueChanges.subscribe(() => {
       this.municipalities.map((item: any) => {
         if (item.id_area == urbanDoc.area.id_area) {
           item.disabled = false;
@@ -673,8 +673,8 @@ export class ZhFormTab6Component implements OnInit {
     });
     const modalRef = this.ngbModal.open(modal, {
       centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
+      size: 'lg',
+      windowClass: 'bib-modal',
     });
     modalRef.result.then().finally(() => {
       $_areaInputSub.unsubscribe();
@@ -691,11 +691,11 @@ export class ZhFormTab6Component implements OnInit {
       let formValues = this.urbanDocForm.value;
       if (formValues.typeClassement && formValues.typeClassement.length > 0) {
         let classementNames = formValues.typeClassement.map((item) => {
-          return item["mnemonique"];
+          return item['mnemonique'];
         });
         formValues.typeClassement = {
           typeClassement: formValues.typeClassement,
-          mnemonique: classementNames.join("\r\n"),
+          mnemonique: classementNames.join('\r\n'),
         };
       }
       this.urbanDocTable = this.urbanDocTable.map((item: any) =>
@@ -731,21 +731,21 @@ export class ZhFormTab6Component implements OnInit {
       if (!itemExist && structure.id_org) {
         this.managements.push(structure);
       }
-      this.formTab6.get("structure").reset();
+      this.formTab6.get('structure').reset();
       this.canChangeTab.emit(false);
     }
   }
 
   onAllStructuresDeselected() {
-    this.formTab6.get("structure").reset();
+    this.formTab6.get('structure').reset();
   }
 
   onDeleteStrutureModal(modal, structure) {
     this.ngbModal
       .open(modal, {
         centered: true,
-        size: "lg",
-        windowClass: "bib-modal",
+        size: 'lg',
+        windowClass: 'bib-modal',
       })
       .result.then(
         () => {
@@ -768,11 +768,11 @@ export class ZhFormTab6Component implements OnInit {
   // open the add plan modal
   onAddPlan(event: any, management: any, modal: any) {
     this.patchModal = false;
-    this.addModalBtnLabel = "Ajouter";
+    this.addModalBtnLabel = 'Ajouter';
     this.modalTitle = "Ajout d'un plan de gestion";
     event.stopPropagation();
     this.selectedManagement = management;
-    this.planInput = [...this.formMetaData["PLAN_GESTION"]];
+    this.planInput = [...this.formMetaData['PLAN_GESTION']];
     this.planInput.map((item: any) => {
       item.disabled = false;
       if (this.selectedManagement.plans && this.selectedManagement.plans.length > 0) {
@@ -783,8 +783,8 @@ export class ZhFormTab6Component implements OnInit {
     });
     const modalRef = this.ngbModal.open(modal, {
       centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
+      size: 'lg',
+      windowClass: 'bib-modal',
     });
     modalRef.result.then().finally(() => {
       this.planForm.reset();
@@ -828,8 +828,8 @@ export class ZhFormTab6Component implements OnInit {
     this.ngbModal
       .open(modal, {
         centered: true,
-        size: "lg",
-        windowClass: "bib-modal",
+        size: 'lg',
+        windowClass: 'bib-modal',
       })
       .result.then(
         () => {
@@ -857,10 +857,10 @@ export class ZhFormTab6Component implements OnInit {
   // open the edit plan modal
   onEditPlan(modal: any, plan: any, management: any) {
     this.patchModal = true;
-    this.addModalBtnLabel = "Modifier";
-    this.modalTitle = "Modifier un plan de gestion";
+    this.addModalBtnLabel = 'Modifier';
+    this.modalTitle = 'Modifier un plan de gestion';
     this.selectedManagement = management;
-    this.planInput = [...this.formMetaData["PLAN_GESTION"]];
+    this.planInput = [...this.formMetaData['PLAN_GESTION']];
     this.planInput.map((item: any) => {
       item.disabled = false;
       if (this.selectedManagement.plans && this.selectedManagement.plans.length > 0) {
@@ -883,7 +883,7 @@ export class ZhFormTab6Component implements OnInit {
       remark: plan.remark,
     });
 
-    let $_planInputSub = this.planForm.get("plan").valueChanges.subscribe(() => {
+    let $_planInputSub = this.planForm.get('plan').valueChanges.subscribe(() => {
       this.planInput.map((item: any) => {
         if (item.id_nomenclature == plan.plan.id_nomenclature) {
           item.disabled = false;
@@ -895,8 +895,8 @@ export class ZhFormTab6Component implements OnInit {
 
     const modalRef = this.ngbModal.open(modal, {
       centered: true,
-      size: "lg",
-      windowClass: "bib-modal",
+      size: 'lg',
+      windowClass: 'bib-modal',
     });
     modalRef.result.then().finally(() => {
       $_planInputSub.unsubscribe();
@@ -933,7 +933,7 @@ export class ZhFormTab6Component implements OnInit {
   }
 
   onDeSelectAll() {
-    this.formTab6.get("protections").reset();
+    this.formTab6.get('protections').reset();
   }
 
   handleEnterKeyPress() {
@@ -1019,8 +1019,8 @@ export class ZhFormTab6Component implements OnInit {
             this._dataService.setCurrentZh(zh);
             this.posted = false;
             this.canChangeTab.emit(true);
-            this._toastr.success("Vos données sont bien enregistrées", "", {
-              positionClass: "toast-top-right",
+            this._toastr.success('Vos données sont bien enregistrées', '', {
+              positionClass: 'toast-top-right',
             });
             this.nextTab.emit(7);
           });
@@ -1028,8 +1028,8 @@ export class ZhFormTab6Component implements OnInit {
         (error) => {
           this.posted = false;
           const frontMsg: string = this._error.getFrontError(error.error.message);
-          this._toastr.error(frontMsg, "", {
-            positionClass: "toast-top-right",
+          this._toastr.error(frontMsg, '', {
+            positionClass: 'toast-top-right',
           });
         }
       );

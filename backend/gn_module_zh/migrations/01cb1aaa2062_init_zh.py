@@ -12,12 +12,10 @@ from sqlalchemy import func
 from sqlalchemy.sql import text
 
 
-
-
 # revision identifiers, used by Alembic.
-revision = '01cb1aaa2062'
+revision = "01cb1aaa2062"
 down_revision = None
-branch_labels = ('zones_humides',)
+branch_labels = ("zones_humides",)
 depends_on = None
 
 
@@ -27,16 +25,24 @@ def upgrade():
         importlib.resources.read_text("gn_module_zh.migrations.data", "script_create_tables.sql")
     )
     nomenclatures_data = text(
-        importlib.resources.read_text("gn_module_zh.migrations.data", "insert_into_ref_nomenclatures_schema.sql")
+        importlib.resources.read_text(
+            "gn_module_zh.migrations.data", "insert_into_ref_nomenclatures_schema.sql"
+        )
     )
     ref_geo_data = text(
-        importlib.resources.read_text("gn_module_zh.migrations.data", "insert_into_ref_geo_schema.sql")
+        importlib.resources.read_text(
+            "gn_module_zh.migrations.data", "insert_into_ref_geo_schema.sql"
+        )
     )
     gn_commons_data = text(
-        importlib.resources.read_text("gn_module_zh.migrations.data", "insert_into_gn_commons_schema.sql")
+        importlib.resources.read_text(
+            "gn_module_zh.migrations.data", "insert_into_gn_commons_schema.sql"
+        )
     )
     mandatory_data = text(
-        importlib.resources.read_text("gn_module_zh.migrations.data", "insert_into_pr_zh_schema.sql")
+        importlib.resources.read_text(
+            "gn_module_zh.migrations.data", "insert_into_pr_zh_schema.sql"
+        )
     )
 
     atlas = text(

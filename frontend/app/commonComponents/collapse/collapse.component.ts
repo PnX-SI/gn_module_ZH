@@ -1,9 +1,9 @@
-import { Component, Input } from "@angular/core";
+import { Component, Input } from '@angular/core';
 
 @Component({
-  selector: "collapse",
-  templateUrl: "./collapse.component.html",
-  styleUrls: ["./collapse.component.scss"],
+  selector: 'collapse',
+  templateUrl: './collapse.component.html',
+  styleUrls: ['./collapse.component.scss'],
 })
 export class CollapseComponent {
   @Input() title: string;

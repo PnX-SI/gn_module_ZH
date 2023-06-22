@@ -1,12 +1,12 @@
-import { Component, OnInit, Input } from "@angular/core";
-import { FormGroup } from "@angular/forms";
-import { of, Observable } from "rxjs";
-import { ZhDataService } from "../../../services/zh-data.service";
-import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from "rxjs/operators";
+import { Component, OnInit, Input } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { of, Observable } from 'rxjs';
+import { ZhDataService } from '../../../services/zh-data.service';
+import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from 'rxjs/operators';
 @Component({
-  selector: "zh-search-code",
-  templateUrl: "./zh-search-code.component.html",
-  styleUrls: ["./zh-search-code.component.scss"],
+  selector: 'zh-search-code',
+  templateUrl: './zh-search-code.component.html',
+  styleUrls: ['./zh-search-code.component.scss'],
 })
 export class ZhSearchCodeComponent implements OnInit {
   @Input() form: FormGroup;

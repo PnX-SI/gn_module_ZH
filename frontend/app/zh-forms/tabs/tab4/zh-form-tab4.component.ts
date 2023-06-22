@@ -1,16 +1,16 @@
-import { Component, EventEmitter, OnInit, Input, Output } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { ToastrService } from "ngx-toastr";
-import { Subscription } from "rxjs";
-import { ZhDataService } from "../../../services/zh-data.service";
-import { TabsService } from "../../../services/tabs.service";
-import { ModalService } from "../../../services/modal.service";
-import { ErrorTranslatorService } from "../../../services/error-translator.service";
+import { Component, EventEmitter, OnInit, Input, Output } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ToastrService } from 'ngx-toastr';
+import { Subscription } from 'rxjs';
+import { ZhDataService } from '../../../services/zh-data.service';
+import { TabsService } from '../../../services/tabs.service';
+import { ModalService } from '../../../services/modal.service';
+import { ErrorTranslatorService } from '../../../services/error-translator.service';
 @Component({
-  selector: "zh-form-tab4",
-  templateUrl: "./zh-form-tab4.component.html",
-  styleUrls: ["./zh-form-tab4.component.scss"],
+  selector: 'zh-form-tab4',
+  templateUrl: './zh-form-tab4.component.html',
+  styleUrls: ['./zh-form-tab4.component.scss'],
 })
 export class ZhFormTab4Component implements OnInit {
   @Input() public formMetaData: any;
@@ -37,58 +37,58 @@ export class ZhFormTab4Component implements OnInit {
   private $_currentZhSub: Subscription;
   private $_fromChangeSub: Subscription;
   public currentZh: any;
-  default_permanance: string = "Non déterminé";
+  default_permanance: string = 'Non déterminé';
 
   private tempId: number;
 
-  readonly flowSize: string = "15%";
-  readonly permaSize: string = "15%";
+  readonly flowSize: string = '15%';
+  readonly permaSize: string = '15%';
 
   public inflowTableCol = [
     {
-      name: "inflow",
+      name: 'inflow',
       label: "Entrée d'eau",
-      subcell: { name: "mnemonique" },
+      subcell: { name: 'mnemonique' },
       size: this.flowSize,
     },
     {
-      name: "permanance",
-      label: "Permanence",
-      subcell: { name: "mnemonique" },
+      name: 'permanance',
+      label: 'Permanence',
+      subcell: { name: 'mnemonique' },
       size: this.permaSize,
     },
     {
-      name: "topo",
+      name: 'topo',
       label: "Toponymie et compléments d'information",
     },
   ];
 
   public outflowTableCol = [
     {
-      name: "outflow",
+      name: 'outflow',
       label: "Sortie d'eau",
-      subcell: { name: "mnemonique" },
+      subcell: { name: 'mnemonique' },
       size: this.flowSize,
     },
     {
-      name: "permanance",
-      label: "Permanence",
-      subcell: { name: "mnemonique" },
+      name: 'permanance',
+      label: 'Permanence',
+      subcell: { name: 'mnemonique' },
       size: this.permaSize,
     },
     {
-      name: "topo",
+      name: 'topo',
       label: "Toponymie et compléments d'information",
     },
   ];
 
   private readonly corConnectionType = {
-    "Aucune connexion": "aucune_connexion.svg",
-    "Entrée et sortie": "entree_sortie.svg",
-    Entrée: "entree.svg",
-    Sortie: "sortie.svg",
-    Traversée: "traversee.svg",
-    "Passe à coté": "passe_a_cote.svg",
+    'Aucune connexion': 'aucune_connexion.svg',
+    'Entrée et sortie': 'entree_sortie.svg',
+    Entrée: 'entree.svg',
+    Sortie: 'sortie.svg',
+    Traversée: 'traversee.svg',
+    'Passe à coté': 'passe_a_cote.svg',
   };
   connexionTypes: any[];
 
@@ -139,9 +139,9 @@ export class ZhFormTab4Component implements OnInit {
 
   // get metaData forms
   getMetaData() {
-    this.inflowInput = [...this.formMetaData["ENTREE_EAU"]];
-    this.outflowInput = [...this.formMetaData["SORTIE_EAU"]];
-    this.connexionTypes = [...this.formMetaData["TYPE_CONNEXION"]];
+    this.inflowInput = [...this.formMetaData['ENTREE_EAU']];
+    this.outflowInput = [...this.formMetaData['SORTIE_EAU']];
+    this.connexionTypes = [...this.formMetaData['TYPE_CONNEXION']];
     this.connexionTypes.map((item: any) => {
       item.image = this.corConnectionType[item.mnemonique];
     });
@@ -158,14 +158,14 @@ export class ZhFormTab4Component implements OnInit {
         if (this.currentZh.properties.flows && this.currentZh.properties.flows.length > 0) {
           this.currentZh.properties.flows.forEach((element: any) => {
             for (const key in element) {
-              if (key == "inflows") {
+              if (key == 'inflows') {
                 if (element[key].length > 0) {
                   element[key].forEach((inflow) => {
                     this.inflowsTable.push({
-                      inflow: this.formMetaData["ENTREE_EAU"].find((item) => {
+                      inflow: this.formMetaData['ENTREE_EAU'].find((item) => {
                         return item.id_nomenclature == inflow.id_inflow;
                       }),
-                      permanance: this.formMetaData["PERMANENCE_ENTREE"].find((item) => {
+                      permanance: this.formMetaData['PERMANENCE_ENTREE'].find((item) => {
                         return item.id_nomenclature == inflow.id_permanance;
                       }),
                       topo: inflow.topo,
@@ -173,14 +173,14 @@ export class ZhFormTab4Component implements OnInit {
                   });
                 }
               }
-              if (key == "outflows") {
+              if (key == 'outflows') {
                 if (element[key].length > 0) {
                   element[key].forEach((outflow) => {
                     this.outflowsTable.push({
-                      outflow: this.formMetaData["SORTIE_EAU"].find((item) => {
+                      outflow: this.formMetaData['SORTIE_EAU'].find((item) => {
                         return item.id_nomenclature == outflow.id_outflow;
                       }),
-                      permanance: this.formMetaData["PERMANENCE_SORTIE"].find((item) => {
+                      permanance: this.formMetaData['PERMANENCE_SORTIE'].find((item) => {
                         return item.id_nomenclature == outflow.id_permanance;
                       }),
                       topo: outflow.topo,
@@ -192,17 +192,17 @@ export class ZhFormTab4Component implements OnInit {
           });
         }
         this.formTab4.patchValue({
-          spread: this.formMetaData["SUBMERSION_ETENDUE"].find((item) => {
+          spread: this.formMetaData['SUBMERSION_ETENDUE'].find((item) => {
             return item.id_nomenclature == this.currentZh.properties.id_spread;
           }),
-          frequency: this.formMetaData["SUBMERSION_FREQ"].find((item) => {
+          frequency: this.formMetaData['SUBMERSION_FREQ'].find((item) => {
             return item.id_nomenclature == this.currentZh.properties.id_frequency;
           }),
           connexion: this.currentZh.properties.id_connexion,
-          diag_hydro: this.formMetaData["FONCTIONNALITE_HYDRO"].find((item) => {
+          diag_hydro: this.formMetaData['FONCTIONNALITE_HYDRO'].find((item) => {
             return item.id_nomenclature == this.currentZh.properties.id_diag_hydro;
           }),
-          diag_bio: this.formMetaData["FONCTIONNALITE_BIO"].find((item) => {
+          diag_bio: this.formMetaData['FONCTIONNALITE_BIO'].find((item) => {
             return item.id_nomenclature == this.currentZh.properties.id_diag_bio;
           }),
           remark_diag: this.currentZh.properties.remark_diag,
@@ -217,15 +217,15 @@ export class ZhFormTab4Component implements OnInit {
   // open the add inFlow modal
   onAddInflow(event: any, modal: any) {
     this.inflowForm.reset();
-    this.inflowForm.controls["permanance"].setValue(
-      this.formMetaData["PERMANENCE_ENTREE"].find((item) => {
+    this.inflowForm.controls['permanance'].setValue(
+      this.formMetaData['PERMANENCE_ENTREE'].find((item) => {
         if (item.mnemonique == this.default_permanance) {
           return item;
         }
       })
     );
     this.patchInflow = false;
-    this.inflowModalBtnLabel = "Ajouter";
+    this.inflowModalBtnLabel = 'Ajouter';
     this.inflowModalTitle = "Ajout d'une entrée d'eau";
     event.stopPropagation();
 
@@ -268,13 +268,13 @@ export class ZhFormTab4Component implements OnInit {
   onEditInflow(modal: any, inflow: any) {
     this.tempId = inflow.inflow.id_nomenclature;
     this.patchInflow = true;
-    this.inflowModalBtnLabel = "Modifier";
+    this.inflowModalBtnLabel = 'Modifier';
     this.inflowModalTitle = "Modifier l'entrée d'eau";
     // init inputs object type
     const selectedInflow = this.inflowInput.find(
       (item: any) => item.id_nomenclature == inflow.inflow.id_nomenclature
     );
-    const selectePermanance = this.formMetaData["PERMANENCE_ENTREE"].find(
+    const selectePermanance = this.formMetaData['PERMANENCE_ENTREE'].find(
       (item: any) => item.id_nomenclature == inflow.permanance.id_nomenclature
     );
     // patch form values
@@ -313,8 +313,8 @@ export class ZhFormTab4Component implements OnInit {
   // open the add outFlow modal
   onAddOutflow(event: any, modal: any) {
     this.outflowForm.reset();
-    this.outflowForm.controls["permanance"].setValue(
-      this.formMetaData["PERMANENCE_SORTIE"].find((item) => {
+    this.outflowForm.controls['permanance'].setValue(
+      this.formMetaData['PERMANENCE_SORTIE'].find((item) => {
         if (item.mnemonique == this.default_permanance) {
           return item;
         }
@@ -322,7 +322,7 @@ export class ZhFormTab4Component implements OnInit {
     );
     this.patchInflow = false;
     this.patchOutflow = false;
-    this.outflowModalBtnLabel = "Ajouter";
+    this.outflowModalBtnLabel = 'Ajouter';
     this.outflowModalTitle = "Ajout d'une sortie d'eau";
     event.stopPropagation();
     this._modalService.open(
@@ -364,13 +364,13 @@ export class ZhFormTab4Component implements OnInit {
   onEditOutflow(modal: any, outflow: any) {
     this.tempId = outflow.outflow.id_nomenclature;
     this.patchOutflow = true;
-    this.outflowModalBtnLabel = "Modifier";
+    this.outflowModalBtnLabel = 'Modifier';
     this.outflowModalTitle = "Modifier la sortie d'eau";
     // init inputs object type
     const selectedOutflow = this.outflowInput.find(
       (item: any) => item.id_nomenclature == outflow.outflow.id_nomenclature
     );
-    const selectePermanance = this.formMetaData["PERMANENCE_SORTIE"].find(
+    const selectePermanance = this.formMetaData['PERMANENCE_SORTIE'].find(
       (item: any) => item.id_nomenclature == outflow.permanance.id_nomenclature
     );
     // patch form values
@@ -453,8 +453,8 @@ export class ZhFormTab4Component implements OnInit {
             this._dataService.setCurrentZh(zh);
             this.posted = false;
             this.canChangeTab.emit(true);
-            this._toastr.success("Vos données sont bien enregistrées", "", {
-              positionClass: "toast-top-right",
+            this._toastr.success('Vos données sont bien enregistrées', '', {
+              positionClass: 'toast-top-right',
             });
             this.nextTab.emit(5);
           });
@@ -462,8 +462,8 @@ export class ZhFormTab4Component implements OnInit {
         (error) => {
           this.posted = false;
           const frontMsg: string = this._error.getFrontError(error.error.message);
-          this._toastr.error(frontMsg, "", {
-            positionClass: "toast-top-right",
+          this._toastr.error(frontMsg, '', {
+            positionClass: 'toast-top-right',
           });
         }
       );

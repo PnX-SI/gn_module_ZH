@@ -1,4 +1,5 @@
 from itertools import groupby
+from werkzeug.exceptions import NotFound
 
 from ref_geo.models import BibAreasTypes, LAreas
 from geonature.utils.env import DB
@@ -1046,7 +1047,7 @@ class Card(ZH):
         self.evaluation = Evaluation()
         try:
             self.hierarchy = Hierarchy(id_zh)
-        except ZHApiError:
+        except (NotFound, ZHApiError):
             self.hierarchy = None
 
     def get_properties(self):

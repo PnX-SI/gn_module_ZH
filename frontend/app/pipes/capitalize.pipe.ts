@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from "@angular/core";
+import { Pipe, PipeTransform } from '@angular/core';
 
 // To be DRY, define a reusable function that converts a
 // (word or sentence) to title case
@@ -10,7 +10,7 @@ const toTitleCase = (value) => {
 };
 
 @Pipe({
-  name: "capitalize",
+  name: 'capitalize',
 })
 export class CapitalizePipe implements PipeTransform {
   transform(value: any, args?: any): any {

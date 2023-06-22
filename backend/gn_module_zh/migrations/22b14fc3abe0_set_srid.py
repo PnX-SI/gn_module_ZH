@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '22b14fc3abe0'
-down_revision = '01cb1aaa2062'
+revision = "22b14fc3abe0"
+down_revision = "01cb1aaa2062"
 branch_labels = None
 depends_on = None
 
@@ -20,10 +20,10 @@ def upgrade():
     op.execute(
         """
           UPDATE pr_zh.t_hydro_area
-            SET geom = ST_Force3D(ST_MakeValid(geom));
+            SET geom = ST_Force2D(ST_MakeValid(geom));
     
           UPDATE pr_zh.t_river_basin
-            SET geom = ST_Force3D(ST_MakeValid(geom));
+            SET geom = ST_Force2D(ST_MakeValid(geom));
 
             drop view pr_zh.vertebrates;
             drop view pr_zh.invertebrates;
@@ -34,11 +34,11 @@ def upgrade():
                 USING ST_SetSRID(geom,4326);
             
             ALTER TABLE pr_zh.t_hydro_area
-            ALTER COLUMN geom TYPE geometry(geometryZ, 4326)
+            ALTER COLUMN geom TYPE geometry(geometry, 4326)
                 USING ST_SetSRID(geom,4326);
             
             ALTER TABLE pr_zh.t_river_basin
-            ALTER COLUMN geom TYPE geometry(geometryZ, 4326)
+            ALTER COLUMN geom TYPE geometry(geometry, 4326)
                 USING ST_SetSRID(geom,4326);
             
             ALTER TABLE pr_zh.t_fct_area

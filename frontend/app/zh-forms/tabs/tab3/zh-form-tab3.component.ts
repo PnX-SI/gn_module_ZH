@@ -1,18 +1,18 @@
-import { Component, EventEmitter, OnInit, Input, Output } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { ZhDataService } from "../../../services/zh-data.service";
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { Subscription, Observable } from "rxjs";
-import { debounceTime, distinctUntilChanged, map } from "rxjs/operators";
-import { ToastrService } from "ngx-toastr";
-import { TabsService } from "../../../services/tabs.service";
-import { ModalService } from "../../../services/modal.service";
-import { ErrorTranslatorService } from "../../../services/error-translator.service";
+import { Component, EventEmitter, OnInit, Input, Output } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { ZhDataService } from '../../../services/zh-data.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription, Observable } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
+import { TabsService } from '../../../services/tabs.service';
+import { ModalService } from '../../../services/modal.service';
+import { ErrorTranslatorService } from '../../../services/error-translator.service';
 
 @Component({
-  selector: "zh-form-tab3",
-  templateUrl: "./zh-form-tab3.component.html",
-  styleUrls: ["./zh-form-tab3.component.scss"],
+  selector: 'zh-form-tab3',
+  templateUrl: './zh-form-tab3.component.html',
+  styleUrls: ['./zh-form-tab3.component.scss'],
 })
 export class ZhFormTab3Component implements OnInit {
   @Input() formMetaData;
@@ -26,9 +26,9 @@ export class ZhFormTab3Component implements OnInit {
   public currentZh: any;
   corinBioMetaData: any;
   corinTableCol = [
-    { name: "CB_code", label: "Code Corine biotopes" },
-    { name: "CB_label", label: "Libellé Corine biotopes" },
-    { name: "CB_humidity", label: "Humidité", size: "5%" },
+    { name: 'CB_code', label: 'Code Corine biotopes' },
+    { name: 'CB_label', label: 'Libellé Corine biotopes' },
+    { name: 'CB_humidity', label: 'Humidité', size: '5%' },
   ];
   // subcell : if the data contain a list inside the data list
   //   example use : consider this
@@ -48,28 +48,28 @@ export class ZhFormTab3Component implements OnInit {
   // then use name for human_activity with name="mnemonique"
   // use key and name for impacts with key="impacts"; name="mnemonique"
 
-  readonly activityColSize: string = "20%";
+  readonly activityColSize: string = '20%';
 
   activityTableCol = [
     {
-      name: "human_activity",
-      label: "Activités humaines",
-      subcell: { name: "mnemonique" },
+      name: 'human_activity',
+      label: 'Activités humaines',
+      subcell: { name: 'mnemonique' },
       size: this.activityColSize,
     },
     {
-      name: "localisation",
-      label: "Localisation",
-      subcell: { name: "mnemonique" },
+      name: 'localisation',
+      label: 'Localisation',
+      subcell: { name: 'mnemonique' },
       size: this.activityColSize,
     },
     {
-      name: "impacts",
+      name: 'impacts',
       label: "Impacts (facteurs influençant l'évolution de la zone)",
-      subcell: { key: "impacts", name: "mnemonique" },
+      subcell: { key: 'impacts', name: 'mnemonique' },
       size: this.activityColSize,
     },
-    { name: "remark_activity", label: "Remarques" },
+    { name: 'remark_activity', label: 'Remarques' },
   ];
   listCorinBio = [];
   posted: boolean = false;
@@ -99,9 +99,9 @@ export class ZhFormTab3Component implements OnInit {
   ngOnInit() {
     this.dropdownSettings = {
       singleSelection: false,
-      idField: "id_nomenclature",
-      textField: "mnemonique",
-      searchPlaceholderText: "Rechercher",
+      idField: 'id_nomenclature',
+      textField: 'mnemonique',
+      searchPlaceholderText: 'Rechercher',
       enableCheckAll: false,
       allowSearchFilter: true,
       maxHeight: 300,
@@ -109,12 +109,12 @@ export class ZhFormTab3Component implements OnInit {
 
     this.settings = {
       enableCheckAll: false,
-      text: "Selectionner",
-      labelKey: "mnemonique",
-      primaryKey: "id_nomenclature",
-      searchPlaceholderText: "Rechercher",
+      text: 'Selectionner',
+      labelKey: 'mnemonique',
+      primaryKey: 'id_nomenclature',
+      searchPlaceholderText: 'Rechercher',
       enableSearchFilter: true,
-      groupBy: "category",
+      groupBy: 'category',
     };
 
     this.activityForm = this.fb.group({
@@ -161,34 +161,34 @@ export class ZhFormTab3Component implements OnInit {
           let impacts = [];
           activity.ids_impact.forEach((impact) => {
             impacts.push(
-              this.formMetaData["IMPACTS"].find((item) => {
+              this.formMetaData['IMPACTS'].find((item) => {
                 return item.id_cor_impact_types == impact;
               })
             );
           });
           activity.impacts = this.sortImpacts(activity.impacts);
           let impactNames = impacts.map((item) => {
-            return item["mnemonique"];
+            return item['mnemonique'];
           });
 
           this.listActivity.push({
             frontId: activity.id_human_activity,
             human_activity: {
               id_nomenclature: activity.id_human_activity,
-              mnemonique: this.formMetaData["ACTIV_HUM"].find((item) => {
+              mnemonique: this.formMetaData['ACTIV_HUM'].find((item) => {
                 return item.id_nomenclature == activity.id_human_activity;
               }).mnemonique,
             },
             localisation: {
               id_nomenclature: activity.id_localisation,
-              mnemonique: this.formMetaData["LOCALISATION"].find((item) => {
+              mnemonique: this.formMetaData['LOCALISATION'].find((item) => {
                 return item.id_nomenclature == activity.id_localisation;
               }).mnemonique,
             },
             remark_activity: activity.remark_activity,
             impacts: {
               impacts: impacts,
-              mnemonique: impactNames.join("\r\n"),
+              mnemonique: impactNames.join('\r\n'),
             },
           });
           this.sortHumanActivities();
@@ -215,17 +215,17 @@ export class ZhFormTab3Component implements OnInit {
   }
 
   getMetaData() {
-    this.allSage = [...this.formMetaData["SDAGE-SAGE"]];
-    this.corinBioMetaData = [...this.formMetaData["CORINE_BIO"]];
-    this.activitiesInput = [...this.formMetaData["ACTIV_HUM"]];
+    this.allSage = [...this.formMetaData['SDAGE-SAGE']];
+    this.corinBioMetaData = [...this.formMetaData['CORINE_BIO']];
+    this.activitiesInput = [...this.formMetaData['ACTIV_HUM']];
     this.activitiesInput.map((item) => {
       item.disabled = false;
     });
   }
 
   onFormValueChanges(): void {
-    this.form.get("id_sdage").valueChanges.subscribe((val: number) => {
-      this.form.get("id_sage").reset();
+    this.form.get('id_sdage').valueChanges.subscribe((val: number) => {
+      this.form.get('id_sage').reset();
       this.allSage.forEach((item) => {
         if (val in item) {
           this.sage = Object.values(item)[0];
@@ -278,7 +278,7 @@ export class ZhFormTab3Component implements OnInit {
       if (!itemExist && this.form.value.corinBio.CB_code) {
         this.listCorinBio.push(this.form.value.corinBio);
       }
-      this.form.get("corinBio").reset();
+      this.form.get('corinBio').reset();
       this.canChangeTab.emit(false);
     }
   }
@@ -294,7 +294,7 @@ export class ZhFormTab3Component implements OnInit {
     this.resetActivityForm();
 
     this.patchActivity = false;
-    this.modalButtonLabel = "Ajouter";
+    this.modalButtonLabel = 'Ajouter';
     this.modalTitle = "Ajout d'une activité humaine";
     event.stopPropagation();
     this._modalService.open(
@@ -314,7 +314,7 @@ export class ZhFormTab3Component implements OnInit {
       if (!itemExist) {
         activity.impacts = this.sortImpacts(activity.impacts);
         let impactNames = activity.impacts.map((item) => {
-          return item["mnemonique"];
+          return item['mnemonique'];
         });
         let acrivityToAdd = {
           frontId: activity.human_activity.id_nomenclature,
@@ -326,7 +326,7 @@ export class ZhFormTab3Component implements OnInit {
         if (activity.impacts && activity.impacts.length > 0) {
           acrivityToAdd.impacts = {
             impacts: activity.impacts,
-            mnemonique: impactNames.join("\r\n"),
+            mnemonique: impactNames.join('\r\n'),
           };
         }
         this.listActivity.push(acrivityToAdd);
@@ -346,13 +346,13 @@ export class ZhFormTab3Component implements OnInit {
 
   onEditActivity(modal: any, activity: any) {
     this.patchActivity = true;
-    this.modalButtonLabel = "Modifier";
+    this.modalButtonLabel = 'Modifier';
     this.modalTitle = "Modifier l'activié humaine";
     this.selectedItems = activity.impacts.impacts;
     const selectedActivity = this.activitiesInput.find(
       (item) => item.id_nomenclature == activity.human_activity.id_nomenclature
     );
-    const selecteLocalisation = this.formMetaData["LOCALISATION"].find(
+    const selecteLocalisation = this.formMetaData['LOCALISATION'].find(
       (item) => item.id_nomenclature == activity.localisation.id_nomenclature
     );
     this.activityForm.patchValue({
@@ -377,11 +377,11 @@ export class ZhFormTab3Component implements OnInit {
       let activity = this.activityForm.value;
       activity.impacts = this.sortImpacts(activity.impacts);
       let impactNames = activity.impacts.map((item) => {
-        return item["mnemonique"];
+        return item['mnemonique'];
       });
       activity.impacts = {
         impacts: activity.impacts,
-        mnemonique: impactNames.join("\r\n"),
+        mnemonique: impactNames.join('\r\n'),
       };
       this.listActivity = this.listActivity.map((item) =>
         item.frontId != activity.frontId ? item : activity
@@ -411,7 +411,7 @@ export class ZhFormTab3Component implements OnInit {
   }
 
   onDeSelectAll() {
-    this.activityForm.get("impacts").setValue([]);
+    this.activityForm.get('impacts').setValue([]);
   }
 
   onFormSubmit() {
@@ -442,8 +442,8 @@ export class ZhFormTab3Component implements OnInit {
             this._dataService.setCurrentZh(zh);
             this.posted = false;
             this.canChangeTab.emit(true);
-            this._toastr.success("Vos données sont bien enregistrées", "", {
-              positionClass: "toast-top-right",
+            this._toastr.success('Vos données sont bien enregistrées', '', {
+              positionClass: 'toast-top-right',
             });
             this.nextTab.emit(4);
           });
@@ -451,8 +451,8 @@ export class ZhFormTab3Component implements OnInit {
         (error) => {
           this.posted = false;
           const frontMsg: string = this._error.getFrontError(error.error.message);
-          this._toastr.error(frontMsg, "", {
-            positionClass: "toast-top-right",
+          this._toastr.error(frontMsg, '', {
+            positionClass: 'toast-top-right',
           });
         }
       );

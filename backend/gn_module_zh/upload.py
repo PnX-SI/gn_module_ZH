@@ -14,9 +14,7 @@ from .utils import get_extension, get_file_path
 def upload_process(
     request, extensions, pdf_size, jpg_size, upload_path, module_name, id_media=None
 ):
-
     if request.files:
-
         check_file_name(request)
 
         if id_media:
@@ -28,8 +26,7 @@ def upload_process(
     # upoad file - including post to t_medias
     upload_file = upload(
         request, extensions, pdf_size, jpg_size, upload_path, module_name, id_media
-    )  
-    print(upload_file)
+    )
 
     # checks if error in user file or user http request:
     if "error" in upload_file:
@@ -46,7 +43,6 @@ def upload_process(
 
 def upload(request, extensions, pdf_size, jpg_size, upload_path, module_name, id_media):
     if request.files:
-
         # get file
         file = request.files["file"]
 
@@ -93,7 +89,6 @@ def upload(request, extensions, pdf_size, jpg_size, upload_path, module_name, id
         )
 
     if request.files:
-
         # set file name
         media_filename = "_".join([str(id_media), filename])
         media_path = Path("external_modules", module_name, upload_path, media_filename)

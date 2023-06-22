@@ -106,9 +106,7 @@ def check_ref_geo_schema():
 
 
 def get_user_cruved():
-    user_cruved = get_scopes_by_action(
-        module_code="ZONES_HUMIDES"
-    )
+    user_cruved = get_scopes_by_action(module_code="ZONES_HUMIDES")
     return user_cruved
 
 

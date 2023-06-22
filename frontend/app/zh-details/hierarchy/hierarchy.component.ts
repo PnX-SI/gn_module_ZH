@@ -1,11 +1,11 @@
-import { Component, Input } from "@angular/core";
-import { HierarchyModel } from "../models/hierarchy.model";
-import { HierarchyService } from "../../services/hierarchy.service";
+import { Component, Input } from '@angular/core';
+import { HierarchyModel } from '../models/hierarchy.model';
+import { HierarchyService } from '../../services/hierarchy.service';
 
 @Component({
-  selector: "zh-details-hierarchy",
-  templateUrl: "./hierarchy.component.html",
-  styleUrls: ["./hierarchy.component.scss"],
+  selector: 'zh-details-hierarchy',
+  templateUrl: './hierarchy.component.html',
+  styleUrls: ['./hierarchy.component.scss'],
 })
 export class HierarchyComponent {
   @Input() data: HierarchyModel;

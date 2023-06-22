@@ -1,13 +1,13 @@
-import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
-import { Output, EventEmitter } from "@angular/core";
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Output, EventEmitter } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { TableColumn } from "../table/table-interface";
+import { TableColumn } from '../table/table-interface';
 
 @Component({
-  selector: "zh-image-table",
-  templateUrl: "./image-table.component.html",
-  styleUrls: ["./image-table.component.scss"],
+  selector: 'zh-image-table',
+  templateUrl: './image-table.component.html',
+  styleUrls: ['./image-table.component.scss'],
 })
 export class ImageTableComponent {
   public mainPhoto: any;
@@ -36,8 +36,8 @@ export class ImageTableComponent {
     this.deleteModal
       .open(modal, {
         centered: true,
-        size: "lg",
-        windowClass: "bib-modal",
+        size: 'lg',
+        windowClass: 'bib-modal',
       })
       .result.then(
         () => {

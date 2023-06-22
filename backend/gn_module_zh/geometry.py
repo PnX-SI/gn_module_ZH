@@ -12,7 +12,10 @@ from .model.zh_schema import TZH, CorZhRb, TRiverBasin
 def set_geom(geometry, id_zh=None):
     if not id_zh:
         id_zh = 0
-    polygon = DB.session.query(func.ST_GeomFromGeoJSON(str(geometry))).one()[0]
+    # SetSRID for POSTGIS < 3.0 compat
+    polygon = DB.session.query(
+        func.ST_SetSRID(func.ST_GeomFromGeoJSON(str(geometry)), 4326)
+    ).one()[0]
     q_zh = (
         DB.session.query(TZH)
         .filter(
@@ -26,12 +29,8 @@ def set_geom(geometry, id_zh=None):
     is_intersected = False
     for zh in q_zh:
         if zh.id_zh != id_zh:
-            zh_geom = DB.session.query(
-                func.ST_GeogFromWKB(func.ST_AsEWKB(zh.geom))
-            ).scalar()
-            polygon_geom = DB.session.query(
-                func.ST_GeogFromWKB(func.ST_AsEWKB(polygon))
-            ).scalar()
+            zh_geom = DB.session.query(func.ST_GeogFromWKB(func.ST_AsEWKB(zh.geom))).scalar()
+            polygon_geom = DB.session.query(func.ST_GeogFromWKB(func.ST_AsEWKB(polygon))).scalar()
             if DB.session.query(func.ST_Intersects(polygon_geom, zh_geom)).scalar():
                 is_intersected = True
             if DB.session.query(
@@ -42,9 +41,7 @@ def set_geom(geometry, id_zh=None):
             ).scalar():
                 raise BadRequest("La ZH est entièrement dans une ZH existante")
             intersect = DB.session.query(func.ST_Difference(polygon_geom, zh_geom))
-            polygon = DB.session.query(
-                func.ST_GeomFromText(to_shape(intersect.scalar()))
-            ).one()[0]
+            polygon = DB.session.query(func.ST_GeomFromText(to_shape(intersect.scalar()))).one()[0]
     return {"polygon": polygon, "is_intersected": is_intersected}
 
 
@@ -53,9 +50,7 @@ def set_area(geom):
     return round(
         (
             DB.session.query(
-                func.ST_Area(
-                    func.ST_GeomFromText(func.ST_AsText(geom["polygon"])), False
-                )
+                func.ST_Area(func.ST_GeomFromText(func.ST_AsText(geom["polygon"])), False)
             ).scalar()
         )
         / 10000,
@@ -68,10 +63,7 @@ def get_main_rb(query: list) -> int:
     area = 0
     for q_ in query:
         zh_polygon = (
-            DB.session.query(TZH.geom)
-            .filter(TZH.id_zh == getattr(q_, "id_zh"))
-            .first()
-            .geom
+            DB.session.query(TZH.geom).filter(TZH.id_zh == getattr(q_, "id_zh")).first().geom
         )
         rb_polygon = (
             DB.session.query(CorZhRb, TRiverBasin)
