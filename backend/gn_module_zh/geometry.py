@@ -8,6 +8,7 @@ from werkzeug.exceptions import BadRequest
 from .api_error import ZHApiError
 from .model.zh_schema import TZH, CorZhRb, TRiverBasin
 
+import pdb
 
 def set_geom(geometry, id_zh=None):
     if not id_zh:
@@ -19,19 +20,20 @@ def set_geom(geometry, id_zh=None):
         func.ST_SetSRID(func.ST_GeomFromGeoJSON(str(geometry)), 4326)
     ).one()[0]
 
-    # select only already existing ZH polygons which intersect with the new ZH polygon
+    # select only already existing ZH geometries which intersect with the new ZH geometry
     q_zh = (
         DB.session.query(TZH)
         .filter(
-            # !!! some ZH polygons won't be filtered here (ST_Intersects=True) when they have a shared borders,
-            # !!! while some other ZH with shared borders will be filtered.
-            # => probably because of small approximation errors when ZH are cropped with PostGis (ST_Difference)
-            # => so, ST_Intersects, ST_Touches or other PostGis methods won't be able here to detect if it is a shared
-            # border or a real intersection
             func.ST_Intersects(
                 func.ST_GeogFromWKB(func.ST_AsEWKB(TZH.geom)),
-                func.ST_GeomFromGeoJSON(str(geometry)),
+                func.ST_GeogFromWKB(func.ST_AsEWKB(str(geometry))),
             )
+        )
+        .filter(
+            func.ST_Touches(
+                func.ST_GeomFromWKB(func.ST_AsEWKB(TZH.geom),4326),
+                func.ST_GeomFromWKB(func.ST_AsEWKB(str(geometry)),4326),
+            ) == False
         )
         .all()
     )
@@ -42,18 +44,8 @@ def set_geom(geometry, id_zh=None):
             zh_geom = DB.session.query(func.ST_GeogFromWKB(func.ST_AsEWKB(zh.geom))).scalar()
             polygon_geom = DB.session.query(func.ST_GeogFromWKB(func.ST_AsEWKB(polygon))).scalar()
             if DB.session.query(func.ST_Intersects(polygon_geom, zh_geom)).scalar():
-                # !!! because some ZH polygons which share borders with the new polygon are not previously
-                # !!! filtered (see comment above), we needed to find a way to detect ZH with shared
-                # !!! border but which not really intersect each other : 
-                # Here we consider that intersecting area < 0.001% of each global ZH area is a shared border
-                interection_area = (DB.session.query(func.ST_Area(func.ST_Intersection(polygon_geom, zh_geom), False)).scalar())/10000
-                polygon_geom_area = (DB.session.query(func.ST_Area(polygon_geom, False)).scalar())/10000
-                zh_geom_area = (DB.session.query(func.ST_Area(zh_geom, False)).scalar())/10000
-                per_intersection_polygon_geom = (interection_area/polygon_geom_area)*100
-                per_intersection_zh_geom = (interection_area/zh_geom_area)*100
-                if (per_intersection_polygon_geom > 0.001 and per_intersection_zh_geom > 0.001):
+                if DB.session.query(func.ST_GeometryType(func.ST_Intersection(zh_geom, polygon_geom, 0.1))).scalar() not in ['ST_LineString','ST_MultiLineString']:
                     is_intersected = True
-                
             if DB.session.query(
                 func.ST_Contains(
                     func.ST_GeomFromText(func.ST_AsText(zh_geom)),
