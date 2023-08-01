@@ -15,11 +15,6 @@ def set_geom(geometry, id_zh=None):
         id_zh = 0
     # SetSRID for POSTGIS < 3.0 compat
 
-    # set new ZH geometry (in WGS84 projection)
-    polygon = DB.session.query(
-        func.ST_SetSRID(func.ST_GeomFromGeoJSON(str(geometry)), 4326)
-    ).one()[0]
-
     # select only already existing ZH geometries which intersect with the new ZH geometry
     q_zh = (
         DB.session.query(TZH)
@@ -42,17 +37,18 @@ def set_geom(geometry, id_zh=None):
     for zh in q_zh:
         if zh.id_zh != id_zh:
             zh_geom = DB.session.query(func.ST_GeogFromWKB(func.ST_AsEWKB(zh.geom))).scalar()
-            polygon_geom = DB.session.query(func.ST_GeogFromWKB(func.ST_AsEWKB(polygon))).scalar()
+            polygon_geom = DB.session.query(func.ST_GeogFromWKB(func.ST_AsEWKB(str(geometry)))).scalar()
             if DB.session.query(func.ST_Intersects(polygon_geom, zh_geom)).scalar():
                 if DB.session.query(func.ST_GeometryType(func.ST_Intersection(zh_geom, polygon_geom, 0.1))).scalar() not in ['ST_LineString','ST_MultiLineString']:
                     is_intersected = True
             if DB.session.query(
                 func.ST_Contains(
-                    func.ST_GeomFromText(func.ST_AsText(zh_geom)),
-                    func.ST_GeomFromText(func.ST_AsText(polygon_geom)),
+                    zh_geom,
+                    polygon_geom,
                 )
             ).scalar():
                 raise BadRequest("La ZH est entièrement dans une ZH existante")
+                # TODO: not detected if contained entirely in 2 or more ZH polygons
             polygon = DB.session.query(func.ST_Difference(polygon_geom, zh_geom)).scalar()
     return {"polygon": polygon, "is_intersected": is_intersected}
 
