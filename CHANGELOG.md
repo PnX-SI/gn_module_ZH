@@ -1,6 +1,21 @@
 # Changelog
 
+## 1.2.0 - La Brenne (unreleased)
+
+Nécessite la version 2.13.0 (ou plus) de GeoNature.
+
+**🚀 Nouveautés**
+
+- Compatibilité avec GeoNature 2.13.0 et la refonte des permissions, en définissant les permissions disponibles du module (#22)
+
+**🐛 Corrections**
+
+- Correction de l'intersection des géométries (#30, by @cen-cgeier)
+- Correction de la Github action de contrôle de formatage du code frontend (#33)
+
 ## 1.1.1 (2023-06-06)
+
+**🐛 Corrections**
 
 - Remplacement de la vue matérialisée `pr_zh.atlas_app` par une vue (utilisée par la route `/api/zones_humides/pbf/complete`) pour corriger et simplifier la mise à jour des données de l'[atlas des zones humides](https://github.com/PnX-SI/GeoNature-ZH-atlas) (#24)
 
