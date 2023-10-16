@@ -5,9 +5,9 @@ import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from '
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ZhDataService } from '../../../services/zh-data.service';
-import { AppConfig } from '@geonature_config/app.config';
 import { TabsService } from '../../../services/tabs.service';
 import { ErrorTranslatorService } from '../../../services/error-translator.service';
+import { ConfigService } from '@geonature/services/config.service';
 
 @Component({
   selector: 'zh-form-tab1',
@@ -22,7 +22,7 @@ export class ZhFormTab1Component implements OnInit {
   public bibForm: FormGroup;
   public siteSpaceList: any[];
   public hasSiteSpace = false;
-  public appConfig = AppConfig;
+  public appConfig;
   public currentZh: any;
   public $_currentZhSub: Subscription;
   public $_fromChangeSub: Subscription;
@@ -46,10 +46,12 @@ export class ZhFormTab1Component implements OnInit {
     private _toastr: ToastrService,
     private _tabService: TabsService,
     private _error: ErrorTranslatorService,
-    public ngbModal: NgbModal
+    public ngbModal: NgbModal,
+    private _config: ConfigService,
   ) {}
 
   ngOnInit() {
+    this.appConfig = this._config;
     this.getMetaData();
     this.createForm();
 
@@ -166,7 +168,7 @@ export class ZhFormTab1Component implements OnInit {
           this._toastr.error(frontMsg, '', {
             positionClass: 'toast-top-right',
           });
-        }
+        },
       );
     }
   }
@@ -180,13 +182,13 @@ export class ZhFormTab1Component implements OnInit {
           map((res: any) =>
             res.filter((r) => {
               return !this.listBib.map((bib) => bib.id_reference).includes(r.id_reference);
-            })
+            }),
           ),
           catchError(() => {
             return of([]);
-          })
-        )
-      )
+          }),
+        ),
+      ),
     );
 
   formatter = (result: any) => `${result.title}`;
