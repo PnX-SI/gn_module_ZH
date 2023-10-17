@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.0 - La Brenne (unreleased)
+## 1.2.0 - La Brenne (2023-10-17)
 
 Nécessite la version 2.13.3 (ou plus) de GeoNature.
 
