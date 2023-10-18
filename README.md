@@ -15,7 +15,7 @@ Pour que la fonctionnalité d'export de PDF, fonctionne il est nécessaire d'ins
 
 Cela est dû à la version de la lirairie Python `weasyprint` qui requiert ce paquet. Cela sera résolu quand cette librairie sera mise à jour car, dans les dernières versions, cette dépendance n'est plus requise.
 
-Ne pas oublier de redémarrer GeoNature : 
+Ne pas oublier de redémarrer GeoNature après cette installation : 
 `sudo systemctl restart geonature`
 
 ## **Installation**
@@ -43,6 +43,8 @@ Vous pouvez modifier la configuration du module en créant un fichier `zones_hum
 du fichier `zones_humides_config.toml.example` et en surcouchant uniquement les paramètres que vous souhaitez.
 
 Voir [ici](/doc/admin.md) la documentation des paramètres de configuration du module pour les administrateurs.
+
+Il vous faut désormais attribuer des permissions aux groupes ou utilisateurs que vous souhaitez, pour qu'ils puissent accéder et utiliser le module (voir https://docs.geonature.fr/admin-manual.html#gestion-des-droits). Si besoin une commande permet d'attribuer automatiquement toutes les permissions dans tous les modules à un groupe ou utilisateur administrateur.
 
 ## **Mise à jour**
 
