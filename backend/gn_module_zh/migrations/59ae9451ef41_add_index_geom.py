@@ -19,16 +19,25 @@ SCHEMA = "pr_zh"
 
 def upgrade():
     op.create_index(
-        "index_t_zh_geom", table_name="t_zh", columns=["geom"], schema=SCHEMA, 
+        "index_t_zh_geom", 
+        table_name="t_zh",
+        columns=["geom"], 
+        schema=SCHEMA,
         postgresql_using='gist')
     op.create_index(
-        "index_t_river_basin_geom", table_name="t_river_basin", columns=["geom"], schema=SCHEMA, 
+        "index_t_river_basin_geom", 
+        table_name="t_river_basin",
+        columns=["geom"], schema=SCHEMA, 
         postgresql_using='gist')
     op.create_index(
-        "index_t_fct_area_geom", table_name="t_fct_area", columns=["geom"], schema=SCHEMA, 
+        "index_t_fct_area_geom", 
+        table_name="t_fct_area",
+        columns=["geom"], schema=SCHEMA,
         postgresql_using='gist')
     op.create_index(
-        "index_t_hydro_area_geom", table_name="t_hydro_area", columns=["geom"], schema=SCHEMA, 
+        "index_t_hydro_area_geom", 
+        table_name="t_hydro_area",
+        columns=["geom"], schema=SCHEMA,
         postgresql_using='gist')
 
 
