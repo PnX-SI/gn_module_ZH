@@ -33,7 +33,7 @@ def upgrade():
 		    vu.organisme
 		FROM gn_synthese.synthese
         JOIN pr_zh.t_zh ON st_intersects(st_setsrid(t_zh.geom, 4326), synthese.the_geom_point)
-		JOIN utilisateurs.v_userslist_forall_applications vu ON ((vu.nom_role::text || ' '::text) || vu.prenom_role::text) = synthese.observers::text
+		LEFT JOIN utilisateurs.v_userslist_forall_applications vu ON ((vu.nom_role::text || ' '::text) || vu.prenom_role::text) = synthese.observers::text
         ORDER BY t_zh.id_zh, synthese.cd_nom, synthese.date_max DESC
         ), bdc_statut AS (
         SELECT bdc_statut_1.cd_nom,
@@ -116,7 +116,7 @@ def upgrade():
 		    vu.organisme
 		FROM gn_synthese.synthese
         JOIN pr_zh.t_zh ON st_intersects(st_setsrid(t_zh.geom, 4326), synthese.the_geom_point)
-		JOIN utilisateurs.v_userslist_forall_applications vu ON ((vu.nom_role::text || ' '::text) || vu.prenom_role::text) = synthese.observers::text
+		LEFT JOIN utilisateurs.v_userslist_forall_applications vu ON ((vu.nom_role::text || ' '::text) || vu.prenom_role::text) = synthese.observers::text
         ORDER BY t_zh.id_zh, synthese.cd_nom, synthese.date_max DESC
         ), bdc_statut AS (
         SELECT bdc_statut_1.cd_nom,
@@ -179,7 +179,7 @@ def upgrade():
 		    vu.organisme
 		FROM gn_synthese.synthese
         JOIN pr_zh.t_zh ON st_intersects(st_setsrid(t_zh.geom, 4326), synthese.the_geom_point)
-		JOIN utilisateurs.v_userslist_forall_applications vu ON ((vu.nom_role::text || ' '::text) || vu.prenom_role::text) = synthese.observers::text
+		LEFT JOIN utilisateurs.v_userslist_forall_applications vu ON ((vu.nom_role::text || ' '::text) || vu.prenom_role::text) = synthese.observers::text
         ORDER BY t_zh.id_zh, synthese.cd_nom, synthese.date_max DESC
     ), bdc_statut AS (
         SELECT bdc_statut_1.cd_nom,
