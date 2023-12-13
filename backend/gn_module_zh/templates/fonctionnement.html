@@ -37,7 +37,10 @@
         {% endfor %}
       </tbody>
     </table>
+    <span class="small-title"><b>Fréquence des submersion : </b>{{ data['fonctionnement']['regime']['entree']['frequence'] or 'Non déterminé' }}</span><br>
+    <span class="small-title"><b>Etendue des submersion : </b>{{ data['fonctionnement']['regime']['entree']['etendue'] or 'Non déterminé' }}</span>
   </section>
+  <br>
   <section class="content">
     <h5 class="subtitle">Connexion de la zone humide dans son environnement</h5>
     <span class="small-title">
@@ -52,5 +55,12 @@
     "Passe à coté": "passe_a_cote.svg",
     } %}
     <img src="{{ url_for('pr_zh.static', filename=connexions[data['fonctionnement']['connexion']]) }}">
+  </section>
+  <br>
+  <section class="content">
+    <h5 class="subtitle">Diagnostic fonctionnel</h5>
+    <span class="small-title"><b>Fonctionnalité hydrologique / biogéochimique : </b>{{ data['fonctionnement']['diagnostic']['hydrologique'] or 'Non évaluée' }}</span><br>
+    <span class="small-title"><b>Fonctionnalité biologique / écologique : </b>{{ data['fonctionnement']['diagnostic']['biologique'] or 'Non évaluée' }}</span><br>
+    <span class="small-title"><b>Remarques : </b>{{ data['fonctionnement']['diagnostic']['commentaires'] or 'Aucune' }}</span>
   </section>
 </div>
