@@ -100,9 +100,8 @@
             {% else %}
             {% for ref in data['statuts']['autres_inventaires'][type['zh_name']] %}
             <span>
-              {{ ref.area_code }} -
-              <a href="{{ ref.url }}">{{ ref.area_name }}</a>
-            </span><br>
+              {{ ref.area_code }} - <a href="{{ ref.url }}">{{ ref.area_name }}</a>
+            </span>
             {% endfor %}
             {% endif %}
           </td>
