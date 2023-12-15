@@ -15,15 +15,17 @@
     <div class="new-page">
       <h1 class="title">Délimitation de la zone humide et de son espace de fonctionnalité</h1>
       {% include 'delimitation.html' %}
-    <h1 class="title">Principaux types de milieux humides (H) ou potentiellement humides (P)</h1>
-    {% include 'milieux.html' %}
+      <h1 class="title">Principaux types de milieux humides (H) ou potentiellement humides (P)</h1>
+      {% include 'milieux.html' %}
+      <h1 class="title">Fonctionnement de la zone humide</h1>
+      {% include 'fonctionnement.html' %}
     </div>
-    <h1 class="title">Fonctionnement de la zone humide</h1>
-    {% include 'fonctionnement.html' %}
-    <h1 class="title">Usages ou processus naturels</h1>
-    {% include 'usages.html' %}
-    <h1 class="title">Statuts et gestion de la zone humide</h1>
-    {% include 'statuts.html' %}
+    <div class="new-page">
+      <h1 class="title">Usages ou processus naturels</h1>
+      {% include 'usages.html' %}
+      <h1 class="title">Statuts et gestion de la zone humide</h1>
+      {% include 'statuts.html' %}
+    </div>
     <div class="new-page">
       <h1 class="title">Évaluation générale du site</h1>
       {% include 'evaluation.html' %}
@@ -213,6 +215,10 @@ tr {
 
 .border-bottom {
   border-bottom: solid 1px;
+}
+
+span {
+  white-space: pre-wrap;
 }
 
 </style>
