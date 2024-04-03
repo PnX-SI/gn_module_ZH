@@ -1,7 +1,7 @@
 import sys
 
 from geonature.utils.env import DB
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func, select
 
 from ..api_error import ZHApiError
 from .zh import ZH
@@ -18,15 +18,20 @@ class Code(ZH):
         try:
             departments = CorZhArea.get_departments(self.id_zh)
             area = 0
-            my_geom = (
-                DB.session.query(func.ST_Transform(func.ST_SetSRID(TZH.geom, 4326), 2154))
-                .filter(TZH.id_zh == self.id_zh)
-                .one()[0]
-            )
+            my_geom = DB.session.execute(
+                select(func.ST_Transform(func.ST_SetSRID(TZH.geom, 4326), 2154)).where(
+                    TZH.id_zh == self.id_zh
+                )
+            ).scalar_one()
             main_dep = None
             for dep in departments:
-                if DB.session.scalar(dep.LAreas.geom.ST_Intersection(my_geom).ST_Area()) > area:
-                    area = DB.session.scalar(dep.LAreas.geom.ST_Intersection(my_geom).ST_Area())
+                if (
+                    DB.session.scalar(select(dep.LAreas.geom.ST_Intersection(my_geom).ST_Area()))
+                    > area
+                ):
+                    area = DB.session.scalar(
+                        select(dep.LAreas.geom.ST_Intersection(my_geom).ST_Area())
+                    )
                     main_dep = dep.LAreas.area_code
             if main_dep is None:
                 raise ZHApiError(message="no_department", details="main_dep value is none")
@@ -44,7 +49,7 @@ class Code(ZH):
 
     def get_number(self):
         base_code = self.get_departments() + self.get_organism()
-        q_codes = DB.session.query(TZH).filter(TZH.code.contains(base_code)).all()
+        q_codes = DB.session.scalars(select(TZH).where(TZH.code.contains(base_code))).all()
         if q_codes:
             code_numbers = [int(zh.code.split(self.get_organism())[1]) for zh in q_codes]
             max_code = max(code_numbers)

@@ -5,6 +5,7 @@ from geonature.utils.env import DB
 from pypnnomenclature.models import TNomenclatures
 from sqlalchemy import and_, desc, func, or_
 from sqlalchemy.sql.expression import select
+from sqlalchemy.orm import aliased
 from utils_flask_sqla.generic import GenericQuery
 
 from .api_error import ZHApiError
@@ -40,7 +41,7 @@ def strip_accents(s):
 def main_search(query, json):
     for key in json.keys():
         if key in TZH.__table__.columns:
-            query = query.filter(getattr(TZH, key) == json[key])
+            query = query.where(getattr(TZH, key) == json[key])
     sdage = json.get("sdage")
     if sdage is not None:
         query = filter_sdage(query, sdage)
@@ -111,7 +112,7 @@ def main_search(query, json):
 
 def filter_sdage(query, json: dict):
     ids = [obj.get("id_nomenclature") for obj in json]
-    return query.filter(TZH.id_sdage.in_(ids))
+    return query.where(TZH.id_sdage.in_(ids))
 
 
 def filter_nameorcode(query, json: dict):
@@ -120,19 +121,19 @@ def filter_nameorcode(query, json: dict):
         json = strip_accents(json)
         # TODO: create index with another function to make unaccent immutable
         unaccent_fullname = func.lower(func.unaccent(TZH.fullname))
-        subquery = (
-            DB.session.query(TZH.id_zh, func.similarity(unaccent_fullname, json).label("idx_trgm"))
-            .filter(unaccent_fullname.ilike("%" + json + "%"))
+        subq = (
+            select(TZH.id_zh, func.similarity(unaccent_fullname, json).label("idx_trgm"))
+            .where(unaccent_fullname.ilike("%" + json + "%"))
             .order_by(desc("idx_trgm"))
             .subquery()
         )
-        return query.filter(TZH.id_zh == subquery.c.id_zh)
+        return query.where(TZH.id_zh == subq.c.id_zh)
     return query
 
 
 def filter_ensemble(query, json: dict):
     ids = [obj.get("id_site_space") for obj in json]
-    return query.filter(TZH.id_site_space.in_(ids))
+    return query.where(TZH.id_site_space.in_(ids))
 
 
 def filter_area_size(query, json: dict):
@@ -143,11 +144,11 @@ def filter_area_size(query, json: dict):
 
     # TZH.area is already in ha
     if symbol == "=":
-        query = query.filter(TZH.area == ha)
+        query = query.where(TZH.area == ha)
     elif symbol == "≥":
-        query = query.filter(TZH.area >= ha)
+        query = query.where(TZH.area >= ha)
     elif symbol == "≤":
-        query = query.filter(TZH.area <= ha)
+        query = query.where(TZH.area <= ha)
 
     return query
 
@@ -159,17 +160,17 @@ def filter_area(query, json: dict, type_code: str):
 
     # Filter on departments
     subquery = (
-        DB.session.query(LAreas)
-        .with_entities(LAreas.area_name, LAreas.geom, LAreas.id_type, BibAreasTypes.type_code)
+        select(LAreas)
+        .with_only_columns(LAreas.area_name, LAreas.geom, LAreas.id_type, BibAreasTypes.type_code)
         .join(BibAreasTypes, LAreas.id_type == BibAreasTypes.id_type)
-        .filter(BibAreasTypes.type_code == type_code)
-        .filter(LAreas.area_code.in_(codes))
+        .where(BibAreasTypes.type_code == type_code)
+        .where(LAreas.area_code.in_(codes))
         .subquery()
     )
 
     # Filter on geom.
     # Need to use (c) on subquery to get the column
-    query = query.filter(
+    query = query.where(
         func.ST_Transform(func.ST_SetSRID(TZH.geom, 4326), 2154).ST_Intersects(subquery.c.geom)
     )
 
@@ -181,14 +182,14 @@ def filter_hydro(query, json):
 
     if codes and all(code is not None for code in codes):
         subquery = (
-            DB.session.query(THydroArea)
-            .with_entities(THydroArea.id_hydro, THydroArea.geom)
-            .filter(THydroArea.id_hydro.in_(codes))
+            select(THydroArea)
+            .with_only_columns(THydroArea.id_hydro, THydroArea.geom)
+            .where(THydroArea.id_hydro.in_(codes))
             .subquery()
         )
 
         # SET_SRID does not return a valid geom...
-        query = query.filter(
+        query = query.where(
             func.ST_Transform(func.ST_SetSRID(TZH.geom, 4326), 4326).ST_Intersects(subquery.c.geom)
         )
 
@@ -200,16 +201,16 @@ def filter_basin(query, json):
 
     if codes is not None:
         subquery = (
-            DB.session.query(TRiverBasin)
-            .with_entities(
+            select(TRiverBasin)
+            .with_only_columns(
                 TRiverBasin.id_rb,
                 TRiverBasin.geom,
             )
-            .filter(TRiverBasin.id_rb.in_(codes))
+            .where(TRiverBasin.id_rb.in_(codes))
             .subquery()
         )
         # SET_SRID does not return a valid geom...
-        query = query.filter(
+        query = query.where(
             func.ST_Transform(func.ST_SetSRID(TZH.geom, 4326), 4326).ST_Intersects(subquery.c.geom)
         )
 
@@ -233,8 +234,8 @@ def filter_fct(query, json: dict, type_: str):
     ids_conn = [f.get("id_nomenclature") for f in json.get("connaissances", [])]
 
     subquery = (
-        DB.session.query(TFunctions.id_zh)
-        .with_entities(
+        select(TFunctions.id_zh)
+        .with_only_columns(
             TFunctions.id_zh,
             TFunctions.id_function,
             TFunctions.id_qualification,
@@ -245,19 +246,19 @@ def filter_fct(query, json: dict, type_: str):
         )
         .join(TFunctions, TFunctions.id_zh == TZH.id_zh)
         .join(TNomenclatures, TNomenclatures.id_nomenclature == TFunctions.id_function)
-        .filter_by(id_type=select([func.ref_nomenclatures.get_id_nomenclature_type(type_)]))
+        .filter_by(id_type=select(func.ref_nomenclatures.get_id_nomenclature_type(type_)))
     )
 
     if ids_fct and all(id_ is not None for id_ in ids_fct):
-        subquery = subquery.filter(TFunctions.id_function.in_(ids_fct))
+        subquery = subquery.where(TFunctions.id_function.in_(ids_fct))
 
     if ids_qual and all(id_ is not None for id_ in ids_qual):
-        subquery = subquery.filter(TFunctions.id_qualification.in_(ids_qual))
+        subquery = subquery.where(TFunctions.id_qualification.in_(ids_qual))
 
     if ids_conn and all(id_ is not None for id_ in ids_conn):
-        subquery = subquery.filter(TFunctions.id_knowledge.in_(ids_conn))
+        subquery = subquery.where(TFunctions.id_knowledge.in_(ids_conn))
 
-    query = query.filter(TZH.id_zh == subquery.subquery().c.id_zh).distinct()
+    query = query.where(TZH.id_zh == subquery.subquery().c.id_zh).distinct()
 
     return query
 
@@ -267,11 +268,11 @@ def filter_statuts(query, json: dict):
 
     if ids_statuts:
         subquery = (
-            DB.session.query(TOwnership.id_zh)
-            .with_entities(TOwnership.id_zh, TOwnership.id_status)
-            .filter(TOwnership.id_status.in_(ids_statuts))
+            select(TOwnership.id_zh)
+            .with_only_columns(TOwnership.id_zh, TOwnership.id_status)
+            .where(TOwnership.id_status.in_(ids_statuts))
         )
-        query = query.filter(TZH.id_zh == subquery.subquery().c.id_zh).distinct()
+        query = query.where(TZH.id_zh == subquery.subquery().c.id_zh).distinct()
 
     return query
 
@@ -281,8 +282,8 @@ def filter_plans(query, json: dict):
 
     if ids_plans and all(id_ is not None for id_ in ids_plans):
         subquery = (
-            DB.session.query(TManagementStructures.id_zh)
-            .with_entities(
+            select(TManagementStructures.id_zh)
+            .with_only_columns(
                 TManagementPlans.id_nature,
                 TManagementPlans.id_structure,
                 TManagementStructures.id_structure,
@@ -292,10 +293,10 @@ def filter_plans(query, json: dict):
                 TManagementStructures,
                 TManagementPlans.id_structure == TManagementStructures.id_structure,
             )
-            .filter(TManagementPlans.id_nature.in_(ids_plans))
+            .where(TManagementPlans.id_nature.in_(ids_plans))
         )
 
-        query = query.filter(TZH.id_zh == subquery.subquery().c.id_zh).distinct()
+        query = query.where(TZH.id_zh == subquery.subquery().c.id_zh).distinct()
 
     return query
 
@@ -303,7 +304,7 @@ def filter_plans(query, json: dict):
 def filter_strategies(query, json: dict):
     ids_strategies = [f.get("id_nomenclature") for f in json.get("strategies", [])]
     if ids_strategies:
-        query = query.filter(TZH.id_strat_gestion.in_(ids_strategies)).distinct()
+        query = query.where(TZH.id_strat_gestion.in_(ids_strategies)).distinct()
     return query
 
 
@@ -313,13 +314,13 @@ def filter_evaluations(query, json: dict):
     ids_menaces = [f.get("id_nomenclature") for f in json.get("menaces", [])]
 
     if ids_hydros and all(id_ is not None for id_ in ids_hydros):
-        query = query.filter(TZH.id_diag_hydro.in_(ids_hydros))
+        query = query.where(TZH.id_diag_hydro.in_(ids_hydros))
 
     if ids_bios and all(id_ is not None for id_ in ids_bios):
-        query = query.filter(TZH.id_diag_bio.in_(ids_bios))
+        query = query.where(TZH.id_diag_bio.in_(ids_bios))
 
     if ids_menaces and all(id_ is not None for id_ in ids_menaces):
-        query = query.filter(TZH.id_thread.in_(ids_menaces))
+        query = query.where(TZH.id_thread.in_(ids_menaces))
 
     return query
 
@@ -348,9 +349,9 @@ def filter_hierarchy(query, json: dict, basin: str):
 
         filters.append(TZH.id_zh.in_(subquery))
     if not and_:
-        query = query.filter(or_(*filters))
+        query = query.where(or_(*filters))
     else:
-        query = query.filter(*filters)
+        query = query.where(*filters)
     return query
 
 
@@ -374,6 +375,7 @@ def generate_global_attributes_subquery(attributes: list, global_notes: dict):
     """
     Generates the subquery taking care only on "GlobalMarks"
     """
+    # TODO: sqlalchemy1.4
     subquery = DB.session.query(CorZhNotes.id_zh)
     note_query = func.sum(CorZhNotes.note)
 
@@ -405,6 +407,7 @@ def generate_global_attributes_subquery(attributes: list, global_notes: dict):
 
 
 def generate_volet(subquery, volet: str, attribute_list: list, global_notes: dict, note_query):
+    # TODO: sqlalchemy1.4
     if volet.lower() in [VOLET1.lower(), VOLET2.lower()]:
         subquery = subquery.join(BibHierPanes, BibHierPanes.pane_id == TRules.pane_id).filter(
             BibHierPanes.label == volet
@@ -426,6 +429,7 @@ def generate_volet_subquery(subquery, volet, attribute_list: list, global_notes:
     """
     Subquery for "volet"
     """
+    # TODO: sqlalchemy1.4
     volet_nb = COR_VOLET[volet]
     max_note = global_notes[volet_nb]
     and_query = []
@@ -439,6 +443,7 @@ def generate_volet_subquery(subquery, volet, attribute_list: list, global_notes:
 
 
 def generate_rub(subquery, rub: str, attribute_list: list, global_notes: dict, note_query):
+    # TODO: sqlalchemy1.4
     subquery = subquery.join(BibHierCategories, BibHierCategories.cat_id == TRules.cat_id).filter(
         BibHierCategories.label == rub
     )
@@ -495,6 +500,7 @@ def generate_rub(subquery, rub: str, attribute_list: list, global_notes: dict, n
 
 
 def generate_attributes_subquery(attributes: list):
+    # TODO: sqlalchemy1.4
     subquery = DB.session.query(CorZhNotes.id_zh)
     attribute_ids = []
     note_type_ids = []

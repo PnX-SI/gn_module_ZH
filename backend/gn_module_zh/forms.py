@@ -9,6 +9,7 @@ from ref_geo.models import BibAreasTypes, LAreas
 from geonature.utils.env import DB
 from pypnnomenclature.models import TNomenclatures
 from sqlalchemy import and_, func
+from sqlalchemy.sql import select, delete, update
 
 from .api_error import ZHApiError
 from .model.code import Code
@@ -46,7 +47,7 @@ from .model.zh_schema import (
 
 
 def update_tzh(data):
-    zh = DB.session.query(TZH).filter_by(id_zh=data["id_zh"]).first()
+    zh = DB.session.get(TZH, data["id_zh"])
     for key, val in data.items():
         if hasattr(TZH, key) and key != "id_zh":
             setattr(zh, key, val)
@@ -85,22 +86,27 @@ def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referenti
     post_cor_zh_area(
         polygon,
         new_zh.id_zh,
-        DB.session.query(BibAreasTypes).filter(BibAreasTypes.type_code == "COM").one().id_type,
+        DB.session.execute(select(BibAreasTypes).where(BibAreasTypes.type_code == "COM"))
+        .scalar_one()
+        .id_type,
     )
     # fill cor_zh_area for departements
     post_cor_zh_area(
         polygon,
         new_zh.id_zh,
-        DB.session.query(BibAreasTypes).filter(BibAreasTypes.type_code == "DEP").one().id_type,
+        DB.session.execute(select(BibAreasTypes).where(BibAreasTypes.type_code == "DEP"))
+        .scalar_one()
+        .id_type,
     )
     # fill cor_zh_area for other geo referentials
     for ref in ref_geo_referentiels:
         post_cor_zh_area(
             polygon,
             new_zh.id_zh,
-            DB.session.query(BibAreasTypes)
-            .filter(BibAreasTypes.type_code == ref["type_code_ref_geo"])
-            .one()
+            DB.session.execute(
+                select(BibAreasTypes).where(BibAreasTypes.type_code == ref["type_code_ref_geo"])
+            )
+            .scalar_one()
             .id_type,
         )
 
@@ -116,9 +122,12 @@ def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referenti
     new_zh.ef_area = total_cover
     # set default values
     fct_delim_default_id = (
-        DB.session.query(DefaultsNomenclaturesValues)
-        .filter(DefaultsNomenclaturesValues.mnemonique_type == "CRIT_DEF_ESP_FCT")
-        .one()
+        DB.session.execute(
+            select(DefaultsNomenclaturesValues).where(
+                DefaultsNomenclaturesValues.mnemonique_type == "CRIT_DEF_ESP_FCT"
+            )
+        )
+        .scalar_one()
         .id_nomenclature
     )
 
@@ -168,28 +177,27 @@ def post_cor_zh_area(polygon, id_zh, id_type):
     # try:
     elements = [
         getattr(element, "id_area")
-        for element in DB.session.query(LAreas)
-        .filter(
-            LAreas.geom.ST_Intersects(
-                func.ST_Transform(func.ST_SetSRID(func.ST_AsText(polygon), 4326), 2154)
+        for element in DB.session.scalars(
+            select(LAreas)
+            .where(
+                LAreas.geom.ST_Intersects(
+                    func.ST_Transform(func.ST_SetSRID(func.ST_AsText(polygon), 4326), 2154)
+                )
             )
-        )
-        .filter(LAreas.id_type == id_type)
-        .all()
+            .where(LAreas.id_type == id_type)
+        ).all()
     ]
     for element in elements:
         # if 'Communes', % of zh in the municipality must be calculated
         if id_type == CorZhArea.get_id_type("Communes"):
-            municipality_geom = getattr(
-                DB.session.query(LAreas).filter(LAreas.id_area == element).first(), "geom"
+            municipality_geom = getattr(DB.session.get(LAreas, element), "geom")
+            polygon_2154 = DB.session.scalar(
+                select(func.ST_Transform(func.ST_SetSRID(func.ST_AsText(polygon), 4326), 2154))
             )
-            polygon_2154 = DB.session.query(
-                func.ST_Transform(func.ST_SetSRID(func.ST_AsText(polygon), 4326), 2154)
-            ).scalar()
-            intersect_area = DB.session.query(
-                func.ST_Area(func.ST_Intersection(municipality_geom, polygon_2154))
-            ).scalar()
-            municipality_area = DB.session.query(func.ST_Area(municipality_geom)).scalar()
+            intersect_area = DB.session.scalar(
+                select(func.ST_Area(func.ST_Intersection(municipality_geom, polygon_2154)))
+            )
+            municipality_area = DB.session.scalar(select(func.ST_Area(municipality_geom)))
             cover = math.ceil((intersect_area * 100) / municipality_area)
             if cover > 100:
                 cover = 100
@@ -280,11 +288,10 @@ def update_zh_tab0(form_data, polygon, area, info_role, zh_date, geo_refs):
     is_geom_new = check_polygon(polygon, form_data["id_zh"])
 
     # update pr_zh.cor_lim_list
-    id_lim_list, ef_area = (
-        DB.session.query(TZH.id_lim_list, TZH.ef_area).filter(TZH.id_zh == form_data["id_zh"]).one()
-    )
+    id_lim_list = DB.session.get(TZH, form_data["id_zh"]).id_lim_list
+    ef_area = DB.session.get(TZH, form_data["id_zh"]).ef_area
 
-    DB.session.query(CorLimList).filter(CorLimList.id_lim_list == id_lim_list).delete()
+    DB.session.execute(delete(CorLimList).where(CorLimList.id_lim_list == id_lim_list))
     post_cor_lim_list(id_lim_list, form_data["critere_delim"])
 
     if is_geom_new:
@@ -294,17 +301,19 @@ def update_zh_tab0(form_data, polygon, area, info_role, zh_date, geo_refs):
         ef_area = update_cor_zh_fct_area(form_data["geom"]["geometry"], form_data["id_zh"])
 
     # update zh : fill pr_zh.t_zh
-    DB.session.query(TZH).filter(TZH.id_zh == form_data["id_zh"]).update(
-        {
-            TZH.main_name: form_data["main_name"],
-            TZH.id_org: form_data["id_org"],
-            TZH.update_author: info_role.id_role,
-            TZH.update_date: zh_date,
-            TZH.id_sdage: form_data["sdage"],
-            TZH.geom: polygon,
-            TZH.area: area,
-            TZH.ef_area: ef_area,
-        }
+    DB.session.execute(
+        update(TZH)
+        .where(TZH.id_zh == form_data["id_zh"])
+        .values(
+            main_name=form_data["main_name"],
+            id_org=form_data["id_org"],
+            update_author=info_role.id_role,
+            update_date=zh_date,
+            id_sdage=form_data["sdage"],
+            geom=polygon,
+            area=area,
+            ef_area=ef_area,
+        )
     )
 
     DB.session.flush()
@@ -324,7 +333,12 @@ def update_zh_tab0(form_data, polygon, area, info_role, zh_date, geo_refs):
 
 def check_polygon(polygon, id_zh):
     try:
-        if polygon != str(DB.session.query(TZH.geom).filter(TZH.id_zh == id_zh).one()[0]).upper():
+        if (
+            polygon
+            != str(
+                DB.session.execute(select(TZH.geom).where(TZH.id_zh == id_zh)).scalar_one()
+            ).upper()
+        ):
             return True
         return False
     except Exception as e:
@@ -336,25 +350,32 @@ def check_polygon(polygon, id_zh):
 
 def update_cor_zh_area(polygon, id_zh, geo_refs):
     try:
-        DB.session.query(CorZhArea).filter(CorZhArea.id_zh == id_zh).delete()
+        DB.session.execute(delete(CorZhArea).where(CorZhArea.id_zh == id_zh))
         post_cor_zh_area(
             polygon,
             id_zh,
-            DB.session.query(BibAreasTypes).filter(BibAreasTypes.type_code == "COM").one().id_type,
+            DB.session.execute(select(BibAreasTypes).where(BibAreasTypes.type_code == "COM"))
+            .scalar_one()
+            .id_type,
         )
         post_cor_zh_area(
             polygon,
             id_zh,
-            DB.session.query(BibAreasTypes).filter(BibAreasTypes.type_code == "DEP").one().id_type,
+            DB.session.execute(select(BibAreasTypes).where(BibAreasTypes.type_code == "DEP"))
+            .scalar_one()
+            .id_type,
         )
         # fill cor_zh_area for other geo referentials
         for ref in geo_refs:
             post_cor_zh_area(
                 polygon,
                 id_zh,
-                DB.session.query(BibAreasTypes)
-                .filter(BibAreasTypes.type_code == ref["type_code_ref_geo"])
-                .one()
+                DB.session.execute(
+                    select(BibAreasTypes).where(
+                        BibAreasTypes.type_code == ref["type_code_ref_geo"]
+                    )
+                )
+                .scalar_one()
                 .id_type,
             )
     except Exception as e:
@@ -372,17 +393,17 @@ def update_cor_zh_area(polygon, id_zh, geo_refs):
 
 
 def update_cor_zh_rb(geom, id_zh):
-    DB.session.query(CorZhRb).filter(CorZhRb.id_zh == id_zh).delete()
+    DB.session.execute(delete(CorZhRb).where(CorZhRb.id_zh == id_zh))
     post_cor_zh_rb(geom, id_zh)
 
 
 def update_cor_zh_hydro(geom, id_zh):
-    DB.session.query(CorZhHydro).filter(CorZhHydro.id_zh == id_zh).delete()
+    DB.session.execute(delete(CorZhHydro).where(CorZhHydro.id_zh == id_zh))
     post_cor_zh_hydro(geom, id_zh)
 
 
 def update_cor_zh_fct_area(geom, id_zh):
-    DB.session.query(CorZhFctArea).filter(CorZhFctArea.id_zh == id_zh).delete()
+    DB.session.execute(delete(CorZhFctArea).where(CorZhFctArea.id_zh == id_zh))
     return post_cor_zh_fct_area(geom, id_zh)
 
 
@@ -391,7 +412,7 @@ def update_cor_zh_fct_area(geom, id_zh):
 
 def update_refs(form_data):
     try:
-        DB.session.query(CorZhRef).filter(CorZhRef.id_zh == form_data["id_zh"]).delete()
+        DB.session.execute(delete(CorZhRef).where(CorZhRef.id_zh == form_data["id_zh"]))
         for ref in form_data["id_references"]:
             DB.session.add(CorZhRef(id_zh=form_data["id_zh"], id_ref=ref))
             DB.session.flush()
@@ -436,7 +457,7 @@ def post_activities(id_zh, activities):
 def update_activities(id_zh, activities):
     try:
         # delete cascade t_activity and cor_impact_list with id_zh
-        DB.session.query(TActivity).filter(TActivity.id_zh == id_zh).delete()
+        DB.session.execute(delete(TActivity).where(TActivity.id_zh == id_zh))
         # post new activities
         post_activities(id_zh, activities)
     except Exception as e:
@@ -455,7 +476,7 @@ def update_activities(id_zh, activities):
 
 def update_corine_biotopes(id_zh, corine_biotopes):
     try:
-        DB.session.query(CorZhCb).filter(CorZhCb.id_zh == id_zh).delete()
+        DB.session.execute(delete(CorZhCb).where(CorZhCb.id_zh == id_zh))
         post_corine_biotopes(id_zh, corine_biotopes)
     except Exception as e:
         if e.__class__.__name__ == "DataError":
@@ -479,7 +500,7 @@ def post_corine_biotopes(id_zh, corine_biotopes):
 
 def update_corine_landcover(id_zh, ids_cover):
     try:
-        DB.session.query(CorZhCorineCover).filter(CorZhCorineCover.id_zh == id_zh).delete()
+        DB.session.execute(delete(CorZhCorineCover).where(CorZhCorineCover.id_zh == id_zh))
         post_corine_landcover(id_zh, ids_cover)
     except Exception as e:
         if e.__class__.__name__ == "DataError":
@@ -506,10 +527,8 @@ def post_corine_landcover(id_zh, ids_cover):
 
 def update_delim(id_zh, criteria):
     try:
-        uuid_lim_list = (
-            DB.session.query(TZH.id_lim_list).filter(TZH.id_zh == id_zh).one().id_lim_list
-        )
-        DB.session.query(CorLimList).filter(CorLimList.id_lim_list == uuid_lim_list).delete()
+        uuid_lim_list = DB.session.get(TZH, id_zh).id_lim_list
+        DB.session.execute(delete(CorLimList).where(CorLimList.id_lim_list == uuid_lim_list))
         post_delim(uuid_lim_list, criteria)
     except Exception as e:
         if e.__class__.__name__ == "DataError":
@@ -533,7 +552,7 @@ def post_delim(uuid_lim, criteria):
 
 def update_fct_delim(id_zh, criteria):
     try:
-        DB.session.query(CorZhLimFs).filter(CorZhLimFs.id_zh == id_zh).delete()
+        DB.session.execute(delete(CorZhLimFs).where(CorZhLimFs.id_zh == id_zh))
         post_fct_delim(id_zh, criteria)
     except Exception as e:
         if e.__class__.__name__ == "DataError":
@@ -560,7 +579,7 @@ def post_fct_delim(id_zh, criteria):
 
 def update_outflow(id_zh, outflows):
     try:
-        DB.session.query(TOutflow).filter(TOutflow.id_zh == id_zh).delete()
+        DB.session.execute(delete(TOutflow).where(TOutflow.id_zh == id_zh))
         post_outflow(id_zh, outflows)
     except Exception as e:
         if e.__class__.__name__ == "DataError":
@@ -591,7 +610,7 @@ def post_outflow(id_zh, outflows):
 
 def update_inflow(id_zh, inflows):
     try:
-        DB.session.query(TInflow).filter(TInflow.id_zh == id_zh).delete()
+        DB.session.execute(select(TInflow).where(TInflow.id_zh == id_zh))
         post_inflow(id_zh, inflows)
     except Exception as e:
         if e.__class__.__name__ == "DataError":
@@ -643,9 +662,13 @@ def update_functions(id_zh, functions, function_type):
             nomenclature.id_nomenclature
             for nomenclature in Nomenclatures.get_nomenclature_info(function_type)
         ]
-        DB.session.query(TFunctions).filter(TFunctions.id_zh == id_zh).filter(
-            TFunctions.id_function.in_(id_function_list)
-        ).delete(synchronize_session="fetch")
+        stmt = (
+            delete(TFunctions)
+            .where(TFunctions.id_zh == id_zh)
+            .where(TFunctions.id_function.in_(id_function_list))
+            .execution_options(synchronize_session="fetch")
+        )
+        DB.session.execute(stmt)
         post_functions(id_zh, functions)
     except Exception as e:
         if e.__class__.__name__ == "DataError":
@@ -664,7 +687,7 @@ def update_functions(id_zh, functions, function_type):
 def update_hab_heritages(id_zh, hab_heritages):
     try:
         # delete cascade t_hab_heritages
-        DB.session.query(THabHeritage).filter(THabHeritage.id_zh == id_zh).delete()
+        DB.session.execute(delete(THabHeritage).where(THabHeritage.id_zh == id_zh))
         # post new hab_heritages
         post_hab_heritages(id_zh, hab_heritages)
     except Exception as e:
@@ -699,7 +722,7 @@ def post_hab_heritages(id_zh, hab_heritages):
 
 def update_ownerships(id_zh, ownerships):
     try:
-        DB.session.query(TOwnership).filter(TOwnership.id_zh == id_zh).delete()
+        DB.session.execute(delete(TOwnership).where(TOwnership.id_zh == id_zh))
         post_ownerships(id_zh, ownerships)
     except Exception as e:
         if e.__class__.__name__ == "DataError":
@@ -725,9 +748,9 @@ def post_ownerships(id_zh, ownerships):
 
 def update_managements(id_zh, managements):
     try:
-        DB.session.query(TManagementStructures).filter(
-            TManagementStructures.id_zh == id_zh
-        ).delete()
+        DB.session.execute(
+            delete(TManagementStructures).where(TManagementStructures.id_zh == id_zh)
+        )
         # verifier si suppression en cascade ok dans TManagementPlans
         post_managements(id_zh, managements)
     except Exception as e:
@@ -753,14 +776,15 @@ def post_managements(id_zh, managements):
                 DB.session.add(
                     TManagementPlans(
                         id_nature=plan["id_nature"],
-                        id_structure=DB.session.query(TManagementStructures)
-                        .filter(
-                            and_(
-                                TManagementStructures.id_zh == id_zh,
-                                TManagementStructures.id_org == management["structure"],
+                        id_structure=DB.session.execute(
+                            select(TManagementStructures).where(
+                                and_(
+                                    TManagementStructures.id_zh == id_zh,
+                                    TManagementStructures.id_org == management["structure"],
+                                )
                             )
                         )
-                        .one()
+                        .scalar_one()
                         .id_structure,
                         plan_date=datetime.datetime.strptime(plan["plan_date"], "%d/%m/%Y"),
                         duration=plan["duration"],
@@ -772,7 +796,7 @@ def post_managements(id_zh, managements):
 
 def update_instruments(id_zh, instruments):
     try:
-        DB.session.query(TInstruments).filter(TInstruments.id_zh == id_zh).delete()
+        DB.session.execute(delete(TInstruments).where(TInstruments.id_zh == id_zh))
         post_instruments(id_zh, instruments)
     except Exception as e:
         if e.__class__.__name__ == "DataError":
@@ -804,7 +828,7 @@ def post_instruments(id_zh, instruments):
 
 def update_protections(id_zh, protections):
     try:
-        DB.session.query(CorZhProtection).filter(CorZhProtection.id_zh == id_zh).delete()
+        DB.session.execute(select(CorZhProtection).where(CorZhProtection.id_zh == id_zh))
         post_protections(id_zh, protections)
     except Exception as e:
         if e.__class__.__name__ == "DataError":
@@ -824,9 +848,12 @@ def post_protections(id_zh, protections):
     for protection in protections:
         DB.session.add(
             CorZhProtection(
-                id_protection=DB.session.query(CorProtectionLevelType)
-                .filter(CorProtectionLevelType.id_protection_status == protection)
-                .one()
+                id_protection=DB.session.execute(
+                    select(CorProtectionLevelType).where(
+                        CorProtectionLevelType.id_protection_status == protection
+                    )
+                )
+                .scalar_one()
                 .id_protection,
                 id_zh=id_zh,
             )
@@ -837,15 +864,17 @@ def post_protections(id_zh, protections):
 def update_zh_tab6(data):
     try:
         is_other_inventory = data["is_other_inventory"]
-        DB.session.query(TZH).filter(TZH.id_zh == data["id_zh"]).update(
-            {
-                TZH.update_author: data["update_author"],
-                TZH.update_date: data["update_date"],
-                TZH.is_other_inventory: is_other_inventory,
-                TZH.remark_is_other_inventory: (
+        DB.session.execute(
+            update(TZH)
+            .where(TZH.id_zh == data["id_zh"])
+            .values(
+                update_author=data["update_author"],
+                update_date=data["update_date"],
+                is_other_inventory=is_other_inventory,
+                remark_is_other_inventory=(
                     data["remark_is_other_inventory"] if is_other_inventory else None
                 ),
-            }
+            )
         )
         DB.session.flush()
     except Exception as e:
@@ -864,7 +893,7 @@ def update_zh_tab6(data):
 
 def update_urban_docs(id_zh, urban_docs):
     try:
-        DB.session.query(TUrbanPlanningDocs).filter(TUrbanPlanningDocs.id_zh == id_zh).delete()
+        DB.session.execute(delete(TUrbanPlanningDocs).where(TUrbanPlanningDocs.id_zh == id_zh))
         post_urban_docs(id_zh, urban_docs)
     except Exception as e:
         if e.__class__.__name__ == "DataError":
@@ -883,9 +912,12 @@ def update_urban_docs(id_zh, urban_docs):
 def post_urban_docs(id_zh, urban_docs):
     for urban_doc in urban_docs:
         id_doc_type = (
-            DB.session.query(CorUrbanTypeRange)
-            .filter(CorUrbanTypeRange.id_cor == urban_doc["id_urban_type"][0]["id_cor"])
-            .one()
+            DB.session.execute(
+                select(CorUrbanTypeRange).where(
+                    CorUrbanTypeRange.id_cor == urban_doc["id_urban_type"][0]["id_cor"]
+                )
+            )
+            .scalar_one()
             .id_doc_type
         )
         uuid_doc = uuid.uuid4()
@@ -910,7 +942,7 @@ def post_urban_docs(id_zh, urban_docs):
 def update_actions(id_zh, actions):
     try:
         # delete cascade actions
-        DB.session.query(TActions).filter(TActions.id_zh == id_zh).delete()
+        DB.session.execute(select(TActions).where(TActions.id_zh == id_zh))
         # post new actions
         post_actions(id_zh, actions)
     except Exception as e:
@@ -945,7 +977,9 @@ def post_actions(id_zh, actions):
 
 def post_file_info(id_zh, title, author, description, extension, media_path=None):
     try:
-        unique_id_media = DB.session.query(TZH).filter(TZH.id_zh == int(id_zh)).one().zh_uuid
+        unique_id_media = (
+            DB.session.execute(select(TZH).where(TZH.id_zh == int(id_zh))).scalar_one().zh_uuid
+        )
         uuid_attached_row = uuid.uuid4()
         if extension == ".pdf":
             mnemo = "PDF"
@@ -954,20 +988,20 @@ def post_file_info(id_zh, title, author, description, extension, media_path=None
         else:
             mnemo = "Photo"
         id_nomenclature_media_type = (
-            DB.session.query(TNomenclatures)
-            .filter(TNomenclatures.mnemonique == mnemo)
-            .one()
+            DB.session.execute(select(TNomenclatures).where(TNomenclatures.mnemonique == mnemo))
+            .scalar_one()
             .id_nomenclature
         )
         id_table_location = (
-            DB.session.query(BibTablesLocation)
-            .filter(
-                and_(
-                    BibTablesLocation.schema_name == "pr_zh",
-                    BibTablesLocation.table_name == "t_zh",
+            DB.session.execute(
+                select(BibTablesLocation).where(
+                    and_(
+                        BibTablesLocation.schema_name == "pr_zh",
+                        BibTablesLocation.table_name == "t_zh",
+                    )
                 )
             )
-            .one()
+            .scalar_one()
             .id_table_location
         )
         post_date = datetime.datetime.now()
@@ -988,9 +1022,10 @@ def post_file_info(id_zh, title, author, description, extension, media_path=None
         )
         DB.session.commit()
         id_media = (
-            DB.session.query(TMedias)
-            .filter(TMedias.uuid_attached_row == uuid_attached_row)
-            .one()
+            DB.session.execute(
+                select(TMedias).where(TMedias.uuid_attached_row == uuid_attached_row)
+            )
+            .scalar_one()
             .id_media
         )
         return id_media
@@ -1006,31 +1041,36 @@ def post_file_info(id_zh, title, author, description, extension, media_path=None
 
 def patch_file_info(id_zh, id_media, title, author, description):
     try:
-        unique_id_media = DB.session.query(TZH).filter(TZH.id_zh == int(id_zh)).one().zh_uuid
+        unique_id_media = (
+            DB.session.execute(select(TZH).where(TZH.id_zh == int(id_zh))).scalar_one().zh_uuid
+        )
         uuid_attached_row = uuid.uuid4()
         id_table_location = (
-            DB.session.query(BibTablesLocation)
-            .filter(
-                and_(
-                    BibTablesLocation.schema_name == "pr_zh",
-                    BibTablesLocation.table_name == "t_zh",
+            DB.session.execute(
+                select(BibTablesLocation).where(
+                    and_(
+                        BibTablesLocation.schema_name == "pr_zh",
+                        BibTablesLocation.table_name == "t_zh",
+                    )
                 )
             )
-            .one()
+            .scalar_one()
             .id_table_location
         )
         post_date = datetime.datetime.now()
-        DB.session.query(TMedias).filter(TMedias.id_media == id_media).update(
-            {
-                "unique_id_media": unique_id_media,
-                "id_table_location": id_table_location,
-                "uuid_attached_row": uuid_attached_row,
-                "title_fr": title,
-                "author": author,
-                "description_fr": description,
-                "is_public": True,
-                "meta_update_date": str(post_date),
-            }
+        DB.session.execute(
+            update(TMedias)
+            .where(TMedias.id_media == id_media)
+            .values(
+                unique_id_media=unique_id_media,
+                id_table_location=id_table_location,
+                uuid_attached_row=uuid_attached_row,
+                title_fr=title,
+                author=author,
+                description_fr=description,
+                is_public=True,
+                meta_update_date=str(post_date),
+            )
         )
         DB.session.flush()
     except exc.DataError as e:
@@ -1052,13 +1092,14 @@ def update_file_extension(id_media, extension):
         else:
             mnemo = "Photo"
         id_nomenclature_media_type = (
-            DB.session.query(TNomenclatures)
-            .filter(TNomenclatures.mnemonique == mnemo)
-            .one()
+            DB.session.execute(select(TNomenclatures).where(TNomenclatures.mnemonique == mnemo))
+            .scalar_one()
             .id_nomenclature
         )
-        DB.session.query(TMedias).filter(TMedias.id_media == id_media).update(
-            {"id_nomenclature_media_type": id_nomenclature_media_type}
+        DB.session.execute(
+            update(TMedias)
+            .where(TMedias.id_media == id_media)
+            .values(id_nomenclature_media_type=id_nomenclature_media_type)
         )
         DB.session.flush()
     except exc.DataError as e:
@@ -1073,12 +1114,11 @@ def update_file_extension(id_media, extension):
 
 def post_note(id_zh, cor_rule_id, note, attribute_id, note_type_id):
     try:
-        element = (
-            DB.session.query(CorZhNotes)
-            .filter(CorZhNotes.id_zh == id_zh)
-            .filter(CorZhNotes.cor_rule_id == cor_rule_id)
-            .first()
-        )
+        element = DB.session.scalars(
+            select(CorZhNotes)
+            .where(CorZhNotes.id_zh == id_zh)
+            .where(CorZhNotes.cor_rule_id == cor_rule_id)
+        ).first()
         if element:
             if element.note != note:
                 element.note = note
