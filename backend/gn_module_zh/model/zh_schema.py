@@ -280,19 +280,19 @@ class TZH(ZhModel):
     @staticmethod
     def get_zh_area_intersected(zh_area_type, id_zh_geom):
         if zh_area_type == "river_basin":
-            q = DB.session.execute(
+            q = DB.session.scalars(
                 select(TRiverBasin).where(
                     TRiverBasin.geom.ST_Intersects(cast(id_zh_geom, Geography))
                 )
             ).all()
         if zh_area_type == "hydro_area":
-            q = DB.session.execute(
+            q = DB.session.scalars(
                 select(THydroArea).where(
                     THydroArea.geom.ST_Intersects(cast(id_zh_geom, Geography))
                 )
             ).all()
         if zh_area_type == "fct_area":
-            q = DB.session.execute(
+            q = DB.session.scalars(
                 select(TFctArea).where(TFctArea.geom.ST_Intersects(cast(id_zh_geom, Geography)))
             ).all()
         return q

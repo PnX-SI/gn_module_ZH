@@ -375,8 +375,7 @@ def generate_global_attributes_subquery(attributes: list, global_notes: dict):
     """
     Generates the subquery taking care only on "GlobalMarks"
     """
-    # TODO: sqlalchemy1.4
-    subquery = DB.session.query(CorZhNotes.id_zh)
+    subquery = select(CorZhNotes.id_zh)
     note_query = func.sum(CorZhNotes.note)
 
     subquery = subquery.join(CorRbRules, CorRbRules.cor_rule_id == CorZhNotes.cor_rule_id).join(
@@ -407,9 +406,8 @@ def generate_global_attributes_subquery(attributes: list, global_notes: dict):
 
 
 def generate_volet(subquery, volet: str, attribute_list: list, global_notes: dict, note_query):
-    # TODO: sqlalchemy1.4
     if volet.lower() in [VOLET1.lower(), VOLET2.lower()]:
-        subquery = subquery.join(BibHierPanes, BibHierPanes.pane_id == TRules.pane_id).filter(
+        subquery = subquery.join(BibHierPanes, BibHierPanes.pane_id == TRules.pane_id).where(
             BibHierPanes.label == volet
         )
         subquery = generate_volet_subquery(
@@ -429,7 +427,6 @@ def generate_volet_subquery(subquery, volet, attribute_list: list, global_notes:
     """
     Subquery for "volet"
     """
-    # TODO: sqlalchemy1.4
     volet_nb = COR_VOLET[volet]
     max_note = global_notes[volet_nb]
     and_query = []
@@ -443,8 +440,7 @@ def generate_volet_subquery(subquery, volet, attribute_list: list, global_notes:
 
 
 def generate_rub(subquery, rub: str, attribute_list: list, global_notes: dict, note_query):
-    # TODO: sqlalchemy1.4
-    subquery = subquery.join(BibHierCategories, BibHierCategories.cat_id == TRules.cat_id).filter(
+    subquery = subquery.join(BibHierCategories, BibHierCategories.cat_id == TRules.cat_id).where(
         BibHierCategories.label == rub
     )
     # Takes care of the several attributes choosen by the user.
@@ -500,8 +496,7 @@ def generate_rub(subquery, rub: str, attribute_list: list, global_notes: dict, n
 
 
 def generate_attributes_subquery(attributes: list):
-    # TODO: sqlalchemy1.4
-    subquery = DB.session.query(CorZhNotes.id_zh)
+    subquery = select(CorZhNotes.id_zh)
     attribute_ids = []
     note_type_ids = []
     cor_rule_ids = []
@@ -514,10 +509,10 @@ def generate_attributes_subquery(attributes: list):
 
     # TODO: see if all of these are usefull... Are cor_rule_id with note sufficient?
     subquery = (
-        subquery.filter(CorZhNotes.attribute_id.in_(attribute_ids))
-        .filter(CorZhNotes.note_type_id.in_(note_type_ids))
-        .filter(CorZhNotes.cor_rule_id.in_(cor_rule_ids))
-        .filter(CorZhNotes.note.in_(notes))
+        subquery.where(CorZhNotes.attribute_id.in_(attribute_ids))
+        .where(CorZhNotes.note_type_id.in_(note_type_ids))
+        .where(CorZhNotes.cor_rule_id.in_(cor_rule_ids))
+        .where(CorZhNotes.note.in_(notes))
     )
 
     return subquery.subquery()

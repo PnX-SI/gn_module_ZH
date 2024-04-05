@@ -253,7 +253,7 @@ class Item:
             if not nb:
                 nb = 0
             try:
-                qualif = DB.session.scalars(
+                qualif = DB.session.execute(
                     select(CorRbRules, TItems, CorItemValue)
                     .join(TItems, TItems.cor_rule_id == CorRbRules.cor_rule_id)
                     .join(CorItemValue, TItems.attribute_id == CorItemValue.attribute_id)
@@ -602,7 +602,7 @@ class Item:
                         )
                     )
                 )
-                .scalar_one()
+                .all()[0]
                 .TNomenclatures,
                 "id_nomenclature",
             )
@@ -887,12 +887,12 @@ class Item:
         try:
             return (
                 DB.session.execute(
-                    select(TRules, BibHierSubcategories)
+                    select(TRules, BibHierCategories)
                     .join(TRules)
                     .where(TRules.rule_id == self.rule_id)
                 )
-                .scalar_one()
-                .BibHierSubcategories.label.capitalize()
+                .all()[0]
+                .BibHierCategories.label.capitalize()
             )
         except NoResultFound:
             pass
@@ -902,7 +902,7 @@ class Item:
                 .join(TRules)
                 .where(TRules.rule_id == self.rule_id)
             )
-            .scalar_one()
+            .all()[0]
             .BibHierCategories.label.capitalize()
         )
 
@@ -920,9 +920,7 @@ class Item:
                                 TNomenclatures.id_nomenclature == BibNoteTypes.id_knowledge,
                             )
                             .where(BibNoteTypes.note_id == self.knowledge)
-                        )
-                        .scalar_one()
-                        .TNomenclatures,
+                        ).scalar_one(),
                         "mnemonique",
                     )
         except Exception as e:
@@ -1214,7 +1212,7 @@ class Hierarchy(ZH):
                 select(CorZhRb, TRiverBasin).join(TRiverBasin).where(CorZhRb.id_zh == self.id_zh)
             )
             .scalar_one()
-            .TRiverBasin.id_rb
+            .id_rb
         )
 
     def __check_if_rules(self):
@@ -1284,7 +1282,7 @@ def get_all_hierarchy_fields(id_rb: int):
         tableName="all_rb_rules",
         schemaName="pr_zh",
         filters={"id_rb": id_rb, "orderby": "name"},
-        limit=-1,
+        limit=100000,
     )
 
     results = query.return_query()
