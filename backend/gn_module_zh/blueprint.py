@@ -810,7 +810,7 @@ def write_csv(id_zh):
             tableName=blueprint.config[i]["table_name"],
             schemaName=blueprint.config[i]["schema_name"],
             filters={"id_zh": id_zh, "orderby": "id_zh"},
-            limit=100,
+            limit=100000,
         )
         results = query.return_query().get("items", [])
         current_date = dt.now()
