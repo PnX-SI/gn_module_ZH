@@ -378,7 +378,7 @@ class CorZhArea(DB.Model):
     @staticmethod
     def get_ref_geo_info(id_zh, id_types):
         return [
-            DB.session.scalars(
+            DB.session.execute(
                 select(CorZhArea, LAreas, TZH)
                 .join(LAreas)
                 .where(CorZhArea.id_zh == id_zh, LAreas.id_type == id_type, TZH.id_zh == id_zh)

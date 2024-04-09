@@ -80,12 +80,12 @@ def get_main_rb(query: list) -> int:
     area = 0
     for q_ in query:
         zh_polygon = (
-            DB.session.scalars(select(TZH.geom).where(TZH.id_zh == getattr(q_, "id_zh")))
+            DB.session.execute(select(TZH.geom).where(TZH.id_zh == getattr(q_, "id_zh")))
             .first()
             .geom
         )
         rb_polygon = (
-            DB.session.scalar(
+            DB.session.execute(
                 select(CorZhRb, TRiverBasin)
                 .join(TRiverBasin, TRiverBasin.id_rb == CorZhRb.id_rb)
                 .where(TRiverBasin.id_rb == getattr(q_, "id_rb"))
