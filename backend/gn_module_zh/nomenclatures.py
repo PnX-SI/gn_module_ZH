@@ -99,7 +99,7 @@ def get_ch(lb_code):
                     "lb_code": hab.lb_code,
                     "lb_hab_fr": hab.lb_hab_fr,
                     "priority": DB.session.execute(
-                        select(CorChStatus).where(CorChStatus.lb_code == hab.lb_code)
+                        select(CorChStatus).where(CorChStatus.lb_code == hab.lb_code).distinct()
                     )
                     .scalar_one()
                     .priority,

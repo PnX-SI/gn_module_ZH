@@ -392,7 +392,9 @@ class HabHeritage:
         cahier_lb_hab_fr = cahier.lb_hab_fr
         cahier_lb_code = cahier.lb_code
         priority = (
-            DB.session.execute(select(CorChStatus).where(CorChStatus.lb_code == cahier_lb_code))
+            DB.session.execute(
+                select(CorChStatus).where(CorChStatus.lb_code == cahier_lb_code).distinct()
+            )
             .scalar_one()
             .priority
         )
