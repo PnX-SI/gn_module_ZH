@@ -103,17 +103,17 @@ ref_geo_referentiels = [
 
 vertebrates_view_name = {
     "schema_name": "pr_zh",
-    "table_name": "vertebrates",
+    "table_name": "vm_vertebrates",
     "category": "vertebrates",
 }
 
 invertebrates_view_name = {
     "schema_name": "pr_zh",
-    "table_name": "invertebrates",
+    "table_name": "vm_invertebrates",
     "category": "invertebrates",
 }
 
-flora_view_name = {"schema_name": "pr_zh", "table_name": "flora", "category": "flora"}
+flora_view_name = {"schema_name": "pr_zh", "table_name": "vm_flora", "category": "flora"}
 
 # Name of the source of species data (tab5)
 species_source_name = "GeoNature"

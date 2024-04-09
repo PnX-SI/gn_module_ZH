@@ -812,6 +812,7 @@ def write_csv(id_zh):
             filters={"id_zh": id_zh, "orderby": "id_zh"},
             limit=100000,
         )
+        # TODO: change for limit=-1 when the next version of Utils-Flask-SQLAlchemy will be released
         results = query.return_query().get("items", [])
         current_date = dt.now()
         if results:
