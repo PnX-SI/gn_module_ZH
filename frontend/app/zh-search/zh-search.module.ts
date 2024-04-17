@@ -8,6 +8,7 @@ import { ZhSearchComponent } from './zh-search.component';
 import { ZhDetailsModule } from '../zh-details/zh-details.module';
 import { TableComponent } from '../commonComponents/table/table.component';
 import { LabelComponent } from '../commonComponents/label/label.component';
+import { ZHMultiSelectComponent } from '../commonComponents/zh-multiselect/zh-multiselect.component';
 import { ZhSearchCodeComponent } from './zh-search-items/zh-search-code/zh-search-code.component';
 import { ZhSearchEnsembleComponent } from './zh-search-items/zh-search-ensemble/zh-search-ensemble.component';
 import { ZhSearchAreaComponent } from './zh-search-items/zh-search-superficie/zh-search-area.component';
@@ -37,6 +38,6 @@ const routes: Routes = [{ path: 'search', component: ZhSearchComponent }];
     ZhAdvancedSearchModule,
     ZhHierarchySearchModule,
   ],
-  exports: [TableComponent, LabelComponent, ZhSearchComponent, AngularMultiSelectModule],
+  exports: [AngularMultiSelectModule, LabelComponent, TableComponent, ZHMultiSelectComponent, ZhSearchComponent],
 })
 export class ZhSearchModule {}

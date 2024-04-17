@@ -1,0 +1,45 @@
+<small>{{ label }}</small>
+<ng-select class="Multiselect"
+           #zhMultiselect
+           [ngClass]="{'Multiselect--multiple': multiple}"
+           [items]="values"
+           [bindLabel]="keyLabel"
+           placeholder="Sélectionner"
+           [multiple]="multiple"
+           [clearable]="true"
+           [virtualScroll]="true"
+           [formControl]="parentFormControl"
+           (add)="onChange.emit($event)"
+           (remove)="onDelete.emit($event)"
+           [closeOnSelect]="!multiple">
+    <ng-template ng-header-tmp>
+        <div class="MultiselectHeader">
+            <input type="text"
+                   class="MultiselectHeader__search"
+                   id="inputValidation"
+                   placeholder="Search"
+                   (input)="zhMultiselect.filter($event.target.value)" />
+            <button *ngIf="zhMultiselect.multiple"
+                    class="MultiselectHeader__selectAll"
+                    mat-flat-button
+                    color="#219653"
+                    (click)="selectAllFiltered(zhMultiselect)">
+                Select all
+            </button>
+        </div>
+    </ng-template>
+    <ng-template ng-option-tmp
+                 let-item="item"
+                 let-item$="item$"
+                 let-index="index"
+                 class="MultiselectOption">
+        <div class="MultiselectOptionItem">
+            <input class="MultiselectOptionItem__checkbox"
+                   id="item-{{index}}"
+                   type="checkbox"
+                   [ngModel]="item$.selected"
+                   [ngModelOptions]="{standalone: true}" />
+            <div class="MultiselectOptionItem__text">{{ item[keyLabel] }}</div>
+        </div>
+    </ng-template>
+</ng-select>

@@ -16,6 +16,7 @@ import { StatutsComponent } from './statuts/statuts.component';
 import { CollapseComponent } from '../commonComponents/collapse/collapse.component';
 import { TableComponent } from '../commonComponents/table/table.component';
 import { LabelComponent } from '../commonComponents/label/label.component';
+import { ZHMultiSelectComponent } from '../commonComponents/zh-multiselect/zh-multiselect.component';
 import { HeaderComponent } from './header/header.component';
 import { DeleteModalComponent } from '../commonComponents/delete-modal/delete-modal.component';
 import { ImageTableComponent } from '../commonComponents/imageTable/image-table.component';
@@ -40,6 +41,7 @@ const routes: Routes = [{ path: 'zhDetails/:id', component: ZhDetailsComponent }
     CollapseComponent,
     TableComponent,
     LabelComponent,
+    ZHMultiSelectComponent,
     HeaderComponent,
     ImageTableComponent,
     DeleteModalComponent,
@@ -52,6 +54,7 @@ const routes: Routes = [{ path: 'zhDetails/:id', component: ZhDetailsComponent }
     ImageTableComponent,
     DeleteModalComponent,
     LabelComponent,
+    ZHMultiSelectComponent
   ],
 })
 export class ZhDetailsModule {}
