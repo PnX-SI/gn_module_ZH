@@ -86,17 +86,15 @@ def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referenti
     post_cor_zh_area(
         polygon,
         new_zh.id_zh,
-        DB.session.execute(select(BibAreasTypes).where(BibAreasTypes.type_code == "COM"))
-        .scalar_one()
-        .id_type,
+        DB.session.execute(select(BibAreasTypes.id_type).where(BibAreasTypes.type_code == "COM"))
+        .scalar_one(),
     )
     # fill cor_zh_area for departements
     post_cor_zh_area(
         polygon,
         new_zh.id_zh,
-        DB.session.execute(select(BibAreasTypes).where(BibAreasTypes.type_code == "DEP"))
-        .scalar_one()
-        .id_type,
+        DB.session.execute(select(BibAreasTypes.id_type).where(BibAreasTypes.type_code == "DEP"))
+        .scalar_one(),
     )
     # fill cor_zh_area for other geo referentials
     for ref in ref_geo_referentiels:
@@ -104,10 +102,9 @@ def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referenti
             polygon,
             new_zh.id_zh,
             DB.session.execute(
-                select(BibAreasTypes).where(BibAreasTypes.type_code == ref["type_code_ref_geo"])
+                select(BibAreasTypes.id_type).where(BibAreasTypes.type_code == ref["type_code_ref_geo"])
             )
-            .scalar_one()
-            .id_type,
+            .scalar_one(),
         )
 
     # fill cor_zh_rb
@@ -123,12 +120,11 @@ def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referenti
     # set default values
     fct_delim_default_id = (
         DB.session.execute(
-            select(DefaultsNomenclaturesValues).where(
+            select(DefaultsNomenclaturesValues.id_nomenclature).where(
                 DefaultsNomenclaturesValues.mnemonique_type == "CRIT_DEF_ESP_FCT"
             )
         )
         .scalar_one()
-        .id_nomenclature
     )
 
     post_fct_delim(new_zh.id_zh, [fct_delim_default_id])
@@ -354,16 +350,14 @@ def update_cor_zh_area(polygon, id_zh, geo_refs):
         post_cor_zh_area(
             polygon,
             id_zh,
-            DB.session.execute(select(BibAreasTypes).where(BibAreasTypes.type_code == "COM"))
-            .scalar_one()
-            .id_type,
+            DB.session.execute(select(BibAreasTypes.id_type).where(BibAreasTypes.type_code == "COM"))
+            .scalar_one(),
         )
         post_cor_zh_area(
             polygon,
             id_zh,
-            DB.session.execute(select(BibAreasTypes).where(BibAreasTypes.type_code == "DEP"))
-            .scalar_one()
-            .id_type,
+            DB.session.execute(select(BibAreasTypes.id_type).where(BibAreasTypes.type_code == "DEP"))
+            .scalar_one(),
         )
         # fill cor_zh_area for other geo referentials
         for ref in geo_refs:
@@ -371,12 +365,11 @@ def update_cor_zh_area(polygon, id_zh, geo_refs):
                 polygon,
                 id_zh,
                 DB.session.execute(
-                    select(BibAreasTypes).where(
+                    select(BibAreasTypes.id_type).where(
                         BibAreasTypes.type_code == ref["type_code_ref_geo"]
                     )
                 )
-                .scalar_one()
-                .id_type,
+                .scalar_one(),
             )
     except Exception as e:
         if e.__class__.__name__ == "DataError":
@@ -777,15 +770,14 @@ def post_managements(id_zh, managements):
                     TManagementPlans(
                         id_nature=plan["id_nature"],
                         id_structure=DB.session.execute(
-                            select(TManagementStructures).where(
+                            select(TManagementStructures.id_structure).where(
                                 and_(
                                     TManagementStructures.id_zh == id_zh,
                                     TManagementStructures.id_org == management["structure"],
                                 )
                             )
                         )
-                        .scalar_one()
-                        .id_structure,
+                        .scalar_one(),
                         plan_date=datetime.datetime.strptime(plan["plan_date"], "%d/%m/%Y"),
                         duration=plan["duration"],
                         remark=plan["remark"],
@@ -849,12 +841,11 @@ def post_protections(id_zh, protections):
         DB.session.add(
             CorZhProtection(
                 id_protection=DB.session.execute(
-                    select(CorProtectionLevelType).where(
+                    select(CorProtectionLevelType.id_protection).where(
                         CorProtectionLevelType.id_protection_status == protection
                     )
                 )
-                .scalar_one()
-                .id_protection,
+                .scalar_one(),
                 id_zh=id_zh,
             )
         )
@@ -913,12 +904,11 @@ def post_urban_docs(id_zh, urban_docs):
     for urban_doc in urban_docs:
         id_doc_type = (
             DB.session.execute(
-                select(CorUrbanTypeRange).where(
+                select(CorUrbanTypeRange.id_doc_type).where(
                     CorUrbanTypeRange.id_cor == urban_doc["id_urban_type"][0]["id_cor"]
                 )
             )
             .scalar_one()
-            .id_doc_type
         )
         uuid_doc = uuid.uuid4()
         DB.session.add(
@@ -978,7 +968,7 @@ def post_actions(id_zh, actions):
 def post_file_info(id_zh, title, author, description, extension, media_path=None):
     try:
         unique_id_media = (
-            DB.session.execute(select(TZH).where(TZH.id_zh == int(id_zh))).scalar_one().zh_uuid
+            DB.session.execute(select(TZH.zh_uuid).where(TZH.id_zh == int(id_zh))).scalar_one()
         )
         uuid_attached_row = uuid.uuid4()
         if extension == ".pdf":
@@ -988,13 +978,12 @@ def post_file_info(id_zh, title, author, description, extension, media_path=None
         else:
             mnemo = "Photo"
         id_nomenclature_media_type = (
-            DB.session.execute(select(TNomenclatures).where(TNomenclatures.mnemonique == mnemo))
+            DB.session.execute(select(TNomenclatures.id_nomenclature).where(TNomenclatures.mnemonique == mnemo))
             .scalar_one()
-            .id_nomenclature
         )
         id_table_location = (
             DB.session.execute(
-                select(BibTablesLocation).where(
+                select(BibTablesLocation.id_table_location).where(
                     and_(
                         BibTablesLocation.schema_name == "pr_zh",
                         BibTablesLocation.table_name == "t_zh",
@@ -1002,7 +991,6 @@ def post_file_info(id_zh, title, author, description, extension, media_path=None
                 )
             )
             .scalar_one()
-            .id_table_location
         )
         post_date = datetime.datetime.now()
         DB.session.add(
@@ -1023,10 +1011,9 @@ def post_file_info(id_zh, title, author, description, extension, media_path=None
         DB.session.commit()
         id_media = (
             DB.session.execute(
-                select(TMedias).where(TMedias.uuid_attached_row == uuid_attached_row)
+                select(TMedias.id_media).where(TMedias.uuid_attached_row == uuid_attached_row)
             )
             .scalar_one()
-            .id_media
         )
         return id_media
     except Exception as e:
@@ -1042,12 +1029,12 @@ def post_file_info(id_zh, title, author, description, extension, media_path=None
 def patch_file_info(id_zh, id_media, title, author, description):
     try:
         unique_id_media = (
-            DB.session.execute(select(TZH).where(TZH.id_zh == int(id_zh))).scalar_one().zh_uuid
+            DB.session.execute(select(TZH.zh_uuid).where(TZH.id_zh == int(id_zh))).scalar_one()
         )
         uuid_attached_row = uuid.uuid4()
         id_table_location = (
             DB.session.execute(
-                select(BibTablesLocation).where(
+                select(BibTablesLocation.id_table_location).where(
                     and_(
                         BibTablesLocation.schema_name == "pr_zh",
                         BibTablesLocation.table_name == "t_zh",
@@ -1055,7 +1042,6 @@ def patch_file_info(id_zh, id_media, title, author, description):
                 )
             )
             .scalar_one()
-            .id_table_location
         )
         post_date = datetime.datetime.now()
         DB.session.execute(
@@ -1092,9 +1078,8 @@ def update_file_extension(id_media, extension):
         else:
             mnemo = "Photo"
         id_nomenclature_media_type = (
-            DB.session.execute(select(TNomenclatures).where(TNomenclatures.mnemonique == mnemo))
+            DB.session.execute(select(TNomenclatures.id_nomenclature).where(TNomenclatures.mnemonique == mnemo))
             .scalar_one()
-            .id_nomenclature
         )
         DB.session.execute(
             update(TMedias)

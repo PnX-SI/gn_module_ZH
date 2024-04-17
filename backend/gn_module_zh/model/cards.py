@@ -34,17 +34,15 @@ class Utils(ZH):
             if type(ids) is int:
                 return (
                     DB.session.execute(
-                        select(TNomenclatures).where(TNomenclatures.id_nomenclature == ids)
+                        select(TNomenclatures.label_default).where(TNomenclatures.id_nomenclature == ids)
                     )
                     .scalar_one()
-                    .label_default
                 )
             return [
                 DB.session.execute(
-                    select(TNomenclatures).where(TNomenclatures.id_nomenclature == id)
+                    select(TNomenclatures.label_default).where(TNomenclatures.id_nomenclature == id)
                 )
                 .scalar_one()
-                .label_default
                 for id in ids
             ]
         return []
@@ -393,10 +391,9 @@ class HabHeritage:
         cahier_lb_code = cahier.lb_code
         priority = (
             DB.session.execute(
-                select(CorChStatus).where(CorChStatus.lb_code == cahier_lb_code).distinct()
+                select(CorChStatus.priority).where(CorChStatus.lb_code == cahier_lb_code).distinct()
             )
-            .scalar_one()
-            .priority
+            .scalar_one()   
         )
         return {
             "biotope": biotope_lb_code + " - " + biotope_lb_hab_fr,
@@ -682,10 +679,9 @@ class Status:
             for i in ref:
                 type_code = (
                     DB.session.execute(
-                        select(BibAreasTypes).where(BibAreasTypes.id_type == i.LAreas.id_type)
+                        select(BibAreasTypes.type_code).where(BibAreasTypes.id_type == i.LAreas.id_type)
                     )
-                    .scalar_one()
-                    .type_code
+                    .scalar_one()   
                 )
                 refs.append(
                     {
@@ -783,10 +779,8 @@ class Management:
     def __str__(self):
         return {
             "structure": DB.session.execute(
-                select(BibOrganismes).where(BibOrganismes.id_org == self.id_org)
-            )
-            .scalar_one()
-            .name,
+                select(BibOrganismes.name).where(BibOrganismes.id_org == self.id_org)
+            ).scalar_one(),
             "plans": [plan.__str__() for plan in self.plans],
         }
 
@@ -825,17 +819,14 @@ class UrbanDoc:
 
     def __str__(self):
         return {
-            "commune": DB.session.execute(select(LAreas).where(LAreas.id_area == self.id_area))
-            .scalar_one()
-            .area_name,
+            "commune": DB.session.execute(select(LAreas.area_name).where(LAreas.id_area == self.id_area))
+            .scalar_one(),
             "type_doc": Utils.get_mnemo(self.id_doc_type),
             "type_classement": [
                 Utils.get_mnemo(
                     DB.session.execute(
-                        select(CorUrbanTypeRange).where(CorUrbanTypeRange.id_cor == id)
-                    )
-                    .scalar_one()
-                    .id_range_type
+                        select(CorUrbanTypeRange.id_range_type).where(CorUrbanTypeRange.id_cor == id)
+                    ).scalar_one()
                 )
                 for id in self.id_cors
             ],
@@ -1016,10 +1007,8 @@ class Action:
     def __str__(self):
         return {
             "proposition": DB.session.execute(
-                select(BibActions).where(BibActions.id_action == self.id_action)
-            )
-            .scalar_one()
-            .name,
+                select(BibActions.name).where(BibActions.id_action == self.id_action)
+            ).scalar_one(),
             "niveau": Utils.get_mnemo(self.id_priority_level),
             "remarque": Utils.get_string(self.remark),
         }

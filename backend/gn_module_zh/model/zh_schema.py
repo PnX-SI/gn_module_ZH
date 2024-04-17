@@ -268,9 +268,8 @@ class TZH(ZhModel):
     @staticmethod
     def get_site_space_name(id):
         return (
-            DB.session.execute(select(BibSiteSpace).where(BibSiteSpace.id_site_space == id))
+            DB.session.execute(select(BibSiteSpace.name).where(BibSiteSpace.id_site_space == id))
             .scalar_one()
-            .name
         )
 
     @staticmethod
@@ -366,12 +365,11 @@ class CorZhArea(DB.Model):
             if ref["active"]:
                 ids.append(
                     DB.session.execute(
-                        select(BibAreasTypes).where(
+                        select(BibAreasTypes.id_type).where(
                             BibAreasTypes.type_code == ref["type_code_ref_geo"]
                         )
                     )
                     .scalar_one()
-                    .id_type
                 )
         return ids
 
@@ -619,13 +617,13 @@ class CorMainFct(DB.Model):
 
     @staticmethod
     def get_main_function_list(ids):
-        # méthode utilisée ???
+        # méthode utilisée ?
         q_id_types = DB.session.scalars(select(func.distinct(CorMainFct.id_main_function))).all()
         return [id[0] for id in q_id_types if id[0] in ids]
 
     @staticmethod
     def get_function_by_main_function(id_main):
-        # méthode utilisée ???
+        # méthode utilisée ?
         return DB.session.execute(
             select(CorMainFct, TNomenclatures)
             .join(TNomenclatures, TNomenclatures.id_nomenclature == CorMainFct.id_function)
@@ -634,8 +632,9 @@ class CorMainFct(DB.Model):
 
     @staticmethod
     def get_mnemo_type(id_type):
+        # methode utilisée ?
         if id_type:
-            # pas testé
+            test = 'test'
             return DB.session.execute(
                 select(TNomenclatures).where(TNomenclatures.id_nomenclature == id_type)
             ).scalar_one()
@@ -798,12 +797,11 @@ class CorUrbanTypeRange(DB.Model):
                     "id_cor": range.id_cor,
                     "id_nomenclature": range.id_range_type,
                     "mnemonique": DB.session.execute(
-                        select(TNomenclatures).where(
+                        select(TNomenclatures.mnemonique).where(
                             TNomenclatures.id_nomenclature == range.id_range_type
                         )
                     )
-                    .scalar_one()
-                    .mnemonique,
+                    .scalar_one(),
                 }
             )
         return ranges

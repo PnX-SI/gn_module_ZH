@@ -20,7 +20,7 @@ def get_main_picture_id(id_zh, media_list=None):
         present
     """
     main_pict_id = (
-        DB.session.execute(select(TZH).where(TZH.id_zh == id_zh)).scalar_one().main_pict_id
+        DB.session.execute(select(TZH.main_pict_id).where(TZH.id_zh == id_zh)).scalar_one()
     )
     if main_pict_id is None and media_list is not None and len(media_list) > 0:
         id_media = media_list[0].id_media
@@ -41,12 +41,14 @@ def get_last_pdf_export(id_zh, last_date) -> Query:
     query = (
         select(TZH, TMedias, TNomenclatures)
         .with_only_columns(TMedias.id_media)
-        .where(TZH.id_zh == id_zh)
-        .where(TZH.zh_uuid == TMedias.unique_id_media)
-        .where(TMedias.id_nomenclature_media_type == TNomenclatures.id_nomenclature)
-        .where(TNomenclatures.mnemonique == "PDF")
-        .where(TMedias.meta_update_date > last_date)
-        .where(TMedias.title_fr.like(f"{id_zh}_fiche%.pdf"))
+        .where(
+            TZH.id_zh == id_zh,
+            TZH.zh_uuid == TMedias.unique_id_media,
+            TMedias.id_nomenclature_media_type == TNomenclatures.id_nomenclature,
+            TNomenclatures.mnemonique == "PDF",
+            TMedias.meta_update_date > last_date,
+            TMedias.title_fr.like(f"{id_zh}_fiche%.pdf")
+        )
     )
     return DB.session.execute(query).first()
 
@@ -92,14 +94,12 @@ def delete_file(id_media):
 def check_ref_geo_schema():
     try:
         id_type_com = (
-            DB.session.execute(select(BibAreasTypes).where(BibAreasTypes.type_code == "COM"))
+            DB.session.execute(select(BibAreasTypes.id_type).where(BibAreasTypes.type_code == "DEP"))
             .scalar_one()
-            .id_type
         )
         id_type_dep = (
-            DB.session.execute(select(BibAreasTypes).where(BibAreasTypes.type_code == "DEP"))
+            DB.session.execute(select(BibAreasTypes.id_type).where(BibAreasTypes.type_code == "DEP"))
             .scalar_one()
-            .id_type
         )
         n_com = DB.session.scalar(select(func.count()).where(LAreas.id_type == id_type_com))
         n_dep = DB.session.scalar(select(func.count()).where(LAreas.id_type == id_type_dep))

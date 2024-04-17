@@ -180,12 +180,11 @@ class ZH(TZH):
         return {
             "protections": [
                 DB.session.execute(
-                    select(CorProtectionLevelType).where(
+                    select(CorProtectionLevelType.id_protection_status).where(
                         CorProtectionLevelType.id_protection == protec
                     )
                 )
                 .scalar_one()
-                .id_protection_status
                 for protec in [
                     protection.id_protection
                     for protection in ZH.get_data_by_id(CorZhProtection, self.zh.id_zh)

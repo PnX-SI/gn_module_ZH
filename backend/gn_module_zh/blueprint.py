@@ -125,7 +125,7 @@ def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
     # try:
     # Pour obtenir le nombre de résultat de la requete sans le LIMIT
     nb_results_without_limit = (
-        DB.session.execute(select(func.count()).select_from(query.subquery())).scalars().one()
+        DB.session.scalar(select(func.count()).select_from(query.subquery()))
     )
     user = info_role
     user_cruved = get_user_cruved()
@@ -155,8 +155,7 @@ def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
     # Order by id because there can be ambiguity in order_by(col) depending
     # on the column so add on order_by id makes it clearer
     data = (
-        DB.session.execute(query.order_by(TZH.id_zh).limit(limit).offset(page * limit))
-        .scalars()
+        DB.session.scalars(query.order_by(TZH.id_zh).limit(limit).offset(page * limit))
         .all()
     )
     is_ref_geo = check_ref_geo_schema()
@@ -370,7 +369,7 @@ def get_pbf_complete():
                          'bassin_versant', tz.bassin_versant) as json_arrays
         FROM   pr_zh.atlas_app tz) AS q;
     """
-    row = DB.session.execute(sql).first()
+    row = DB.session.execute(text(sql).limit(1)).first()
     return Response(bytes(row["pbf"]) if row["pbf"] else bytes(), mimetype="application/protobuf")
 
 
@@ -390,7 +389,7 @@ def get_json():
     ) AS feature
     FROM (SELECT * FROM pr_zh.atlas_app tz) inputs) features;
     """
-    row = DB.session.execute(sql).first()
+    row = DB.session.execute(text(sql).limit(1)).first()
     return row["geojson"]
 
 
@@ -463,7 +462,7 @@ def get_file_list(id_zh):
     """get a list of the zh files contained in static repo"""
     try:
         # FIXME: to optimize... See relationships and lazy join with sqlalchemy
-        zh_uuid = DB.session.execute(select(TZH).where(TZH.id_zh == id_zh)).scalar_one().zh_uuid
+        zh_uuid = DB.session.execute(select(TZH.zh_uuid).where(TZH.id_zh == id_zh)).scalar_one()
         q_medias = DB.session.execute(
             select(TMedias, TNomenclatures.label_default)
             .join(
@@ -773,7 +772,7 @@ def deleteOneZh(id_zh):
 
     # delete criteres delim
     id_lim_list = (
-        DB.session.execute(select(TZH).where(TZH.id_zh == id_zh)).scalar_one().id_lim_list
+        DB.session.execute(select(TZH.id_lim_list).where(TZH.id_zh == id_zh)).scalar_one()
     )
     DB.session.execute(delete(CorLimList).where(CorLimList.id_lim_list == id_lim_list))
 
@@ -781,7 +780,7 @@ def deleteOneZh(id_zh):
     DB.session.execute(delete(CorZhArea).where(CorZhArea.id_zh == id_zh))
 
     # delete files in TMedias and repos
-    zh_uuid = DB.session.execute(select(TZH).where(TZH.id_zh == id_zh)).scalar_one().zh_uuid
+    zh_uuid = DB.session.execute(select(TZH.zh_uuid).where(TZH.id_zh == id_zh)).scalar_one()
     q_medias = DB.session.scalars(select(TMedias).where(TMedias.unique_id_media == zh_uuid)).all()
     for media in q_medias:
         delete_file(media.id_media)
@@ -807,7 +806,7 @@ def write_csv(id_zh):
     names = []
     FILE_PATH = blueprint.config["file_path"]
     MODULE_NAME = blueprint.config["MODULE_CODE"].lower()
-    zh_code = DB.session.execute(select(TZH).where(TZH.id_zh == id_zh)).scalar_one().code
+    zh_code = DB.session.execute(select(TZH.code).where(TZH.id_zh == id_zh)).scalar_one()
     # author name
     user = DB.session.execute(
         select(User).where(User.id_role == g.current_user.id_role)

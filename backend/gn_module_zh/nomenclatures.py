@@ -63,22 +63,19 @@ def get_corine_biotope():
 def get_ch(lb_code):
     try:
         CH_typo = (
-            DB.session.execute(select(TypoRef).where(TypoRef.cd_table == "TYPO_CH"))
-            .scalar_one()
-            .cd_typo
+            DB.session.execute(select(TypoRef.cd_typo).where(TypoRef.cd_table == "TYPO_CH"))
+            .scalar_one()   
         )
         CB_typo = (
-            DB.session.execute(select(TypoRef).where(TypoRef.cd_table == "TYPO_CORINE_BIOTOPES"))
+            DB.session.execute(select(TypoRef.cd_typo).where(TypoRef.cd_table == "TYPO_CORINE_BIOTOPES"))
             .scalar_one()
-            .cd_typo
         )
         # get cd_hab_sortie list from lb_code of selected Corine Biotope
         cd_hab_sortie = (
             DB.session.execute(
-                select(Habref).where(and_(Habref.lb_code == lb_code, Habref.cd_typo == CB_typo))
+                select(Habref.cd_hab).where(and_(Habref.lb_code == lb_code, Habref.cd_typo == CB_typo))
             )
             .scalar_one()
-            .cd_hab
         )
         # get all cd_hab_entre corresponding to cd_hab_sortie
         q_cd_hab_entre = DB.session.scalars(
@@ -99,10 +96,8 @@ def get_ch(lb_code):
                     "lb_code": hab.lb_code,
                     "lb_hab_fr": hab.lb_hab_fr,
                     "priority": DB.session.execute(
-                        select(CorChStatus).where(CorChStatus.lb_code == hab.lb_code).distinct()
-                    )
-                    .scalar_one()
-                    .priority,
+                        select(CorChStatus.priority).where(CorChStatus.lb_code == hab.lb_code).distinct()
+                    ).scalar_one()
                 }
             )
         return ch
@@ -145,12 +140,11 @@ def get_impact_category(impact):
     if impact.CorImpactTypes.id_impact_type is not None:
         return (
             DB.session.execute(
-                select(TNomenclatures).where(
+                select(TNomenclatures.mnemonique).where(
                     TNomenclatures.id_nomenclature == impact.CorImpactTypes.id_impact_type
                 )
             )
             .scalar_one()
-            .mnemonique
         )
     return "Aucun"
 
@@ -160,10 +154,9 @@ def get_function_list(mnemo):
         # get id_type of mnemo (ex : 'FONCTIONS_HYDRO') in BibNomenclatureTypes
         id_type_main_function = (
             DB.session.execute(
-                select(BibNomenclaturesTypes).where(BibNomenclaturesTypes.mnemonique == mnemo)
+                select(BibNomenclaturesTypes.id_type).where(BibNomenclaturesTypes.mnemonique == mnemo)
             )
             .scalar_one()
-            .id_type
         )
 
         # get list of TNomenclatures ids by id_type
@@ -180,12 +173,12 @@ def get_function_list(mnemo):
                 "mnemonique": function.TNomenclatures.mnemonique,
                 "id_category": function.CorMainFct.id_main_function,
                 "category": DB.session.execute(
-                    select(TNomenclatures).where(
+                    select(TNomenclatures.mnemonique).where(
                         TNomenclatures.id_nomenclature == function.CorMainFct.id_main_function
                     )
                 )
                 .scalar_one()
-                .mnemonique.upper(),
+                .upper(),
             }
             for function in CorMainFct.get_functions(nomenclature_ids)
         ]
@@ -202,10 +195,9 @@ def get_all_function_list(mnemo):
         # get id_type of mnemo (ex : 'FONCTIONS_HYDRO') in BibNomenclatureTypes
         id_type_main_function = (
             DB.session.execute(
-                select(BibNomenclaturesTypes).where(BibNomenclaturesTypes.mnemonique == mnemo)
+                select(BibNomenclaturesTypes.id_type).where(BibNomenclaturesTypes.mnemonique == mnemo)
             )
             .scalar_one()
-            .id_type
         )
 
         # get list of TNomenclatures ids by id_type
@@ -222,12 +214,12 @@ def get_all_function_list(mnemo):
                 "mnemonique": function.TNomenclatures.mnemonique,
                 "id_category": function.CorMainFct.id_main_function,
                 "category": DB.session.execute(
-                    select(TNomenclatures).where(
+                    select(TNomenclatures.mnemonique).where(
                         TNomenclatures.id_nomenclature == function.CorMainFct.id_main_function
                     )
                 )
                 .scalar_one()
-                .mnemonique.upper(),
+                .upper(),
             }
             for function in CorMainFct.get_all_functions(nomenclature_ids)
         ]
@@ -263,20 +255,18 @@ def get_protections():
             {
                 "id_protection_status": protection.id_protection_status,
                 "mnemonique_status": DB.session.execute(
-                    select(TNomenclatures).where(
+                    select(TNomenclatures.mnemonique).where(
                         TNomenclatures.id_nomenclature == protection.id_protection_status
                     )
                 )
-                .scalar_one()
-                .mnemonique,
+                .scalar_one(),
                 "id_protection_level": protection.id_protection_level,
                 "mnemonique_level": DB.session.execute(
-                    select(TNomenclatures).where(
+                    select(TNomenclatures.mnemonique).where(
                         TNomenclatures.id_nomenclature == protection.id_protection_level
                     )
                 )
-                .scalar_one()
-                .mnemonique,
+                .scalar_one(),
                 "category": get_protection_category(protection),
                 "category_id": protection.id_protection_type,
             }
@@ -296,12 +286,11 @@ def get_protection_category(protection):
     if protection.id_protection_type is not None:
         return (
             DB.session.execute(
-                select(TNomenclatures).where(
+                select(TNomenclatures.mnemonique).where(
                     TNomenclatures.id_nomenclature == protection.id_protection_type
                 )
             )
             .scalar_one()
-            .mnemonique
         )
     return "Autre"
 
