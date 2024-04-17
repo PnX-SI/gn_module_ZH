@@ -177,5 +177,5 @@ class GnModuleSchemaConf(Schema):
     pdf_layer_number = fields.Integer(load_default=pdf_layer_number)
     pdf_small_layer_number = fields.Integer(load_default=pdf_small_layer_number)
     pdf_last_page_img = fields.String(load_default=pdf_last_page_img)
-    pdf_title = fields.String(load_default=pdf_title)    
+    pdf_title = fields.String(load_default=pdf_title)
     TAXON_VM_CRONTAB = fields.String(load_default="0 0,12 * * *")

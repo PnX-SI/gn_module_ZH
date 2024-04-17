@@ -39,4 +39,3 @@ def refresh_taxon_vm(self):
     db.session.execute(func.pr_zh.refresh_taxon_materialized_views())
     db.session.commit()
     logger.info("Taxon vms refreshed.")
-

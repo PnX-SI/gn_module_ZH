@@ -5,13 +5,14 @@ Revises: c0c4748a597a
 Create Date: 2024-04-16 08:12:41.346540
 
 """
+
 from alembic import op
 import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '76e89c793961'
-down_revision = 'c0c4748a597a'
+revision = "76e89c793961"
+down_revision = "c0c4748a597a"
 branch_labels = None
 depends_on = None
 
