@@ -54,7 +54,9 @@ class Item:
 
     def __get_rule_id(self, abb):
         try:
-            return DB.session.execute(select(TRules.rule_id).where(TRules.abbreviation == abb)).scalar_one()
+            return DB.session.execute(
+                select(TRules.rule_id).where(TRules.abbreviation == abb)
+            ).scalar_one()
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
@@ -90,13 +92,13 @@ class Item:
         try:
             if self.active:
                 return DB.session.execute(
-                        select(CorRbRules.cor_rule_id).where(
-                            and_(
-                                CorRbRules.rb_id == self.rb_id,
-                                CorRbRules.rule_id == self.rule_id,
-                            )
+                    select(CorRbRules.cor_rule_id).where(
+                        and_(
+                            CorRbRules.rb_id == self.rb_id,
+                            CorRbRules.rule_id == self.rule_id,
                         )
-                    ).scalar_one()
+                    )
+                ).scalar_one()
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
@@ -153,21 +155,41 @@ class Item:
     def __get_qualif_cat7(self):
         try:
             id_nomenc = self.__get_qualif_val()
-            if DB.session.execute(
-                        select(TNomenclatures.cd_nomenclature).where(TNomenclatures.id_nomenclature == id_nomenc)
-                    ).scalar_one() == "0":
+            if (
+                DB.session.execute(
+                    select(TNomenclatures.cd_nomenclature).where(
+                        TNomenclatures.id_nomenclature == id_nomenc
+                    )
+                ).scalar_one()
+                == "0"
+            ):
                 return self.__get_id_nomenc(self.__get_id_type("HIERARCHY"), "NE")
-            if DB.session.execute(
-                        select(TNomenclatures.cd_nomenclature).where(TNomenclatures.id_nomenclature == id_nomenc)
-                    ).scalar_one() == "1":
+            if (
+                DB.session.execute(
+                    select(TNomenclatures.cd_nomenclature).where(
+                        TNomenclatures.id_nomenclature == id_nomenc
+                    )
+                ).scalar_one()
+                == "1"
+            ):
                 return self.__get_id_nomenc(self.__get_id_type("HIERARCHY"), "bon")
-            if DB.session.execute(
-                        select(TNomenclatures.cd_nomenclature).where(TNomenclatures.id_nomenclature == id_nomenc)
-                    ).scalar_one() == "2":
+            if (
+                DB.session.execute(
+                    select(TNomenclatures.cd_nomenclature).where(
+                        TNomenclatures.id_nomenclature == id_nomenc
+                    )
+                ).scalar_one()
+                == "2"
+            ):
                 return self.__get_id_nomenc(self.__get_id_type("HIERARCHY"), "moyen")
-            if DB.session.execute(
-                        select(TNomenclatures.cd_nomenclature).where(TNomenclatures.id_nomenclature == id_nomenc)
-                    ).scalar_one() == "3":
+            if (
+                DB.session.execute(
+                    select(TNomenclatures.cd_nomenclature).where(
+                        TNomenclatures.id_nomenclature == id_nomenc
+                    )
+                ).scalar_one()
+                == "3"
+            ):
                 return self.__get_id_nomenc(self.__get_id_type("HIERARCHY"), "mauvais")
         except ZHApiError as e:
             raise ZHApiError(
@@ -310,22 +332,22 @@ class Item:
             if len(q_functions) >= 1:
                 # if 61 and/or 62 : get nomenc id of continum ('res')
                 return DB.session.execute(
-                        select(TNomenclatures.id_nomenclature).where(
-                            and_(
-                                TNomenclatures.id_type == hier_type_id,
-                                TNomenclatures.cd_nomenclature == "res",
-                            )
+                    select(TNomenclatures.id_nomenclature).where(
+                        and_(
+                            TNomenclatures.id_type == hier_type_id,
+                            TNomenclatures.cd_nomenclature == "res",
                         )
-                    ).scalar_one()
+                    )
+                ).scalar_one()
             else:
                 return DB.session.execute(
-                        select(TNomenclatures.id_nomenclature).where(
-                            and_(
-                                TNomenclatures.id_type == hier_type_id,
-                                TNomenclatures.cd_nomenclature == "iso",
-                            )
+                    select(TNomenclatures.id_nomenclature).where(
+                        and_(
+                            TNomenclatures.id_type == hier_type_id,
+                            TNomenclatures.cd_nomenclature == "iso",
                         )
-                    ).scalar_one()
+                    )
+                ).scalar_one()
         except ZHApiError as e:
             raise ZHApiError(
                 message=str(e.message),
@@ -409,8 +431,10 @@ class Item:
         try:
             # get id_type in TNomenclatures
             return DB.session.execute(
-                    select(BibNomenclaturesTypes.id_type).where(BibNomenclaturesTypes.mnemonique == mnemo)
-                ).scalar_one()
+                select(BibNomenclaturesTypes.id_type).where(
+                    BibNomenclaturesTypes.mnemonique == mnemo
+                )
+            ).scalar_one()
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
@@ -581,22 +605,22 @@ class Item:
             if cd_id_nature_naturaliste in selected_id_nature:
                 # if id_nature == 'naturaliste' in selected plans : return
                 return DB.session.execute(
-                        select(TNomenclatures.id_nomenclature).where(
-                            and_(
-                                TNomenclatures.id_type == self.__get_id_type("HIERARCHY"),
-                                TNomenclatures.cd_nomenclature == "OUI",
-                            )
+                    select(TNomenclatures.id_nomenclature).where(
+                        and_(
+                            TNomenclatures.id_type == self.__get_id_type("HIERARCHY"),
+                            TNomenclatures.cd_nomenclature == "OUI",
                         )
-                    ).scalar_one()
+                    )
+                ).scalar_one()
             else:
                 return DB.session.execute(
-                        select(TNomenclatures.id_nomenclature).where(
-                            and_(
-                                TNomenclatures.id_type == self.__get_id_type("HIERARCHY"),
-                                TNomenclatures.cd_nomenclature == "NON",
-                            )
+                    select(TNomenclatures.id_nomenclature).where(
+                        and_(
+                            TNomenclatures.id_type == self.__get_id_type("HIERARCHY"),
+                            TNomenclatures.cd_nomenclature == "NON",
                         )
-                    ).scalar_one()
+                    )
+                ).scalar_one()
         except ZHApiError as e:
             raise ZHApiError(
                 message=str(e.message),
@@ -868,13 +892,13 @@ class Item:
                     return None
                 else:
                     return DB.session.execute(
-                            select(TNomenclatures.mnemonique, BibNoteTypes)
-                            .join(
-                                BibNoteTypes,
-                                TNomenclatures.id_nomenclature == BibNoteTypes.id_knowledge,
-                            )
-                            .where(BibNoteTypes.note_id == self.knowledge)
-                        ).scalar_one()
+                        select(TNomenclatures.mnemonique, BibNoteTypes)
+                        .join(
+                            BibNoteTypes,
+                            TNomenclatures.id_nomenclature == BibNoteTypes.id_knowledge,
+                        )
+                        .where(BibNoteTypes.note_id == self.knowledge)
+                    ).scalar_one()
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
@@ -886,10 +910,10 @@ class Item:
         try:
             if self.active:
                 return DB.session.execute(
-                        select(TNomenclatures.label_default).where(
-                            TNomenclatures.id_nomenclature == self.qualif_id
-                        )
-                    ).scalar_one()
+                    select(TNomenclatures.label_default).where(
+                        TNomenclatures.id_nomenclature == self.qualif_id
+                    )
+                ).scalar_one()
         except Exception as e:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
@@ -930,8 +954,8 @@ class Cat:
 
     def __get_name(self):
         return DB.session.execute(
-                select(BibHierCategories.label).where(BibHierCategories.abbreviation == self.abb)
-            ).scalar_one()
+            select(BibHierCategories.label).where(BibHierCategories.abbreviation == self.abb)
+        ).scalar_one()
 
     @staticmethod
     def get_note(value):
@@ -1154,8 +1178,8 @@ class Hierarchy(ZH):
         if len(q_rb) > 1:
             return get_main_rb(q_rb)
         return DB.session.execute(
-                select(CorZhRb.id_rb, TRiverBasin).join(TRiverBasin).where(CorZhRb.id_zh == self.id_zh)
-            ).scalar_one()
+            select(CorZhRb.id_rb, TRiverBasin).join(TRiverBasin).where(CorZhRb.id_zh == self.id_zh)
+        ).scalar_one()
 
     def __check_if_rules(self):
         try:
@@ -1179,15 +1203,12 @@ class Hierarchy(ZH):
 
     @staticmethod
     def get_denom(rb_id, col_name):
-        rb_name = (
-            DB.session.execute(select(TRiverBasin.name).where(TRiverBasin.id_rb == rb_id))
-            .scalar_one()
-        )
-        return (
-            DB.session.execute(
-                select(RbNotesSummary.col_name).where(RbNotesSummary.bassin_versant == rb_name)
-            ).scalar_one()
-        )
+        rb_name = DB.session.execute(
+            select(TRiverBasin.name).where(TRiverBasin.id_rb == rb_id)
+        ).scalar_one()
+        return DB.session.execute(
+            select(RbNotesSummary.col_name).where(RbNotesSummary.bassin_versant == rb_name)
+        ).scalar_one()
 
     @staticmethod
     def get_str_note(note, denominator):

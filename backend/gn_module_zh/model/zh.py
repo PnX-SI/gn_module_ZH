@@ -183,8 +183,7 @@ class ZH(TZH):
                     select(CorProtectionLevelType.id_protection_status).where(
                         CorProtectionLevelType.id_protection == protec
                     )
-                )
-                .scalar_one()
+                ).scalar_one()
                 for protec in [
                     protection.id_protection
                     for protection in ZH.get_data_by_id(CorZhProtection, self.zh.id_zh)

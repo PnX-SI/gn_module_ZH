@@ -267,10 +267,9 @@ class TZH(ZhModel):
 
     @staticmethod
     def get_site_space_name(id):
-        return (
-            DB.session.execute(select(BibSiteSpace.name).where(BibSiteSpace.id_site_space == id))
-            .scalar_one()
-        )
+        return DB.session.execute(
+            select(BibSiteSpace.name).where(BibSiteSpace.id_site_space == id)
+        ).scalar_one()
 
     @staticmethod
     def get_tzh_by_id(id):
@@ -368,8 +367,7 @@ class CorZhArea(DB.Model):
                         select(BibAreasTypes.id_type).where(
                             BibAreasTypes.type_code == ref["type_code_ref_geo"]
                         )
-                    )
-                    .scalar_one()
+                    ).scalar_one()
                 )
         return ids
 
@@ -634,7 +632,7 @@ class CorMainFct(DB.Model):
     def get_mnemo_type(id_type):
         # methode utilisée ?
         if id_type:
-            test = 'test'
+            test = "test"
             return DB.session.execute(
                 select(TNomenclatures).where(TNomenclatures.id_nomenclature == id_type)
             ).scalar_one()
@@ -800,8 +798,7 @@ class CorUrbanTypeRange(DB.Model):
                         select(TNomenclatures.mnemonique).where(
                             TNomenclatures.id_nomenclature == range.id_range_type
                         )
-                    )
-                    .scalar_one(),
+                    ).scalar_one(),
                 }
             )
         return ranges

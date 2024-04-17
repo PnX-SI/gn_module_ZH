@@ -32,17 +32,17 @@ class Utils(ZH):
     def get_mnemo(ids):
         if ids:
             if type(ids) is int:
-                return (
-                    DB.session.execute(
-                        select(TNomenclatures.label_default).where(TNomenclatures.id_nomenclature == ids)
+                return DB.session.execute(
+                    select(TNomenclatures.label_default).where(
+                        TNomenclatures.id_nomenclature == ids
                     )
-                    .scalar_one()
-                )
+                ).scalar_one()
             return [
                 DB.session.execute(
-                    select(TNomenclatures.label_default).where(TNomenclatures.id_nomenclature == id)
-                )
-                .scalar_one()
+                    select(TNomenclatures.label_default).where(
+                        TNomenclatures.id_nomenclature == id
+                    )
+                ).scalar_one()
                 for id in ids
             ]
         return []
@@ -389,12 +389,9 @@ class HabHeritage:
         ).scalar_one()
         cahier_lb_hab_fr = cahier.lb_hab_fr
         cahier_lb_code = cahier.lb_code
-        priority = (
-            DB.session.execute(
-                select(CorChStatus.priority).where(CorChStatus.lb_code == cahier_lb_code).distinct()
-            )
-            .scalar_one()   
-        )
+        priority = DB.session.execute(
+            select(CorChStatus.priority).where(CorChStatus.lb_code == cahier_lb_code).distinct()
+        ).scalar_one()
         return {
             "biotope": biotope_lb_code + " - " + biotope_lb_hab_fr,
             "etat": Utils.get_mnemo(self.id_preservation_state),
@@ -677,12 +674,11 @@ class Status:
         refs = []
         for ref in CorZhArea.get_ref_geo_info(self.id_zh, id_types):
             for i in ref:
-                type_code = (
-                    DB.session.execute(
-                        select(BibAreasTypes.type_code).where(BibAreasTypes.id_type == i.LAreas.id_type)
+                type_code = DB.session.execute(
+                    select(BibAreasTypes.type_code).where(
+                        BibAreasTypes.id_type == i.LAreas.id_type
                     )
-                    .scalar_one()   
-                )
+                ).scalar_one()
                 refs.append(
                     {
                         "area_name": i.LAreas.area_name,
@@ -819,13 +815,16 @@ class UrbanDoc:
 
     def __str__(self):
         return {
-            "commune": DB.session.execute(select(LAreas.area_name).where(LAreas.id_area == self.id_area))
-            .scalar_one(),
+            "commune": DB.session.execute(
+                select(LAreas.area_name).where(LAreas.id_area == self.id_area)
+            ).scalar_one(),
             "type_doc": Utils.get_mnemo(self.id_doc_type),
             "type_classement": [
                 Utils.get_mnemo(
                     DB.session.execute(
-                        select(CorUrbanTypeRange.id_range_type).where(CorUrbanTypeRange.id_cor == id)
+                        select(CorUrbanTypeRange.id_range_type).where(
+                            CorUrbanTypeRange.id_cor == id
+                        )
                     ).scalar_one()
                 )
                 for id in self.id_cors
