@@ -812,7 +812,6 @@ def write_csv(id_zh):
             tableName=blueprint.config[i]["table_name"],
             schemaName=blueprint.config[i]["schema_name"],
             filters={"id_zh": id_zh, "orderby": "id_zh"},
-            limit=100000,
         )
         # TODO: change for limit=-1 when the next version of Utils-Flask-SQLAlchemy will be released
         results = query.return_query().get("items", [])

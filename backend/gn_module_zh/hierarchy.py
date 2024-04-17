@@ -1235,7 +1235,6 @@ def get_all_hierarchy_fields(id_rb: int):
         tableName="all_rb_rules",
         schemaName="pr_zh",
         filters={"id_rb": id_rb, "orderby": "name"},
-        limit=100000,
     )
 
     results = query.return_query()
