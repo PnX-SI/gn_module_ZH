@@ -20,22 +20,15 @@ export class ZhSearchDependantComponent implements OnInit {
   }
   @Output() onSelected = new EventEmitter<object>();
   public _inputData: inputDataType[] = null;
-  public dataForm: FormGroup;
-  public dropdownSettings = {
-    enableSearchFilter: true,
-    text: '',
-    labelKey: 'name',
-    primaryKey: 'code',
-    enableFilterSelectAll: false,
-    selectAllText: 'Tout sélectionner',
-    unSelectAllText: 'Tout déselectionner',
-    searchPlaceholderText: 'Rechercher',
-    disabled: true,
-  };
+
 
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    if (!this._inputData || this._inputData.length < 1) {
+      this.disable()
+    }
+  }
 
   setData(value) {
     if (this._inputData != undefined) {
@@ -48,16 +41,10 @@ export class ZhSearchDependantComponent implements OnInit {
       this.disable();
     }
   }
-
-  onDeselectAll() {
-    this.form.reset();
-  }
-
-  //Awkward but taken from the doc : https://cuppalabs.github.io/angular2-multiselect-dropdown/#/disablemode
   disable() {
-    this.dropdownSettings = { ...this.dropdownSettings, disabled: true };
+    this.form.disable()
   }
   enable() {
-    this.dropdownSettings = { ...this.dropdownSettings, disabled: false };
+    this.form.enable()
   }
 }
