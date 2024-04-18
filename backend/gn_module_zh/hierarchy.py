@@ -109,18 +109,14 @@ class Item:
             DB.session.close()
 
     def __get_id_nomenc(self, id_type: int, cd_nomenc: str) -> int:
-        return getattr(
-            DB.session.scalars(
-                select(TNomenclatures).where(
+        return DB.session.scalars(
+                select(TNomenclatures.id_nomenclature).where(
                     and_(
                         TNomenclatures.id_type == id_type,
                         TNomenclatures.cd_nomenclature == cd_nomenc,
                     )
                 )
-            ).first(),
-            "id_nomenclature",
-            None,
-        )
+            ).first()
 
     def __get_nomencs(self, abb, cat=None):
         cat_id = self.__get_id_nomenc(self.__get_id_type("HIERARCHY"), cat)
@@ -495,12 +491,9 @@ class Item:
         try:
             combination = self.__get_combination()
             # set qualif_id
-            qualif_id = getattr(
-                DB.session.scalars(
-                    select(TCorQualif).where(TCorQualif.combination == combination)
-                ).first(),
-                "id_qualification",
-            )
+            qualif_id = DB.session.scalars(
+                    select(TCorQualif.id_qualification).where(TCorQualif.combination == combination)
+                ).first()
             return qualif_id
         except ZHApiError as e:
             raise ZHApiError(
@@ -1206,9 +1199,10 @@ class Hierarchy(ZH):
         rb_name = DB.session.execute(
             select(TRiverBasin.name).where(TRiverBasin.id_rb == rb_id)
         ).scalar_one()
-        return DB.session.execute(
-            select(RbNotesSummary.col_name).where(RbNotesSummary.bassin_versant == rb_name)
-        ).scalar_one()
+        return getattr(
+            DB.session.execute(
+            select(RbNotesSummary).where(RbNotesSummary.bassin_versant == rb_name)
+        ).scalar_one(), col_name)
 
     @staticmethod
     def get_str_note(note, denominator):
