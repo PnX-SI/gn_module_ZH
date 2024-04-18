@@ -8,13 +8,11 @@
         <zh-label label="Fonctionnalité hydrologique / biogéochimique"> </zh-label>
       </div>
       <div class="form-group col-6 customselect">
-        <angular2-multiselect
-          [data]="hydros"
-          [formControl]="form.controls.hydros"
-          [settings]="dropdownSettings"
-          (onDeSelectAll)="onDeSelectAllHydro()"
-        >
-        </angular2-multiselect>
+        <zh-multiselect
+          [values]="hydros"
+          [parentFormControl]="form.controls.hydros"
+          keyLabel="mnemonique"
+        />
       </div>
     </div>
     <div class="form-row">
@@ -23,13 +21,11 @@
         </zh-label>
       </div>
       <div class="form-group col-6 customselect">
-        <angular2-multiselect
-          [data]="bios"
-          [formControl]="form.controls.bios"
-          [settings]="dropdownSettings"
-          (onDeSelectAll)="onDeSelectAllBio()"
-        >
-        </angular2-multiselect>
+        <zh-multiselect
+          [values]="bios"
+          [parentFormControl]="form.controls.bios"
+          keyLabel="mnemonique"
+        />
       </div>
     </div>
     <div class="form-row">
@@ -37,13 +33,11 @@
         <zh-label label="Menaces potentielles ou avérées"> </zh-label>
       </div>
       <div class="form-group col-6 customselect menaces">
-        <angular2-multiselect
-          [data]="menaces"
-          [formControl]="form.controls.menaces"
-          [settings]="dropdownSettings"
-          (onDeSelectAll)="onDeSelectAllMenaces()"
-        >
-        </angular2-multiselect>
+        <zh-multiselect
+          [values]="menaces"
+          [parentFormControl]="form.controls.menaces"
+          keyLabel="mnemonique"
+        />
       </div>
     </div>
   </form>
