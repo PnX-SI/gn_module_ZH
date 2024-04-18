@@ -8,13 +8,11 @@
         <zh-label label="Régime foncier - statut de propriété"> </zh-label>
       </div>
       <div class="form-group col-6 customselect">
-        <angular2-multiselect
-          [data]="statuts"
-          [formControl]="form.controls.statuts"
-          [settings]="dropdownSettings"
-          (onDeSelectAll)="onDeSelectAllStatuts()"
-        >
-        </angular2-multiselect>
+        <zh-multiselect
+          [values]="statuts"
+          [parentFormControl]="form.controls.statuts"
+          keyLabel="mnemonique"
+        />
       </div>
     </div>
     <div class="form-row">
@@ -22,13 +20,11 @@
         <zh-label label="Plan de gestion"> </zh-label>
       </div>
       <div class="form-group col-6 customselect">
-        <angular2-multiselect
-          [data]="plans"
-          [formControl]="form.controls.plans"
-          [settings]="dropdownSettings"
-          (onDeSelectAll)="onDeSelectAllPlans()"
-        >
-        </angular2-multiselect>
+        <zh-multiselect
+          [values]="plans"
+          [parentFormControl]="form.controls.plans"
+          keyLabel="mnemonique"
+        />
       </div>
     </div>
     <div class="form-row">
@@ -36,13 +32,11 @@
         <zh-label label="Stratégie de gestion"> </zh-label>
       </div>
       <div class="form-group col-6 customselect">
-        <angular2-multiselect
-          [data]="strategies"
-          [formControl]="form.controls.strategies"
-          [settings]="dropdownSettings"
-          (onDeSelectAll)="onDeSelectAllStrategies()"
-        >
-        </angular2-multiselect>
+        <zh-multiselect
+          [values]="strategies"
+          [parentFormControl]="form.controls.strategies"
+          keyLabel="mnemonique"
+        />
       </div>
     </div>
   </form>
