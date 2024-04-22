@@ -46,16 +46,6 @@ export class ZhHierarchySearchTableComponent implements OnInit {
     noDataLabel: 'Aucune donnée disponible',
     minSelectionLimit: 1,
   };
-  public attributesSettings = {
-    ...this.mainSettings,
-    labelKey: 'attribut',
-    primaryKey: 'id_attribut',
-  };
-  public knowledgeSettings = {
-    ...this.mainSettings,
-    labelKey: 'note_type',
-    primaryKey: 'note_type',
-  };
 
   public columns: TableColumn[] = [
     { name: 'field', label: 'Rubrique' },
@@ -140,15 +130,6 @@ export class ZhHierarchySearchTableComponent implements OnInit {
     if (this.attributes.length > 0) {
       this.knowledges = this.getKnowledge(this.attributes[0]);
     }
-    this.knowledgeSettings = {
-      ...this.knowledgeSettings,
-      disabled: this.knowledges.length === 0,
-    };
-    this.attributesSettings = {
-      ...this.attributesSettings,
-      disabled: this.attributes.length === 0,
-      singleSelection: this.knowledges.length !== 0,
-    };
 
     if (this.attributes.length > 0) {
       this.localForm.controls['attributes'].setValue([this.attributes[0]]);
