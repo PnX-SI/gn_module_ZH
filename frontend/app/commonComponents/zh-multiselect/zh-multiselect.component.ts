@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { MultiSelectComponent } from '@geonature_common/form/multiselect/multiselect.component';
 
 @Component({
@@ -10,7 +10,8 @@ export class ZHMultiSelectComponent extends MultiSelectComponent implements OnIn
   /** 
   */
   @Input() multiple: boolean;
-  @Input() groupBy: string|null;
+  @Input() groupBy: string | null;
+  @Output() onOpen = new EventEmitter<any>();
   constructor() {
     super()
     this.multiple = true;

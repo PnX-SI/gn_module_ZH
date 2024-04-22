@@ -11,6 +11,7 @@
            [formControl]="parentFormControl"
            (add)="onChange.emit($event)"
            (remove)="onDelete.emit($event)"
+           (open)="onOpen.emit($event)"
            [closeOnSelect]="!multiple"
            [groupBy]="groupBy"
            [selectableGroup]="true"
