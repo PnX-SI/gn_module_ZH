@@ -28,7 +28,8 @@
                 keyValue="id_org"
                 [values]="idOrg"
                 [parentFormControl]="form.controls.id_org"
-                [multiple]="false" />
+                [multiple]="false" 
+                [hightlightValue]="false"/>
               <small
                 *ngIf="
                   (form.controls.id_org.touched || submitted) &&
@@ -95,6 +96,7 @@
                 [values]="sdage"
                 [parentFormControl]="form.controls.sdage"
                 [multiple]="false" 
+                [hightlightValue]="false"
               />
               <small
                 *ngIf="
