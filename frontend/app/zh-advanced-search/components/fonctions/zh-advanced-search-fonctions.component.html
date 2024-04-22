@@ -8,13 +8,12 @@
         <zh-label [label]="fonctionLabel"> </zh-label>
       </div>
       <div class="form-group col-6 customselect">
-        <angular2-multiselect
-          [data]="data"
-          [formControl]="form.controls.functions"
-          [settings]="dropdownSettings"
-          (onDeSelectAll)="onDeSelectAllFcts()"
-        >
-        </angular2-multiselect>
+        <zh-multiselect
+          [values]="data"
+          [parentFormControl]="form.controls.functions"
+          keyLabel="mnemonique"
+        />
+
       </div>
     </div>
     <div class="form-row">
@@ -22,13 +21,11 @@
         <zh-label label="Qualification"> </zh-label>
       </div>
       <div class="form-group col-6 customselect">
-        <angular2-multiselect
-          [data]="qualifications"
-          [formControl]="form.controls.qualifications"
-          [settings]="dropdownSettingsNoCategory"
-          (onDeSelectAll)="onDeSelectAllQual()"
-        >
-        </angular2-multiselect>
+        <zh-multiselect
+          [values]="qualifications"
+          [parentFormControl]="form.controls.qualifications"
+          keyLabel="mnemonique"
+        />
       </div>
     </div>
     <div class="form-row">
@@ -36,13 +33,11 @@
         <zh-label label="Connaissance"> </zh-label>
       </div>
       <div class="form-group col-6 customselect">
-        <angular2-multiselect
-          [data]="connaissances"
-          [formControl]="form.controls.connaissances"
-          [settings]="dropdownSettingsNoCategory"
-          (onDeSelectAll)="onDeSelectAllConn()"
-        >
-        </angular2-multiselect>
+        <zh-multiselect
+          [values]="connaissances"
+          [parentFormControl]="form.controls.connaissances"
+          keyLabel="mnemonique"
+        />
       </div>
     </div>
   </form>
