@@ -22,11 +22,13 @@
             <!-- <h3 class="section-label">Identification de la zone humide</h3> -->
             <div class="form-group col-md-12" [hidden]="_currentZh">
               <small class="required">Organisme de l'opérateur </small>
-              <select class="form-control form-control-sm" [formControl]="form.controls.id_org">
-                <option *ngFor="let id of idOrg" [ngValue]="id.id_org">
-                  {{ id.name }}
-                </option>
-              </select>
+
+              <zh-multiselect 
+                keyLabel="name"
+                keyValue="id_org"
+                [values]="idOrg"
+                [parentFormControl]="form.controls.id_org"
+                [multiple]="false" />
               <small
                 *ngIf="
                   (form.controls.id_org.touched || submitted) &&
@@ -87,11 +89,13 @@
             </h3> -->
             <div class="form-group col-md-12">
               <small class="required">Typologie SDAGE</small>
-              <select class="form-control" [formControl]="form.controls.sdage">
-                <option *ngFor="let sd of sdage" [ngValue]="sd.id_nomenclature">
-                  {{ sd.mnemonique }}
-                </option>
-              </select>
+              <zh-multiselect
+                keyLabel="mnemonique"
+                keyValue="id_nomenclature"
+                [values]="sdage"
+                [parentFormControl]="form.controls.sdage"
+                [multiple]="false" 
+              />
               <small
                 *ngIf="
                   (form.controls.sdage.touched || submitted) && form.controls.sdage.errors?.required

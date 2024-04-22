@@ -5,7 +5,6 @@ import { Subscription } from 'rxjs';
 import { GeoJSON } from 'leaflet';
 import * as L from 'leaflet';
 import { MapService } from '@geonature_common/map/map.service';
-import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { ToastrService } from 'ngx-toastr';
 import { ZhDataService } from '../../../services/zh-data.service';
 import { TabsService } from '../../../services/tabs.service';
