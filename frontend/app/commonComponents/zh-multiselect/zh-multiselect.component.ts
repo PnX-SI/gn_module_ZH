@@ -10,12 +10,14 @@ export class ZHMultiSelectComponent extends MultiSelectComponent implements OnIn
   /** 
   */
   @Input() multiple: boolean;
+  @Input() hightlightValue: boolean;
   @Input() groupBy: string | null;
   @Input() placeholder: string;
   @Output() onOpen = new EventEmitter<any>();
   constructor() {
     super()
     this.multiple = true;
+    this.hightlightValue = true;
     this.groupBy = null;
     this.placeholder = "Sélectionner";
   }

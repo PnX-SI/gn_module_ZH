@@ -47,8 +47,12 @@ $gray-darken: #dcdcdc;
         max-width: 90%;
         padding-left: 5px;
         padding-right: 5px;
-        background-color: $primary !important;
-        color: $primary-text !important;
+    }
+    &--hightlightValue {
+        ::ng-deep .ng-value  {
+            background-color: $primary !important;
+            color: $primary-text !important;
+        }
     }
     // Chip items
     &--multiple{

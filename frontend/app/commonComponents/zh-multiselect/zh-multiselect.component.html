@@ -1,7 +1,7 @@
 <small>{{ label }}</small>
 <ng-select class="Multiselect"
            #zhMultiselect
-           [ngClass]="{'Multiselect--multiple': multiple}"
+           [ngClass]="{'Multiselect--multiple': multiple, 'Multiselect--hightlightValue': hightlightValue}"
            [items]="values"
            [bindLabel]="keyLabel"
            [bindValue]="keyValue"
