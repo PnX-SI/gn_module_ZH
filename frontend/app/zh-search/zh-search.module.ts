@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
-import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
 import { GN2CommonModule } from '@geonature_common/GN2Common.module';
 import { ZhSearchSDAGEComponent } from './zh-search-items/zh-search-sdage/zh-search-sdage.component';
 import { ZhSearchComponent } from './zh-search.component';
@@ -31,13 +30,17 @@ const routes: Routes = [{ path: 'search', component: ZhSearchComponent }];
   ],
   entryComponents: [],
   imports: [
-    GN2CommonModule,
     CommonModule,
+    GN2CommonModule,
     RouterModule.forChild(routes),
     ZhDetailsModule,
     ZhAdvancedSearchModule,
     ZhHierarchySearchModule,
   ],
-  exports: [AngularMultiSelectModule, LabelComponent, TableComponent, ZHMultiSelectComponent, ZhSearchComponent],
+  exports: [
+    LabelComponent,
+    TableComponent,
+    ZHMultiSelectComponent,
+    ZhSearchComponent],
 })
 export class ZhSearchModule {}
