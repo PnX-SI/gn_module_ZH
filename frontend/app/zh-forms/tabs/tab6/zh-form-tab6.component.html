@@ -470,13 +470,11 @@
         </div>
         <div class="form-group col-md-12">
           <small class="required">Type de classement</small>
-          <ng-multiselect-dropdown
-            [settings]="multiselectTypeClassement"
-            [data]="typeClassementInput"
-            [formControl]="urbanDocForm.controls.typeClassement"
-            [disabled]="!typeClassementInput || typeClassementInput.length == 0"
-          >
-          </ng-multiselect-dropdown>
+            <zh-multiselect
+              [values]="typeClassementInput"
+              [parentFormControl]="urbanDocForm.controls.typeClassement"
+              keyLabel="mnemonique"
+            />
           <small
             *ngIf="
               (urbanDocForm.controls.typeClassement.touched || modalFormSubmitted) &&
