@@ -16,7 +16,6 @@ export class ZhFormTab7Component implements OnInit {
   @Input() public formMetaData: any;
   @Output() public canChangeTab = new EventEmitter<boolean>();
   @Output() nextTab = new EventEmitter<number>();
-  public dropdownSettings;
   public formTab7: FormGroup;
   public patchModal: boolean;
   public modalFormSubmitted: boolean;
@@ -158,17 +157,6 @@ export class ZhFormTab7Component implements OnInit {
         this.getCurrentZh();
       }
     });
-    this.dropdownSettings = {
-      enableFilterSelectAll: false,
-      enableCheckAll: false,
-      text: 'Selectionner',
-      labelKey: 'name',
-      primaryKey: 'id_action',
-      searchPlaceholderText: 'Rechercher',
-      enableSearchFilter: true,
-      singleSelection: true,
-      noDataLabel: 'Toutes les propositions disponibles ont déjà été renseignées dans le tableau',
-    };
   }
 
   initActionInput() {
@@ -367,7 +355,7 @@ export class ZhFormTab7Component implements OnInit {
     this.modalFormSubmitted = true;
     if (this.actionForm.valid) {
       let formValues = this.actionForm.value;
-      formValues.action = formValues.action[0];
+      formValues.action = formValues.action;
       // check if the action to add is already added
       let itemExist = this.actionTable.some(
         (item: any) => item.action.id_action == formValues.action.id_action
@@ -427,7 +415,7 @@ export class ZhFormTab7Component implements OnInit {
     this.modalFormSubmitted = true;
     if (this.actionForm.valid) {
       let formValues = this.actionForm.value;
-      formValues.action = formValues.action[0];
+      formValues.action = formValues.action;
       this.actionTable = this.actionTable.map((item: any) =>
         item.action.id_action != this.tempID ? item : formValues
       );
