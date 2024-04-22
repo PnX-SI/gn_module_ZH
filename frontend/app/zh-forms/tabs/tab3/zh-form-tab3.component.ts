@@ -74,7 +74,6 @@ export class ZhFormTab3Component implements OnInit {
   listCorinBio = [];
   posted: boolean = false;
   patchActivity: boolean = false;
-  dropdownSettings: any;
   activityForm: FormGroup;
   modalButtonLabel: string;
   modalTitle: string;
@@ -96,16 +95,6 @@ export class ZhFormTab3Component implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.dropdownSettings = {
-      singleSelection: false,
-      idField: 'id_nomenclature',
-      textField: 'mnemonique',
-      searchPlaceholderText: 'Rechercher',
-      enableCheckAll: false,
-      allowSearchFilter: true,
-      maxHeight: 300,
-    };
-
     this.activityForm = this.fb.group({
       human_activity: [null, Validators.required],
       localisation: [null, Validators.required],

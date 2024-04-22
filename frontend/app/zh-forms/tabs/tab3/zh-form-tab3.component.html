@@ -79,12 +79,11 @@
       <div class="form-row">
         <div class="form-group col-md-12">
           <small>Occupation des sols (Nomenclature Corine Land Cover)</small>
-          <ng-multiselect-dropdown
-            [settings]="dropdownSettings"
-            [data]="formMetaData.OCCUPATION_SOLS"
-            [formControl]="form.controls.id_corine_landcovers"
-          >
-          </ng-multiselect-dropdown>
+          <zh-multiselect
+            [values]="formMetaData.OCCUPATION_SOLS"
+            [parentFormControl]="form.controls.id_corine_landcovers"
+            keyLabel="mnemonique"
+          />
         </div>
       </div>
     </fieldset>
