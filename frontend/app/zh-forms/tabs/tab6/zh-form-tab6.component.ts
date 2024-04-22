@@ -725,9 +725,9 @@ export class ZhFormTab6Component implements OnInit {
 
   onAddStructure() {
     // multi select : returns an Array...
-    const structure = this.formTab6.value.structure[0];
+    const structure = this.formTab6.value.structure;
     if (structure) {
-      let itemExist = this.managements.some((item) => item.id_org == structure.id_org);
+      const itemExist = this.managements.some((item) => item.id_org == structure.id_org);
       if (!itemExist && structure.id_org) {
         this.managements.push(structure);
       }

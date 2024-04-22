@@ -34,15 +34,13 @@
       <small>Structure de gestion</small>
       <div class="form-row">
         <div class="form-group col-md-6">
-          <angular2-multiselect
-            [settings]="organismDropdownSettings"
-            [data]="structures"
-            [formControl]="formTab6.controls.structure"
+          <zh-multiselect
+            [values]="structures"
+            keyLabel="name"
+            [parentFormControl]="formTab6.controls.structure"
             (onOpen)="onStructureOpened()"
-            (onDeSelectAll)="onAllStructuresDeselected()"
-            (keydown.enter)="handleEnterKeyPress()"
-          >
-          </angular2-multiselect>
+            [multiple]="false"
+          />
         </div>
         <div class="form-group d-flex align-items-end col-md-6">
           <button
@@ -233,15 +231,13 @@
       <div class="form-row">
         <div class="form-group col-md-12">
           <small>Statuts</small>
-          <angular2-multiselect
-            [data]="formMetaData.PROTECTIONS"
+          <zh-multiselect
+            [values]="formMetaData.PROTECTIONS"
             [(ngModel)]="selectedItems"
-            [formControl]="formTab6.controls.protections"
-            [settings]="dropdownSettings"
-            (onDeSelectAll)="onDeSelectAll()"
-            (keydown.enter)="handleEnterKeyPress()"
-          >
-          </angular2-multiselect>
+            [parentFormControl]="formTab6.controls.protections"
+            groupBy="category"
+            keyLabel="mnemonique_status"
+          />
         </div>
       </div>
     </fieldset>
