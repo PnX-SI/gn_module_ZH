@@ -21,7 +21,6 @@ export class ZhFormTab2Component implements OnInit, AfterViewInit {
   public formTab2: FormGroup;
   public critDelim: any;
   public critDelimFct: any;
-  public dropdownSettings: any;
   public submitted: boolean;
   public posted: boolean;
 
@@ -34,15 +33,6 @@ export class ZhFormTab2Component implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit() {
-    this.dropdownSettings = {
-      singleSelection: false,
-      idField: 'id_nomenclature',
-      textField: 'mnemonique',
-      searchPlaceholderText: 'Rechercher',
-      enableCheckAll: false,
-      allowSearchFilter: true,
-    };
-
     this.getMetaData();
     this.createForm();
   }
