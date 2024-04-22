@@ -10,9 +10,11 @@ export class ZHMultiSelectComponent extends MultiSelectComponent implements OnIn
   /** 
   */
   @Input() multiple: boolean;
+  @Input() groupBy: string|null;
   constructor() {
     super()
     this.multiple = true;
+    this.groupBy = null;
   }
   ngOnInit() {
     super.ngOnInit()

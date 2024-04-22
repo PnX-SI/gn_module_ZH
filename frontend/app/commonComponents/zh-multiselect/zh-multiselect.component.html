@@ -11,7 +11,11 @@
            [formControl]="parentFormControl"
            (add)="onChange.emit($event)"
            (remove)="onDelete.emit($event)"
-           [closeOnSelect]="!multiple">
+           [closeOnSelect]="!multiple"
+           [groupBy]="groupBy"
+           [selectableGroup]="true"
+           [selectableGroupAsModel]="false"
+           >
     <ng-template ng-header-tmp>
         <div class="MultiselectHeader">
             <input type="text"
@@ -26,6 +30,20 @@
                     (click)="selectAllFiltered(zhMultiselect)">
                 Select all
             </button>
+        </div>
+    </ng-template>
+    <ng-template ng-optgroup-tmp
+                let-item="item"
+                let-item$="item$"
+                let-index="index"
+                class="MultiselectOption">
+        <div class="MultiselectOptionItem">
+            <input class="MultiselectOptionItem__checkbox"
+                id="item-{{index}}"
+                type="checkbox"
+                [ngModel]="item$.selected"
+                [ngModelOptions]="{standalone: true}" />
+            <div class="MultiselectOptionItem__text">{{ item[groupBy] }}</div>
         </div>
     </ng-template>
     <ng-template ng-option-tmp
