@@ -30,7 +30,6 @@ export class ZhFormTab0Component implements OnInit {
   public critDelim: any;
   public sdage: any;
   public idOrg: any;
-  public dropdownSettings: IDropdownSettings;
   public $_geojsonSub: Subscription;
   public $_currentZhSub: Subscription;
   private geometry: any;
@@ -53,15 +52,6 @@ export class ZhFormTab0Component implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.dropdownSettings = {
-      singleSelection: false,
-      idField: 'id_nomenclature',
-      textField: 'mnemonique',
-      searchPlaceholderText: 'Rechercher',
-      enableCheckAll: false,
-      allowSearchFilter: true,
-    };
-
     this.getMetaData();
     this.createForm();
 

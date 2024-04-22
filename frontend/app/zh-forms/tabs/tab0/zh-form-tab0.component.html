@@ -65,13 +65,12 @@
             </h3> -->
             <div class="form-group col-md-12">
               <small class="required">Critères de délimitation de la zone humide</small>
-              <ng-multiselect-dropdown
-                [placeholder]="'Critères utilisés'"
-                [settings]="dropdownSettings"
-                [data]="critDelim"
-                [formControl]="form.controls.critere_delim"
-              >
-              </ng-multiselect-dropdown>
+              <zh-multiselect
+                placeholder="Critères utilisés"
+                keyLabel="mnemonique"
+                [values]="critDelim"
+                [parentFormControl]="form.controls.critere_delim"
+              />
               <small
                 *ngIf="
                   (form.controls.critere_delim.touched || submitted) &&
