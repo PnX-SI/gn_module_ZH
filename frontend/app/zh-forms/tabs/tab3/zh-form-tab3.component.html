@@ -204,14 +204,13 @@
         </div>
         <div class="form-group col-md-12">
           <small class="required">Impacts (facteurs influençant l’évolution de la zone) </small>
-          <angular2-multiselect
-            [data]="formMetaData.IMPACTS"
+          <zh-multiselect
+            [values]="formMetaData.IMPACTS"
+            [parentFormControl]="activityForm.controls.impacts"
+            keyLabel="mnemonique"
             [(ngModel)]="selectedItems"
-            [formControl]="activityForm.controls.impacts"
-            [settings]="settings"
-            (onDeSelectAll)="onDeSelectAll($event)"
-          >
-          </angular2-multiselect>
+            groupBy="category"
+          />
           <small
             *ngIf="
               (activityForm.controls.impacts.touched || formImpactSubmitted) &&

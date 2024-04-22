@@ -80,7 +80,6 @@ export class ZhFormTab3Component implements OnInit {
   modalTitle: string;
 
   selectedItems = [];
-  settings = {};
   listActivity: any = [];
   activitiesInput: any = [];
   submitted: boolean;
@@ -105,16 +104,6 @@ export class ZhFormTab3Component implements OnInit {
       enableCheckAll: false,
       allowSearchFilter: true,
       maxHeight: 300,
-    };
-
-    this.settings = {
-      enableCheckAll: false,
-      text: 'Selectionner',
-      labelKey: 'mnemonique',
-      primaryKey: 'id_nomenclature',
-      searchPlaceholderText: 'Rechercher',
-      enableSearchFilter: true,
-      groupBy: 'category',
     };
 
     this.activityForm = this.fb.group({
