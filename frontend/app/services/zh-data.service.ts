@@ -16,7 +16,7 @@ export class ZhDataService {
 
   constructor(
     private _api: HttpClient,
-    public config: ConfigService,
+    public config: ConfigService
   ) {}
 
   setCurrentZh(zh: any) {
@@ -47,7 +47,7 @@ export class ZhDataService {
 
   autocompletBib(search_title: string) {
     return this._api.get<any>(
-      `${this.config.API_ENDPOINT}/zones_humides/references/autocomplete?search_title=${search_title}`,
+      `${this.config.API_ENDPOINT}/zones_humides/references/autocomplete?search_title=${search_title}`
     );
   }
 
@@ -57,7 +57,7 @@ export class ZhDataService {
 
   getHabitatByCorine(corineId: string) {
     return this._api.get<any>(
-      `${this.config.API_ENDPOINT}/zones_humides/forms/cahierhab/${corineId}`,
+      `${this.config.API_ENDPOINT}/zones_humides/forms/cahierhab/${corineId}`
     );
   }
 
@@ -72,7 +72,7 @@ export class ZhDataService {
         map((municipalities: any) => {
           municipalities.map((item) => (item.disabled = false));
           return municipalities;
-        }),
+        })
       );
   }
 
@@ -82,7 +82,7 @@ export class ZhDataService {
 
   getZhDetails(zhId: number) {
     return this._api.get<DetailsModel>(
-      `${this.config.API_ENDPOINT}/zones_humides/${zhId}/complete_card`,
+      `${this.config.API_ENDPOINT}/zones_humides/${zhId}/complete_card`
     );
   }
 
@@ -107,7 +107,7 @@ export class ZhDataService {
   postMainPicture(zhId: number, mediaId: number) {
     return this._api.patch(
       `${this.config.API_ENDPOINT}/zones_humides/${zhId}/main_pict/${mediaId}`,
-      {},
+      {}
     );
   }
 
@@ -117,7 +117,7 @@ export class ZhDataService {
 
   getHierZh(zhId: string) {
     return this._api.get<HierarchyModel>(
-      `${this.config.API_ENDPOINT}/zones_humides/${zhId}/hierarchy`,
+      `${this.config.API_ENDPOINT}/zones_humides/${zhId}/hierarchy`
     );
   }
 

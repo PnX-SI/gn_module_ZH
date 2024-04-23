@@ -207,9 +207,7 @@ class Author:
             if getattr(self.zh, type).prenom_role is not None
             else ""
         )
-        nom = (
-            getattr(self.zh, type).nom_role if getattr(self.zh, type).nom_role is not None else ""
-        )
+        nom = getattr(self.zh, type).nom_role if getattr(self.zh, type).nom_role is not None else ""
         return prenom + " " + nom.upper()
 
     def __get_organism(self, type="authors"):
@@ -485,8 +483,7 @@ class Description:
         return {
             "presentation": self.presentation.__str__(),
             "espace": [
-                f"{cd} - {label}"
-                for cd, label in Utils.get_cd_and_mnemo(self.id_corine_landcovers)
+                f"{cd} - {label}" for cd, label in Utils.get_cd_and_mnemo(self.id_corine_landcovers)
             ],
             "usage": self.use.__str__(),
             "basin": self.basin.__str__(),
@@ -868,9 +865,7 @@ class EvalMainFunction:
     @hydro.setter
     def hydro(self, val):
         self.__hydro = [
-            Function(
-                v["id_function"], v["id_qualification"], v["id_knowledge"], v["justification"]
-            )
+            Function(v["id_function"], v["id_qualification"], v["id_knowledge"], v["justification"])
             for v in val
         ]
 
@@ -881,9 +876,7 @@ class EvalMainFunction:
     @bio.setter
     def bio(self, value):
         self.__bio = [
-            Function(
-                v["id_function"], v["id_qualification"], v["id_knowledge"], v["justification"]
-            )
+            Function(v["id_function"], v["id_qualification"], v["id_knowledge"], v["justification"])
             for v in value
         ]
 
@@ -911,9 +904,7 @@ class EvalInterest:
     @interet_patrim.setter
     def interet_patrim(self, val):
         self.__interet_patrim = [
-            Function(
-                i["id_function"], i["id_qualification"], i["id_knowledge"], i["justification"]
-            )
+            Function(i["id_function"], i["id_qualification"], i["id_knowledge"], i["justification"])
             for i in val
         ]
 
@@ -924,18 +915,14 @@ class EvalInterest:
     @val_soc_eco.setter
     def val_soc_eco(self, val):
         self.__val_soc_eco = [
-            Function(
-                i["id_function"], i["id_qualification"], i["id_knowledge"], i["justification"]
-            )
+            Function(i["id_function"], i["id_qualification"], i["id_knowledge"], i["justification"])
             for i in val
         ]
 
     @interet_patrim.setter
     def interet_patrim(self, val):
         self.__interet_patrim = [
-            Function(
-                i["id_function"], i["id_qualification"], i["id_knowledge"], i["justification"]
-            )
+            Function(i["id_function"], i["id_qualification"], i["id_knowledge"], i["justification"])
             for i in val
         ]
 
@@ -1092,7 +1079,7 @@ class Card(ZH):
         self.info.localisation = Localisation(
             self.id_zh,
             self.properties["geo_info"]["regions"],
-            self.properties["geo_info"]["departments"]
+            self.properties["geo_info"]["departments"],
             # self.ref_geo_config
         )
 

@@ -934,9 +934,11 @@ class Item:
             "qualification": self.__get_qualif_mnemo(),
             "knowledge": self.__get_knowledge_mnemo(),
             "name": self.__get_rule_name(),
-            "note": Hierarchy.get_str_note(self.note, self.denominator)
-            if self.active
-            else "Non paramétrée",
+            "note": (
+                Hierarchy.get_str_note(self.note, self.denominator)
+                if self.active
+                else "Non paramétrée"
+            ),
         }
 
 
@@ -973,9 +975,11 @@ class Cat:
                     filter(
                         None,
                         [
-                            (float(item["note"].split("/")[0]))
-                            if item["note"] is not None
-                            else None
+                            (
+                                (float(item["note"].split("/")[0]))
+                                if item["note"] is not None
+                                else None
+                            )
                             for item in value
                             if item["active"]
                         ],
@@ -1213,9 +1217,7 @@ class Hierarchy(ZH):
     def get_denom(rb_id, col_name):
         rb_name = DB.session.query(TRiverBasin).filter(TRiverBasin.id_rb == rb_id).one().name
         return getattr(
-            DB.session.query(RbNotesSummary)
-            .filter(RbNotesSummary.bassin_versant == rb_name)
-            .one(),
+            DB.session.query(RbNotesSummary).filter(RbNotesSummary.bassin_versant == rb_name).one(),
             col_name,
         )
 
