@@ -281,9 +281,7 @@ def update_zh_tab0(form_data, polygon, area, info_role, zh_date, geo_refs):
 
     # update pr_zh.cor_lim_list
     id_lim_list, ef_area = (
-        DB.session.query(TZH.id_lim_list, TZH.ef_area)
-        .filter(TZH.id_zh == form_data["id_zh"])
-        .one()
+        DB.session.query(TZH.id_lim_list, TZH.ef_area).filter(TZH.id_zh == form_data["id_zh"]).one()
     )
 
     DB.session.query(CorLimList).filter(CorLimList.id_lim_list == id_lim_list).delete()
@@ -844,9 +842,9 @@ def update_zh_tab6(data):
                 TZH.update_author: data["update_author"],
                 TZH.update_date: data["update_date"],
                 TZH.is_other_inventory: is_other_inventory,
-                TZH.remark_is_other_inventory: data["remark_is_other_inventory"]
-                if is_other_inventory
-                else None,
+                TZH.remark_is_other_inventory: (
+                    data["remark_is_other_inventory"] if is_other_inventory else None
+                ),
             }
         )
         DB.session.flush()

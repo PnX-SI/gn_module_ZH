@@ -469,8 +469,8 @@ export class ZhFormTab3Component implements OnInit {
       a.human_activity.mnemonique.slice(0, 2) > b.human_activity.mnemonique.slice(0, 2)
         ? 1
         : b.human_activity.mnemonique.slice(0, 2) > a.human_activity.mnemonique.slice(0, 2)
-        ? -1
-        : 0
+          ? -1
+          : 0
     );
   }
 
@@ -480,8 +480,8 @@ export class ZhFormTab3Component implements OnInit {
         a.mnemonique.slice(0, 2) > b.mnemonique.slice(0, 2)
           ? 1
           : b.mnemonique.slice(0, 2) > a.mnemonique.slice(0, 2)
-          ? -1
-          : 0
+            ? -1
+            : 0
       );
     }
     return impacts;

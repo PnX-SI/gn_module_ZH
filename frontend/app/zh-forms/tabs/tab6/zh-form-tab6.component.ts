@@ -1041,8 +1041,8 @@ export class ZhFormTab6Component implements OnInit {
       a.area.municipality_name > b.area.municipality_name
         ? 1
         : b.area.municipality_name > a.area.municipality_name
-        ? -1
-        : 0
+          ? -1
+          : 0
     );
   }
 

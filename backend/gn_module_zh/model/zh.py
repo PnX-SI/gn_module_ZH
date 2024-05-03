@@ -165,9 +165,11 @@ class ZH(TZH):
             "instruments": [
                 {
                     "id_instrument": instrument.id_instrument,
-                    "instrument_date": instrument.instrument_date.date().strftime("%d/%m/%Y")
-                    if instrument.instrument_date
-                    else None,
+                    "instrument_date": (
+                        instrument.instrument_date.date().strftime("%d/%m/%Y")
+                        if instrument.instrument_date
+                        else None
+                    ),
                 }
                 for instrument in ZH.get_data_by_id(TInstruments, self.zh.id_zh)
             ]

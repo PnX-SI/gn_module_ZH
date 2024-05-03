@@ -595,9 +595,7 @@ def get_tab_data(id_tab):
             )
 
         # select active geo refs in config
-        active_geo_refs = [
-            ref for ref in blueprint.config["ref_geo_referentiels"] if ref["active"]
-        ]
+        active_geo_refs = [ref for ref in blueprint.config["ref_geo_referentiels"] if ref["active"]]
         intersection = None
         # Check on geometry that should always exist (PATCH or POST)
         if len(form_data["geom"]["geometry"]["coordinates"]) == 0:
