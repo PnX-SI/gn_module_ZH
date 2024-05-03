@@ -12,6 +12,5 @@ export class ZhSearchSDAGEComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 }

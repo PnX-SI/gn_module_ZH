@@ -21,12 +21,11 @@ export class ZhSearchDependantComponent implements OnInit {
   @Output() onSelected = new EventEmitter<object>();
   public _inputData: inputDataType[] = null;
 
-
   constructor() {}
 
   ngOnInit() {
     if (!this._inputData || this._inputData.length < 1) {
-      this.disable()
+      this.disable();
     }
   }
 
@@ -42,9 +41,9 @@ export class ZhSearchDependantComponent implements OnInit {
     }
   }
   disable() {
-    this.form.disable()
+    this.form.disable();
   }
   enable() {
-    this.form.enable()
+    this.form.enable();
   }
 }

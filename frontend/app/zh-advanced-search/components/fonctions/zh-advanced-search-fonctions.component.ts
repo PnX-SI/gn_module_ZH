@@ -17,6 +17,5 @@ export class ZhAdvancedSearchFonctionsComponent implements OnInit {
   // public dropdownSettingsNoCategory: {};
   constructor() {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 }

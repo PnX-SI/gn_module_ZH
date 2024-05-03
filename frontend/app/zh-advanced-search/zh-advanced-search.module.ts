@@ -18,12 +18,7 @@ const routes: Routes = [{ path: 'advanced_search', component: ZhAdvancedSearchCo
     ZhAdvancedSearchEvaluationsComponent,
   ],
   entryComponents: [],
-  imports: [
-    GN2CommonModule,
-    CommonModule,
-    RouterModule.forChild(routes),
-    ZhDetailsModule,
-  ],
+  imports: [GN2CommonModule, CommonModule, RouterModule.forChild(routes), ZhDetailsModule],
   exports: [ZhAdvancedSearchComponent],
 })
 export class ZhAdvancedSearchModule {}

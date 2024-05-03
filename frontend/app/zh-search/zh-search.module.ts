@@ -37,10 +37,6 @@ const routes: Routes = [{ path: 'search', component: ZhSearchComponent }];
     ZhAdvancedSearchModule,
     ZhHierarchySearchModule,
   ],
-  exports: [
-    LabelComponent,
-    TableComponent,
-    ZHMultiSelectComponent,
-    ZhSearchComponent],
+  exports: [LabelComponent, TableComponent, ZHMultiSelectComponent, ZhSearchComponent],
 })
 export class ZhSearchModule {}

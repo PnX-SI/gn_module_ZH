@@ -12,12 +12,7 @@ const routes: Routes = [{ path: 'hierarchy_search', component: ZhHierarchySearch
 @NgModule({
   declarations: [ZhHierarchySearchComponent, ZhHierarchySearchTableComponent, CapitalizePipe],
   entryComponents: [],
-  imports: [
-    GN2CommonModule,
-    CommonModule,
-    RouterModule.forChild(routes),
-    ZhDetailsModule,
-  ],
+  imports: [GN2CommonModule, CommonModule, RouterModule.forChild(routes), ZhDetailsModule],
   exports: [ZhHierarchySearchComponent],
 })
 export class ZhHierarchySearchModule {}

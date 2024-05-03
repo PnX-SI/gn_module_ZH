@@ -11,6 +11,5 @@ export class ZhSearchEnsembleComponent implements OnInit {
   @Input() form: FormGroup;
   constructor() {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 }

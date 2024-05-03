@@ -7,27 +7,27 @@ import { MultiSelectComponent } from '@geonature_common/form/multiselect/multise
   styleUrls: ['./zh-multiselect.component.scss'],
 })
 export class ZHMultiSelectComponent extends MultiSelectComponent implements OnInit {
-  /** 
-  */
+  /**
+   */
   @Input() multiple: boolean;
   @Input() hightlightValue: boolean;
   @Input() groupBy: string | null;
   @Input() placeholder: string;
   @Output() onOpen = new EventEmitter<any>();
   constructor() {
-    super()
+    super();
     this.multiple = true;
     this.hightlightValue = true;
     this.groupBy = null;
-    this.placeholder = "Sélectionner";
+    this.placeholder = 'Sélectionner';
   }
   ngOnInit() {
-    super.ngOnInit()
+    super.ngOnInit();
   }
 
   public selectAllFiltered(select: any) {
     for (const item of select.itemsList.filteredItems) {
-      select.select(item)
+      select.select(item);
     }
     // close popup
     select.close();

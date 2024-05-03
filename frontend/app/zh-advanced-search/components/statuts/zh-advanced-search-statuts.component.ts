@@ -11,7 +11,7 @@ export class ZhAdvancedSearchStatutsComponent implements OnInit {
   @Input() plans: [];
   @Input() strategies: [];
   @Input() form: FormGroup;
-  
+
   constructor() {}
   ngOnInit() {}
 }

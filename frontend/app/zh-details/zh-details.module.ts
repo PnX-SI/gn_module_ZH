@@ -54,7 +54,7 @@ const routes: Routes = [{ path: 'zhDetails/:id', component: ZhDetailsComponent }
     ImageTableComponent,
     DeleteModalComponent,
     LabelComponent,
-    ZHMultiSelectComponent
+    ZHMultiSelectComponent,
   ],
 })
 export class ZhDetailsModule {}
