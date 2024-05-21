@@ -1198,7 +1198,7 @@ class Card(ZH):
         return self.status.__str__()
 
     def __set_hierarchy(self):
-        return self.hierarchy.__str__() if self.hierarchy is not None else None
+        return self.hierarchy.as_dict() if self.hierarchy is not None else None
 
     def __set_evaluation(self):
         self.__set_main_functions()
