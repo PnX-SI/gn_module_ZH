@@ -38,8 +38,9 @@ export class HierarchyService {
   }
 
   // get current zone humides
-  getHierarchy(zhId) {
+  getHierarchy(zhId, rb_name) {
     this.isLoading = true;
+    this.rb_name = rb_name;
     this._dataService.getHierZh(zhId).subscribe(
       (data: HierarchyModel) => {
         this.items = this.setItems(data);
@@ -65,8 +66,7 @@ export class HierarchyService {
       this.items = [];
       return;
     }
-    this.rb_name = data.river_basin_name;
-
+    
     this.items = [{ name: '', active: true, qualification: '', knowledge: '', note: '' }];
 
     // cat 1
