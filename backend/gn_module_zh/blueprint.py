@@ -748,13 +748,11 @@ def patch_file(id_media):
 
     DB.session.commit()
 
-    return jsonify(
-        {
-            "media_path": upload_resp["media_path"],
-            "secured_file_name": upload_resp["secured_file_name"],
-            "id_media": upload_resp["id_media"],
-        }
-    )
+    return {
+        "media_path": upload_resp["media_path"],
+        "secured_file_name": upload_resp["secured_file_name"],
+        "id_media": upload_resp["id_media"],
+    }
 
 
 @blueprint.route("/<int:id_zh>", methods=["DELETE"])
