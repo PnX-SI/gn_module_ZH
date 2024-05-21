@@ -124,9 +124,7 @@ def get_zh(scope):
 def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
     # try:
     # Pour obtenir le nombre de résultat de la requete sans le LIMIT
-    nb_results_without_limit = DB.session.scalar(
-        select(func.count()).select_from(query.subquery())
-    )
+    nb_results_without_limit = DB.session.scalar(select(func.count()).select_from(query.subquery()))
     user = info_role
     user_cruved = get_user_cruved()
 
@@ -768,9 +766,7 @@ def deleteOneZh(id_zh):
     DB.session.execute(delete(CorZhRef).where(CorZhRef.id_zh == id_zh))
 
     # delete criteres delim
-    id_lim_list = DB.session.execute(
-        select(TZH.id_lim_list).where(TZH.id_zh == id_zh)
-    ).scalar_one()
+    id_lim_list = DB.session.execute(select(TZH.id_lim_list).where(TZH.id_zh == id_zh)).scalar_one()
     DB.session.execute(delete(CorLimList).where(CorLimList.id_lim_list == id_lim_list))
 
     # delete cor_zh_area

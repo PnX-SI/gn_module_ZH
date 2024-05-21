@@ -110,13 +110,13 @@ class Item:
 
     def __get_id_nomenc(self, id_type: int, cd_nomenc: str) -> int:
         return DB.session.scalars(
-                select(TNomenclatures.id_nomenclature).where(
-                    and_(
-                        TNomenclatures.id_type == id_type,
-                        TNomenclatures.cd_nomenclature == cd_nomenc,
-                    )
+            select(TNomenclatures.id_nomenclature).where(
+                and_(
+                    TNomenclatures.id_type == id_type,
+                    TNomenclatures.cd_nomenclature == cd_nomenc,
                 )
-            ).first()
+            )
+        ).first()
 
     def __get_nomencs(self, abb, cat=None):
         cat_id = self.__get_id_nomenc(self.__get_id_type("HIERARCHY"), cat)
@@ -492,8 +492,8 @@ class Item:
             combination = self.__get_combination()
             # set qualif_id
             qualif_id = DB.session.scalars(
-                    select(TCorQualif.id_qualification).where(TCorQualif.combination == combination)
-                ).first()
+                select(TCorQualif.id_qualification).where(TCorQualif.combination == combination)
+            ).first()
             return qualif_id
         except ZHApiError as e:
             raise ZHApiError(
@@ -870,9 +870,7 @@ class Item:
             pass
         return (
             DB.session.execute(
-                select(TRules, BibHierCategories)
-                .join(TRules)
-                .where(TRules.rule_id == self.rule_id)
+                select(TRules, BibHierCategories).join(TRules).where(TRules.rule_id == self.rule_id)
             )
             .all()[0]
             .BibHierCategories.label.capitalize()
@@ -1201,8 +1199,10 @@ class Hierarchy(ZH):
         ).scalar_one()
         return getattr(
             DB.session.execute(
-            select(RbNotesSummary).where(RbNotesSummary.bassin_versant == rb_name)
-        ).scalar_one(), col_name)
+                select(RbNotesSummary).where(RbNotesSummary.bassin_versant == rb_name)
+            ).scalar_one(),
+            col_name,
+        )
 
     @staticmethod
     def get_str_note(note, denominator):

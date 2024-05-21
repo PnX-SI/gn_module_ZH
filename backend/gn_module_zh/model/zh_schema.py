@@ -285,9 +285,7 @@ class TZH(ZhModel):
             ).all()
         if zh_area_type == "hydro_area":
             q = DB.session.scalars(
-                select(THydroArea).where(
-                    THydroArea.geom.ST_Intersects(cast(id_zh_geom, Geography))
-                )
+                select(THydroArea).where(THydroArea.geom.ST_Intersects(cast(id_zh_geom, Geography)))
             ).all()
         if zh_area_type == "fct_area":
             q = DB.session.scalars(

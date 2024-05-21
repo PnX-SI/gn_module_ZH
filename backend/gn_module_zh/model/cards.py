@@ -39,9 +39,7 @@ class Utils(ZH):
                 ).scalar_one()
             return [
                 DB.session.execute(
-                    select(TNomenclatures.label_default).where(
-                        TNomenclatures.id_nomenclature == id
-                    )
+                    select(TNomenclatures.label_default).where(TNomenclatures.id_nomenclature == id)
                 ).scalar_one()
                 for id in ids
             ]
@@ -675,9 +673,7 @@ class Status:
         for ref in CorZhArea.get_ref_geo_info(self.id_zh, id_types):
             for i in ref:
                 type_code = DB.session.execute(
-                    select(BibAreasTypes.type_code).where(
-                        BibAreasTypes.id_type == i.LAreas.id_type
-                    )
+                    select(BibAreasTypes.type_code).where(BibAreasTypes.id_type == i.LAreas.id_type)
                 ).scalar_one()
                 refs.append(
                     {
