@@ -28,4 +28,7 @@ def upgrade():
 
 
 def downgrade():
-    pass
+    data = text(
+        importlib.resources.read_text("gn_module_zh.migrations.data", "delete_fake_data.sql")
+    )
+    op.get_bind().execute(data)
