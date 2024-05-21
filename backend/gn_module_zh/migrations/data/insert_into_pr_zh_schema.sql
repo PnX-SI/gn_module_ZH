@@ -1435,5 +1435,21 @@ INSERT INTO pr_zh.cor_rule_nomenc VALUES
 ((SELECT rule_id FROM pr_zh.t_rules WHERE abbreviation = 'status'), (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'STATUT_PROTECTION') AND cd_nomenclature = '97'), (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY') AND cd_nomenclature = 'faible')),
 ((SELECT rule_id FROM pr_zh.t_rules WHERE abbreviation = 'status'), (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'STATUT_PROTECTION') AND cd_nomenclature = '98'), (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY') AND cd_nomenclature = 'faible')),
 ((SELECT rule_id FROM pr_zh.t_rules WHERE abbreviation = 'status'), (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'STATUT_PROTECTION') AND cd_nomenclature = '99'), (SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY') AND cd_nomenclature = 'faible'));
-                                                                                                                                      
+
+-- insert min and max values for rules which need quantifications
+INSERT INTO pr_zh.cor_item_value VALUES
+((SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = 'Aucun' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 0, 0),
+((SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = '1 ou 2' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 1, 2),
+((SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = '3 à 5' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 3, 5),
+((SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = '>5' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 6, 999999999),
+((SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = '1 à 4' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 1, 4),
+((SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = '5 à 7' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 5, 7),
+((SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = '8 ou 9' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 8, 9),
+((SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = '>9' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 10, 999999999),
+((SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = '1' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 1, 1),
+((SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = '2' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 2, 2),
+((SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = '3' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 3, 3),
+((SELECT id_nomenclature FROM ref_nomenclatures.t_nomenclatures WHERE mnemonique = '>3' and id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HIERARCHY')), 4, 999999999);
+
+
 COMMIT;
