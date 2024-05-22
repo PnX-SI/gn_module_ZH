@@ -733,7 +733,7 @@ def patch_file(id_media):
     ALLOWED_EXTENSIONS = blueprint.config["allowed_extensions"]
     MAX_PDF_SIZE = blueprint.config["max_pdf_size"]
     MAX_JPG_SIZE = blueprint.config["max_jpg_size"]
-    FILE_PATH = blueprint.config["file_path"]
+    FILE_PATH = Path(BACKEND_DIR, config["MEDIA_FOLDER"], "attachments")
     MODULE_NAME = blueprint.config["MODULE_CODE"].lower()
 
     upload_resp = upload_process(
