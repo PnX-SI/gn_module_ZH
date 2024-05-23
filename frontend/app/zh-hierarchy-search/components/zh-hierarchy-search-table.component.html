@@ -39,22 +39,22 @@
     </div>
     <div class="pr-0 col-lg-3 col-6">
       <h5>Attribut</h5>
-      <angular2-multiselect
-        [data]="attributes"
-        [formControl]="localForm.controls.attributes"
-        [settings]="attributesSettings"
-        (onSelect)="attributesChanged($event)"
-      >
-      </angular2-multiselect>
+      <zh-multiselect 
+        [values]="attributes"
+        [parentFormControl]="localForm.controls.attributes"
+        keyLabel="attribut"
+        (onChange)="attributesChanged($event)"
+        [multiple]="knowledges.length"
+      />
     </div>
     <div class="pr-0 col-lg-3 col-6">
       <h5>Connaissance</h5>
-      <angular2-multiselect
-        [data]="knowledges"
-        [formControl]="localForm.controls.knowledges"
-        [settings]="knowledgeSettings"
-      >
-      </angular2-multiselect>
+      <zh-multiselect 
+        [values]="knowledges"
+        [parentFormControl]="localForm.controls.knowledges"
+        keyLabel="note_type"
+        (onChange)="attributesChanged($event)"
+      />
     </div>
     <div class="pr-0 col-lg-2 col-6">
       <button

@@ -79,12 +79,11 @@
       <div class="form-row">
         <div class="form-group col-md-12">
           <small>Occupation des sols (Nomenclature Corine Land Cover)</small>
-          <ng-multiselect-dropdown
-            [settings]="dropdownSettings"
-            [data]="formMetaData.OCCUPATION_SOLS"
-            [formControl]="form.controls.id_corine_landcovers"
-          >
-          </ng-multiselect-dropdown>
+          <zh-multiselect
+            [values]="formMetaData.OCCUPATION_SOLS"
+            [parentFormControl]="form.controls.id_corine_landcovers"
+            keyLabel="mnemonique"
+          />
         </div>
       </div>
     </fieldset>
@@ -204,14 +203,13 @@
         </div>
         <div class="form-group col-md-12">
           <small class="required">Impacts (facteurs influençant l’évolution de la zone) </small>
-          <angular2-multiselect
-            [data]="formMetaData.IMPACTS"
+          <zh-multiselect
+            [values]="formMetaData.IMPACTS"
+            [parentFormControl]="activityForm.controls.impacts"
+            keyLabel="mnemonique"
             [(ngModel)]="selectedItems"
-            [formControl]="activityForm.controls.impacts"
-            [settings]="settings"
-            (onDeSelectAll)="onDeSelectAll($event)"
-          >
-          </angular2-multiselect>
+            groupBy="category"
+          />
           <small
             *ngIf="
               (activityForm.controls.impacts.touched || formImpactSubmitted) &&

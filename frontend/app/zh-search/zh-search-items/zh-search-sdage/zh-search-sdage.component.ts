@@ -10,23 +10,7 @@ export class ZhSearchSDAGEComponent implements OnInit {
   @Input() data: any;
   @Input() form: FormGroup;
 
-  public dropdownSettings;
-
   constructor() {}
 
-  ngOnInit() {
-    this.dropdownSettings = {
-      enableCheckAll: false,
-      text: 'Sélectionner',
-      labelKey: 'mnemonique',
-      primaryKey: 'id_nomenclature',
-      searchPlaceholderText: 'Rechercher',
-      enableSearchFilter: true,
-      autoPosition: true,
-    };
-  }
-
-  onDeSelectAll() {
-    this.form.reset();
-  }
+  ngOnInit() {}
 }

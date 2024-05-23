@@ -212,14 +212,12 @@
     <div class="form-row">
       <div class="form-group col-md-6">
         <small class="required">Propositions d'actions</small>
-        <angular2-multiselect
-          [settings]="dropdownSettings"
-          [data]="actionInput"
-          [(ngModel)]="selectedAction"
-          [formControl]="actionForm.controls.action"
-          (onDeSelectAll)="onDeSelectAllActions()"
-        >
-        </angular2-multiselect>
+        <zh-multiselect
+          [values]="actionInput"
+          keyLabel="name"
+          [parentFormControl]="actionForm.controls.action"
+          [multiple]="false"
+        />
         <small
           *ngIf="
             (actionForm.controls.action.touched || modalFormSubmitted) &&

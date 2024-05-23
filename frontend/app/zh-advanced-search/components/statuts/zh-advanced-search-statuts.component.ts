@@ -11,28 +11,7 @@ export class ZhAdvancedSearchStatutsComponent implements OnInit {
   @Input() plans: [];
   @Input() strategies: [];
   @Input() form: FormGroup;
-  public dropdownSettings: {};
+
   constructor() {}
-
-  ngOnInit() {
-    this.dropdownSettings = {
-      enableCheckAll: false,
-      text: 'Sélectionner',
-      labelKey: 'mnemonique',
-      primaryKey: 'id_nomenclature',
-      searchPlaceholderText: 'Rechercher',
-      enableSearchFilter: true,
-      autoPosition: true,
-    };
-  }
-
-  onDeSelectAllStatuts() {
-    this.form.get('statuts').reset();
-  }
-  onDeSelectAllPlans() {
-    this.form.get('plans').reset();
-  }
-  onDeSelectAllStrategies() {
-    this.form.get('strategies').reset();
-  }
+  ngOnInit() {}
 }
