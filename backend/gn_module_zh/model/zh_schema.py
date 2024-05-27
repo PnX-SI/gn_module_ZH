@@ -267,13 +267,11 @@ class TZH(ZhModel):
 
     @staticmethod
     def get_site_space_name(id):
-        return DB.session.execute(
-            select(BibSiteSpace.name).where(BibSiteSpace.id_site_space == id)
-        ).scalar_one()
+        return DB.session.scalar(select(BibSiteSpace.name).where(BibSiteSpace.id_site_space == id))
 
     @staticmethod
     def get_tzh_by_id(id):
-        return DB.session.execute(select(TZH).where(TZH.id_zh == id)).scalar_one()
+        return DB.session.scalar(select(TZH).where(TZH.id_zh == id))
 
     @staticmethod
     def get_zh_area_intersected(zh_area_type, id_zh_geom):
@@ -308,10 +306,10 @@ class TZH(ZhModel):
     def bassin_versant(self):
         bassin_versant = [
             name
-            for (name,) in DB.session.execute(
-                select(TRiverBasin.name)
-                .where(TRiverBasin.id_rb == CorZhRb.id_rb)
-                .where(CorZhRb.id_zh == self.id_zh)
+            for name in DB.session.execute(
+                select(TRiverBasin.name).where(
+                    TRiverBasin.id_rb == CorZhRb.id_rb, CorZhRb.id_zh == self.id_zh
+                )
             ).all()
         ]
         return ", ".join([str(item) for item in bassin_versant])
@@ -361,11 +359,11 @@ class CorZhArea(DB.Model):
         for ref in ref_geo_config:
             if ref["active"]:
                 ids.append(
-                    DB.session.execute(
+                    DB.session.scalar(
                         select(BibAreasTypes.id_type).where(
                             BibAreasTypes.type_code == ref["type_code_ref_geo"]
                         )
-                    ).scalar_one()
+                    )
                 )
         return ids
 
@@ -598,8 +596,7 @@ class CorMainFct(DB.Model):
         return DB.session.execute(
             select(CorMainFct, TNomenclatures)
             .join(TNomenclatures, TNomenclatures.id_nomenclature == CorMainFct.id_function)
-            .where(CorMainFct.active)
-            .where(CorMainFct.id_function.in_(nomenc_ids))
+            .where(CorMainFct.active, CorMainFct.id_function.in_(nomenc_ids))
         ).all()
 
     @staticmethod
@@ -619,7 +616,7 @@ class CorMainFct(DB.Model):
 
     @staticmethod
     def get_function_by_main_function(id_main):
-        # méthode utilisée ?
+        # TODO: méthode utilisée ?
         return DB.session.execute(
             select(CorMainFct, TNomenclatures)
             .join(TNomenclatures, TNomenclatures.id_nomenclature == CorMainFct.id_function)
@@ -628,12 +625,11 @@ class CorMainFct(DB.Model):
 
     @staticmethod
     def get_mnemo_type(id_type):
-        # methode utilisée ?
+        # TODO: methode utilisée ?
         if id_type:
-            test = "test"
-            return DB.session.execute(
+            return DB.session.scalar(
                 select(TNomenclatures).where(TNomenclatures.id_nomenclature == id_type)
-            ).scalar_one()
+            )
         else:
             return ""
 
@@ -666,13 +662,9 @@ class CorImpactList(DB.Model):
 
     @staticmethod
     def get_impacts_by_uuid(uuid_activity):
-        return (
-            DB.session.execute(
-                select(CorImpactList).where(CorImpactList.id_impact_list == uuid_activity)
-            )
-            .scalars()
-            .all()
-        )
+        return DB.session.scalars(
+            select(CorImpactList).where(CorImpactList.id_impact_list == uuid_activity)
+        ).all()
 
 
 class TActivity(DB.Model):
@@ -753,10 +745,11 @@ class TFunctions(DB.Model):
             ]
 
         return DB.session.scalars(
-            select(TFunctions)
-            .where(TFunctions.id_zh == id_zh)
-            .where(TFunctions.id_function.in_(function_ids))
-            .where(TFunctions.id_qualification.in_(qualif_ids))
+            select(TFunctions).where(
+                TFunctions.id_zh == id_zh,
+                TFunctions.id_function.in_(function_ids),
+                TFunctions.id_qualification.in_(qualif_ids),
+            )
         ).all()
 
 
@@ -792,11 +785,11 @@ class CorUrbanTypeRange(DB.Model):
                 {
                     "id_cor": range.id_cor,
                     "id_nomenclature": range.id_range_type,
-                    "mnemonique": DB.session.execute(
+                    "mnemonique": DB.session.scalar(
                         select(TNomenclatures.mnemonique).where(
                             TNomenclatures.id_nomenclature == range.id_range_type
                         )
-                    ).scalar_one(),
+                    ),
                 }
             )
         return ranges

@@ -337,7 +337,7 @@ def get_pbf():
     SELECT ST_AsGeobuf(q, 'geom') as pbf
     FROM (SELECT id_zh, geom from pr_zh.t_zh tz) AS q;
     """
-    row = DB.session.execute(sql).first()
+    row = DB.session.execute(text(sql)).first()
     return Response(bytes(row["pbf"]) if row["pbf"] else bytes(), mimetype="application/protobuf")
 
 
@@ -364,7 +364,7 @@ def get_pbf_complete():
                          'bassin_versant', tz.bassin_versant) as json_arrays
         FROM   pr_zh.atlas_app tz) AS q;
     """
-    row = DB.session.execute(text(sql).limit(1)).first()
+    row = DB.session.execute(text(sql)).first()
     return Response(bytes(row["pbf"]) if row["pbf"] else bytes(), mimetype="application/protobuf")
 
 
@@ -384,7 +384,7 @@ def get_json():
     ) AS feature
     FROM (SELECT * FROM pr_zh.atlas_app tz) inputs) features;
     """
-    row = DB.session.execute(text(sql).limit(1)).first()
+    row = DB.session.execute(text(sql)).first()
     return row["geojson"]
 
 
@@ -457,7 +457,7 @@ def get_file_list(id_zh):
     """get a list of the zh files contained in static repo"""
     try:
         # FIXME: to optimize... See relationships and lazy join with sqlalchemy
-        zh_uuid = DB.session.execute(select(TZH.zh_uuid).where(TZH.id_zh == id_zh)).scalar_one()
+        zh_uuid = DB.session.scalar(select(TZH.zh_uuid).where(TZH.id_zh == id_zh))
         q_medias = DB.session.execute(
             select(TMedias, TNomenclatures.label_default)
             .join(
@@ -558,8 +558,7 @@ def get_all_photos(id_zh: int):
             TNomenclatures.id_nomenclature == TMedias.id_nomenclature_media_type,
         )
         .order_by(TMedias.meta_update_date.desc())
-        .where(TNomenclatures.label_default == "Photo")
-        .where(TZH.id_zh == id_zh)
+        .where(TNomenclatures.label_default == "Photo", TZH.id_zh == id_zh)
     ).all()
     api_uri = urljoin(
         f"{config['API_ENDPOINT']}/",
@@ -799,7 +798,7 @@ def write_csv(id_zh):
     names = []
     FILE_PATH = blueprint.config["file_path"]
     MODULE_NAME = blueprint.config["MODULE_CODE"].lower()
-    zh_code = DB.session.execute(select(TZH.code).where(TZH.id_zh == id_zh)).scalar_one()
+    zh_code = DB.session.scalar(select(TZH.code).where(TZH.id_zh == id_zh))
     # author name
     user = DB.session.execute(
         select(User).where(User.id_role == g.current_user.id_role)
@@ -959,11 +958,7 @@ def get_area_from_department() -> dict:
 @blueprint.route("/bassins", methods=["GET"])
 @json_resp
 def bassins():
-    query = (
-        select(TRiverBasin)
-        .with_only_columns(TRiverBasin.id_rb, TRiverBasin.name)
-        .order_by(TRiverBasin.name)
-    )
+    query = select(TRiverBasin.id_rb, TRiverBasin.name).order_by(TRiverBasin.name)
     resp = DB.session.execute(query).all()
     return [{"code": r.id_rb, "name": r.name} for r in resp]
 
@@ -974,8 +969,7 @@ def get_hydro_zones_from_bassin() -> dict:
     code = request.json.get("code")
     if code:
         query = (
-            select(THydroArea)
-            .with_only_columns(THydroArea.id_hydro, THydroArea.name, TRiverBasin.id_rb)
+            select(THydroArea.id_hydro, THydroArea.name, TRiverBasin.id_rb)
             .where(TRiverBasin.id_rb == code)
             .join(
                 TRiverBasin,

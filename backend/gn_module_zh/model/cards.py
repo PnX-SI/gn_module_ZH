@@ -32,15 +32,15 @@ class Utils(ZH):
     def get_mnemo(ids):
         if ids:
             if type(ids) is int:
-                return DB.session.execute(
+                return DB.session.scalar(
                     select(TNomenclatures.label_default).where(
                         TNomenclatures.id_nomenclature == ids
                     )
-                ).scalar_one()
+                )
             return [
-                DB.session.execute(
+                DB.session.scalar(
                     select(TNomenclatures.label_default).where(TNomenclatures.id_nomenclature == id)
-                ).scalar_one()
+                )
                 for id in ids
             ]
         return []
@@ -495,23 +495,23 @@ class Basin:
             "hydros": self.hydro_zones,
         }
 
+    # TODO: replace in "where with multiples conditions" the coma by AND
     def __get_river_basins(self):
         return [
             name
-            for (name,) in DB.session.execute(
-                select(TRiverBasin.name)
-                .where(TRiverBasin.id_rb == CorZhRb.id_rb)
-                .where(CorZhRb.id_zh == self.id_zh)
+            for name in DB.session.execute(
+                select(TRiverBasin.name).where(
+                    TRiverBasin.id_rb == CorZhRb.id_rb, CorZhRb.id_zh == self.id_zh
+                )
             ).all()
         ]
 
     def __get_hydro_zones(self):
         return [
             name
-            for (name,) in DB.session.execute(
+            for name in DB.session.execute(
                 select(THydroArea.name)
-                .where(THydroArea.id_hydro == CorZhHydro.id_hydro)
-                .where(CorZhHydro.id_zh == self.id_zh)
+                .where(THydroArea.id_hydro == CorZhHydro.id_hydro, CorZhHydro.id_zh == self.id_zh)
                 .distinct()
             ).all()
         ]
@@ -670,16 +670,14 @@ class Status:
     def other_ref_geo(self, ref_geo):
         id_types = CorZhArea.get_id_types_ref_geo(self.id_zh, ref_geo)
         refs = []
-        for ref in CorZhArea.get_ref_geo_info(self.id_zh, id_types):
-            for i in ref:
-                type_code = DB.session.execute(
-                    select(BibAreasTypes.type_code).where(BibAreasTypes.id_type == i.LAreas.id_type)
-                ).scalar_one()
+        for ref_infos in CorZhArea.get_ref_geo_info(self.id_zh, id_types):
+            for info in ref_infos:
+                type_code = DB.session.get(BibAreasTypes, info.LAreas.id_type)
                 refs.append(
                     {
-                        "area_name": i.LAreas.area_name,
-                        "area_code": i.LAreas.area_code,
-                        "url": i.LAreas.source,
+                        "area_name": info.LAreas.area_name,
+                        "area_code": info.LAreas.area_code,
+                        "url": info.LAreas.source,
                         "type_code": type_code,
                         "zh_type_name": [
                             ref["zh_name"]
@@ -770,9 +768,9 @@ class Management:
 
     def __str__(self):
         return {
-            "structure": DB.session.execute(
+            "structure": DB.session.scalar(
                 select(BibOrganismes.name).where(BibOrganismes.id_org == self.id_org)
-            ).scalar_one(),
+            ),
             "plans": [plan.__str__() for plan in self.plans],
         }
 
@@ -811,17 +809,15 @@ class UrbanDoc:
 
     def __str__(self):
         return {
-            "commune": DB.session.execute(
-                select(LAreas.area_name).where(LAreas.id_area == self.id_area)
-            ).scalar_one(),
+            "commune": DB.session.get(LAreas, self.id_area),
             "type_doc": Utils.get_mnemo(self.id_doc_type),
             "type_classement": [
                 Utils.get_mnemo(
-                    DB.session.execute(
+                    DB.session.scalar(
                         select(CorUrbanTypeRange.id_range_type).where(
                             CorUrbanTypeRange.id_cor == id
                         )
-                    ).scalar_one()
+                    )
                 )
                 for id in self.id_cors
             ],
@@ -1001,9 +997,7 @@ class Action:
 
     def __str__(self):
         return {
-            "proposition": DB.session.execute(
-                select(BibActions.name).where(BibActions.id_action == self.id_action)
-            ).scalar_one(),
+            "proposition": DB.session.get(BibActions, self.id_action).name,
             "niveau": Utils.get_mnemo(self.id_priority_level),
             "remarque": Utils.get_string(self.remark),
         }

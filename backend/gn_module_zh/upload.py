@@ -113,9 +113,9 @@ def upload(request, extensions, pdf_size, jpg_size, upload_path, module_name, id
     return {
         "file_name": get_file_path(id_media).name,
         "full_path": str(get_file_path(id_media)),
-        "media_path": DB.session.execute(
+        "media_path": DB.session.scalar(
             select(TMedias.media_path).where(TMedias.id_media == id_media)
-        ).scalar_one(),
+        ),
         "extension": get_extension(get_file_path(id_media).name),
     }
 

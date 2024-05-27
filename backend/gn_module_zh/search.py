@@ -160,11 +160,9 @@ def filter_area(query, json: dict, type_code: str):
 
     # Filter on departments
     subquery = (
-        select(LAreas)
-        .with_only_columns(LAreas.area_name, LAreas.geom, LAreas.id_type, BibAreasTypes.type_code)
+        select(LAreas.area_name, LAreas.geom, LAreas.id_type, BibAreasTypes.type_code)
         .join(BibAreasTypes, LAreas.id_type == BibAreasTypes.id_type)
-        .where(BibAreasTypes.type_code == type_code)
-        .where(LAreas.area_code.in_(codes))
+        .where(BibAreasTypes.type_code == type_code, LAreas.area_code.in_(codes))
         .subquery()
     )
 
@@ -182,8 +180,7 @@ def filter_hydro(query, json):
 
     if codes and all(code is not None for code in codes):
         subquery = (
-            select(THydroArea)
-            .with_only_columns(THydroArea.id_hydro, THydroArea.geom)
+            select(THydroArea.id_hydro, THydroArea.geom)
             .where(THydroArea.id_hydro.in_(codes))
             .subquery()
         )
@@ -201,8 +198,7 @@ def filter_basin(query, json):
 
     if codes is not None:
         subquery = (
-            select(TRiverBasin)
-            .with_only_columns(
+            select(
                 TRiverBasin.id_rb,
                 TRiverBasin.geom,
             )
@@ -234,8 +230,8 @@ def filter_fct(query, json: dict, type_: str):
     ids_conn = [f.get("id_nomenclature") for f in json.get("connaissances", [])]
 
     subquery = (
-        select(TFunctions.id_zh)
-        .with_only_columns(
+        # TODO: be careful with this. To be verified
+        select(
             TFunctions.id_zh,
             TFunctions.id_function,
             TFunctions.id_qualification,
@@ -267,10 +263,8 @@ def filter_statuts(query, json: dict):
     ids_statuts = [f.get("id_nomenclature") for f in json.get("statuts", [])]
 
     if ids_statuts:
-        subquery = (
-            select(TOwnership.id_zh)
-            .with_only_columns(TOwnership.id_zh, TOwnership.id_status)
-            .where(TOwnership.id_status.in_(ids_statuts))
+        subquery = select(TOwnership.id_zh, TOwnership.id_status).where(
+            TOwnership.id_status.in_(ids_statuts)
         )
         query = query.where(TZH.id_zh == subquery.subquery().c.id_zh).distinct()
 
@@ -282,8 +276,7 @@ def filter_plans(query, json: dict):
 
     if ids_plans and all(id_ is not None for id_ in ids_plans):
         subquery = (
-            select(TManagementStructures.id_zh)
-            .with_only_columns(
+            select(
                 TManagementPlans.id_nature,
                 TManagementPlans.id_structure,
                 TManagementStructures.id_structure,
@@ -509,10 +502,10 @@ def generate_attributes_subquery(attributes: list):
 
     # TODO: see if all of these are usefull... Are cor_rule_id with note sufficient?
     subquery = (
-        subquery.where(CorZhNotes.attribute_id.in_(attribute_ids))
-        .where(CorZhNotes.note_type_id.in_(note_type_ids))
-        .where(CorZhNotes.cor_rule_id.in_(cor_rule_ids))
-        .where(CorZhNotes.note.in_(notes))
+        subquery.where(CorZhNotes.attribute_id.in_(attribute_ids),
+        CorZhNotes.note_type_id.in_(note_type_ids),
+        CorZhNotes.cor_rule_id.in_(cor_rule_ids),
+        CorZhNotes.note.in_(notes))
     )
 
     return subquery.subquery()

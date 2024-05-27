@@ -25,13 +25,11 @@ class Code(ZH):
             ).scalar_one()
             main_dep = None
             for dep in departments:
-                if (
-                    DB.session.scalar(select(dep.LAreas.geom.ST_Intersection(my_geom).ST_Area()))
-                    > area
-                ):
-                    area = DB.session.scalar(
-                        select(dep.LAreas.geom.ST_Intersection(my_geom).ST_Area())
-                    )
+                dep_area = DB.session.scalar(
+                    select(dep.LAreas.geom.ST_Intersection(my_geom).ST_Area())
+                )
+                if dep_area > area:
+                    area = dep_area
                     main_dep = dep.LAreas.area_code
             if main_dep is None:
                 raise ZHApiError(message="no_department", details="main_dep value is none")
