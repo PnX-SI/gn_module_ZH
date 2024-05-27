@@ -501,11 +501,11 @@ def generate_attributes_subquery(attributes: list):
         notes.append(attribute["note"])
 
     # TODO: see if all of these are usefull... Are cor_rule_id with note sufficient?
-    subquery = (
-        subquery.where(CorZhNotes.attribute_id.in_(attribute_ids),
+    subquery = subquery.where(
+        CorZhNotes.attribute_id.in_(attribute_ids),
         CorZhNotes.note_type_id.in_(note_type_ids),
         CorZhNotes.cor_rule_id.in_(cor_rule_ids),
-        CorZhNotes.note.in_(notes))
+        CorZhNotes.note.in_(notes),
     )
 
     return subquery.subquery()

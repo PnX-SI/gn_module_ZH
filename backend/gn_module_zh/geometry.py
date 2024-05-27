@@ -2,6 +2,7 @@ import sys
 
 from geoalchemy2.shape import to_shape
 from geonature.utils.env import DB
+from sqlalchemy import func
 from sqlalchemy.sql import select, func
 from werkzeug.exceptions import BadRequest
 
@@ -15,11 +16,7 @@ def set_geom(geometry, id_zh=None):
     if not id_zh:
         id_zh = 0
     # SetSRID for POSTGIS < 3.0 compat
-
     # select only already existing ZH geometries which intersect with the new ZH geometry
-    # polygon = DB.session.execute(
-    #     select(func.ST_SetSRID(func.ST_GeomFromGeoJSON(str(geometry)), 4326))
-    # ).scalar_one()
     q_zh = DB.session.scalars(
         select(TZH)
         .where(
@@ -28,7 +25,8 @@ def set_geom(geometry, id_zh=None):
                 func.ST_GeogFromWKB(func.ST_AsEWKB(str(geometry))),
             )
         )
-        .where(func.ST_Touches(
+        .where(
+            func.ST_Touches(
                 func.ST_GeomFromWKB(func.ST_AsEWKB(TZH.geom), 4326),
                 func.ST_GeomFromWKB(func.ST_AsEWKB(str(geometry)), 4326),
             )
@@ -36,8 +34,10 @@ def set_geom(geometry, id_zh=None):
         )
     ).all()
 
-
     is_intersected = False
+    polygon = DB.session.scalar(
+        select(func.ST_SetSRID(func.ST_GeomFromGeoJSON(str(geometry)), 4326))
+    )
     for zh in q_zh:
         if zh.id_zh != id_zh:
             zh_geom = DB.session.scalar(select(func.ST_GeogFromWKB(func.ST_AsEWKB(zh.geom))))
@@ -46,18 +46,19 @@ def set_geom(geometry, id_zh=None):
             )
             if DB.session.scalar(select(func.ST_Intersects(polygon_geom, zh_geom))):
                 if DB.session.scalar(
-                        func.ST_GeometryType(func.ST_Intersection(zh_geom, polygon_geom, 0.1))
-                    ) not in ["ST_LineString", "ST_MultiLineString"]:
+                    select(func.ST_GeometryType(func.ST_Intersection(zh_geom, polygon_geom, 0.1)))
+                ) not in ["ST_LineString", "ST_MultiLineString"]:
                     is_intersected = True
             if DB.session.scalar(
-                func.ST_Contains(
-                    zh_geom,
-                    polygon_geom,
-
+                select(
+                    func.ST_Contains(
+                        zh_geom,
+                        polygon_geom,
+                    )
                 )
             ):
                 raise BadRequest("La ZH est entièrement dans une ZH existante")
-            # TODO: not detected if contained entirely in 2 or more ZH polygons
+                # TODO: not detected if contained entirely in 2 or more ZH polygons
             polygon = DB.session.scalar(select(func.ST_Difference(polygon_geom, zh_geom)))
     return {"polygon": polygon, "is_intersected": is_intersected}
 
@@ -79,20 +80,16 @@ def get_main_rb(query: list) -> int:
     rb_id = None
     area = 0
     for q_ in query:
-        zh_polygon = (
-            DB.session.execute(select(TZH.geom).where(TZH.id_zh == getattr(q_, "id_zh")))
-            .first()
-            .geom
+        zh_polygon = DB.session.execute(
+            select(TZH.geom).where(TZH.id_zh == getattr(q_, "id_zh")).first()
         )
-        rb_polygon = (
-            DB.session.execute(
-                select(CorZhRb, TRiverBasin)
-                .join(TRiverBasin, TRiverBasin.id_rb == CorZhRb.id_rb)
-                .where(TRiverBasin.id_rb == getattr(q_, "id_rb"))
-            )
+        rb_polygon = DB.session.execute(
+            select(TRiverBasin.geom)
+            .join(TRiverBasin, TRiverBasin.id_rb == CorZhRb.id_rb)
+            .where(TRiverBasin.id_rb == getattr(q_, "id_rb"))
             .first()
-            .TRiverBasin.geom
         )
+
         intersection = DB.session.scalar(
             select(
                 func.ST_Intersection(
