@@ -21,7 +21,7 @@ from geonature.utils.config import config
 from geonature.utils.env import DB, ROOT_DIR, BACKEND_DIR
 from pypnnomenclature.models import TNomenclatures
 from pypnusershub.db.models import Organisme, User
-from sqlalchemy import desc, func, text
+from sqlalchemy import desc, func, text, select, update, delete
 from sqlalchemy.orm import aliased
 from utils_flask_sqla.generic import GenericQuery
 from utils_flask_sqla.response import json_resp_accept_empty_list, json_resp
@@ -93,7 +93,7 @@ def get_zh(scope):
     coauthor = aliased(User, name="coauthor")
     coorganism = aliased(Organisme, name="coorganism")
     q = (
-        DB.session.query(TZH)
+        select(TZH)
         .join(TNomenclatures, TZH.sdage)
         .join(User, TZH.authors)
         .join(coauthor, TZH.coauthors)
@@ -109,6 +109,7 @@ def get_zh(scope):
 
     if request.is_json:
         q = main_search(q, request.json)
+        # q2 = main_search(q2, request.json)
 
     return get_all_zh(
         info_role=g.current_user,
@@ -123,7 +124,7 @@ def get_zh(scope):
 def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
     # try:
     # Pour obtenir le nombre de résultat de la requete sans le LIMIT
-    nb_results_without_limit = query.count()
+    nb_results_without_limit = DB.session.scalar(select(func.count()).select_from(query.subquery()))
     user = info_role
     user_cruved = get_user_cruved()
 
@@ -151,7 +152,7 @@ def get_all_zh(info_role, query, limit, page, orderby=None, order="asc"):
 
     # Order by id because there can be ambiguity in order_by(col) depending
     # on the column so add on order_by id makes it clearer
-    data = query.order_by(TZH.id_zh).limit(limit).offset(page * limit).all()
+    data = DB.session.scalars(query.order_by(TZH.id_zh).limit(limit).offset(page * limit)).all()
     is_ref_geo = check_ref_geo_schema()
 
     featureCollection = []
@@ -336,8 +337,7 @@ def get_pbf():
     SELECT ST_AsGeobuf(q, 'geom') as pbf
     FROM (SELECT id_zh, geom from pr_zh.t_zh tz) AS q;
     """
-    query = DB.session.execute(sql)
-    row = query.first()
+    row = DB.session.execute(text(sql)).first()
     return Response(bytes(row["pbf"]) if row["pbf"] else bytes(), mimetype="application/protobuf")
 
 
@@ -364,8 +364,7 @@ def get_pbf_complete():
                          'bassin_versant', tz.bassin_versant) as json_arrays
         FROM   pr_zh.atlas_app tz) AS q;
     """
-    query = DB.session.execute(sql)
-    row = query.first()
+    row = DB.session.execute(text(sql)).first()
     return Response(bytes(row["pbf"]) if row["pbf"] else bytes(), mimetype="application/protobuf")
 
 
@@ -385,8 +384,7 @@ def get_json():
     ) AS feature
     FROM (SELECT * FROM pr_zh.atlas_app tz) inputs) features;
     """
-    query = DB.session.execute(sql)
-    row = query.first()
+    row = DB.session.execute(text(sql)).first()
     return row["geojson"]
 
 
@@ -396,7 +394,7 @@ def get_json():
 def get_geometries():
     """Get list of all zh geometries (contours)"""
     try:
-        if not DB.session.query(TZH).all():
+        if not DB.session.execute(select(TZH)).all():
             raise ZHApiError(
                 message="no_geometry",
                 details="Empty list of zh returned from get_zh_list db request",
@@ -406,7 +404,7 @@ def get_geometries():
                 "geometry": zh.get_geofeature()["geometry"],
                 "id_zh": zh.get_geofeature()["properties"]["id_zh"],
             }
-            for zh in DB.session.query(TZH).all()
+            for zh in DB.session.scalars(select(TZH)).all()
         ]
     except Exception as e:
         if e.__class__.__name__ == "ZHApiError":
@@ -428,17 +426,14 @@ def get_ref_autocomplete():
         params = request.args
         search_title = params.get("search_title")
         # search_title = 'MCD'
-        q = DB.session.query(
-            TReferences,
-            func.similarity(TReferences.title, search_title).label("idx_trgm"),
-        )
+        q = select(TReferences, func.similarity(TReferences.title, search_title).label("idx_trgm"))
 
         search_title = search_title.replace(" ", "%")
-        q = q.filter(TReferences.title.ilike("%" + search_title + "%")).order_by(desc("idx_trgm"))
+        q = q.where(TReferences.title.ilike("%" + search_title + "%")).order_by(desc("idx_trgm"))
 
         limit = request.args.get("limit", 20)
 
-        data = q.limit(limit).all()
+        data = DB.session.execute(q.limit(limit)).all()
         if data:
             return [d[0].as_dict() for d in data]
         else:
@@ -462,17 +457,16 @@ def get_file_list(id_zh):
     """get a list of the zh files contained in static repo"""
     try:
         # FIXME: to optimize... See relationships and lazy join with sqlalchemy
-        zh_uuid = DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().zh_uuid
-        q_medias = (
-            DB.session.query(TMedias, TNomenclatures.label_default)
-            .filter(TMedias.unique_id_media == zh_uuid)
+        zh_uuid = DB.session.scalar(select(TZH.zh_uuid).where(TZH.id_zh == id_zh))
+        q_medias = DB.session.execute(
+            select(TMedias, TNomenclatures.label_default)
             .join(
                 TNomenclatures,
                 TNomenclatures.id_nomenclature == TMedias.id_nomenclature_media_type,
             )
+            .where(TMedias.unique_id_media == zh_uuid)
             .order_by(TMedias.meta_update_date.desc())
-            .all()
-        )
+        ).all()
         res_media, image_medias = [], []
         for media, media_type in q_medias:
             res_media.append(media)
@@ -528,9 +522,12 @@ def post_main_pict(id_zh, id_media):
     """post main picture id in tzh"""
     try:
         # FIXME: after insert+after update on t_zh => update_date=dt.now()
-        DB.session.query(TZH).filter(TZH.id_zh == id_zh).update(
-            {TZH.main_pict_id: id_media, TZH.update_date: dt.now()}
+        stmt = (
+            update(TZH)
+            .where(TZH.id_zh == id_zh)
+            .values(main_pict_id=id_media, update_date=dt.now())
         )
+        DB.session.execute(stmt)
         DB.session.commit()
         return ("", 204)
     except Exception as e:
@@ -553,18 +550,16 @@ def post_main_pict(id_zh, id_media):
 @blueprint.route("<int:id_zh>/photos", methods=["GET"])
 @json_resp
 def get_all_photos(id_zh: int):
-    q_medias = (
-        DB.session.query(TZH.main_pict_id, TMedias.id_media, TMedias.media_path)
+    q_medias = DB.session.execute(
+        select(TZH.main_pict_id, TMedias.id_media, TMedias.media_path)
         .join(TZH, TZH.zh_uuid == TMedias.unique_id_media)
         .join(
             TNomenclatures,
             TNomenclatures.id_nomenclature == TMedias.id_nomenclature_media_type,
         )
         .order_by(TMedias.meta_update_date.desc())
-        .filter(TNomenclatures.label_default == "Photo")
-        .filter(TZH.id_zh == id_zh)
-        .all()
-    )
+        .where(TNomenclatures.label_default == "Photo", TZH.id_zh == id_zh)
+    ).all()
     api_uri = urljoin(
         f"{config['API_ENDPOINT']}/",
         f"{blueprint.config['MODULE_CODE'].lower()}/{blueprint.config['file_path']}/",
@@ -767,18 +762,18 @@ def deleteOneZh(id_zh):
     zhRepository = ZhRepository(TZH)
 
     # delete references
-    DB.session.query(CorZhRef).filter(CorZhRef.id_zh == id_zh).delete()
+    DB.session.execute(delete(CorZhRef).where(CorZhRef.id_zh == id_zh))
 
     # delete criteres delim
-    id_lim_list = DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().id_lim_list
-    DB.session.query(CorLimList).filter(CorLimList.id_lim_list == id_lim_list).delete()
+    id_lim_list = DB.session.execute(select(TZH.id_lim_list).where(TZH.id_zh == id_zh)).scalar_one()
+    DB.session.execute(delete(CorLimList).where(CorLimList.id_lim_list == id_lim_list))
 
     # delete cor_zh_area
-    DB.session.query(CorZhArea).filter(CorZhArea.id_zh == id_zh).delete()
+    DB.session.execute(delete(CorZhArea).where(CorZhArea.id_zh == id_zh))
 
     # delete files in TMedias and repos
-    zh_uuid = DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().zh_uuid
-    q_medias = DB.session.query(TMedias).filter(TMedias.unique_id_media == zh_uuid).all()
+    zh_uuid = DB.session.execute(select(TZH.zh_uuid).where(TZH.id_zh == id_zh)).scalar_one()
+    q_medias = DB.session.scalars(select(TMedias).where(TMedias.unique_id_media == zh_uuid)).all()
     for media in q_medias:
         delete_file(media.id_media)
 
@@ -803,9 +798,11 @@ def write_csv(id_zh):
     names = []
     FILE_PATH = blueprint.config["file_path"]
     MODULE_NAME = blueprint.config["MODULE_CODE"].lower()
-    zh_code = DB.session.query(TZH).filter(TZH.id_zh == id_zh).one().code
+    zh_code = DB.session.scalar(select(TZH.code).where(TZH.id_zh == id_zh))
     # author name
-    user = DB.session.query(User).filter(User.id_role == g.current_user.id_role).one()
+    user = DB.session.execute(
+        select(User).where(User.id_role == g.current_user.id_role)
+    ).scalar_one()
     author = user.prenom_role + " " + user.nom_role
     for i in ["vertebrates_view_name", "invertebrates_view_name", "flora_view_name"]:
         query = GenericQuery(
@@ -813,7 +810,7 @@ def write_csv(id_zh):
             tableName=blueprint.config[i]["table_name"],
             schemaName=blueprint.config[i]["schema_name"],
             filters={"id_zh": id_zh, "orderby": "id_zh"},
-            limit=-1,
+            limit=100,
         )
         results = query.return_query().get("items", [])
         current_date = dt.now()
@@ -864,8 +861,10 @@ def write_csv(id_zh):
             DB.session.flush()
 
             # update TMedias.media_path with media_filename
-            DB.session.query(TMedias).filter(TMedias.id_media == id_media).update(
-                {"media_path": str(media_path)}
+            DB.session.execute(
+                update(TMedias)
+                .where(TMedias.id_media == id_media)
+                .values(media_path=str(media_path))
             )
 
             DB.session.commit()
@@ -924,41 +923,43 @@ def download(id_zh: int):
 @json_resp
 def departments():
     query = (
-        DB.session.query(LAreas)
-        .with_entities(LAreas.area_name, LAreas.area_code, LAreas.id_type, BibAreasTypes.type_code)
+        select(LAreas)
+        .with_only_columns(
+            LAreas.area_name, LAreas.area_code, LAreas.id_type, BibAreasTypes.type_code
+        )
         .join(BibAreasTypes, LAreas.id_type == BibAreasTypes.id_type)
-        .filter(BibAreasTypes.type_code == "DEP")
-        .filter(LAreas.enable)
+        .where(BibAreasTypes.type_code == "DEP")
+        .where(LAreas.enable)
         .order_by(LAreas.area_code)
     )
-    resp = query.all()
+    resp = DB.session.execute(query).all()
     return [{"code": r.area_code, "name": r.area_name} for r in resp]
 
 
 @blueprint.route("/communes", methods=["POST"])
 @json_resp
 def get_area_from_department() -> dict:
+    # route utilisée ?
     code = request.json.get("code")
     if code:
         query = (
-            DB.session.query(LiMunicipalities)
-            .with_entities(LiMunicipalities.id_area, LAreas.area_name, LAreas.area_code)
+            select(LiMunicipalities)
+            .with_only_columns(LiMunicipalities.id_area, LAreas.area_name, LAreas.area_code)
             .join(LAreas, LiMunicipalities.id_area == LAreas.id_area)
-            .filter(LiMunicipalities.insee_com.like("{}%".format(code)))
-            .filter(LAreas.enable)
+            .where(LiMunicipalities.insee_com.like("{}%".format(code)))
+            .where(LAreas.enable)
+            .order_by(LAreas.area_code)
         )
-        query = query.order_by(LAreas.area_code)
-        resp = query.all()
+        resp = DB.session.execute(query).all()
         return [{"code": r.area_code, "name": r.area_name} for r in resp]
-
     return []
 
 
 @blueprint.route("/bassins", methods=["GET"])
 @json_resp
 def bassins():
-    query = DB.session.query(TRiverBasin).with_entities(TRiverBasin.id_rb, TRiverBasin.name)
-    resp = query.order_by(TRiverBasin.name).all()
+    query = select(TRiverBasin.id_rb, TRiverBasin.name).order_by(TRiverBasin.name)
+    resp = DB.session.execute(query).all()
     return [{"code": r.id_rb, "name": r.name} for r in resp]
 
 
@@ -968,9 +969,8 @@ def get_hydro_zones_from_bassin() -> dict:
     code = request.json.get("code")
     if code:
         query = (
-            DB.session.query(THydroArea)
-            .with_entities(THydroArea.id_hydro, THydroArea.name, TRiverBasin.id_rb)
-            .filter(TRiverBasin.id_rb == code)
+            select(THydroArea.id_hydro, THydroArea.name, TRiverBasin.id_rb)
+            .where(TRiverBasin.id_rb == code)
             .join(
                 TRiverBasin,
                 func.ST_Contains(
@@ -978,9 +978,10 @@ def get_hydro_zones_from_bassin() -> dict:
                     func.ST_SetSRID(THydroArea.geom, 4326),
                 ),
             )
+            .order_by(THydroArea.name)
         )
 
-        resp = query.order_by(THydroArea.name).all()
+        resp = DB.session.execute(query).all()
         return [{"code": r.id_hydro, "name": r.name} for r in resp]
 
     return []

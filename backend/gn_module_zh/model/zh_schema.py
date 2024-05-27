@@ -91,12 +91,13 @@ class Nomenclatures(TNomenclatures):
 
     @staticmethod
     def get_nomenclature_info(bib_mnemo):
-        q = TNomenclatures.query.filter_by(
-            id_type=select([func.ref_nomenclatures.get_id_nomenclature_type(bib_mnemo)])
+        # todo
+        q = select(TNomenclatures).where(
+            TNomenclatures.id_type == (func.ref_nomenclatures.get_id_nomenclature_type(bib_mnemo))
         )
         if bib_mnemo == "SDAGE":
             q = q.order_by(TNomenclatures.id_nomenclature)
-        return q.all()
+        return DB.session.scalars(q).all()
 
 
 @serializable
@@ -127,7 +128,8 @@ class BibSiteSpace(DB.Model):
 
     @staticmethod
     def get_bib_site_spaces():
-        bib_site_spaces = DB.session.query(BibSiteSpace).all()
+        # bib_site_spaces = DB.session.execute(select(BibSiteSpace)).scalars().all()
+        bib_site_spaces = DB.session.scalars(select(BibSiteSpace)).all()
         bib_site_spaces_list = [bib_site_space.as_dict() for bib_site_space in bib_site_spaces]
         return bib_site_spaces_list
 
@@ -143,12 +145,15 @@ class BibOrganismes(DB.Model):
 
     @staticmethod
     def get_abbrevation(id_org):
-        org = DB.session.query(BibOrganismes).filter(BibOrganismes.id_org == id_org).one()
+        org = DB.session.execute(
+            select(BibOrganismes).where(BibOrganismes.id_org == id_org)
+        ).scalar_one()
         return org.abbrevation
 
     @staticmethod
     def get_bib_organisms(org_type):
-        bib_organismes = DB.session.query(BibOrganismes).all()
+        # bib_organismes = DB.session.execute(select(BibOrganismes)).scalars().all()
+        bib_organismes = DB.session.scalars(select(BibOrganismes)).all()
         if org_type == "operator":
             return [bib_org.as_dict() for bib_org in bib_organismes if bib_org.is_op_org]
         elif org_type == "management_structure":
@@ -165,7 +170,7 @@ class CorLimList(DB.Model):
     id_lim = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), primary_key=True)
 
     def get_lims_by_id(id):
-        return DB.session.query(CorLimList).filter(CorLimList.id_lim_list == id).all()
+        return DB.session.scalars(select(CorLimList).where(CorLimList.id_lim_list == id)).all()
 
 
 @serializable
@@ -262,53 +267,50 @@ class TZH(ZhModel):
 
     @staticmethod
     def get_site_space_name(id):
-        return DB.session.query(BibSiteSpace).filter(BibSiteSpace.id_site_space == id).one().name
+        return DB.session.scalar(select(BibSiteSpace.name).where(BibSiteSpace.id_site_space == id))
 
     @staticmethod
     def get_tzh_by_id(id):
-        return DB.session.query(TZH).filter(TZH.id_zh == id).one()
+        return DB.session.scalar(select(TZH).where(TZH.id_zh == id))
 
     @staticmethod
     def get_zh_area_intersected(zh_area_type, id_zh_geom):
         if zh_area_type == "river_basin":
-            q = (
-                DB.session.query(TRiverBasin)
-                .filter(TRiverBasin.geom.ST_Intersects(cast(id_zh_geom, Geography)))
-                .all()
-            )
+            q = DB.session.scalars(
+                select(TRiverBasin).where(
+                    TRiverBasin.geom.ST_Intersects(cast(id_zh_geom, Geography))
+                )
+            ).all()
         if zh_area_type == "hydro_area":
-            q = (
-                DB.session.query(THydroArea)
-                .filter(THydroArea.geom.ST_Intersects(cast(id_zh_geom, Geography)))
-                .all()
-            )
+            q = DB.session.scalars(
+                select(THydroArea).where(THydroArea.geom.ST_Intersects(cast(id_zh_geom, Geography)))
+            ).all()
         if zh_area_type == "fct_area":
-            q = (
-                DB.session.query(TFctArea)
-                .filter(TFctArea.geom.ST_Intersects(cast(id_zh_geom, Geography)))
-                .all()
-            )
+            q = DB.session.scalars(
+                select(TFctArea).where(TFctArea.geom.ST_Intersects(cast(id_zh_geom, Geography)))
+            ).all()
         return q
 
     @hybrid_property
     def delims(self):
-        delims = [
-            element.TNomenclatures.mnemonique
-            for element in DB.session.query(CorLimList, TNomenclatures)
-            .filter(CorLimList.id_lim_list == self.id_lim_list)
-            .filter(TNomenclatures.id_nomenclature == CorLimList.id_lim)
-            .all()
-        ]
+        query = select(CorLimList, TNomenclatures).where(
+            and_(
+                TNomenclatures.id_nomenclature == CorLimList.id_lim,
+                CorLimList.id_lim_list == self.id_lim_list,
+            )
+        )
+        delims = [element.TNomenclatures.mnemonique for element in DB.session.execute(query).all()]
         return ", ".join([str(item) for item in delims])
 
     @hybrid_property
     def bassin_versant(self):
         bassin_versant = [
             name
-            for (name,) in DB.session.query(TRiverBasin.name)
-            .filter(TRiverBasin.id_rb == CorZhRb.id_rb)
-            .filter(CorZhRb.id_zh == self.id_zh)
-            .all()
+            for name in DB.session.execute(
+                select(TRiverBasin.name).where(
+                    TRiverBasin.id_rb == CorZhRb.id_rb, CorZhRb.id_zh == self.id_zh
+                )
+            ).all()
         ]
         return ", ".join([str(item) for item in bassin_versant])
 
@@ -324,31 +326,32 @@ class CorZhArea(DB.Model):
     @staticmethod
     def get_id_type(mnemo):
         return (
-            DB.session.query(BibAreasTypes).filter(BibAreasTypes.type_name == mnemo).one().id_type
+            DB.session.scalars(select(BibAreasTypes).where(BibAreasTypes.type_name == mnemo))
+            .one()
+            .id_type
         )
 
     @staticmethod
     def get_departments(id_zh):
-        return (
-            DB.session.query(CorZhArea, LAreas, TZH)
+        query = (
+            select(CorZhArea, LAreas, TZH)
             .join(LAreas)
-            .filter(
+            .where(
                 CorZhArea.id_zh == id_zh,
                 LAreas.id_type == CorZhArea.get_id_type("Départements"),
                 TZH.id_zh == id_zh,
             )
-            .all()
         )
+        return DB.session.execute(query).all()
 
     @staticmethod
     def get_municipalities_info(id_zh):
-        return (
-            DB.session.query(CorZhArea, LiMunicipalities, TZH)
+        return DB.session.execute(
+            select(CorZhArea, LiMunicipalities, TZH)
             .join(LiMunicipalities, LiMunicipalities.id_area == CorZhArea.id_area)
-            .filter(CorZhArea.id_zh == id_zh, TZH.id_zh == id_zh)
+            .where(CorZhArea.id_zh == id_zh, TZH.id_zh == id_zh)
             .order_by(LiMunicipalities.nom_com)
-            .all()
-        )
+        ).all()
 
     @staticmethod
     def get_id_types_ref_geo(id_zh, ref_geo_config):
@@ -356,20 +359,22 @@ class CorZhArea(DB.Model):
         for ref in ref_geo_config:
             if ref["active"]:
                 ids.append(
-                    DB.session.query(BibAreasTypes)
-                    .filter(BibAreasTypes.type_code == ref["type_code_ref_geo"])
-                    .one()
-                    .id_type
+                    DB.session.scalar(
+                        select(BibAreasTypes.id_type).where(
+                            BibAreasTypes.type_code == ref["type_code_ref_geo"]
+                        )
+                    )
                 )
         return ids
 
     @staticmethod
     def get_ref_geo_info(id_zh, id_types):
         return [
-            DB.session.query(CorZhArea, LAreas, TZH)
-            .join(LAreas)
-            .filter(CorZhArea.id_zh == id_zh, LAreas.id_type == id_type, TZH.id_zh == id_zh)
-            .all()
+            DB.session.execute(
+                select(CorZhArea, LAreas, TZH)
+                .join(LAreas)
+                .where(CorZhArea.id_zh == id_zh, LAreas.id_type == id_type, TZH.id_zh == id_zh)
+            ).all()
             for id_type in id_types
         ]
 
@@ -441,13 +446,12 @@ class CorZhRef(DB.Model):
 
     @staticmethod
     def get_references_by_id(id_zh):
-        return (
-            DB.session.query(TReferences)
+        return DB.session.scalars(
+            select(TReferences)
             .join(CorZhRef)
-            .filter(CorZhRef.id_zh == id_zh)
+            .where(CorZhRef.id_zh == id_zh)
             .order_by(TReferences.pub_year.desc())
-            .all()
-        )
+        ).all()
 
 
 class CorZhLimFs(DB.Model):
@@ -465,17 +469,16 @@ class CorSdageSage(DB.Model):
 
     @staticmethod
     def get_id_sdage_list():
-        q_id_sdages = DB.session.query(func.distinct(CorSdageSage.id_sdage)).all()
+        q_id_sdages = DB.session.execute(select(func.distinct(CorSdageSage.id_sdage))).all()
         return [id[0] for id in q_id_sdages]
 
     @staticmethod
     def get_sage_by_id(id):
-        return (
-            DB.session.query(CorSdageSage, TNomenclatures)
+        return DB.session.execute(
+            select(CorSdageSage, TNomenclatures)
             .join(TNomenclatures, TNomenclatures.id_nomenclature == CorSdageSage.id_sage)
-            .filter(CorSdageSage.id_sdage == id)
-            .all()
-        )
+            .where(CorSdageSage.id_sdage == id)
+        ).all()
 
 
 class BibCb(DB.Model):
@@ -487,17 +490,19 @@ class BibCb(DB.Model):
 
     @staticmethod
     def get_label():
-        return (
-            DB.session.query(BibCb, Habref)
+        return DB.session.execute(
+            select(BibCb, Habref)
             .join(Habref, BibCb.lb_code == Habref.lb_code)
-            .filter(Habref.cd_typo == 22)
+            .where(Habref.cd_typo == 22)
             .order_by(BibCb.lb_code)
-            .all()
-        )
+        ).all()
 
     @staticmethod
     def get_ch(lb_code):
         # get cd_hab_sortie from lb_code of selected Corine Biotope
+        # !!! est-ce que method utilisée qqpart ?
+        # todo
+        """
         cd_hab_sortie = (
             DB.session.query(Habref)
             .filter(and_(Habref.lb_code == lb_code, Habref.cd_typo == 22))
@@ -505,11 +510,13 @@ class BibCb(DB.Model):
             .cd_hab
         )
         # get all cd_hab_entre corresponding to cd_hab_sortie
+        #todo
         q_cd_hab_entre = (
             DB.session.query(CorespHab).filter(CorespHab.cd_hab_sortie == cd_hab_sortie).all()
         )
         # get list of cd_hab_entre/lb_code/lb_hab_fr for each cahier habitat
         ch = []
+        #todo
         for q in q_cd_hab_entre:
             ch.append(
                 {
@@ -525,6 +532,7 @@ class BibCb(DB.Model):
                 }
             )
         return ch
+        """
 
 
 class CorChStatus(DB.Model):
@@ -544,15 +552,14 @@ class CorImpactTypes(DB.Model):
 
     @staticmethod
     def get_impacts():
-        return (
-            DB.session.query(CorImpactTypes, TNomenclatures)
+        return DB.session.execute(
+            select(CorImpactTypes, TNomenclatures)
             .join(
                 TNomenclatures,
                 TNomenclatures.id_nomenclature == CorImpactTypes.id_impact,
             )
-            .filter(CorImpactTypes.active)
-            .all()
-        )
+            .where(CorImpactTypes.active)
+        ).all()
 
     #            and_(CorImpactTypes.id_impact_type == id_type, CorImpactTypes.active)).all()
     # def get_impact_type_list():
@@ -586,44 +593,42 @@ class CorMainFct(DB.Model):
 
     @staticmethod
     def get_functions(nomenc_ids):
-        return (
-            DB.session.query(CorMainFct, TNomenclatures)
+        return DB.session.execute(
+            select(CorMainFct, TNomenclatures)
             .join(TNomenclatures, TNomenclatures.id_nomenclature == CorMainFct.id_function)
-            .filter(CorMainFct.active)
-            .filter(CorMainFct.id_function.in_(nomenc_ids))
-            .all()
-        )
+            .where(CorMainFct.active, CorMainFct.id_function.in_(nomenc_ids))
+        ).all()
 
     @staticmethod
     def get_all_functions(nomenc_ids):
-        return (
-            DB.session.query(CorMainFct, TNomenclatures)
+        query = (
+            select(CorMainFct, TNomenclatures)
             .join(TNomenclatures, TNomenclatures.id_nomenclature == CorMainFct.id_function)
-            .filter(CorMainFct.id_function.in_(nomenc_ids))
-            .all()
+            .where(CorMainFct.id_function.in_(nomenc_ids))
         )
+        return DB.session.execute(query).all()
 
     @staticmethod
     def get_main_function_list(ids):
-        q_id_types = DB.session.query(func.distinct(CorMainFct.id_main_function)).all()
+        # méthode utilisée ?
+        q_id_types = DB.session.scalars(select(func.distinct(CorMainFct.id_main_function))).all()
         return [id[0] for id in q_id_types if id[0] in ids]
 
     @staticmethod
     def get_function_by_main_function(id_main):
-        return (
-            DB.session.query(CorMainFct, TNomenclatures)
+        # TODO: méthode utilisée ?
+        return DB.session.execute(
+            select(CorMainFct, TNomenclatures)
             .join(TNomenclatures, TNomenclatures.id_nomenclature == CorMainFct.id_function)
-            .filter(and_(CorMainFct.id_main_function == id_main, CorMainFct.active))
-            .all()
-        )
+            .where(and_(CorMainFct.id_main_function == id_main, CorMainFct.active))
+        ).all()
 
     @staticmethod
     def get_mnemo_type(id_type):
+        # TODO: methode utilisée ?
         if id_type:
-            return (
-                DB.session.query(TNomenclatures)
-                .filter(TNomenclatures.id_nomenclature == id_type)
-                .one()
+            return DB.session.scalar(
+                select(TNomenclatures).where(TNomenclatures.id_nomenclature == id_type)
             )
         else:
             return ""
@@ -657,11 +662,9 @@ class CorImpactList(DB.Model):
 
     @staticmethod
     def get_impacts_by_uuid(uuid_activity):
-        return (
-            DB.session.query(CorImpactList)
-            .filter(CorImpactList.id_impact_list == uuid_activity)
-            .all()
-        )
+        return DB.session.scalars(
+            select(CorImpactList).where(CorImpactList.id_impact_list == uuid_activity)
+        ).all()
 
 
 class TActivity(DB.Model):
@@ -741,13 +744,13 @@ class TFunctions(DB.Model):
                 for nomenclature in Nomenclatures.get_nomenclature_info("FONCTIONS_QUALIF")
             ]
 
-        return (
-            DB.session.query(TFunctions)
-            .filter(TFunctions.id_zh == id_zh)
-            .filter(TFunctions.id_function.in_(function_ids))
-            .filter(TFunctions.id_qualification.in_(qualif_ids))
-            .all()
-        )
+        return DB.session.scalars(
+            select(TFunctions).where(
+                TFunctions.id_zh == id_zh,
+                TFunctions.id_function.in_(function_ids),
+                TFunctions.id_qualification.in_(qualif_ids),
+            )
+        ).all()
 
 
 class THabHeritage(DB.Model):
@@ -773,21 +776,20 @@ class CorUrbanTypeRange(DB.Model):
 
     @staticmethod
     def get_range_by_doc(doc_id):
-        q_ranges = (
-            DB.session.query(CorUrbanTypeRange)
-            .filter(CorUrbanTypeRange.id_doc_type == doc_id)
-            .all()
-        )
+        q_ranges = DB.session.scalars(
+            select(CorUrbanTypeRange).where(CorUrbanTypeRange.id_doc_type == doc_id)
+        ).all()
         ranges = []
         for range in q_ranges:
             ranges.append(
                 {
                     "id_cor": range.id_cor,
                     "id_nomenclature": range.id_range_type,
-                    "mnemonique": DB.session.query(TNomenclatures)
-                    .filter(TNomenclatures.id_nomenclature == range.id_range_type)
-                    .one()
-                    .mnemonique,
+                    "mnemonique": DB.session.scalar(
+                        select(TNomenclatures.mnemonique).where(
+                            TNomenclatures.id_nomenclature == range.id_range_type
+                        )
+                    ),
                 }
             )
         return ranges
@@ -834,7 +836,7 @@ class BibActions(DB.Model):
 
     @staticmethod
     def get_bib_actions():
-        q_bib_actions = DB.session.query(BibActions).all()
+        q_bib_actions = DB.session.scalars(select(BibActions)).all()
         bib_actions_list = [bib_action.as_dict() for bib_action in q_bib_actions]
         return bib_actions_list
 
