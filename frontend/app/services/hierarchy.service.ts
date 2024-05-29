@@ -52,6 +52,10 @@ export class HierarchyService {
           this._toastr.warning("La ZH n'est présente dans aucun bassin versant", '', {
             closeButton: true,
           });
+        } else if (error.status === 400) {
+          this._toastr.warning(this._error['errors'].filter(i => error.error['message'] === i.api )[0].front, '', {
+            closeButton: true,
+          });
         }
       },
       () => {
