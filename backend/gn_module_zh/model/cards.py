@@ -672,7 +672,7 @@ class Status:
         refs = []
         for ref_infos in CorZhArea.get_ref_geo_info(self.id_zh, id_types):
             for info in ref_infos:
-                type_code = DB.session.get(BibAreasTypes, info.LAreas.id_type)
+                type_code = DB.session.get(BibAreasTypes, info.LAreas.id_type).type_code
                 refs.append(
                     {
                         "area_name": info.LAreas.area_name,
@@ -809,7 +809,7 @@ class UrbanDoc:
 
     def __str__(self):
         return {
-            "commune": DB.session.get(LAreas, self.id_area),
+            "commune": DB.session.get(LAreas, self.id_area).id_area,
             "type_doc": Utils.get_mnemo(self.id_doc_type),
             "type_classement": [
                 Utils.get_mnemo(
