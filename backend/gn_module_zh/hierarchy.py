@@ -1180,7 +1180,7 @@ class Hierarchy(ZH):
                 raise ZHApiError(
                     message="no_rb_rules",
                     details="no existing rules for the river basin",
-                    status_code=400
+                    status_code=400,
                 )
         except ZHApiError:
             raise
