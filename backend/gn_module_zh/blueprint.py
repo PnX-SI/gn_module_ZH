@@ -812,8 +812,9 @@ def write_csv(id_zh):
             tableName=blueprint.config[i]["table_name"],
             schemaName=blueprint.config[i]["schema_name"],
             filters={"id_zh": id_zh, "orderby": "id_zh"},
+            # TODO: limit=-1 when version 0.4.2 of Utils-Flask-SQLAlchemy will be released
         )
-        # TODO: change for limit=-1 when the next version of Utils-Flask-SQLAlchemy will be released
+
         results = query.return_query().get("items", [])
         current_date = dt.now()
         if results:
