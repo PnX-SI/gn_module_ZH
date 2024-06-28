@@ -1180,6 +1180,7 @@ class Hierarchy(ZH):
                 raise ZHApiError(
                     message="no_rb_rules",
                     details="no existing rules for the river basin",
+                    status_code=400,
                 )
         except ZHApiError:
             raise
@@ -1235,7 +1236,6 @@ def get_all_hierarchy_fields(id_rb: int):
         tableName="all_rb_rules",
         schemaName="pr_zh",
         filters={"id_rb": id_rb, "orderby": "name"},
-        limit=100000,
     )
 
     results = query.return_query()

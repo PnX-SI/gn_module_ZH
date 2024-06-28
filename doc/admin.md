@@ -26,12 +26,18 @@ Si l'administrateur désire qu'un inventaire n'apparaisse plus dans la section 6
 
 ## **5 - Téléchargement des listes de taxons**
 
+### Fonctionnement
+
 Lorsque l'utilisateur clique sur "générer la liste des espèces" dans l'onglet 5, l'application génère 3 fichiers csv correspondant aux taxons de flore, faune vertébrée et invertébrée protégés et observés au sein du périmètre de la zone humide. Voir la documentation utilisateur du module pour plus de détails sur les critères retenus pour la composition de cette liste. A noter qu’il s’agit d’une liste de taxons et non pas d’une liste d’occurrences de taxons (les observations liées à 1 taxon représentent donc 1 seule ligne). Chaque clic sur le bouton génère les fichiers, ces derniers étant stockés sur le serveur (et donc constamment disponibles au téléchargement) dans le dossier `static`.  
 
-Par défaut, les 3 vues (`vertebrates_view_name`, `invertebrates_view_name` et `flore_view_name`) sont paramétrées pour : 
+Par défaut, les 3 vues matérialisées (`vertebrates_view_name`, `invertebrates_view_name` et `flore_view_name`) sont paramétrées pour : 
 
-- lister les taxons présents dans la synthèse GeoNature de l'instance sur laquelle est déployé le module ZH. Les vues utilisent donc la table `gn_synthese.synthese` en base de données. 
+- lister les taxons présents dans la synthèse GeoNature de l'instance sur laquelle est déployé le module ZH. Les vues matérialisées utilisent donc la table `gn_synthese.synthese` en base de données. 
 - utiliser les statuts d’évaluation, protection et menace listés dans la table `taxonomie.bdc_statut`
+
+![columns](taxons.png)
+
+### Changer la source des données
 
 Si l'administrateur veut changer la source de données, par exemple se brancher sur la synthèse d'une autre instance en configurant un foreign data wrapper, il devra supprimer les vues déjà existantes en base de données puis les recréer en respectant leur structure :
 
@@ -52,9 +58,17 @@ Si l'administrateur veut changer la source de données, par exemple se brancher 
 
 L’association `id_zh`/`cd_nom` doit être unique puisque la vue liste les taxons protégés présents dans chaque zone humide.  
 
-Le script `data/script_create_taxon_view.sh` permet d’aider la génération des vues en indiquant la table source des occurrences de taxons et la table listant les statuts d’évaluation, protection et menaces. Etant donné que par défaut les vues sont construites sur la base de la structure des tables `gn_synthese.synthese` et `taxonomie.bdc_statut` de GeoNature, ce script fonctionne de manière optimale en utilisant des sources de données dont la structure est identique, c’est-à-dire provenant de GeoNature, que ce soit en local (= l’instance sur laquelle est installé le module ZH) ou à l’extérieur (ex : un foreign data wrapper vers les données d’un autre GeoNature). Si l’administrateur désire utiliser d’autres sources de données structurées différemment, il devra modifier le code sql de ce script pour obtenir la structure attendue (décrite ci-dessus) des vues.
+Le script `data/script_create_taxon_view.sh` permet d’aider la génération des vues matérialisées en indiquant la table source des occurrences de taxons et la table listant les statuts d’évaluation, protection et menaces. Etant donné que par défaut les vues matérialisées sont construites sur la base de la structure des tables `gn_synthese.synthese` et `taxonomie.bdc_statut` de GeoNature, ce script fonctionne de manière optimale en utilisant des sources de données dont la structure est identique, c’est-à-dire provenant de GeoNature, que ce soit en local (= l’instance sur laquelle est installé le module ZH) ou à l’extérieur (ex : un foreign data wrapper vers les données d’un autre GeoNature). Si l’administrateur désire utiliser d’autres sources de données structurées différemment, il devra modifier le code sql de ce script pour obtenir la structure attendue (décrite ci-dessus) des vues.
 
-![columns](taxons.png)
+### Rafraichissement des vues matérialisées
+
+Les vues matérisalisées sont mises à jour automatiquement à fréquence définie, par défaut toutes les 12 heures. Si toutefois, vous souhaitez diminuer ou augmenter la durée entre chaque mise à jour, définissez cette dernière dans le fichier de configuration (``zones_humides_config.toml``) dans la variable ``TAXON_VM_CRONTAB``.
+  
+     TAXON_VM_CRONTAB ="0 0,12 * * *"
+
+Ce paramètre est composé de cinq valeurs, chacune séparée par un espace: minute, heure, jour du mois, mois de l'année, journée de la semaine. Dans l'exemple ci-dessus, il est indiqué que la mise à jour sera effectuée toutes les 12 heures. Pour plus d'informations, vous pouvez consulter la documentation de Celery à ce sujet : https://docs.celeryq.dev/en/stable/userguide/periodic-tasks.html#crontab-schedules.
+
+**Note** : Si vous ne voulez pas définir un des paramètres de périodicité, utilisez un astérisque (``*``).
 
 ## **6- Les ressources documentaires**
 
