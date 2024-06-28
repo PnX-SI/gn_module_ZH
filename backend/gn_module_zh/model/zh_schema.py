@@ -306,7 +306,7 @@ class TZH(ZhModel):
     def bassin_versant(self):
         bassin_versant = [
             name
-            for name in DB.session.execute(
+            for name in DB.session.scalars(
                 select(TRiverBasin.name).where(
                     TRiverBasin.id_rb == CorZhRb.id_rb, CorZhRb.id_zh == self.id_zh
                 )
