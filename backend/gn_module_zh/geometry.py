@@ -4,6 +4,8 @@ from geoalchemy2.shape import to_shape
 from geonature.utils.env import DB
 from sqlalchemy import func
 from sqlalchemy.sql import select, func
+from sqlalchemy.orm import aliased
+
 from werkzeug.exceptions import BadRequest
 
 from .api_error import ZHApiError
@@ -81,14 +83,16 @@ def get_main_rb(query: list) -> int:
     area = 0
     for q_ in query:
         zh_polygon = DB.session.execute(
-            select(TZH.geom).where(TZH.id_zh == getattr(q_, "id_zh")).first()
-        )
+            select(TZH.geom).where(TZH.id_zh == getattr(q_, "id_zh"))
+        ).scalar_one()
+
         rb_polygon = DB.session.execute(
             select(TRiverBasin.geom)
+            .select_from(CorZhRb)
             .join(TRiverBasin, TRiverBasin.id_rb == CorZhRb.id_rb)
             .where(TRiverBasin.id_rb == getattr(q_, "id_rb"))
-            .first()
-        )
+            .limit(1)
+        ).scalar_one()
 
         intersection = DB.session.scalar(
             select(
