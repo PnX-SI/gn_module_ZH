@@ -5,6 +5,7 @@ Revises: 01cb1aaa2062
 Create Date: 2023-03-27 13:32:22.741263
 
 """
+
 import importlib
 
 from alembic import op
@@ -27,4 +28,7 @@ def upgrade():
 
 
 def downgrade():
-    pass
+    data = text(
+        importlib.resources.read_text("gn_module_zh.migrations.data", "delete_fake_data.sql")
+    )
+    op.get_bind().execute(data)

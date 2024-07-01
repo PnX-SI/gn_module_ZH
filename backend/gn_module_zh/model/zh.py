@@ -1,5 +1,6 @@
 # instance de la BDD
 from geonature.utils.env import DB
+from sqlalchemy.sql import select
 
 from .zh_schema import (
     TZH,
@@ -32,11 +33,11 @@ class ZH(TZH):
     __abstract__ = True
 
     def __init__(self, id_zh):
-        self.zh = DB.session.query(TZH).filter(TZH.id_zh == id_zh).one()
+        self.zh = DB.session.get(TZH, id_zh)
 
     @staticmethod
     def get_data_by_id(table_name, id_zh):
-        return DB.session.query(table_name).filter(table_name.id_zh == id_zh).all()
+        return DB.session.scalars(select(table_name).where(table_name.id_zh == id_zh)).all()
 
     def get_id_lims(self):
         lim_list = CorLimList.get_lims_by_id(self.zh.id_lim_list)
@@ -141,11 +142,11 @@ class ZH(TZH):
         q_management_structures = ZH.get_data_by_id(TManagementStructures, self.zh.id_zh)
         managements = []
         for management in q_management_structures:
-            q_management_plans = (
-                DB.session.query(TManagementPlans)
-                .filter(TManagementPlans.id_structure == management.id_structure)
-                .all()
-            )
+            q_management_plans = DB.session.scalars(
+                select(TManagementPlans).where(
+                    TManagementPlans.id_structure == management.id_structure
+                )
+            ).all()
             plans = []
             if q_management_plans:
                 for plan in q_management_plans:
@@ -165,9 +166,11 @@ class ZH(TZH):
             "instruments": [
                 {
                     "id_instrument": instrument.id_instrument,
-                    "instrument_date": instrument.instrument_date.date().strftime("%d/%m/%Y")
-                    if instrument.instrument_date
-                    else None,
+                    "instrument_date": (
+                        instrument.instrument_date.date().strftime("%d/%m/%Y")
+                        if instrument.instrument_date
+                        else None
+                    ),
                 }
                 for instrument in ZH.get_data_by_id(TInstruments, self.zh.id_zh)
             ]
@@ -176,10 +179,11 @@ class ZH(TZH):
     def get_protections(self):
         return {
             "protections": [
-                DB.session.query(CorProtectionLevelType)
-                .filter(CorProtectionLevelType.id_protection == protec)
-                .one()
-                .id_protection_status
+                DB.session.execute(
+                    select(CorProtectionLevelType.id_protection_status).where(
+                        CorProtectionLevelType.id_protection == protec
+                    )
+                ).scalar_one()
                 for protec in [
                     protection.id_protection
                     for protection in ZH.get_data_by_id(CorZhProtection, self.zh.id_zh)
@@ -195,9 +199,9 @@ class ZH(TZH):
                     "id_doc_type": urban_doc.id_doc_type,
                     "id_cors": [
                         doc.id_cor
-                        for doc in DB.session.query(CorZhDocRange)
-                        .filter(CorZhDocRange.id_doc == urban_doc.id_doc)
-                        .all()
+                        for doc in DB.session.scalars(
+                            select(CorZhDocRange).where(CorZhDocRange.id_doc == urban_doc.id_doc)
+                        ).all()
                     ],
                     "remark": urban_doc.remark,
                 }
@@ -250,9 +254,9 @@ class ZH(TZH):
         for municipality in query:
             if municipality.LiMunicipalities.insee_reg not in region_list:
                 region_list.append(municipality.LiMunicipalities.insee_reg)
-        q_region = (
-            DB.session.query(InseeRegions).filter(InseeRegions.insee_reg.in_(region_list)).all()
-        )
+        q_region = DB.session.scalars(
+            select(InseeRegions).where(InseeRegions.insee_reg.in_(region_list))
+        ).all()
         regions = [region.region_name for region in q_region]
         return regions
 

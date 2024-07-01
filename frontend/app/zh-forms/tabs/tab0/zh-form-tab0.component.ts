@@ -5,7 +5,6 @@ import { Subscription } from 'rxjs';
 import { GeoJSON } from 'leaflet';
 import * as L from 'leaflet';
 import { MapService } from '@geonature_common/map/map.service';
-import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { ToastrService } from 'ngx-toastr';
 import { ZhDataService } from '../../../services/zh-data.service';
 import { TabsService } from '../../../services/tabs.service';
@@ -30,7 +29,6 @@ export class ZhFormTab0Component implements OnInit {
   public critDelim: any;
   public sdage: any;
   public idOrg: any;
-  public dropdownSettings: IDropdownSettings;
   public $_geojsonSub: Subscription;
   public $_currentZhSub: Subscription;
   private geometry: any;
@@ -53,15 +51,6 @@ export class ZhFormTab0Component implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.dropdownSettings = {
-      singleSelection: false,
-      idField: 'id_nomenclature',
-      textField: 'mnemonique',
-      searchPlaceholderText: 'Rechercher',
-      enableCheckAll: false,
-      allowSearchFilter: true,
-    };
-
     this.getMetaData();
     this.createForm();
 

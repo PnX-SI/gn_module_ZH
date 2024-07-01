@@ -47,7 +47,7 @@ export class ZhFormTab1Component implements OnInit {
     private _tabService: TabsService,
     private _error: ErrorTranslatorService,
     public ngbModal: NgbModal,
-    private _config: ConfigService,
+    private _config: ConfigService
   ) {}
 
   ngOnInit() {
@@ -168,7 +168,7 @@ export class ZhFormTab1Component implements OnInit {
           this._toastr.error(frontMsg, '', {
             positionClass: 'toast-top-right',
           });
-        },
+        }
       );
     }
   }
@@ -182,13 +182,13 @@ export class ZhFormTab1Component implements OnInit {
           map((res: any) =>
             res.filter((r) => {
               return !this.listBib.map((bib) => bib.id_reference).includes(r.id_reference);
-            }),
+            })
           ),
           catchError(() => {
             return of([]);
-          }),
-        ),
-      ),
+          })
+        )
+      )
     );
 
   formatter = (result: any) => `${result.title}`;

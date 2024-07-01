@@ -3,6 +3,7 @@ from werkzeug.exceptions import NotFound
 
 from ref_geo.models import BibAreasTypes, LAreas
 from geonature.utils.env import DB
+from sqlalchemy.sql import select
 from pypn_habref_api.models import Habref
 from pypnnomenclature.models import TNomenclatures
 
@@ -31,17 +32,15 @@ class Utils(ZH):
     def get_mnemo(ids):
         if ids:
             if type(ids) is int:
-                return (
-                    DB.session.query(TNomenclatures)
-                    .filter(TNomenclatures.id_nomenclature == ids)
-                    .one()
-                    .label_default
+                return DB.session.scalar(
+                    select(TNomenclatures.label_default).where(
+                        TNomenclatures.id_nomenclature == ids
+                    )
                 )
             return [
-                DB.session.query(TNomenclatures)
-                .filter(TNomenclatures.id_nomenclature == id)
-                .one()
-                .label_default
+                DB.session.scalar(
+                    select(TNomenclatures.label_default).where(TNomenclatures.id_nomenclature == id)
+                )
                 for id in ids
             ]
         return []
@@ -50,18 +49,16 @@ class Utils(ZH):
     def get_cd_and_mnemo(ids):
         if ids:
             if type(ids) is int:
-                result = (
-                    DB.session.query(TNomenclatures)
-                    .filter(TNomenclatures.id_nomenclature == ids)
-                    .one()
-                )
+                result = DB.session.execute(
+                    select(TNomenclatures).where(TNomenclatures.id_nomenclature == ids)
+                ).scalar_one()
                 return (result.cd_nomenclature, result.label_default)
 
-            return (
-                DB.session.query(TNomenclatures.cd_nomenclature, TNomenclatures.label_default)
-                .filter(TNomenclatures.id_nomenclature.in_(ids))
-                .all()
-            )
+            return DB.session.execute(
+                select(TNomenclatures.cd_nomenclature, TNomenclatures.label_default).where(
+                    TNomenclatures.id_nomenclature.in_(ids)
+                )
+            ).all()
 
         return []
 
@@ -207,9 +204,7 @@ class Author:
             if getattr(self.zh, type).prenom_role is not None
             else ""
         )
-        nom = (
-            getattr(self.zh, type).nom_role if getattr(self.zh, type).nom_role is not None else ""
-        )
+        nom = getattr(self.zh, type).nom_role if getattr(self.zh, type).nom_role is not None else ""
         return prenom + " " + nom.upper()
 
     def __get_organism(self, type="authors"):
@@ -382,23 +377,19 @@ class HabHeritage:
         self.hab_cover: int = hab_cover
 
     def __str__(self):
-        hab_biotope = (
-            DB.session.query(Habref)
-            .filter(Habref.lb_code == self.id_corine_bio)
-            .filter(Habref.cd_typo == 22)
-            .one()
-        )
+        hab_biotope = DB.session.execute(
+            select(Habref).where(Habref.lb_code == self.id_corine_bio).where(Habref.cd_typo == 22)
+        ).scalar_one()
         biotope_lb_hab_fr = hab_biotope.lb_hab_fr
         biotope_lb_code = hab_biotope.lb_code
-        cahier = DB.session.query(Habref).filter(Habref.cd_hab == self.id_cahier_hab).one()
+        cahier = DB.session.execute(
+            select(Habref).where(Habref.cd_hab == self.id_cahier_hab)
+        ).scalar_one()
         cahier_lb_hab_fr = cahier.lb_hab_fr
         cahier_lb_code = cahier.lb_code
-        priority = (
-            DB.session.query(CorChStatus)
-            .filter(CorChStatus.lb_code == cahier_lb_code)
-            .one()
-            .priority
-        )
+        priority = DB.session.execute(
+            select(CorChStatus.priority).where(CorChStatus.lb_code == cahier_lb_code).distinct()
+        ).scalar_one()
         return {
             "biotope": biotope_lb_code + " - " + biotope_lb_hab_fr,
             "etat": Utils.get_mnemo(self.id_preservation_state),
@@ -485,8 +476,7 @@ class Description:
         return {
             "presentation": self.presentation.__str__(),
             "espace": [
-                f"{cd} - {label}"
-                for cd, label in Utils.get_cd_and_mnemo(self.id_corine_landcovers)
+                f"{cd} - {label}" for cd, label in Utils.get_cd_and_mnemo(self.id_corine_landcovers)
             ],
             "usage": self.use.__str__(),
             "basin": self.basin.__str__(),
@@ -505,22 +495,25 @@ class Basin:
             "hydros": self.hydro_zones,
         }
 
+    # TODO: replace in "where with multiples conditions" the coma by AND
     def __get_river_basins(self):
         return [
             name
-            for (name,) in DB.session.query(TRiverBasin.name)
-            .filter(TRiverBasin.id_rb == CorZhRb.id_rb)
-            .filter(CorZhRb.id_zh == self.id_zh)
-            .all()
+            for (name,) in DB.session.execute(
+                select(TRiverBasin.name).where(
+                    TRiverBasin.id_rb == CorZhRb.id_rb, CorZhRb.id_zh == self.id_zh
+                )
+            ).all()
         ]
 
     def __get_hydro_zones(self):
         return [
             name
-            for (name,) in DB.session.query(THydroArea.name)
-            .filter(THydroArea.id_hydro == CorZhHydro.id_hydro)
-            .filter(CorZhHydro.id_zh == self.id_zh)
-            .distinct()
+            for name in DB.session.execute(
+                select(THydroArea.name)
+                .where(THydroArea.id_hydro == CorZhHydro.id_hydro, CorZhHydro.id_zh == self.id_zh)
+                .distinct()
+            ).all()
         ]
 
 
@@ -677,19 +670,14 @@ class Status:
     def other_ref_geo(self, ref_geo):
         id_types = CorZhArea.get_id_types_ref_geo(self.id_zh, ref_geo)
         refs = []
-        for ref in CorZhArea.get_ref_geo_info(self.id_zh, id_types):
-            for i in ref:
-                type_code = (
-                    DB.session.query(BibAreasTypes)
-                    .filter(BibAreasTypes.id_type == i.LAreas.id_type)
-                    .one()
-                    .type_code
-                )
+        for ref_infos in CorZhArea.get_ref_geo_info(self.id_zh, id_types):
+            for info in ref_infos:
+                type_code = DB.session.get(BibAreasTypes, info.LAreas.id_type).type_code
                 refs.append(
                     {
-                        "area_name": i.LAreas.area_name,
-                        "area_code": i.LAreas.area_code,
-                        "url": i.LAreas.source,
+                        "area_name": info.LAreas.area_name,
+                        "area_code": info.LAreas.area_code,
+                        "url": info.LAreas.source,
                         "type_code": type_code,
                         "zh_type_name": [
                             ref["zh_name"]
@@ -725,11 +713,11 @@ class Status:
         self.__protections: list(int) = protections
 
     def __str_protections(self):
-        q_protections = (
-            DB.session.query(CorProtectionLevelType)
-            .filter(CorProtectionLevelType.id_protection_status.in_(self.protections))
-            .all()
-        )
+        q_protections = DB.session.scalars(
+            select(CorProtectionLevelType).where(
+                CorProtectionLevelType.id_protection_status.in_(self.protections)
+            )
+        ).all()
         temp = [
             {
                 "status": Utils.get_mnemo(protection.id_protection_status),
@@ -780,10 +768,9 @@ class Management:
 
     def __str__(self):
         return {
-            "structure": DB.session.query(BibOrganismes)
-            .filter(BibOrganismes.id_org == self.id_org)
-            .one()
-            .name,
+            "structure": DB.session.scalar(
+                select(BibOrganismes.name).where(BibOrganismes.id_org == self.id_org)
+            ),
             "plans": [plan.__str__() for plan in self.plans],
         }
 
@@ -822,17 +809,15 @@ class UrbanDoc:
 
     def __str__(self):
         return {
-            "commune": DB.session.query(LAreas)
-            .filter(LAreas.id_area == self.id_area)
-            .one()
-            .area_name,
+            "commune": DB.session.get(LAreas, self.id_area).id_area,
             "type_doc": Utils.get_mnemo(self.id_doc_type),
             "type_classement": [
                 Utils.get_mnemo(
-                    DB.session.query(CorUrbanTypeRange)
-                    .filter(CorUrbanTypeRange.id_cor == id)
-                    .one()
-                    .id_range_type
+                    DB.session.scalar(
+                        select(CorUrbanTypeRange.id_range_type).where(
+                            CorUrbanTypeRange.id_cor == id
+                        )
+                    )
                 )
                 for id in self.id_cors
             ],
@@ -868,9 +853,7 @@ class EvalMainFunction:
     @hydro.setter
     def hydro(self, val):
         self.__hydro = [
-            Function(
-                v["id_function"], v["id_qualification"], v["id_knowledge"], v["justification"]
-            )
+            Function(v["id_function"], v["id_qualification"], v["id_knowledge"], v["justification"])
             for v in val
         ]
 
@@ -881,9 +864,7 @@ class EvalMainFunction:
     @bio.setter
     def bio(self, value):
         self.__bio = [
-            Function(
-                v["id_function"], v["id_qualification"], v["id_knowledge"], v["justification"]
-            )
+            Function(v["id_function"], v["id_qualification"], v["id_knowledge"], v["justification"])
             for v in value
         ]
 
@@ -911,9 +892,7 @@ class EvalInterest:
     @interet_patrim.setter
     def interet_patrim(self, val):
         self.__interet_patrim = [
-            Function(
-                i["id_function"], i["id_qualification"], i["id_knowledge"], i["justification"]
-            )
+            Function(i["id_function"], i["id_qualification"], i["id_knowledge"], i["justification"])
             for i in val
         ]
 
@@ -924,18 +903,14 @@ class EvalInterest:
     @val_soc_eco.setter
     def val_soc_eco(self, val):
         self.__val_soc_eco = [
-            Function(
-                i["id_function"], i["id_qualification"], i["id_knowledge"], i["justification"]
-            )
+            Function(i["id_function"], i["id_qualification"], i["id_knowledge"], i["justification"])
             for i in val
         ]
 
     @interet_patrim.setter
     def interet_patrim(self, val):
         self.__interet_patrim = [
-            Function(
-                i["id_function"], i["id_qualification"], i["id_knowledge"], i["justification"]
-            )
+            Function(i["id_function"], i["id_qualification"], i["id_knowledge"], i["justification"])
             for i in val
         ]
 
@@ -1022,10 +997,7 @@ class Action:
 
     def __str__(self):
         return {
-            "proposition": DB.session.query(BibActions)
-            .filter(BibActions.id_action == self.id_action)
-            .one()
-            .name,
+            "proposition": DB.session.get(BibActions, self.id_action).name,
             "niveau": Utils.get_mnemo(self.id_priority_level),
             "remarque": Utils.get_string(self.remark),
         }
@@ -1092,7 +1064,7 @@ class Card(ZH):
         self.info.localisation = Localisation(
             self.id_zh,
             self.properties["geo_info"]["regions"],
-            self.properties["geo_info"]["departments"]
+            self.properties["geo_info"]["departments"],
             # self.ref_geo_config
         )
 
@@ -1211,7 +1183,7 @@ class Card(ZH):
         return self.status.__str__()
 
     def __set_hierarchy(self):
-        return self.hierarchy.__str__() if self.hierarchy is not None else None
+        return self.hierarchy.as_dict() if self.hierarchy is not None else None
 
     def __set_evaluation(self):
         self.__set_main_functions()

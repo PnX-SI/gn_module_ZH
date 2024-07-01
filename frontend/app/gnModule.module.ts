@@ -5,7 +5,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { GN2CommonModule } from '@geonature_common/GN2Common.module';
 import { MapListService } from '@geonature_common/map-list/map-list.service';
 import { ZhDetailsModule } from './zh-details/zh-details.module';
-import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 //Components
 import { ZhMapListComponent } from './zh-map-list/zh-map-list.component';
 import { ZhFormMapComponent } from './zh-forms/map/map.component';
@@ -57,7 +56,6 @@ const routes: Routes = [
     GN2CommonModule,
     CommonModule,
     RouterModule.forChild(routes),
-    NgMultiSelectDropDownModule.forRoot(),
     NgbModule,
     ZhDetailsModule,
     ZhSearchModule,

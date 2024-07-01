@@ -13,37 +13,9 @@ export class ZhAdvancedSearchFonctionsComponent implements OnInit {
   @Input() title: string = '';
   @Input() fonctionLabel: string = 'Fonction';
   @Input() form: FormGroup;
-  public dropdownSettings: {};
-  public dropdownSettingsNoCategory: {};
+  // public dropdownSettings: {};
+  // public dropdownSettingsNoCategory: {};
   constructor() {}
 
-  ngOnInit() {
-    this.dropdownSettings = {
-      enableCheckAll: false,
-      text: 'Sélectionner',
-      labelKey: 'mnemonique',
-      primaryKey: 'id_nomenclature',
-      searchPlaceholderText: 'Rechercher',
-      enableSearchFilter: true,
-      position: 'bottom',
-      autoPosition: false,
-    };
-    this.dropdownSettingsNoCategory = {
-      enableCheckAll: false,
-      text: 'Sélectionner',
-      labelKey: 'mnemonique',
-      primaryKey: 'id_nomenclature',
-      autoPosition: false,
-    };
-  }
-
-  onDeSelectAllFcts() {
-    this.form.get('functions').reset();
-  }
-  onDeSelectAllQual() {
-    this.form.get('qualifications').reset();
-  }
-  onDeSelectAllConn() {
-    this.form.get('connaissances').reset();
-  }
+  ngOnInit() {}
 }

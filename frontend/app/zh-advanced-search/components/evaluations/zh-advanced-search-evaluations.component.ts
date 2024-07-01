@@ -12,29 +12,7 @@ export class ZhAdvancedSearchEvaluationsComponent implements OnInit {
   @Input() bios: [];
   @Input() menaces: [];
 
-  public dropdownSettings: {};
   constructor() {}
 
-  ngOnInit() {
-    this.dropdownSettings = {
-      enableCheckAll: false,
-      text: 'Sélectionner',
-      labelKey: 'mnemonique',
-      primaryKey: 'id_nomenclature',
-      searchPlaceholderText: 'Rechercher',
-      enableSearchFilter: true,
-      autoPosition: false,
-      position: 'bottom',
-    };
-  }
-
-  onDeSelectAllHydro() {
-    this.form.get('hydros').reset();
-  }
-  onDeSelectAllBio() {
-    this.form.get('bios').reset();
-  }
-  onDeSelectAllMenaces() {
-    this.form.get('menaces').reset();
-  }
+  ngOnInit() {}
 }

@@ -113,7 +113,6 @@ export class ZhFormTab6Component implements OnInit {
   ];
 
   public dropdownSettings: any;
-  public multiselectTypeClassement: any;
   public organismDropdownSettings: {
     enableSearchFilter: boolean;
     singleSelection: boolean;
@@ -141,36 +140,6 @@ export class ZhFormTab6Component implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.multiselectTypeClassement = {
-      singleSelection: false,
-      idField: 'id_cor',
-      textField: 'mnemonique',
-      searchPlaceholderText: 'Rechercher',
-      enableCheckAll: false,
-      allowSearchFilter: true,
-    };
-    this.organismDropdownSettings = {
-      enableSearchFilter: true,
-      singleSelection: true,
-      text: 'Sélectionner un organisme',
-      labelKey: 'name',
-      primaryKey: 'id_org',
-      enableFilterSelectAll: false,
-      noDataLabel: 'Aucun organisme disponible',
-    };
-    this.dropdownSettings = {
-      enableCheckAll: false,
-      text: 'Selectionner',
-      labelKey: 'mnemonique_status',
-      primaryKey: 'id_protection_status',
-      searchPlaceholderText: 'Rechercher',
-      enableSearchFilter: true,
-      groupBy: 'category',
-      autoposition: false,
-      position: 'top',
-      maxHeight: 190,
-    };
-
     this.getMetaData();
     this.initForms();
 
@@ -725,9 +694,9 @@ export class ZhFormTab6Component implements OnInit {
 
   onAddStructure() {
     // multi select : returns an Array...
-    const structure = this.formTab6.value.structure[0];
+    const structure = this.formTab6.value.structure;
     if (structure) {
-      let itemExist = this.managements.some((item) => item.id_org == structure.id_org);
+      const itemExist = this.managements.some((item) => item.id_org == structure.id_org);
       if (!itemExist && structure.id_org) {
         this.managements.push(structure);
       }
@@ -1041,8 +1010,8 @@ export class ZhFormTab6Component implements OnInit {
       a.area.municipality_name > b.area.municipality_name
         ? 1
         : b.area.municipality_name > a.area.municipality_name
-        ? -1
-        : 0
+          ? -1
+          : 0
     );
   }
 

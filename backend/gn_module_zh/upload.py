@@ -4,6 +4,7 @@ from pathlib import Path
 
 from geonature.core.gn_commons.models import TMedias
 from geonature.utils.env import DB, ROOT_DIR
+from sqlalchemy.sql import update, select
 from werkzeug.utils import secure_filename
 
 from .api_error import ZHApiError
@@ -101,8 +102,8 @@ def upload(request, extensions, pdf_size, jpg_size, upload_path, module_name, id
             return {"error": "ERROR_WHILE_LOADING_FILE"}
 
         # update TMedias.media_path with media_filename
-        DB.session.query(TMedias).filter(TMedias.id_media == id_media).update(
-            {"media_path": str(media_path)}
+        DB.session.execute(
+            update(TMedias).where(TMedias.id_media == id_media).values(media_path=str(media_path))
         )
 
         update_file_extension(id_media, extension)
@@ -112,8 +113,8 @@ def upload(request, extensions, pdf_size, jpg_size, upload_path, module_name, id
     return {
         "file_name": get_file_path(id_media).name,
         "full_path": str(get_file_path(id_media)),
-        "media_path": getattr(
-            DB.session.query(TMedias).filter(TMedias.id_media == id_media).one(), "media_path"
+        "media_path": DB.session.scalar(
+            select(TMedias.media_path).where(TMedias.id_media == id_media)
         ),
         "extension": get_extension(get_file_path(id_media).name),
     }

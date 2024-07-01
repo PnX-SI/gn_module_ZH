@@ -3,25 +3,12 @@
     <zh-label [label]="label"> </zh-label>
   </div>
   <div class="form-group col-md-7 customselect">
-    <angular2-multiselect
-      [settings]="dropdownSettings"
-      [data]="data"
-      [formControl]="form"
-      (onDeSelect)="onDeselect()"
-      (onDeSelectAll)="onDeselect()"
-    >
-      <ng-container *ngIf="displayCode">
-        <c-badge>
-          <ng-template let-item="item">
-            <label>{{ item.name }} ({{ item.code }})</label>
-          </ng-template>
-        </c-badge>
-        <c-item>
-          <ng-template let-item="item">
-            <label>{{ item.name }} ({{ item.code }})</label>
-          </ng-template>
-        </c-item>
-      </ng-container>
-    </angular2-multiselect>
+    <zh-multiselect 
+      [values]="data"
+      [parentFormControl]="form"
+      [multiple]="false"
+      keyLabel="name"
+      (change)="onSelected.emit($event)"
+    />
   </div>
 </div>

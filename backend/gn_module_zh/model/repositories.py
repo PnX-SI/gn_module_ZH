@@ -1,5 +1,6 @@
 from geonature.utils.env import DB
 from werkzeug.exceptions import NotFound
+from sqlalchemy.sql import select
 
 
 class ZhRepository:
@@ -17,7 +18,7 @@ class ZhRepository:
          - id_zh: integer
          - info_user: TRole object model"""
         level = user_cruved["D"]
-        zh = DB.session.query(self.model).get(id_zh)
+        zh = DB.session.get(self.model, id_zh)
         if zh:
             zh = zh.get_zh_if_allowed(user, "D", level)
             DB.session.delete(zh)

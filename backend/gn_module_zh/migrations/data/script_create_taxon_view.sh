@@ -33,7 +33,7 @@ for val in ${ViewArray[@]}; do
         branch="taxref.phylum != 'Chordata' AND taxref.regne = 'Animalia'"
     fi
     query=("
-        CREATE OR REPLACE VIEW pr_zh.$val AS
+        CREATE MATERIALIZED VIEW pr_zh.vm_$val AS
             WITH 
                 synthese_taxa AS (
                     SELECT 

@@ -74,13 +74,11 @@ export class ZhFormTab3Component implements OnInit {
   listCorinBio = [];
   posted: boolean = false;
   patchActivity: boolean = false;
-  dropdownSettings: any;
   activityForm: FormGroup;
   modalButtonLabel: string;
   modalTitle: string;
 
   selectedItems = [];
-  settings = {};
   listActivity: any = [];
   activitiesInput: any = [];
   submitted: boolean;
@@ -97,26 +95,6 @@ export class ZhFormTab3Component implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.dropdownSettings = {
-      singleSelection: false,
-      idField: 'id_nomenclature',
-      textField: 'mnemonique',
-      searchPlaceholderText: 'Rechercher',
-      enableCheckAll: false,
-      allowSearchFilter: true,
-      maxHeight: 300,
-    };
-
-    this.settings = {
-      enableCheckAll: false,
-      text: 'Selectionner',
-      labelKey: 'mnemonique',
-      primaryKey: 'id_nomenclature',
-      searchPlaceholderText: 'Rechercher',
-      enableSearchFilter: true,
-      groupBy: 'category',
-    };
-
     this.activityForm = this.fb.group({
       human_activity: [null, Validators.required],
       localisation: [null, Validators.required],
@@ -469,8 +447,8 @@ export class ZhFormTab3Component implements OnInit {
       a.human_activity.mnemonique.slice(0, 2) > b.human_activity.mnemonique.slice(0, 2)
         ? 1
         : b.human_activity.mnemonique.slice(0, 2) > a.human_activity.mnemonique.slice(0, 2)
-        ? -1
-        : 0
+          ? -1
+          : 0
     );
   }
 
@@ -480,8 +458,8 @@ export class ZhFormTab3Component implements OnInit {
         a.mnemonique.slice(0, 2) > b.mnemonique.slice(0, 2)
           ? 1
           : b.mnemonique.slice(0, 2) > a.mnemonique.slice(0, 2)
-          ? -1
-          : 0
+            ? -1
+            : 0
       );
     }
     return impacts;

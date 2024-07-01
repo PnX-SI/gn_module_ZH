@@ -1,6 +1,6 @@
 <div class="container-fluid">
   <mat-drawer-container [hasBackdrop]="false" [autosize]="true">
-    <mat-drawer #drawer mode="push">
+    <mat-drawer #drawer mode="push" [opened]="false">
       <zh-search
         [data]="metaData"
         (onClose)="drawer.close()"
