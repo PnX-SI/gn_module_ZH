@@ -499,7 +499,7 @@ class Basin:
     def __get_river_basins(self):
         return [
             name
-            for name in DB.session.execute(
+            for (name,) in DB.session.execute(
                 select(TRiverBasin.name).where(
                     TRiverBasin.id_rb == CorZhRb.id_rb, CorZhRb.id_zh == self.id_zh
                 )
