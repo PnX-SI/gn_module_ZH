@@ -44,7 +44,7 @@ def set_geom(geometry, id_zh=None):
         if zh.id_zh != id_zh:
             zh_geom = DB.session.scalar(select(func.ST_GeogFromWKB(func.ST_AsEWKB(zh.geom))))
             polygon_geom = DB.session.scalar(
-                select(func.ST_GeogFromWKB(func.ST_AsEWKB(str(geometry))))
+                select(func.ST_GeogFromWKB(func.ST_AsEWKB(func.ST_GeomFromGeoJSON(str(geometry)))))
             )
             if DB.session.scalar(select(func.ST_Intersects(polygon_geom, zh_geom))):
                 if DB.session.scalar(
