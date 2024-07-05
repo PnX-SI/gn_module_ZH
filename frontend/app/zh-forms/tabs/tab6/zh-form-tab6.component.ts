@@ -60,7 +60,6 @@ export class ZhFormTab6Component implements OnInit {
   private $_currentZhSub: Subscription;
   private $_fromChangeSub: Subscription;
   private $_getTabChangeSub: Subscription;
-  public selectedItems = [];
   default_status: string = 'Indéterminé';
 
   readonly urbanColSize: string = '15%';
