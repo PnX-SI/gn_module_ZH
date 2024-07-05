@@ -61,7 +61,19 @@ def set_geom(geometry, id_zh=None):
             ):
                 raise BadRequest("La ZH est entièrement dans une ZH existante")
                 # TODO: not detected if contained entirely in 2 or more ZH polygons
+            if DB.session.scalar(
+                select(
+                    func.ST_Contains(
+                        polygon_geom,
+                        zh_geom,
+                    )
+                )
+            ):
+                raise BadRequest("La ZH englobe complètement une ZH existante")
+                # TODO: not detected if contained entirely in 2 or more ZH polygons
+
             polygon = DB.session.scalar(select(func.ST_Difference(polygon_geom, zh_geom)))
+
     return {"polygon": polygon, "is_intersected": is_intersected}
 
 
