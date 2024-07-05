@@ -24,13 +24,13 @@ def set_geom(geometry, id_zh=None):
         .where(
             func.ST_Intersects(
                 func.ST_GeogFromWKB(func.ST_AsEWKB(TZH.geom)),
-                func.ST_GeogFromWKB(func.ST_AsEWKB(str(geometry))),
+                func.ST_GeogFromWKB(func.ST_AsEWKB(func.ST_GeomFromGeoJSON(str(geometry)))),
             )
         )
         .where(
             func.ST_Touches(
                 func.ST_GeomFromWKB(func.ST_AsEWKB(TZH.geom), 4326),
-                func.ST_GeomFromWKB(func.ST_AsEWKB(str(geometry)), 4326),
+                func.ST_GeomFromWKB(func.ST_AsEWKB(func.ST_GeomFromGeoJSON(str(geometry))), 4326),
             )
             == False
         )
