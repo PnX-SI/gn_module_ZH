@@ -39,19 +39,19 @@ def set_geom(geometry_geojson, id_zh=None):
     ).all()
 
     is_intersected = False
-    polygon = geometry
+    polygon_geom = geometry
     for zh in q_zh:
         if zh.id_zh != id_zh:
-            if DB.session.scalar(select(func.ST_Intersects(polygon, zh.geom))):
+            if DB.session.scalar(select(func.ST_Intersects(polygon_geom, zh.geom))):
                 if DB.session.scalar(
-                    select(func.ST_GeometryType(func.ST_Intersection(zh.geom, polygon, 0.1)))
+                    select(func.ST_GeometryType(func.ST_Intersection(zh.geom, polygon_geom)))
                 ) not in ["ST_LineString", "ST_MultiLineString"]:
                     is_intersected = True
             if DB.session.scalar(
                 select(
                     func.ST_Contains(
                         zh.geom,
-                        polygon,
+                        polygon_geom,
                     )
                 )
             ):
@@ -60,7 +60,7 @@ def set_geom(geometry_geojson, id_zh=None):
             if DB.session.scalar(
                 select(
                     func.ST_Contains(
-                        polygon,
+                        polygon_geom,
                         zh.geom,
                     )
                 )
@@ -68,9 +68,9 @@ def set_geom(geometry_geojson, id_zh=None):
                 raise BadRequest("La ZH englobe complètement une ZH existante")
                 # TODO: not detected if contained entirely in 2 or more ZH polygons
 
-            polygon = DB.session.scalar(select(func.ST_Difference(polygon, zh.geom)))
+            polygon_geom = DB.session.scalar(select(func.ST_Difference(polygon_geom, zh.geom)))
 
-    return {"polygon": polygon, "is_intersected": is_intersected}
+    return {"polygon": polygon_geom, "is_intersected": is_intersected}
 
 
 def set_area(geom):
