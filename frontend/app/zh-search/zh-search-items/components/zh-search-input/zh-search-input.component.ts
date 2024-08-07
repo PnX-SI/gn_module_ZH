@@ -11,6 +11,7 @@ export class ZhSearchInputComponent implements OnInit {
   @Input() label: string = '';
   @Input() displayCode: boolean = false;
   @Input() form: FormGroup;
+  @Input() multiple: boolean = false;
   @Output() onSelected = new EventEmitter<object>();
 
   public dropdownSettings = {

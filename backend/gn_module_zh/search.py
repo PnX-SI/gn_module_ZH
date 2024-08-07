@@ -193,16 +193,16 @@ def filter_hydro(query, json):
     return query
 
 
-def filter_basin(query, json):
-    codes = [area.get("code", None) for area in json]
+def filter_basin(query, basin):
+    code = basin.get("code", None)
 
-    if codes is not None:
+    if code is not None:
         subquery = (
             select(
                 TRiverBasin.id_rb,
                 TRiverBasin.geom,
             )
-            .where(TRiverBasin.id_rb.in_(codes))
+            .where(TRiverBasin.id_rb == code)
             .subquery()
         )
         # SET_SRID does not return a valid geom...
