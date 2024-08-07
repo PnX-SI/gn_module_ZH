@@ -4,7 +4,7 @@
       <span class="mr-1">OU</span>
       <mat-slide-toggle
         [formControl]="form.controls.and"
-        matTooltip="Si OU est choisi, les zones humides recherchées respecteront au moins 1 critère listé ci-dessous. 
+        matTooltip="Si OU est choisi, les zones humides recherchées respecteront au moins 1 critère listé ci-dessous.
         Si ET est choisi: elles respecteront tous les critères"
       >
       </mat-slide-toggle>
@@ -39,7 +39,7 @@
     </div>
     <div class="pr-0 col-lg-3 col-6">
       <h5>Attribut</h5>
-      <zh-multiselect 
+      <zh-multiselect
         [values]="attributes"
         [parentFormControl]="localForm.controls.attributes"
         keyLabel="attribut"
@@ -49,11 +49,12 @@
     </div>
     <div class="pr-0 col-lg-3 col-6">
       <h5>Connaissance</h5>
-      <zh-multiselect 
+      <zh-multiselect
         [values]="knowledges"
         [parentFormControl]="localForm.controls.knowledges"
         keyLabel="note_type"
         (onChange)="attributesChanged($event)"
+        [multiple]="false"
       />
     </div>
     <div class="pr-0 col-lg-2 col-6">
