@@ -14,6 +14,10 @@
         <span>{{ data['description']['presentation']['sdage'] }}</span>
       </div>
       <div class="fieldset">
+        <label>Typologie SAGE</label>
+        <span>{{ data['description']['presentation']['typologie_locale'] or '' }}</span>
+      </div>
+      <div class="fieldset">
         <label>Bassin versant</label>
         {% for basin in data['description']['basin']['basins'] %}
         <span>{{ basin }}</span><br>

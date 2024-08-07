@@ -24,6 +24,7 @@
             {% endfor %}
         </tbody>
       </table>
+      <span class="small-title"><b>Remarques : </b>{{ data['description']['presentation']['remarques'] or 'Aucune' }}</span>
     </section>
   </div>
   {% if data['image_name'] is not none %}

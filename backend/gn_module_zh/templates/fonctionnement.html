@@ -37,12 +37,17 @@
         {% endfor %}
       </tbody>
     </table>
+    <span class="small-title"><b>Fréquence des submersions : </b>{{ data['fonctionnement']['regime']['entree']['frequence'] or 'Non déterminé' }}</span><br>
+    <span class="small-title"><b>Étendue des submersions : </b>{{ data['fonctionnement']['regime']['entree']['etendue'] or 'Non déterminé' }}</span>
   </section>
+  <br>
   <section class="content">
     <h5 class="subtitle">Connexion de la zone humide dans son environnement</h5>
-    <span class="small-title">
-      <b>{{ data['fonctionnement']['connexion'] }}</b>
-    </span>
+    {% if data['fonctionnement']['connexion'] %}
+    <span class="small-title"><b>{{ data['fonctionnement']['connexion'] }}</b></span>
+    {% else %}
+    <span class="small-title">Non déterminé</span>
+    {% endif %}
     {% set connexions = {
     "Aucune connexion": "aucune_connexion.svg",
     "Entrée et sortie": "entree_sortie.svg",
@@ -52,5 +57,12 @@
     "Passe à coté": "passe_a_cote.svg",
     } %}
     <img src="{{ url_for('pr_zh.static', filename=connexions[data['fonctionnement']['connexion']]) }}">
+  </section>
+  <br>
+  <section class="content">
+    <h5 class="subtitle">Diagnostic fonctionnel</h5>
+    <span class="small-title"><b>Fonctionnalité hydrologique / biogéochimique : </b>{{ data['fonctionnement']['diagnostic']['hydrologique'] or 'Non évaluée' }}</span><br>
+    <span class="small-title"><b>Fonctionnalité biologique / écologique : </b>{{ data['fonctionnement']['diagnostic']['biologique'] or 'Non évaluée' }}</span><br>
+    <span class="small-title"><b>Remarques : </b>{{ data['fonctionnement']['diagnostic']['commentaires'] or 'Aucune' }}</span>
   </section>
 </div>
