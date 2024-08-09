@@ -4,5 +4,10 @@
     [options]="leafletDrawOptions"
     (layerDrawed)="onDrawn($event)"
   >
+  <pnx-leaflet-filelayer
+  [editMode]="true"
+  (onLoad)="infoMessageFileLayer()"
+  [style]="{ color: 'green' }"
+></pnx-leaflet-filelayer>
   </pnx-leaflet-draw>
 </pnx-map>
