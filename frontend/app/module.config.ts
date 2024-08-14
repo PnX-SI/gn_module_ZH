@@ -1,6 +1,7 @@
 export const ModuleConfig = {
   MODULE_CODE: 'ZONES_HUMIDES',
   MODULE_URL: '/zones_humides',
+  TAXON_VM_CRONTAB: '0 0,12 * * *',
   allowed_extensions: ['.pdf', '.jpg', '.png'],
   available_maplist_column: [
     {
@@ -77,12 +78,12 @@ export const ModuleConfig = {
   flora_view_name: {
     category: 'flora',
     schema_name: 'pr_zh',
-    table_name: 'flora',
+    table_name: 'vm_flora',
   },
   invertebrates_view_name: {
     category: 'invertebrates',
     schema_name: 'pr_zh',
-    table_name: 'invertebrates',
+    table_name: 'vm_invertebrates',
   },
   max_jpg_size: 0.5,
   max_pdf_size: 1.5,
@@ -163,6 +164,6 @@ export const ModuleConfig = {
   vertebrates_view_name: {
     category: 'vertebrates',
     schema_name: 'pr_zh',
-    table_name: 'vertebrates',
+    table_name: 'vm_vertebrates',
   },
 };
