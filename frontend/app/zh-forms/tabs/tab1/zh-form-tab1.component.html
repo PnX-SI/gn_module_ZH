@@ -19,8 +19,9 @@
               generalInfoForm.controls.main_name.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-6">
           <small>Autre nom</small>
@@ -35,11 +36,14 @@
         <div class="form-group col-md-6">
           <small style="display: block; margin-bottom: 8px">Partie d'un grand ensemble ?</small>
           <mat-label ngClass="labelBeforeSlide">Non</mat-label>
-          <mat-slide-toggle [formControl]="generalInfoForm.controls.is_id_site_space"
-            >oui</mat-slide-toggle
-          >
+          <mat-slide-toggle [formControl]="generalInfoForm.controls.is_id_site_space">
+            oui
+          </mat-slide-toggle>
         </div>
-        <div *ngIf="hasSiteSpace" class="form-group col-md-6">
+        <div
+          *ngIf="hasSiteSpace"
+          class="form-group col-md-6"
+        >
           <small>Nom du grand ensemble</small>
           <select
             list="grandEnsemble"
@@ -47,7 +51,10 @@
             class="form-control"
             [formControl]="generalInfoForm.controls.id_site_space"
           >
-            <option *ngFor="let siteSpace of siteSpaceList" [ngValue]="siteSpace.id_site_space">
+            <option
+              *ngFor="let siteSpace of siteSpaceList"
+              [ngValue]="siteSpace.id_site_space"
+            >
               {{ siteSpace.name }}
             </option>
           </select>
@@ -75,11 +82,17 @@
           />
         </div>
       </div>
-      <span class="form-row" class="bib-hint"
-        >Si vous ne trouvez pas la bibliographie que vous cherchez, veuillez contacter
-        l'administrateur</span
+      <span
+        class="form-row"
+        class="bib-hint"
       >
-      <div *ngIf="listBib && listBib.length > 0" class="card-body table-responsive">
+        Si vous ne trouvez pas la bibliographie que vous cherchez, veuillez contacter
+        l'administrateur
+      </span>
+      <div
+        *ngIf="listBib && listBib.length > 0"
+        class="card-body table-responsive"
+      >
         <zh-table
           [tableCols]="cols"
           [data]="listBib"
@@ -90,7 +103,10 @@
     </fieldset>
   </form>
   <div class="footer-btn">
-    <zh-cancelButton *ngIf="currentZh" [zhId]="currentZh.properties.id_zh"></zh-cancelButton>
+    <zh-cancelButton
+      *ngIf="currentZh"
+      [zhId]="currentZh.properties.id_zh"
+    ></zh-cancelButton>
     <button
       type="submit"
       mat-raised-button
@@ -100,7 +116,10 @@
       (click)="onFormSubmit(generalInfoForm.value)"
     >
       <mat-icon *ngIf="!posted">save_outline</mat-icon>
-      <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
+      <mat-spinner
+        *ngIf="posted"
+        [diameter]="20"
+      ></mat-spinner>
       Enregistrer
     </button>
   </div>

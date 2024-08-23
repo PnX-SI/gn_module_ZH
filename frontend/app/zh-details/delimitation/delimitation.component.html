@@ -5,14 +5,17 @@
         <legend>
           <h5 class="section-title">Critères de délimitation de la zone humide</h5>
         </legend>
-        <zh-label *ngIf="data.delimitation_zone?.critere" label="Critères utilisés :"> </zh-label>
+        <zh-label
+          *ngIf="data.delimitation_zone?.critere"
+          label="Critères utilisés :"
+        ></zh-label>
         <ul>
           <li *ngFor="let item of data.delimitation_zone.critere">
             {{ item }}
           </li>
         </ul>
         <zh-label label="Remarques :">
-          <span>{{ data.delimitation_zone?.remark }} </span>
+          <span>{{ data.delimitation_zone?.remark }}</span>
         </zh-label>
         <p class="label"><b></b></p>
       </fieldset>
@@ -22,15 +25,17 @@
         <legend>
           <h5 class="section-title">Critères de délimitation de l'espace de fonctionnalité</h5>
         </legend>
-        <zh-label *ngIf="data.delimitation_fonctions?.critere" label="Critères utilisés :">
-        </zh-label>
+        <zh-label
+          *ngIf="data.delimitation_fonctions?.critere"
+          label="Critères utilisés :"
+        ></zh-label>
         <ul>
           <li *ngFor="let item of data.delimitation_fonctions.critere">
             {{ item }}
           </li>
         </ul>
         <zh-label label="Remarques :">
-          <span>{{ data.delimitation_fonctions?.remark }} </span>
+          <span>{{ data.delimitation_fonctions?.remark }}</span>
         </zh-label>
       </fieldset>
     </div>

@@ -15,7 +15,10 @@
           Ajouter
         </button>
       </div>
-      <collapse [title]="imageFiles.name" *ngIf="imageFiles.files && imageFiles.files.length > 0">
+      <collapse
+        [title]="imageFiles.name"
+        *ngIf="imageFiles.files && imageFiles.files.length > 0"
+      >
         <zh-image-table
           [tableCols]="fileTableCol"
           [data]="imageFiles.files"
@@ -26,11 +29,13 @@
           (onEdit)="onEditFile($event, fileModal)"
           (onDownload)="_filesService.downloadFile($event)"
           (onRadioChanged)="onChangeMainPhoto($event)"
-        >
-        </zh-image-table>
+        ></zh-image-table>
       </collapse>
       <ng-container *ngFor="let item of corFilesExt">
-        <collapse [title]="item.name" *ngIf="item.files && item.files.length > 0">
+        <collapse
+          [title]="item.name"
+          *ngIf="item.files && item.files.length > 0"
+        >
           <zh-table
             [tableCols]="fileTableCol"
             [data]="item.files"
@@ -46,8 +51,16 @@
     </fieldset>
 
     <div class="footer-btn">
-      <zh-cancelButton *ngIf="zh" [zhId]="zh.properties.id_zh"></zh-cancelButton>
-      <button mat-raised-button color="primary" class="ml-3" (click)="nextTab.emit(9)">
+      <zh-cancelButton
+        *ngIf="zh"
+        [zhId]="zh.properties.id_zh"
+      ></zh-cancelButton>
+      <button
+        mat-raised-button
+        color="primary"
+        class="ml-3"
+        (click)="nextTab.emit(9)"
+      >
         <mat-icon>save_outline</mat-icon>
         Enregistrer
       </button>
@@ -56,10 +69,18 @@
 </div>
 
 <!-- Modal recources documentaires -->
-<ng-template #fileModal let-c="close" let-d="dismiss">
+<ng-template
+  #fileModal
+  let-c="close"
+  let-d="dismiss"
+>
   <div class="modal-header">
     <h6>{{ modalTitle }}</h6>
-    <button mat-icon-button class="closeModalBtn" (click)="c()">
+    <button
+      mat-icon-button
+      class="closeModalBtn"
+      (click)="c()"
+    >
       <mat-icon class="cancel-icon">cancel</mat-icon>
     </button>
   </div>
@@ -76,34 +97,41 @@
       <ul>
         <li *ngIf="config['ZONES_HUMIDES']?.fileformat_validated">
           <ng-container>
-            <span
-              >Seules les extensions suivantes sont acceptées :
+            <span>
+              Seules les extensions suivantes sont acceptées :
               <b *ngFor="let item of fileTypeAccepted; let isLast = last">
-                {{ item.split("/")[1] }}{{ isLast ? "" : ", " }}
-              </b> </span
-            ><br />
+                {{ item.split('/')[1] }}{{ isLast ? '' : ', ' }}
+              </b>
+            </span>
+            <br />
           </ng-container>
         </li>
         <li *ngIf="config['ZONES_HUMIDES']?.filename_validated">
           <ng-container>
-            <span
-              >Pour les images, le format doit être le suivant :
-              <b>{{ zh.properties.code }}_#.jpeg</b> (avec # un nombre)</span
-            ><br />
+            <span>
+              Pour les images, le format doit être le suivant :
+              <b>{{ zh.properties.code }}_#.jpeg</b>
+              (avec # un nombre)
+            </span>
+            <br />
           </ng-container>
         </li>
         <li *ngIf="config['ZONES_HUMIDES']?.max_pdf_size">
           <ng-container>
-            <span
-              >La taille maximale des fichiers pdf est de <b>{{ config["ZONES_HUMIDES"].max_pdf_size }}Mo</b></span
-            ><br />
+            <span>
+              La taille maximale des fichiers pdf est de
+              <b>{{ config['ZONES_HUMIDES'].max_pdf_size }}Mo</b>
+            </span>
+            <br />
           </ng-container>
         </li>
         <li *ngIf="config?.max_jpg_size">
           <ng-container>
-            <span
-              >La taille maximale des fichiers image est de <b>{{ config["ZONES_HUMIDES"].max_jpg_size }}Mo</b></span
-            ><br />
+            <span>
+              La taille maximale des fichiers image est de
+              <b>{{ config['ZONES_HUMIDES'].max_jpg_size }}Mo</b>
+            </span>
+            <br />
           </ng-container>
         </li>
         <li *ngIf="config['ZONES_HUMIDES']?.fileformat_validated">
@@ -126,49 +154,79 @@
             (change)="handleFileInput($event.target.files)"
             accept="image/*,.pdf"
           />
-          <button mat-raised-button color="primary" (click)="fileInput.click()">Parcourir</button>
-          <small class="file-name" *ngIf="fileToUpload !== null"
-            >Fichier renseigné : {{ fileToUpload.name }}</small
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="fileInput.click()"
           >
+            Parcourir
+          </button>
+          <small
+            class="file-name"
+            *ngIf="fileToUpload !== null"
+          >
+            Fichier renseigné : {{ fileToUpload.name }}
+          </small>
         </div>
         <div class="form-group col-md-12">
-          <small *ngIf="fileForm.controls.file.errors?.fileSizeValidator" class="error-msg"
-            >Le fichier excède le poids maximum autorisé qui est de {{ config["ZONES_HUMIDES"].max_jpg_size }}Mo pour
-            les photos, {{ config["ZONES_HUMIDES"]["max_pdf_size"] }}Mo pour les pdf.<br />Poids mesuré :
-            {{ fileToUpload.size / 1000000 | number: "1.0-1" }}Mo</small
+          <small
+            *ngIf="fileForm.controls.file.errors?.fileSizeValidator"
+            class="error-msg"
           >
-          <small *ngIf="fileForm.controls.file.errors?.fileNameValidator" class="error-msg"
-            >Le fichier ne respecte pas le format suivant : &lt;ZHCODE&gt;_&lt;nombre&gt;. Pour
-            cette zone humide, un nom correct serait : {{ zh.properties.code }}_3.jpeg<br
-          /></small>
-          <small *ngIf="fileForm.controls.file.errors?.fileFormatValidator" class="error-msg"
-            >Le fichier n'est pas du bon format (image ou pdf)<br
-          /></small>
+            Le fichier excède le poids maximum autorisé qui est de
+            {{ config['ZONES_HUMIDES'].max_jpg_size }}Mo pour les photos,
+            {{ config['ZONES_HUMIDES']['max_pdf_size'] }}Mo pour les pdf.
+            <br />
+            Poids mesuré : {{ fileToUpload.size / 1000000 | number: '1.0-1' }}Mo
+          </small>
+          <small
+            *ngIf="fileForm.controls.file.errors?.fileNameValidator"
+            class="error-msg"
+          >
+            Le fichier ne respecte pas le format suivant : &lt;ZHCODE&gt;_&lt;nombre&gt;. Pour cette
+            zone humide, un nom correct serait : {{ zh.properties.code }}_3.jpeg
+            <br />
+          </small>
+          <small
+            *ngIf="fileForm.controls.file.errors?.fileFormatValidator"
+            class="error-msg"
+          >
+            Le fichier n'est pas du bon format (image ou pdf)
+            <br />
+          </small>
         </div>
 
         <div class="form-group col-md-6">
           <small class="required">Titre du document</small>
-          <input class="form-control" [formControl]="fileForm.controls.title" />
+          <input
+            class="form-control"
+            [formControl]="fileForm.controls.title"
+          />
           <small
             *ngIf="
               (fileForm.controls.title.touched || modalFormSubmitted) &&
               fileForm.controls.title.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-6">
           <small class="required">Auteur du document</small>
-          <input class="form-control" [formControl]="fileForm.controls.author" />
+          <input
+            class="form-control"
+            [formControl]="fileForm.controls.author"
+          />
           <small
             *ngIf="
               (fileForm.controls.author.touched || modalFormSubmitted) &&
               fileForm.controls.author.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
 
         <div class="form-group col-md-12">
@@ -191,7 +249,11 @@
       class="uppercase"
       (click)="patchModal ? patchFile() : postFile()"
     >
-      <mat-spinner *ngIf="loadingUpload" color="warn" diameter="25"></mat-spinner>
+      <mat-spinner
+        *ngIf="loadingUpload"
+        color="warn"
+        diameter="25"
+      ></mat-spinner>
       Téléverser
     </button>
   </div>

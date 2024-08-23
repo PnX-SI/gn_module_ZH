@@ -1,29 +1,57 @@
-<button mat-raised-button color="warn" (click)="onCancel(cancelModal)">
+<button
+  mat-raised-button
+  color="warn"
+  (click)="onCancel(cancelModal)"
+>
   Quitter
 </button>
 
 <!-- cancelModal -->
-<ng-template #cancelModal let-c="close" let-d="dismiss">
+<ng-template
+  #cancelModal
+  let-c="close"
+  let-d="dismiss"
+>
   <div class="modal-header">
-    <button mat-icon-button class="closeModalBtn" (click)="c()">
+    <button
+      mat-icon-button
+      class="closeModalBtn"
+      (click)="c()"
+    >
       <mat-icon class="cancel-icon">cancel</mat-icon>
     </button>
   </div>
   <div class="modal-body">
     Vers où voulez-vous être redirigé ?
     <h6 class="warning">
-      <mat-icon class="warning-icon" color="warn">warning</mat-icon>Tout changement non enregistré
-      sera perdu
+      <mat-icon
+        class="warning-icon"
+        color="warn"
+      >
+        warning
+      </mat-icon>
+      Tout changement non enregistré sera perdu
     </h6>
   </div>
   <div class="footer-modal-btn">
     <a (click)="onExit()">
-      <button type="button" ngbAutofocus mat-raised-button color="primary" class="uppercase">
+      <button
+        type="button"
+        ngbAutofocus
+        mat-raised-button
+        color="primary"
+        class="uppercase"
+      >
         liste des zones humides
       </button>
     </a>
     <a [routerLink]="['/zones_humides/zhDetails', zhId]">
-      <button type="button" mat-raised-button color="accent" class="uppercase">
+      <button
+        type="button"
+        mat-raised-button
+        color="accent"
+        class="uppercase"
+      >
         fiche complète de la zone humide
       </button>
     </a>

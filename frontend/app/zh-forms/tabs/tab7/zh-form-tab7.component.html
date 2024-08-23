@@ -1,4 +1,7 @@
-<div *ngIf="evalZh" class="container-fluid">
+<div
+  *ngIf="evalZh"
+  class="container-fluid"
+>
   <h2 class="tabsTitle">Evaluation génerale du site</h2>
   <form>
     <fieldset>
@@ -9,25 +12,35 @@
             class="info-icon"
             ngbTooltip="Cette rubrique met en avant les principaux enjeux liés à la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
             placement="right"
-            >info
+          >
+            info
           </mat-icon>
         </h5>
       </legend>
-      <div *ngIf="hydroFctData && hydroFctData.length > 0" class="table-responsive">
+      <div
+        *ngIf="hydroFctData && hydroFctData.length > 0"
+        class="table-responsive"
+      >
         <zh-table
           class="eval-table"
           [tableCols]="hydroFctTableCol"
           [data]="hydroFctData"
         ></zh-table>
       </div>
-      <div *ngIf="bioFctData && bioFctData.length > 0" class="table-responsive">
+      <div
+        *ngIf="bioFctData && bioFctData.length > 0"
+        class="table-responsive"
+      >
         <zh-table
           class="eval-table fct-table"
           [tableCols]="bioFctTableCol"
           [data]="bioFctData"
         ></zh-table>
       </div>
-      <div *ngIf="patrimData && patrimData.length > 0" class="table-responsive">
+      <div
+        *ngIf="patrimData && patrimData.length > 0"
+        class="table-responsive"
+      >
         <zh-table
           class="eval-table fct-table"
           [tableCols]="patrimTableCol"
@@ -76,7 +89,10 @@
           </table>
         </div>
       </div>
-      <div *ngIf="socEcoData && socEcoData.length > 0" class="table-responsive">
+      <div
+        *ngIf="socEcoData && socEcoData.length > 0"
+        class="table-responsive"
+      >
         <zh-table
           class="eval-table fct-table"
           [tableCols]="socEcoTableCol"
@@ -101,7 +117,8 @@
             class="info-icon"
             ngbTooltip="Cette rubrique met en avant les menaces et l’état fonctionnel de la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
             placement="right"
-            >info
+          >
+            info
           </mat-icon>
         </h5>
       </legend>
@@ -116,9 +133,9 @@
           </thead>
           <tbody>
             <tr>
-              <td>{{ evalZh.thread?.mnemonique || "Non évaluée" }}</td>
-              <td>{{ evalZh.diag_hydro?.mnemonique || "Non évaluée" }}</td>
-              <td>{{ evalZh.diag_bio?.mnemonique || "Non évaluée" }}</td>
+              <td>{{ evalZh.thread?.mnemonique || 'Non évaluée' }}</td>
+              <td>{{ evalZh.diag_hydro?.mnemonique || 'Non évaluée' }}</td>
+              <td>{{ evalZh.diag_bio?.mnemonique || 'Non évaluée' }}</td>
             </tr>
           </tbody>
         </table>
@@ -141,7 +158,10 @@
       <div class="form-row">
         <div class="form-group col-md-4">
           <small>Stratégie de gestion</small>
-          <select class="form-control" [formControl]="formTab7.controls.id_strat_gestion">
+          <select
+            class="form-control"
+            [formControl]="formTab7.controls.id_strat_gestion"
+          >
             <option
               *ngFor="let strat of formMetaData.STRAT_GESTION"
               [ngValue]="strat.id_nomenclature"
@@ -161,7 +181,10 @@
           <mat-icon>add_box</mat-icon>
           proposition d’action
         </button>
-        <div *ngIf="actionTable && actionTable.length > 0" class="table-responsive">
+        <div
+          *ngIf="actionTable && actionTable.length > 0"
+          class="table-responsive"
+        >
           <zh-table
             [tableCols]="actionTableCol"
             [data]="actionTable"
@@ -183,7 +206,10 @@
       </div>
     </fieldset>
     <div class="footer-btn">
-      <zh-cancelButton *ngIf="currentZh" [zhId]="currentZh.properties.id_zh"></zh-cancelButton>
+      <zh-cancelButton
+        *ngIf="currentZh"
+        [zhId]="currentZh.properties.id_zh"
+      ></zh-cancelButton>
       <button
         type="submit"
         mat-raised-button
@@ -193,7 +219,10 @@
         (click)="onFormSubmit()"
       >
         <mat-icon *ngIf="!posted">save_outline</mat-icon>
-        <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
+        <mat-spinner
+          *ngIf="posted"
+          [diameter]="20"
+        ></mat-spinner>
         Enregistrer
       </button>
     </div>
@@ -201,10 +230,18 @@
 </div>
 
 <!-- Modal Stratégie de gestion et orientations d'actions-->
-<ng-template #actionModal let-c="close" let-d="dismiss">
+<ng-template
+  #actionModal
+  let-c="close"
+  let-d="dismiss"
+>
   <div class="modal-header">
     <h6>{{ modalTitle }}</h6>
-    <button mat-icon-button class="closeModalBtn" (click)="c()">
+    <button
+      mat-icon-button
+      class="closeModalBtn"
+      (click)="c()"
+    >
       <mat-icon class="cancel-icon">cancel</mat-icon>
     </button>
   </div>
@@ -224,13 +261,20 @@
             actionForm.controls.action.errors?.required
           "
           class="error-msg"
-          >Champ requis</small
         >
+          Champ requis
+        </small>
       </div>
       <div class="form-group col-md-6">
         <small class="required">Niveau de priorité</small>
-        <select class="form-control" [formControl]="actionForm.controls.priority">
-          <option *ngFor="let qualif of formMetaData.NIVEAU_PRIORITE" [ngValue]="qualif">
+        <select
+          class="form-control"
+          [formControl]="actionForm.controls.priority"
+        >
+          <option
+            *ngFor="let qualif of formMetaData.NIVEAU_PRIORITE"
+            [ngValue]="qualif"
+          >
             {{ qualif.mnemonique }}
           </option>
         </select>
@@ -240,8 +284,9 @@
             actionForm.controls.priority.errors?.required
           "
           class="error-msg"
-          >Champ requis</small
         >
+          Champ requis
+        </small>
       </div>
       <div class="form-group col-md-12">
         <small>Remarques</small>

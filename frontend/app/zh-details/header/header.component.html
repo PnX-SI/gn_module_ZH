@@ -9,7 +9,8 @@
         class="uppercase"
         (click)="onReturn()"
       >
-        <mat-icon> west </mat-icon> Retour
+        <mat-icon>west</mat-icon>
+        Retour
       </button>
     </div>
     <div class="col-6">
@@ -28,7 +29,11 @@
       >
         <span *ngIf="!loadingPdf">Fiche pdf</span>
         <mat-icon *ngIf="loadingPdf">
-          <mat-spinner class="loading" color="warn" diameter="25"> </mat-spinner>
+          <mat-spinner
+            class="loading"
+            color="warn"
+            diameter="25"
+          ></mat-spinner>
         </mat-icon>
       </button>
       <button
@@ -56,8 +61,15 @@
     </div>
   </div>
 </div>
-<ng-template #content let-c="close" let-d="dismiss">
-  <zh-delete-modal (onCancel)="d()" (onDelete)="c()">
+<ng-template
+  #content
+  let-c="close"
+  let-d="dismiss"
+>
+  <zh-delete-modal
+    (onCancel)="d()"
+    (onDelete)="c()"
+  >
     <p>Etes-vous sûr de vouloir supprimer cette zone humide ? Cette action est irréversible</p>
   </zh-delete-modal>
 </ng-template>

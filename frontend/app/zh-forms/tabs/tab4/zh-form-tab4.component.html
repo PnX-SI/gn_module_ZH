@@ -24,7 +24,10 @@
           <mat-icon>add_box</mat-icon>
           Sortie d'eau
         </button>
-        <div *ngIf="inflowsTable && inflowsTable.length > 0" class="table-responsive">
+        <div
+          *ngIf="inflowsTable && inflowsTable.length > 0"
+          class="table-responsive"
+        >
           <zh-table
             [tableCols]="inflowTableCol"
             [data]="inflowsTable"
@@ -36,7 +39,10 @@
         </div>
       </div>
       <div class="form-row">
-        <div *ngIf="outflowsTable && outflowsTable.length > 0" class="table-responsive">
+        <div
+          *ngIf="outflowsTable && outflowsTable.length > 0"
+          class="table-responsive"
+        >
           <zh-table
             [tableCols]="outflowTableCol"
             [data]="outflowsTable"
@@ -50,16 +56,28 @@
       <div class="form-row">
         <div class="form-group col-md-4">
           <small>Submersion fréquence</small>
-          <select class="form-control" [formControl]="formTab4.controls.frequency">
-            <option *ngFor="let freq of formMetaData.SUBMERSION_FREQ" [ngValue]="freq">
+          <select
+            class="form-control"
+            [formControl]="formTab4.controls.frequency"
+          >
+            <option
+              *ngFor="let freq of formMetaData.SUBMERSION_FREQ"
+              [ngValue]="freq"
+            >
               {{ freq.mnemonique }}
             </option>
           </select>
         </div>
         <div class="form-group col-md-4">
           <small>Submersion étendue</small>
-          <select class="form-control" [formControl]="formTab4.controls.spread">
-            <option *ngFor="let spread of formMetaData.SUBMERSION_ETENDUE" [ngValue]="spread">
+          <select
+            class="form-control"
+            [formControl]="formTab4.controls.spread"
+          >
+            <option
+              *ngFor="let spread of formMetaData.SUBMERSION_ETENDUE"
+              [ngValue]="spread"
+            >
               {{ spread.mnemonique }}
             </option>
           </select>
@@ -75,10 +93,16 @@
           *ngFor="let connexionType of connexionTypes"
           class="d-flex flex-column align-items-center radio-item"
         >
-          <label class="form-check-label p-3" [for]="'inlineRadio' + connexionType.id_nomenclature">
+          <label
+            class="form-check-label p-3"
+            [for]="'inlineRadio' + connexionType.id_nomenclature"
+          >
             <small class="radio-label">{{ connexionType.mnemonique }}</small>
-            <img [src]="_dataService.getStatic(connexionType.image)" alt=""
-          /></label>
+            <img
+              [src]="_dataService.getStatic(connexionType.image)"
+              alt=""
+            />
+          </label>
           <input
             type="radio"
             name="inlineRadioOptions"
@@ -96,7 +120,10 @@
       <div class="form-row">
         <div class="form-group col-md-6">
           <small>Fonctionnalité hydrologique / biogéochimique</small>
-          <select class="form-control" [formControl]="formTab4.controls.diag_hydro">
+          <select
+            class="form-control"
+            [formControl]="formTab4.controls.diag_hydro"
+          >
             <option
               *ngFor="let fct_hydro of formMetaData.FONCTIONNALITE_HYDRO"
               [ngValue]="fct_hydro"
@@ -107,8 +134,14 @@
         </div>
         <div class="form-group col-md-6">
           <small>Fonctionnalité biologique / écologique</small>
-          <select class="form-control" [formControl]="formTab4.controls.diag_bio">
-            <option *ngFor="let fct_bio of formMetaData.FONCTIONNALITE_BIO" [ngValue]="fct_bio">
+          <select
+            class="form-control"
+            [formControl]="formTab4.controls.diag_bio"
+          >
+            <option
+              *ngFor="let fct_bio of formMetaData.FONCTIONNALITE_BIO"
+              [ngValue]="fct_bio"
+            >
               {{ fct_bio.mnemonique }}
             </option>
           </select>
@@ -125,7 +158,10 @@
       </div>
     </fieldset>
     <div class="footer-btn">
-      <zh-cancelButton *ngIf="currentZh" [zhId]="currentZh.properties.id_zh"></zh-cancelButton>
+      <zh-cancelButton
+        *ngIf="currentZh"
+        [zhId]="currentZh.properties.id_zh"
+      ></zh-cancelButton>
       <button
         type="submit"
         mat-raised-button
@@ -135,17 +171,28 @@
         (click)="onFormSubmit()"
       >
         <mat-icon *ngIf="!posted">save_outline</mat-icon>
-        <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
+        <mat-spinner
+          *ngIf="posted"
+          [diameter]="20"
+        ></mat-spinner>
         Enregistrer
       </button>
     </div>
   </form>
 </div>
 <!-- MODAL ENTREE EAU -->
-<ng-template #inflowModal let-c="close" let-d="dismiss">
+<ng-template
+  #inflowModal
+  let-c="close"
+  let-d="dismiss"
+>
   <div class="modal-header">
     <h6>{{ inflowModalTitle }}</h6>
-    <button mat-icon-button class="closeModalBtn" (click)="c()">
+    <button
+      mat-icon-button
+      class="closeModalBtn"
+      (click)="c()"
+    >
       <mat-icon class="cancel-icon">cancel</mat-icon>
     </button>
   </div>
@@ -173,12 +220,16 @@
               inflowForm.controls.inflow.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-6">
           <small class="required">Permanence</small>
-          <select class="form-control" [formControl]="inflowForm.controls.permanance">
+          <select
+            class="form-control"
+            [formControl]="inflowForm.controls.permanance"
+          >
             <option
               *ngFor="let permanance of formMetaData.PERMANENCE_ENTREE"
               [ngValue]="permanance"
@@ -192,8 +243,9 @@
               inflowForm.controls.permanance.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
 
         <div class="form-group col-md-12">
@@ -220,10 +272,18 @@
   </div>
 </ng-template>
 <!-- MODAL SORTIE EAU -->
-<ng-template #outflowModal let-c="close" let-d="dismiss">
+<ng-template
+  #outflowModal
+  let-c="close"
+  let-d="dismiss"
+>
   <div class="modal-header">
     <h6>{{ outflowModalTitle }}</h6>
-    <button mat-icon-button class="closeModalBtn" (click)="c()">
+    <button
+      mat-icon-button
+      class="closeModalBtn"
+      (click)="c()"
+    >
       <mat-icon class="cancel-icon">cancel</mat-icon>
     </button>
   </div>
@@ -251,12 +311,16 @@
               outflowForm.controls.outflow.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-6">
           <small class="required">Permanence</small>
-          <select class="form-control" [formControl]="outflowForm.controls.permanance">
+          <select
+            class="form-control"
+            [formControl]="outflowForm.controls.permanance"
+          >
             <option
               *ngFor="let permanance of formMetaData.PERMANENCE_SORTIE"
               [ngValue]="permanance"
@@ -270,8 +334,9 @@
               outflowForm.controls.permanance.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
 
         <div class="form-group col-md-12">

@@ -2,7 +2,10 @@
   class="container-fluid"
   *ngIf="_cruvedStore.cruved?.ZONES_HUMIDES?.cruved.U !== '0'; else elseBlock"
 >
-  <div class="custom-container" [ngStyle]="{ 'min-height.px': cardContentHeight }">
+  <div
+    class="custom-container"
+    [ngStyle]="{ 'min-height.px': cardContentHeight }"
+  >
     <mat-tab-group
       #tabs
       animationDuration="0ms"
@@ -19,8 +22,7 @@
           (activeTabs)="onActiveTabs($event)"
           (canChangeTab)="onCanChangeTab($event)"
           (nextTab)="onNext($event)"
-        >
-        </zh-form-tab0>
+        ></zh-form-tab0>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
         <ng-template mat-tab-label>1. Renseignements</ng-template>
@@ -31,11 +33,10 @@
           [formMetaData]="formMetaData"
           (canChangeTab)="onCanChangeTab($event)"
           (nextTab)="onNext($event)"
-        >
-        </zh-form-tab1>
+        ></zh-form-tab1>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label>2. Délimitation </ng-template>
+        <ng-template mat-tab-label>2. Délimitation</ng-template>
         <zh-form-tab2
           *ngIf="formMetaData"
           class="d-flex flex-column"
@@ -43,11 +44,10 @@
           [formMetaData]="formMetaData"
           (canChangeTab)="onCanChangeTab($event)"
           (nextTab)="onNext($event)"
-        >
-        </zh-form-tab2>
+        ></zh-form-tab2>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label>3. Description </ng-template>
+        <ng-template mat-tab-label>3. Description</ng-template>
         <zh-form-tab3
           *ngIf="formMetaData"
           class="d-flex flex-column"
@@ -55,11 +55,10 @@
           [formMetaData]="formMetaData"
           (canChangeTab)="onCanChangeTab($event)"
           (nextTab)="onNext($event)"
-        >
-        </zh-form-tab3>
+        ></zh-form-tab3>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label>4. Fonctionnement </ng-template>
+        <ng-template mat-tab-label>4. Fonctionnement</ng-template>
         <zh-form-tab4
           *ngIf="formMetaData"
           class="d-flex flex-column"
@@ -70,7 +69,7 @@
         ></zh-form-tab4>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label>5. Fonctions et valeurs </ng-template>
+        <ng-template mat-tab-label>5. Fonctions et valeurs</ng-template>
         <zh-form-tab5
           *ngIf="formMetaData"
           class="d-flex flex-column"
@@ -81,7 +80,7 @@
         ></zh-form-tab5>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label>6. Statuts </ng-template>
+        <ng-template mat-tab-label>6. Statuts</ng-template>
         <zh-form-tab6
           *ngIf="formMetaData"
           class="d-flex flex-column"
@@ -92,7 +91,7 @@
         ></zh-form-tab6>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label>7. Evaluation </ng-template>
+        <ng-template mat-tab-label>7. Evaluation</ng-template>
         <zh-form-tab7
           *ngIf="formMetaData"
           class="d-flex flex-column"
@@ -103,7 +102,7 @@
         ></zh-form-tab7>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label>8. Ressources documentaires </ng-template>
+        <ng-template mat-tab-label>8. Ressources documentaires</ng-template>
         <zh-form-tab8
           *ngIf="formMetaData"
           class="d-flex flex-column"
@@ -114,7 +113,7 @@
         ></zh-form-tab8>
       </mat-tab>
       <mat-tab [disabled]="disabledTabs">
-        <ng-template mat-tab-label>9. Hierarchisation </ng-template>
+        <ng-template mat-tab-label>9. Hierarchisation</ng-template>
         <zh-form-tab9
           class="d-flex flex-column"
           [ngStyle]="{ 'height.px': cardContentHeight }"
@@ -128,7 +127,11 @@
 </ng-template>
 
 <!--  CHANGE TAB MODAL -->
-<ng-template #tabsChangeModal let-c="close" let-d="dismiss">
+<ng-template
+  #tabsChangeModal
+  let-c="close"
+  let-d="dismiss"
+>
   <div class="modal-header">
     <h5 class="modal-title"><i class="fa fa-exchange"></i></h5>
   </div>
@@ -136,7 +139,12 @@
     Êtes-vous sûr de vouloir changer d'onglet sans enregistrer vos modifications ?
   </div>
   <div class="modal-footer">
-    <button type="button" mat-raised-button class="mr-1 uppercase" (click)="onChangeTab(false)">
+    <button
+      type="button"
+      mat-raised-button
+      class="mr-1 uppercase"
+      (click)="onChangeTab(false)"
+    >
       Annuler
     </button>
     <button

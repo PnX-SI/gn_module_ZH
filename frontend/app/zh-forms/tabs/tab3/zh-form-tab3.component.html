@@ -8,8 +8,14 @@
       <div class="form-row">
         <div class="form-group col-md-6">
           <small class="required">Typologie SDAGE</small>
-          <select class="form-control" [formControl]="form.controls.id_sdage">
-            <option *ngFor="let sd of formMetaData.SDAGE" [ngValue]="sd.id_nomenclature">
+          <select
+            class="form-control"
+            [formControl]="form.controls.id_sdage"
+          >
+            <option
+              *ngFor="let sd of formMetaData.SDAGE"
+              [ngValue]="sd.id_nomenclature"
+            >
               {{ sd.mnemonique }}
             </option>
           </select>
@@ -19,14 +25,21 @@
               form.controls.id_sdage.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-6">
           <small>Sous-type SAGE</small>
-          <select class="form-control" [formControl]="form.controls.id_sage">
+          <select
+            class="form-control"
+            [formControl]="form.controls.id_sage"
+          >
             <option></option>
-            <option *ngFor="let sg of sage" [ngValue]="sg.id_nomenclature">
+            <option
+              *ngFor="let sg of sage"
+              [ngValue]="sg.id_nomenclature"
+            >
               {{ sg.mnemonique }}
             </option>
           </select>
@@ -47,13 +60,20 @@
           />
         </div>
         <div class="form-group d-flex align-items-end col-md-6">
-          <button mat-raised-button color="primary" (click)="onAddCorinBio()">
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="onAddCorinBio()"
+          >
             <mat-icon>add_box</mat-icon>
             Ajouter
           </button>
         </div>
       </div>
-      <div *ngIf="listCorinBio && listCorinBio.length > 0" class="table-responsive">
+      <div
+        *ngIf="listCorinBio && listCorinBio.length > 0"
+        class="table-responsive"
+      >
         <zh-table
           [tableCols]="corinTableCol"
           [data]="listCorinBio"
@@ -100,7 +120,10 @@
         <mat-icon>add_box</mat-icon>
         Ajouter une activité humaine
       </button>
-      <div *ngIf="listActivity && listActivity.length > 0" class="table-responsive">
+      <div
+        *ngIf="listActivity && listActivity.length > 0"
+        class="table-responsive"
+      >
         <zh-table
           [tableCols]="activityTableCol"
           [data]="listActivity"
@@ -113,7 +136,10 @@
       <div class="form-row">
         <div class="form-group col-md-12">
           <small>Évaluation globale des menaces potentielles ou avérées</small>
-          <select class="form-control" [formControl]="form.controls.id_thread">
+          <select
+            class="form-control"
+            [formControl]="form.controls.id_thread"
+          >
             <option
               *ngFor="let menace of formMetaData.EVAL_GLOB_MENACES"
               [ngValue]="menace.id_nomenclature"
@@ -134,7 +160,10 @@
     </fieldset>
   </form>
   <div class="footer-btn">
-    <zh-cancelButton *ngIf="currentZh" [zhId]="currentZh.properties.id_zh"></zh-cancelButton>
+    <zh-cancelButton
+      *ngIf="currentZh"
+      [zhId]="currentZh.properties.id_zh"
+    ></zh-cancelButton>
     <button
       type="submit"
       mat-raised-button
@@ -144,17 +173,28 @@
       (click)="onFormSubmit()"
     >
       <mat-icon *ngIf="!posted">save_outline</mat-icon>
-      <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
+      <mat-spinner
+        *ngIf="posted"
+        [diameter]="20"
+      ></mat-spinner>
       Enregistrer
     </button>
   </div>
 </div>
 
 <!-- MODAL humain activity -->
-<ng-template #activityModal let-c="close" let-d="dismiss">
+<ng-template
+  #activityModal
+  let-c="close"
+  let-d="dismiss"
+>
   <div class="modal-header">
     <h6>{{ modalTitle }}</h6>
-    <button mat-icon-button class="closeModalBtn" (click)="c()">
+    <button
+      mat-icon-button
+      class="closeModalBtn"
+      (click)="c()"
+    >
       <mat-icon class="cancel-icon">cancel</mat-icon>
     </button>
   </div>
@@ -182,13 +222,20 @@
               activityForm.controls.human_activity.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-6">
           <small class="required">Localisation</small>
-          <select class="form-control" [formControl]="activityForm.controls.localisation">
-            <option *ngFor="let localisation of formMetaData.LOCALISATION" [ngValue]="localisation">
+          <select
+            class="form-control"
+            [formControl]="activityForm.controls.localisation"
+          >
+            <option
+              *ngFor="let localisation of formMetaData.LOCALISATION"
+              [ngValue]="localisation"
+            >
               {{ localisation.mnemonique }}
             </option>
           </select>
@@ -198,11 +245,12 @@
               activityForm.controls.localisation.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-12">
-          <small class="required">Impacts (facteurs influençant l’évolution de la zone) </small>
+          <small class="required">Impacts (facteurs influençant l’évolution de la zone)</small>
           <zh-multiselect
             [values]="formMetaData.IMPACTS"
             [parentFormControl]="activityForm.controls.impacts"
@@ -215,8 +263,9 @@
               activityForm.controls.impacts.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-12">
           <small>Remarques</small>
@@ -239,5 +288,5 @@
     >
       {{ modalButtonLabel }}
     </button>
-  </div></ng-template
->
+  </div>
+</ng-template>
