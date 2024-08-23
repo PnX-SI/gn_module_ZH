@@ -604,7 +604,7 @@ def post_outflow(id_zh, outflows):
 
 def update_inflow(id_zh, inflows):
     try:
-        DB.session.execute(select(TInflow).where(TInflow.id_zh == id_zh))
+        DB.session.execute(delete(TInflow).where(TInflow.id_zh == id_zh))
         post_inflow(id_zh, inflows)
     except Exception as e:
         if e.__class__.__name__ == "DataError":
@@ -820,7 +820,7 @@ def post_instruments(id_zh, instruments):
 
 def update_protections(id_zh, protections):
     try:
-        DB.session.execute(select(CorZhProtection).where(CorZhProtection.id_zh == id_zh))
+        DB.session.execute(delete(CorZhProtection).where(CorZhProtection.id_zh == id_zh))
         post_protections(id_zh, protections)
     except Exception as e:
         if e.__class__.__name__ == "DataError":
@@ -928,7 +928,7 @@ def post_urban_docs(id_zh, urban_docs):
 def update_actions(id_zh, actions):
     try:
         # delete cascade actions
-        DB.session.execute(select(TActions).where(TActions.id_zh == id_zh))
+        DB.session.execute(delete(TActions).where(TActions.id_zh == id_zh))
         # post new actions
         post_actions(id_zh, actions)
     except Exception as e:
