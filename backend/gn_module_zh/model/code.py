@@ -18,8 +18,9 @@ class Code(ZH):
         try:
             departments = CorZhArea.get_departments(self.id_zh)
             area = 0
+            local_srid = DB.session.execute(func.Find_SRID("ref_geo", "l_areas", "geom")).scalar()
             my_geom = DB.session.execute(
-                select(func.ST_Transform(func.ST_SetSRID(TZH.geom, 4326), 2154)).where(
+                select(func.ST_Transform(func.ST_SetSRID(TZH.geom, 4326), local_srid)).where(
                     TZH.id_zh == self.id_zh
                 )
             ).scalar_one()
