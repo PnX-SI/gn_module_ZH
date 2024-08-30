@@ -171,13 +171,14 @@ def post_cor_lim_list(uuid_lim, criteria):
 
 def post_cor_zh_area(polygon, id_zh, id_type):
     # try:
+    local_srid = DB.session.execute(func.Find_SRID("ref_geo", "l_areas", "geom")).scalar()
     elements = [
         getattr(element, "id_area")
         for element in DB.session.scalars(
             select(LAreas)
             .where(
                 LAreas.geom.ST_Intersects(
-                    func.ST_Transform(func.ST_SetSRID(func.ST_AsText(polygon), 4326), 2154)
+                    func.ST_Transform(func.ST_SetSRID(func.ST_AsText(polygon), 4326), local_srid)
                 )
             )
             .where(LAreas.id_type == id_type)
@@ -188,7 +189,9 @@ def post_cor_zh_area(polygon, id_zh, id_type):
         if id_type == CorZhArea.get_id_type("Communes"):
             municipality_geom = getattr(DB.session.get(LAreas, element), "geom")
             polygon_2154 = DB.session.scalar(
-                select(func.ST_Transform(func.ST_SetSRID(func.ST_AsText(polygon), 4326), 2154))
+                select(
+                    func.ST_Transform(func.ST_SetSRID(func.ST_AsText(polygon), 4326), local_srid)
+                )
             )
             intersect_area = DB.session.scalar(
                 select(func.ST_Area(func.ST_Intersection(municipality_geom, polygon_2154)))
