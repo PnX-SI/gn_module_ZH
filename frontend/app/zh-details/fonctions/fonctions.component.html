@@ -6,7 +6,10 @@
           <h5 class="section-title">Fonctions hydrologiques / biogéochimiques</h5>
         </legend>
         <div class="mx-2">
-          <zh-table [tableCols]="hydroFctTableCol" [data]="data.hydrologie"></zh-table>
+          <zh-table
+            [tableCols]="hydroFctTableCol"
+            [data]="data.hydrologie"
+          ></zh-table>
         </div>
       </fieldset>
     </div>
@@ -16,7 +19,10 @@
           <h5 class="section-title">Fonctions biologiques / écologiques</h5>
         </legend>
         <div class="mx-2">
-          <zh-table [tableCols]="bioFctTableCol" [data]="data.biologie"></zh-table>
+          <zh-table
+            [tableCols]="bioFctTableCol"
+            [data]="data.biologie"
+          ></zh-table>
         </div>
       </fieldset>
     </div>
@@ -26,7 +32,10 @@
           <h5 class="section-title">Intérêts patrimoniaux</h5>
         </legend>
         <div class="mx-2">
-          <zh-table [tableCols]="intertesTableCol" [data]="data.interet"></zh-table>
+          <zh-table
+            [tableCols]="intertesTableCol"
+            [data]="data.interet"
+          ></zh-table>
         </div>
         <h5 class="section-title sub-title mx-2">Habitats naturels humides patrimoniaux :</h5>
         <div class="mx-3">
@@ -47,7 +56,10 @@
               </zh-label>
             </div>
           </div>
-          <zh-table [tableCols]="corineTableCol" [data]="data.habitats.corine"></zh-table>
+          <zh-table
+            [tableCols]="corineTableCol"
+            [data]="data.habitats.corine"
+          ></zh-table>
           <i>*I.C. = Intérêt communautaire; P.R. = Intérêt communautaire prioritaire</i>
         </div>
         <h5 class="section-title sub-title mx-2">Faune et flore patrimoniale :</h5>
@@ -78,7 +90,10 @@
           <h5 class="section-title">Valeurs socio-économiques</h5>
         </legend>
         <div class="mx-2">
-          <zh-table [tableCols]="socioEcoTableCol" [data]="data.socio"></zh-table>
+          <zh-table
+            [tableCols]="socioEcoTableCol"
+            [data]="data.socio"
+          ></zh-table>
         </div>
       </fieldset>
     </div>

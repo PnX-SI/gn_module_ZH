@@ -1,6 +1,9 @@
 <div class="custom-container">
   <div class="row">
-    <div class="col-xl-6 col-lg-7 col-sm-6" [ngStyle]="{ 'min-height.px': cardContentHeight }">
+    <div
+      class="col-xl-6 col-lg-7 col-sm-6"
+      [ngStyle]="{ 'min-height.px': cardContentHeight }"
+    >
       <zh-form-map
         (draw)="updateGeom($event)"
         (endDraw)="onNewGeom($event)"
@@ -9,9 +12,12 @@
     </div>
     <div class="col-xl-6 col-lg-5 col-sm-6">
       <div class="d-flex mt-3">
-        <mat-slide-toggle [(ngModel)]="toggleChecked" (change)="slideToggleChanged()"
-          >Afficher toutes les zones humides sur la carte</mat-slide-toggle
+        <mat-slide-toggle
+          [(ngModel)]="toggleChecked"
+          (change)="slideToggleChanged()"
         >
+          Afficher toutes les zones humides sur la carte
+        </mat-slide-toggle>
       </div>
       <form>
         <fieldset>
@@ -20,46 +26,57 @@
           </legend>
           <div class="form-row">
             <!-- <h3 class="section-label">Identification de la zone humide</h3> -->
-            <div class="form-group col-md-12" [hidden]="_currentZh">
-              <small class="required">Organisme de l'opérateur </small>
+            <div
+              class="form-group col-md-12"
+              [hidden]="_currentZh"
+            >
+              <small class="required">Organisme de l'opérateur</small>
 
-              <zh-multiselect 
+              <zh-multiselect
                 keyLabel="name"
                 keyValue="id_org"
                 [values]="idOrg"
                 [parentFormControl]="form.controls.id_org"
-                [multiple]="false" 
-                [hightlightValue]="false"/>
+                [multiple]="false"
+                [hightlightValue]="false"
+              />
               <small
                 *ngIf="
                   (form.controls.id_org.touched || submitted) &&
                   form.controls.id_org.errors?.required
                 "
                 class="error-msg"
-                >Champ requis</small
               >
+                Champ requis
+              </small>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group col-md-6">
               <small class="required">Nom usuel de la zone humide</small>
-              <input class="form-control" type="text" [formControl]="form.controls.main_name" />
+              <input
+                class="form-control"
+                type="text"
+                [formControl]="form.controls.main_name"
+              />
               <small
                 *ngIf="
                   (form.controls.main_name.touched || submitted) &&
                   form.controls.main_name.errors?.required
                 "
                 class="error-msg"
-                >Champ requis</small
               >
+                Champ requis
+              </small>
               <small
                 *ngIf="
                   (form.controls.main_name.touched || submitted) &&
                   form.controls.main_name.errors?.zh_exists
                 "
                 class="error-msg"
-                >Ce nom est déjà pris. Veuillez entrer un autre nom</small
               >
+                Ce nom est déjà pris. Veuillez entrer un autre nom
+              </small>
             </div>
           </div>
           <div class="form-row">
@@ -80,8 +97,9 @@
                   form.controls.critere_delim.errors?.required
                 "
                 class="error-msg"
-                >Champ requis</small
               >
+                Champ requis
+              </small>
             </div>
           </div>
           <div class="form-row">
@@ -95,7 +113,7 @@
                 keyValue="id_nomenclature"
                 [values]="sdage"
                 [parentFormControl]="form.controls.sdage"
-                [multiple]="false" 
+                [multiple]="false"
                 [hightlightValue]="false"
               />
               <small
@@ -103,8 +121,9 @@
                   (form.controls.sdage.touched || submitted) && form.controls.sdage.errors?.required
                 "
                 class="error-msg"
-                >Champ requis</small
               >
+                Champ requis
+              </small>
             </div>
           </div>
         </fieldset>
@@ -120,7 +139,10 @@
           (click)="onFormSubmit(form.value)"
         >
           <mat-icon *ngIf="!posted">save_outline</mat-icon>
-          <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
+          <mat-spinner
+            *ngIf="posted"
+            [diameter]="20"
+          ></mat-spinner>
           Enregistrer
         </button>
       </div>

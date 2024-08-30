@@ -17,8 +17,11 @@
         </div>
         <div class="form-group col-md-12">
           <small>Remarque</small>
-          <textarea class="form-control form-control-sm" rows="3" formControlName="remark_lim">
-          </textarea>
+          <textarea
+            class="form-control form-control-sm"
+            rows="3"
+            formControlName="remark_lim"
+          ></textarea>
         </div>
       </div>
     </fieldset>
@@ -29,7 +32,8 @@
       <div class="form-row">
         <div class="form-group col-md-12">
           <small>Critères utilisés</small>
-          <zh-multiselect placeholder="Critères utilisés"
+          <zh-multiselect
+            placeholder="Critères utilisés"
             keyLabel="mnemonique"
             [values]="critDelimFct"
             [parentFormControl]="formTab2.controls.critere_delim_fs"
@@ -37,15 +41,21 @@
         </div>
         <div class="form-group col-md-12">
           <small>Remarque</small>
-          <textarea class="form-control form-control-sm" rows="3" formControlName="remark_lim_fs">
-          </textarea>
+          <textarea
+            class="form-control form-control-sm"
+            rows="3"
+            formControlName="remark_lim_fs"
+          ></textarea>
         </div>
       </div>
     </fieldset>
   </form>
 
   <div class="footer-btn">
-    <zh-cancelButton *ngIf="currentZh" [zhId]="currentZh.properties.id_zh"></zh-cancelButton>
+    <zh-cancelButton
+      *ngIf="currentZh"
+      [zhId]="currentZh.properties.id_zh"
+    ></zh-cancelButton>
     <button
       type="submit"
       mat-raised-button
@@ -55,7 +65,10 @@
       (click)="onFormSubmit(formTab2.value)"
     >
       <mat-icon *ngIf="!posted">save_outline</mat-icon>
-      <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
+      <mat-spinner
+        *ngIf="posted"
+        [diameter]="20"
+      ></mat-spinner>
       Enregistrer
     </button>
   </div>
