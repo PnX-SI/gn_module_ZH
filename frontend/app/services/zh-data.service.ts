@@ -115,10 +115,9 @@ export class ZhDataService {
     return this._api.get(`${this.config.API_ENDPOINT}/zones_humides/${zhId}/taxa`);
   }
 
-  getHierZh(zhId: string, headers?: HttpHeaders | { [header: string]: string | string[]; }) {
-    return this._api.get(
-      `${this.config.API_ENDPOINT}/zones_humides/${zhId}/hierarchy`, {
-      headers
+  getHierZh(zhId: string, headers?: HttpHeaders | { [header: string]: string | string[] }) {
+    return this._api.get(`${this.config.API_ENDPOINT}/zones_humides/${zhId}/hierarchy`, {
+      headers,
     });
   }
 

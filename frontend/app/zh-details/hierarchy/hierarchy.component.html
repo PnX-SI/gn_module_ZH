@@ -1,5 +1,8 @@
 <h4 class="tabsSubtitle">Bassin versant : {{ data?.river_basin_name }}</h4>
-<div *ngIf="hierarchy.warning" class="alert alert-warning mat-alert">
+<div
+  *ngIf="hierarchy.warning"
+  class="alert alert-warning mat-alert"
+>
   {{ hierarchy.warning }}
 </div>
 <zh-table
