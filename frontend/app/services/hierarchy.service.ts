@@ -26,7 +26,7 @@ export class HierarchyService {
   public items: ItemModel[];
   public rb_name: string;
   public isLoading: boolean = false;
-  public warning: string = "";
+  public warning: string = '';
 
   constructor(
     private _dataService: ZhDataService,
@@ -41,27 +41,31 @@ export class HierarchyService {
   // get current zone humides
   getHierarchy(zhId, rb_name) {
     this.isLoading = true;
-    this.warning = "";
+    this.warning = '';
     this.rb_name = rb_name;
-    this._dataService.getHierZh(zhId, {
-      "not-to-handle": "1"
-    }).subscribe(
-      (data: HierarchyModel) => {
-        this.items = this.setItems(data);
-      },
-      (error) => {
-        this.isLoading = false;
-        this.items = [];
-        if (error.status === 404) {
-          this.warning = "La ZH n'est présente dans aucun bassin versant";
-        } else if (error.status === 400) {
-          this.warning = this._error['errors'].filter((i) => error.error['message'] === i.api)[0].front
+    this._dataService
+      .getHierZh(zhId, {
+        'not-to-handle': '1',
+      })
+      .subscribe(
+        (data: HierarchyModel) => {
+          this.items = this.setItems(data);
+        },
+        (error) => {
+          this.isLoading = false;
+          this.items = [];
+          if (error.status === 404) {
+            this.warning = "La ZH n'est présente dans aucun bassin versant";
+          } else if (error.status === 400) {
+            this.warning = this._error['errors'].filter(
+              (i) => error.error['message'] === i.api
+            )[0].front;
+          }
+        },
+        () => {
+          this.isLoading = false;
         }
-      },
-      () => {
-        this.isLoading = false;
-      }
-    );
+      );
   }
 
   // set list of hierarchy items
