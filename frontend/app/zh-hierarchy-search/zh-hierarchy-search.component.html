@@ -8,12 +8,12 @@
     <div class="card-body">
       <div
         class="row"
-        *ngIf="riverBasin?.value?.length > 0; else noZone"
+        *ngIf="riverBasin?.value?.code !== undefined; else noZone"
       >
         <div class="col-12">
           <zh-hierarchy-search-table
             [form]="form"
-            [riverBasin]="riverBasin?.value[0]"
+            [riverBasin]="riverBasin?.value"
           ></zh-hierarchy-search-table>
         </div>
       </div>
