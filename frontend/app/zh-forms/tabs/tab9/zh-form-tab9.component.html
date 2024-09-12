@@ -8,8 +8,16 @@
       </span> : {{ main_rb_name }}
     </h4>
 
+    <div
+      *ngIf="hierarchy.warning"
+      class="alert alert-warning mat-alert"
+    >
+      {{ hierarchy.warning }}
+    </div>
+
   <div *ngIf="!hierarchy.isLoading && main_rb_name != 'aucun'">
     <zh-table
+      *ngIf="hierarchy.items?.length"
       [tableCols]="hierarchy.hierTableCols"
       [data]="hierarchy.items"
       [bold_row_values]="hierarchy.bold_row_values"

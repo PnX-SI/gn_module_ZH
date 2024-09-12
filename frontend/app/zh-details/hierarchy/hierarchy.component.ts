@@ -8,17 +8,16 @@ import { HierarchyService } from '../../services/hierarchy.service';
   styleUrls: ['./hierarchy.component.scss'],
 })
 export class HierarchyComponent {
-  @Input() data: HierarchyTotalModel;
-  main_river_basin_name: string;
+  @Input() main_rb_name: string;
+  main_river_basin: string;
 
   constructor(public hierarchy: HierarchyService) {}
   ngOnInit() {
-    this.main_river_basin_name = ''
-    if (this.data.main_basin_name != null) {
-      this.main_river_basin_name = this.data.main_basin_name;
-      this.hierarchy.setItems(this.data.hierarchy);
+    this.main_river_basin = ''
+    if (this.main_rb_name != null) {
+      this.main_river_basin = this.main_rb_name;
     } else {
-      this.main_river_basin_name = 'aucun'
+      this.main_river_basin = 'aucun'
     }
   }
 }
