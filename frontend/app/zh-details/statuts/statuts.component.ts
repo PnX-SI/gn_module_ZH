@@ -44,7 +44,6 @@ export class StatutsComponent implements OnInit {
     { name: 'remark', label: 'Remarques' },
   ];
   constructor(public config: ConfigService) {
-    console.log(config);
   }
 
   ngOnInit() {
