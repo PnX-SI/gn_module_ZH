@@ -48,7 +48,7 @@ export class ZhDetailsComponent implements OnInit, AfterViewInit {
     this._zhService.getZhById(this.id_zh).subscribe((zh: any) => {
       if (zh) {
         this.currentZh = zh;
-        this.hierarchy.getHierarchy(zh.id)
+        this.hierarchy.getHierarchy(zh.id);
       }
     });
   }

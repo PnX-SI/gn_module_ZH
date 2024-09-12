@@ -41,7 +41,7 @@ export class ZhFormTab9Component implements OnInit {
           this.main_rb_name = zh.properties.main_rb_name;
           this.hierarchy.getHierarchy(zh.id);
         } else {
-          this.main_rb_name = "aucun";
+          this.main_rb_name = 'aucun';
         }
       }
     });

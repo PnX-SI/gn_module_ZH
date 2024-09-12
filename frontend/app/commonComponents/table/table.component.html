@@ -15,7 +15,7 @@
     <ng-container *ngIf="data && data.length > 0">
       <tr
         [ngStyle]="{
-          background: item[color_col_name] == color_value ? '#EBFFE5' : 'rgba(67, 175, 0, 0.04)'
+          background: item[color_col_name] == color_value ? '#EBFFE5' : 'rgba(67, 175, 0, 0.04)',
         }"
         *ngFor="let item of data"
       >

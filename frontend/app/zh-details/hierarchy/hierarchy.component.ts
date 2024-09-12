@@ -13,11 +13,11 @@ export class HierarchyComponent {
 
   constructor(public hierarchy: HierarchyService) {}
   ngOnInit() {
-    this.main_river_basin = ''
+    this.main_river_basin = '';
     if (this.main_rb_name != null) {
       this.main_river_basin = this.main_rb_name;
     } else {
-      this.main_river_basin = 'aucun'
+      this.main_river_basin = 'aucun';
     }
   }
 }
