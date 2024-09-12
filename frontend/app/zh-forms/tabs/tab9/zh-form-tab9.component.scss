@@ -23,3 +23,22 @@ select.custom-select option:disabled {
     margin-left: 2px;
   }
 }
+.tip-txt {
+  width: 300px;
+  position: absolute;
+  visibility: hidden;
+  background: #757171;
+  padding: 10px;
+  font-size: 12px;
+  border-radius: 3px;
+  box-sizing: border-box;
+  text-align: justify;
+}
+.fa {
+  font-size: 14px;
+}
+.fa-info-circle:hover + .tip-txt { 
+  visibility: visible;
+  color: rgb(255, 255, 255);
+  opacity: 1;
+}

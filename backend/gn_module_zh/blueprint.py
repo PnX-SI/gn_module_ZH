@@ -9,7 +9,7 @@ import sqlalchemy.exc as exc
 from flask import Blueprint, Response, jsonify, request, send_file, g
 from flask.helpers import send_file
 from geojson import FeatureCollection
-from werkzeug.exceptions import Forbidden, BadRequest
+from werkzeug.exceptions import Forbidden, BadRequest, NotFound
 
 from geonature.core.gn_commons.models import TMedias
 
@@ -53,7 +53,7 @@ from .forms import (
 )
 
 # from .forms import *
-from .geometry import set_area, set_geom
+from .geometry import set_area, set_geom, get_main_rb
 from .hierarchy import Hierarchy, get_all_hierarchy_fields
 from .model.cards import Card
 from .model.repositories import ZhRepository
@@ -225,7 +225,8 @@ def get_complete_info(id_zh):
 
 def get_complete_card(id_zh: int) -> Card:
     ref_geo_config = [ref for ref in blueprint.config["ref_geo_referentiels"] if ref["active"]]
-    return Card(id_zh, "full", ref_geo_config).__repr__()
+    main_id_rb = DB.session.scalar(select(TZH.main_id_rb).where(TZH.id_zh == id_zh))
+    return Card(id_zh, main_id_rb, "full", ref_geo_config).__repr__()
 
 
 @blueprint.route("/eval/<int:id_zh>", methods=["GET"])
@@ -599,6 +600,7 @@ def get_tab_data(id_tab):
             raise BadRequest(
                 "Géométrie manquante",
             )
+
         # POST / PATCH
         if "id_zh" not in form_data.keys():
             # set geometry from coordinates
@@ -612,7 +614,7 @@ def get_tab_data(id_tab):
                 form_data["update_date"],
                 geom["polygon"],
                 area,
-                active_geo_refs,
+                active_geo_refs
             )
             intersection = geom["is_intersected"]
         else:
@@ -627,7 +629,7 @@ def get_tab_data(id_tab):
                 area,
                 g.current_user,
                 form_data["update_date"],
-                active_geo_refs,
+                active_geo_refs
             )
             intersection = geom["is_intersected"]
 
@@ -994,7 +996,10 @@ def get_hydro_zones_from_bassin() -> dict:
 @permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
 def get_hierarchy(id_zh):
     """Get zh note"""
-    hierarchy = Hierarchy(id_zh)
+    main_id_rb = DB.session.scalar(select(TZH.main_id_rb).where(TZH.id_zh == id_zh))
+    if not main_id_rb:
+        raise NotFound("The ZH is not in a river basin")
+    hierarchy = Hierarchy(id_zh, main_id_rb)
     return hierarchy.as_dict()
 
 

@@ -1,7 +1,5 @@
 import sys
 from itertools import groupby
-from werkzeug.exceptions import NotFound
-
 
 from geonature.utils.env import DB
 from pypnnomenclature.models import BibNomenclaturesTypes, TNomenclatures
@@ -1134,11 +1132,9 @@ class Volet2(Volet):
 
 
 class Hierarchy(ZH):
-    def __init__(self, id_zh):
+    def __init__(self, id_zh, main_id_rb):
         self.id_zh = id_zh
-        self.rb_id = self.__get_rb()
-        if not self.rb_id:
-            raise NotFound("The ZH is not in a river basin")
+        self.rb_id = main_id_rb
         self.is_rules = self.__check_if_rules()
         self.volet1 = Volet1(self.id_zh, self.rb_id)
         self.volet2 = Volet2(self.id_zh, self.rb_id)
@@ -1161,16 +1157,6 @@ class Hierarchy(ZH):
             )
         else:
             return None
-
-    def __get_rb(self):
-        q_rb = ZH.get_data_by_id(CorZhRb, self.id_zh)
-        if not q_rb:
-            return None
-        if len(q_rb) > 1:
-            return get_main_rb(q_rb)
-        return DB.session.execute(
-            select(CorZhRb.id_rb, TRiverBasin).join(TRiverBasin).where(CorZhRb.id_zh == self.id_zh)
-        ).scalar_one()
 
     def __check_if_rules(self):
         try:

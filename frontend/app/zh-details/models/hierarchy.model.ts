@@ -1,5 +1,9 @@
+export interface HierarchyTotalModel {
+  main_basin_name: string;
+  hierarchy: HierarchyModel;
+}
+
 export interface HierarchyModel {
-  river_basin_name: string;
   volet1: Volet1;
   volet2: Volet2;
   global_note: string;

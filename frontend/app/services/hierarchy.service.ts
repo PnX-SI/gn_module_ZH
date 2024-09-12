@@ -24,7 +24,6 @@ export class HierarchyService {
   public currentZh: any;
   //public hierZh: HierarchyModel = null;
   public items: ItemModel[];
-  public rb_name: string;
   public isLoading: boolean = false;
 
   constructor(
@@ -38,9 +37,8 @@ export class HierarchyService {
   }
 
   // get current zone humides
-  getHierarchy(zhId, rb_name) {
+  getHierarchy(zhId) {
     this.isLoading = true;
-    this.rb_name = rb_name;
     this._dataService.getHierZh(zhId).subscribe(
       (data: HierarchyModel) => {
         this.items = this.setItems(data);
