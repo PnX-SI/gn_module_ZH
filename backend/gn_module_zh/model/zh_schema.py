@@ -314,10 +314,13 @@ class TZH(ZhModel):
             ).all()
         ]
         return ", ".join([str(item) for item in bassin_versant])
-    
+
     @hybrid_property
     def main_rb_name(self):
-        return DB.session.scalar(select(TRiverBasin.name).where(TRiverBasin.id_rb == self.main_id_rb))
+        return DB.session.scalar(
+            select(TRiverBasin.name).where(TRiverBasin.id_rb == self.main_id_rb)
+        )
+
 
 @serializable
 class CorZhArea(DB.Model):

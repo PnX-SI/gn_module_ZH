@@ -614,7 +614,7 @@ def get_tab_data(id_tab):
                 form_data["update_date"],
                 geom["polygon"],
                 area,
-                active_geo_refs
+                active_geo_refs,
             )
             intersection = geom["is_intersected"]
         else:
@@ -629,7 +629,7 @@ def get_tab_data(id_tab):
                 area,
                 g.current_user,
                 form_data["update_date"],
-                active_geo_refs
+                active_geo_refs,
             )
             intersection = geom["is_intersected"]
 

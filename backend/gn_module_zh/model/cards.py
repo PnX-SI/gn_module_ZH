@@ -1185,8 +1185,10 @@ class Card(ZH):
 
     def __set_hierarchy(self):
         return {
-            "main_basin_name": DB.session.scalar(select(TRiverBasin.name).where(TRiverBasin.id_rb == self.main_id_rb)),
-            "hierarchy": self.hierarchy.as_dict() if self.hierarchy is not None else None
+            "main_basin_name": DB.session.scalar(
+                select(TRiverBasin.name).where(TRiverBasin.id_rb == self.main_id_rb)
+            ),
+            "hierarchy": self.hierarchy.as_dict() if self.hierarchy is not None else None,
         }
 
     def __set_evaluation(self):

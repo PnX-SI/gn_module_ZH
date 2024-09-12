@@ -67,7 +67,9 @@ def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referenti
     code = str(uuid.uuid4())[0:12]
 
     # main river basin
-    rbs = TZH.get_zh_area_intersected("river_basin", func.ST_GeomFromGeoJSON(str(form_data["geom"]["geometry"])))
+    rbs = TZH.get_zh_area_intersected(
+        "river_basin", func.ST_GeomFromGeoJSON(str(form_data["geom"]["geometry"]))
+    )
     main_id_rb = get_main_rb(rbs, form_data["geom"]["geometry"])
 
     # create zh : fill pr_zh.t_zh
@@ -83,7 +85,7 @@ def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referenti
         id_sdage=form_data["sdage"],
         geom=polygon,
         area=zh_area,
-        main_id_rb=main_id_rb
+        main_id_rb=main_id_rb,
     )
     DB.session.add(new_zh)
     DB.session.flush()
@@ -261,7 +263,9 @@ def update_zh_tab0(form_data, polygon, area, info_role, zh_date, geo_refs):
     main_id_rb = DB.session.get(TZH, form_data["id_zh"]).main_id_rb
 
     if is_geom_new:
-        rbs = TZH.get_zh_area_intersected("river_basin", func.ST_GeomFromGeoJSON(str(form_data["geom"]["geometry"])))
+        rbs = TZH.get_zh_area_intersected(
+            "river_basin", func.ST_GeomFromGeoJSON(str(form_data["geom"]["geometry"]))
+        )
         main_id_rb = get_main_rb(rbs, form_data["geom"]["geometry"])
         update_cor_zh_area(polygon, form_data["id_zh"], geo_refs)
         update_cor_zh_rb(form_data["geom"]["geometry"], form_data["id_zh"], rbs)
@@ -281,7 +285,7 @@ def update_zh_tab0(form_data, polygon, area, info_role, zh_date, geo_refs):
             geom=polygon,
             area=area,
             ef_area=ef_area,
-            main_id_rb=main_id_rb
+            main_id_rb=main_id_rb,
         )
     )
 
