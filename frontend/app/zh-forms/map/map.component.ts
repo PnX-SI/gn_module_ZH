@@ -18,7 +18,10 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit {
   @Output() edit = new EventEmitter<any>();
   @Output() endDraw = new EventEmitter<any>();
 
-  constructor(private _mapService: MapService, private _commonService: CommonService) {}
+  constructor(
+    private _mapService: MapService,
+    private _commonService: CommonService
+  ) {}
 
   ngOnInit() {
     // overight the leaflet draw object to set options
@@ -37,7 +40,7 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit {
     if (this._mapService.currentExtend) {
       this._mapService.map.setView(
         this._mapService.currentExtend.center,
-        this._mapService.currentExtend.zoom,
+        this._mapService.currentExtend.zoom
       );
     }
 
@@ -69,7 +72,6 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit {
   onDrawStop(e) {
     this.endDraw.emit(e);
   }
-
 
   // display help toaster for filelayer
   infoMessageFileLayer() {
