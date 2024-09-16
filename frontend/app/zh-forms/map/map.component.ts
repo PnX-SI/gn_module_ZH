@@ -1,5 +1,6 @@
 import { Component, OnInit, AfterViewInit, Output, EventEmitter } from '@angular/core';
 import { leafletDrawOption } from '@geonature_common/map/leaflet-draw.options';
+import { CommonService } from '@geonature_common/service/common.service';
 import { MapService } from '@geonature_common/map/map.service';
 
 import * as L from 'leaflet';
@@ -12,11 +13,15 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit {
   public leafletDrawOptions: any;
   public geometry: any = null;
   public editedGeometry: any = null;
+  public firstFileLayerMessage = true;
   @Output() draw = new EventEmitter<any>();
   @Output() edit = new EventEmitter<any>();
   @Output() endDraw = new EventEmitter<any>();
 
-  constructor(private _mapService: MapService) {}
+  constructor(
+    private _mapService: MapService,
+    private _commonService: CommonService
+  ) {}
 
   ngOnInit() {
     // overight the leaflet draw object to set options
@@ -66,5 +71,13 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit {
 
   onDrawStop(e) {
     this.endDraw.emit(e);
+  }
+
+  // display help toaster for filelayer
+  infoMessageFileLayer() {
+    if (this.firstFileLayerMessage) {
+      this._commonService.translateToaster('info', 'Map.FileLayerInfoMessage');
+    }
+    this.firstFileLayerMessage = false;
   }
 }
