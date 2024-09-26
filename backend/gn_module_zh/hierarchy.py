@@ -859,14 +859,14 @@ class Item:
         try:
             return (
                 DB.session.execute(
-                    select(TRules, BibHierCategories)
+                    select(TRules, BibHierSubcategories)
                     .join(TRules)
                     .where(TRules.rule_id == self.rule_id)
                 )
                 .all()[0]
-                .BibHierCategories.label.capitalize()
+                .BibHierSubcategories.label.capitalize()
             )
-        except NoResultFound:
+        except:
             pass
         return (
             DB.session.execute(

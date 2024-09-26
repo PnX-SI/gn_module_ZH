@@ -7,7 +7,7 @@ import { HierarchyField, HierarchyFields, Note, RiverBasin } from '../../models/
 import { TableColumn } from '../../commonComponents/table/table-interface';
 
 type Data = {
-  kownledges: string[];
+  knowledges: string[];
   field: string;
   attributes: string;
 };
@@ -62,7 +62,7 @@ export class ZhHierarchySearchTableComponent implements OnInit {
     private _zhService: ZhDataService,
     private _toastr: ToastrService,
     private _error: ErrorTranslatorService
-  ) {}
+  ) { }
 
   get data() {
     return this.form.controls['hierarchy'] as FormArray;
@@ -87,7 +87,7 @@ export class ZhHierarchySearchTableComponent implements OnInit {
           this.fields = [];
           this.notes = [];
         })
-        .finally(() => {});
+        .finally(() => { });
     }
   }
 
@@ -119,7 +119,7 @@ export class ZhHierarchySearchTableComponent implements OnInit {
         (item.rubrique == event && item.sousrubrique == null) ||
         item.sousrubrique == event
     );
-
+    
     // Creates kind of a Set to have unique objects
     this.attributes = filteredNotes.filter(
       (v, i, a) => a.findIndex((v2) => ['attribut'].every((k) => v2[k] === v[k])) === i
@@ -130,12 +130,12 @@ export class ZhHierarchySearchTableComponent implements OnInit {
     if (this.attributes.length > 0) {
       this.knowledges = this.getKnowledge(this.attributes[0]);
     }
-
+    
     if (this.attributes.length > 0) {
-      this.localForm.controls['attributes'].setValue([this.attributes[0]]);
+      this.localForm.controls["attributes"].setValue([this.attributes[0]]);
     }
     if (this.knowledges.length > 0) {
-      this.localForm.controls['knowledges'].setValue([this.knowledges[0]]);
+      this.localForm.controls["knowledges"].setValue([this.knowledges]);
     }
   }
 
@@ -170,10 +170,18 @@ export class ZhHierarchySearchTableComponent implements OnInit {
       const form = this.initialForm();
       form.patchValue(this.localForm.value);
       this.data.push(form);
-      // Reset all form data
-      this.reset();
-    }
-  }
+      let knowledges_array = []
+      this.data.value.forEach(element => {
+        if ((element['knowledges'] !== null) && (!(Array.isArray(element['knowledges'])))) {
+          // avoid object object in 'connaissance' column of the frontend table
+          knowledges_array.push(element['knowledges']);
+          element['knowledges'] = knowledges_array;
+          knowledges_array = []
+        }
+      })
+    }  
+    this.reset();
+  };
 
   onDeleteFilter(event) {
     const item = this.getFilterIndex(event);
