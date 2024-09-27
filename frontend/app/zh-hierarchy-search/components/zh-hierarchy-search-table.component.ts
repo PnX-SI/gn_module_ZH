@@ -87,7 +87,9 @@ export class ZhHierarchySearchTableComponent implements OnInit {
           this.fields = [];
           this.notes = [];
         })
-        .finally(() => {});
+        .finally(() => {
+          this.updateAttributesAndKnowledgeForm();
+        });
     }
   }
 
@@ -110,9 +112,6 @@ export class ZhHierarchySearchTableComponent implements OnInit {
   }
 
   fieldChanged(event) {
-    this.localForm.controls['attributes'].reset();
-    this.localForm.controls['knowledges'].reset();
-
     const filteredNotes = this.notes.filter(
       (item) =>
         (item.volet == event && item.rubrique == null && item.sousrubrique == null) ||
@@ -131,11 +130,32 @@ export class ZhHierarchySearchTableComponent implements OnInit {
       this.knowledges = this.getKnowledge(this.attributes[0]);
     }
 
-    if (this.attributes.length > 0) {
-      this.localForm.controls['attributes'].setValue([this.attributes[0]]);
+    // Update the form
+    this.updateAttributesAndKnowledgeForm();
+  }
+
+  updateAttributesAndKnowledgeForm() {
+    const knowledgeControl = this.localForm.controls['knowledges'];
+    const attributesControl = this.localForm.controls['attributes'];
+
+    attributesControl.reset();
+    knowledgeControl.reset();
+
+    if (this.attributes.length) {
+      attributesControl.enable();
+      attributesControl.setValue([this.attributes[0]]);
     }
+    else {
+      attributesControl.disable();
+    }
+
+
     if (this.knowledges.length > 0) {
-      this.localForm.controls['knowledges'].setValue([this.knowledges]);
+      knowledgeControl.enable();
+      knowledgeControl.setValue(this.knowledges[0]);
+    }
+    else {
+      knowledgeControl.disable();
     }
   }
 
