@@ -47,7 +47,7 @@ export class HierarchyService {
       })
       .subscribe(
         (data: HierarchyModel) => {
-          this.items = this.setItems(data);
+          this.setItems(data);
         },
         (error) => {
           this.isLoading = false;
@@ -345,7 +345,5 @@ export class HierarchyService {
       note: data.final_note,
     });
     //this.bold_row_values.push("NOTE FINALE");
-
-    return this.items;
   }
 }
