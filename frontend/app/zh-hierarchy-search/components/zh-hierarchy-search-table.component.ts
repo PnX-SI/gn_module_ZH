@@ -144,17 +144,14 @@ export class ZhHierarchySearchTableComponent implements OnInit {
     if (this.attributes.length) {
       attributesControl.enable();
       attributesControl.setValue([this.attributes[0]]);
-    }
-    else {
+    } else {
       attributesControl.disable();
     }
-
 
     if (this.knowledges.length > 0) {
       knowledgeControl.enable();
       knowledgeControl.setValue(this.knowledges[0]);
-    }
-    else {
+    } else {
       knowledgeControl.disable();
     }
   }
