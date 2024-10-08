@@ -509,9 +509,10 @@ class Basin:
     def __get_hydro_zones(self):
         return [
             name
-            for name in DB.session.execute(
-                select(THydroArea.name)
-                .where(THydroArea.id_hydro == CorZhHydro.id_hydro, CorZhHydro.id_zh == self.id_zh)
+            for (name,) in DB.session.execute(
+                select(THydroArea.name).where(
+                    THydroArea.id_hydro == CorZhHydro.id_hydro, CorZhHydro.id_zh == self.id_zh
+                    )
                 .distinct()
             ).all()
         ]
