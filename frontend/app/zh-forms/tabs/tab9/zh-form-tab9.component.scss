@@ -33,6 +33,7 @@ select.custom-select option:disabled {
   border-radius: 3px;
   box-sizing: border-box;
   text-align: justify;
+  z-index: 999;
 }
 .fa {
   font-size: 14px;
