@@ -43,9 +43,7 @@ export class StatutsComponent implements OnInit {
     { name: 'duree', label: 'Durée (années)' },
     { name: 'remark', label: 'Remarques' },
   ];
-  constructor(public config: ConfigService) {
-    console.log(config);
-  }
+  constructor(public config: ConfigService) {}
 
   ngOnInit() {
     var groupBy = function (xs, key) {

@@ -499,21 +499,21 @@ class Basin:
     def __get_river_basins(self):
         return [
             name
-            for (name,) in DB.session.execute(
+            for name in DB.session.scalars(
                 select(TRiverBasin.name).where(
                     TRiverBasin.id_rb == CorZhRb.id_rb, CorZhRb.id_zh == self.id_zh
                 )
-            ).all()
+            )
         ]
 
     def __get_hydro_zones(self):
         return [
             name
-            for name in DB.session.execute(
+            for name in DB.session.scalars(
                 select(THydroArea.name)
                 .where(THydroArea.id_hydro == CorZhHydro.id_hydro, CorZhHydro.id_zh == self.id_zh)
                 .distinct()
-            ).all()
+            )
         ]
 
 
@@ -1004,8 +1004,9 @@ class Action:
 
 
 class Card(ZH):
-    def __init__(self, id_zh, type, ref_geo_config):
+    def __init__(self, id_zh, main_id_rb, type, ref_geo_config):
         self.id_zh = id_zh
+        self.main_id_rb = main_id_rb
         self.type = type
         self.ref_geo_config = ref_geo_config
         self.properties = self.get_properties()
@@ -1018,7 +1019,7 @@ class Card(ZH):
         self.status = Status()
         self.evaluation = Evaluation()
         try:
-            self.hierarchy = Hierarchy(id_zh)
+            self.hierarchy = Hierarchy(id_zh, main_id_rb)
         except (NotFound, ZHApiError):
             self.hierarchy = None
 
@@ -1183,7 +1184,12 @@ class Card(ZH):
         return self.status.__str__()
 
     def __set_hierarchy(self):
-        return self.hierarchy.as_dict() if self.hierarchy is not None else None
+        return {
+            "main_basin_name": DB.session.scalar(
+                select(TRiverBasin.name).where(TRiverBasin.id_rb == self.main_id_rb)
+            ),
+            "hierarchy": self.hierarchy.as_dict() if self.hierarchy is not None else None,
+        }
 
     def __set_evaluation(self):
         self.__set_main_functions()

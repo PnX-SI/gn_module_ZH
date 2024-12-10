@@ -1,10 +1,29 @@
 <div class="container-fluid">
   <h2 class="tabsTitle">Hiérarchisation</h2>
 
-  <div *ngIf="!hierarchy.isLoading">
-    <h4 class="tabsSubtitle">Bassin versant : {{ hierarchy.rb_name }}</h4>
+  <h4 class="tabsSubtitle">
+    Bassin versant principal
+    <i class="fa fa-info-circle"></i>
+    <span class="tip-txt">
+      Une zone humide peut intersecter plusieurs bassins versants. Le bassin versant principal est
+      celui qui couvre le plus de surface sur la zone humide. Le calcul de la hiérarchisation d'une
+      zone humide se base UNIQUEMENT sur les règles du bassin versant principal. Pour avoir une
+      liste complète de tous les bassins versants intersectés par une zone humide, voir l'onglet 3
+      de la fiche complète.
+    </span>
+    : {{ main_rb_name }}
+  </h4>
 
+  <div
+    *ngIf="hierarchy.warning"
+    class="alert alert-warning mat-alert"
+  >
+    {{ hierarchy.warning }}
+  </div>
+
+  <div *ngIf="!hierarchy.isLoading && main_rb_name != 'aucun'">
     <zh-table
+      *ngIf="hierarchy.items?.length"
       [tableCols]="hierarchy.hierTableCols"
       [data]="hierarchy.items"
       [bold_row_values]="hierarchy.bold_row_values"

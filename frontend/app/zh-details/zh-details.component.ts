@@ -6,10 +6,11 @@ import { ZhDataService } from '../services/zh-data.service';
 import { ErrorTranslatorService } from '../services/error-translator.service';
 import { Rights } from '../models/rights';
 import { ToastrService } from 'ngx-toastr';
-import { GeoJSON } from 'leaflet';
+import { Subscription } from 'rxjs';
 import * as L from 'leaflet';
 
 import { DetailsModel } from './models/zh-details.model';
+import { HierarchyService } from '../services/hierarchy.service';
 
 @Component({
   selector: 'zh-details',
@@ -24,10 +25,13 @@ export class ZhDetailsComponent implements OnInit, AfterViewInit {
   public rights: Rights;
   public expanded: boolean = false;
   public onError: boolean = false;
+  private $_currentZhSub: Subscription;
+  public currentZh: any;
 
   constructor(
     private _mapService: MapService,
     private _zhService: ZhDataService,
+    public hierarchy: HierarchyService,
     private _route: ActivatedRoute,
     private _toastr: ToastrService,
     private _error: ErrorTranslatorService
@@ -37,6 +41,16 @@ export class ZhDetailsComponent implements OnInit, AfterViewInit {
     this.id_zh = this._route.snapshot.params['id'];
     this.getRights(this.id_zh);
     this.getData();
+    this.getCurrentZh();
+  }
+
+  getCurrentZh() {
+    this._zhService.getZhById(this.id_zh).subscribe((zh: any) => {
+      if (zh) {
+        this.currentZh = zh;
+        this.hierarchy.getHierarchy(zh.id);
+      }
+    });
   }
 
   getRights(idZh: number) {
@@ -106,5 +120,9 @@ export class ZhDetailsComponent implements OnInit, AfterViewInit {
 
   onWrapAll() {
     this.expanded = !this.expanded;
+  }
+
+  ngOnDestroy() {
+    if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
   }
 }

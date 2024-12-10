@@ -279,6 +279,7 @@ CREATE  TABLE pr_zh.t_zh (
 	remark_is_other_inventory  varchar(2000)   ,
 	main_pict_id         integer   ,
 	area				 real	,
+	main_id_rb			 integer	,
 	CONSTRAINT pk_t_zh_zh_id PRIMARY KEY ( id_zh ),
 	CONSTRAINT unq_t_zh_code UNIQUE ( code ) ,
 	CONSTRAINT unq_t_zh UNIQUE ( zh_uuid ) 

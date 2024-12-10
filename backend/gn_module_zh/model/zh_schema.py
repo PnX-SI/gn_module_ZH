@@ -247,6 +247,7 @@ class TZH(ZhModel):
     remark_is_other_inventory = DB.Column(DB.Unicode)
     main_pict_id = DB.Column(DB.Integer)
     area = DB.Column(DB.Float)
+    main_id_rb = DB.Column(DB.Integer, nullable=True)
 
     sdage = DB.relationship(
         TNomenclatures,
@@ -313,6 +314,12 @@ class TZH(ZhModel):
             ).all()
         ]
         return ", ".join([str(item) for item in bassin_versant])
+
+    @hybrid_property
+    def main_rb_name(self):
+        return DB.session.scalar(
+            select(TRiverBasin.name).where(TRiverBasin.id_rb == self.main_id_rb)
+        )
 
 
 @serializable

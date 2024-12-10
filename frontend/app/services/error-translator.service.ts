@@ -116,9 +116,7 @@ export class ErrorTranslatorService {
   }
 
   getFrontError(errorMsg: string): string {
-    console.log('error:', errorMsg);
     const frontError: error = this.getError(errorMsg);
-    console.log(frontError);
     return frontError ? frontError.front : 'Erreur inconnue';
   }
 

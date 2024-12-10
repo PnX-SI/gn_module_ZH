@@ -29,7 +29,7 @@
     #accordion="matAccordion"
     [multi]="true"
   >
-    <!-- Attention : bien mettre entre crochet title et les strings entre '' 
+    <!-- Attention : bien mettre entre crochet title et les strings entre ''
         sinon génère un tooltip native (title) dans le collapse -->
     <collapse
       [title]="'1. Renseignements généraux'"
@@ -83,7 +83,9 @@
       [title]="'9. Hiérarchisation'"
       [expanded]="expanded"
     >
-      <zh-details-hierarchy [data]="zhDetails.hierarchy"></zh-details-hierarchy>
+      <zh-details-hierarchy
+        [main_rb_name]="currentZh.properties.main_rb_name"
+      ></zh-details-hierarchy>
     </collapse>
   </mat-accordion>
 </div>
