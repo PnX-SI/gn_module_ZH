@@ -154,7 +154,11 @@ def filter_area_size(query, json: dict):
 
 
 def filter_area(query, json: dict, type_code: str):
-    codes = [area.get("code", None) for area in json]
+    if type_code == "COM":
+        codes = [area.get("code", None) for area in json]
+    else:
+        codes = json["code"].split()
+
     if any(code is None for code in codes):
         return query
 
@@ -193,9 +197,8 @@ def filter_hydro(query, json):
     return query
 
 
-def filter_basin(query, basin):
-    code = basin.get("code", None)
-
+def filter_basin(query, json):
+    code = json["code"]
     if code is not None:
         subquery = (
             select(
