@@ -28,6 +28,7 @@
           <option
             class="option-title"
             [value]="field.name"
+            disabled
           >
             {{ field.name | uppercase }}
           </option>
@@ -36,6 +37,7 @@
             <option
               *ngIf="cat?.name"
               [value]="cat.name"
+              [disabled]="cat.subcategory.length !== 1"
             >
               <span>&nbsp;{{ cat.name | capitalize }}</span>
             </option>
@@ -60,7 +62,6 @@
         [parentFormControl]="localForm.controls.attributes"
         keyLabel="attribut"
         (onChange)="attributesChanged($event)"
-        [multiple]="knowledges.length"
       />
     </div>
     <div class="pr-0 col-lg-3 col-6">

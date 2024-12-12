@@ -105,7 +105,7 @@ def main_search(query, json):
     # --- Hierarchy search
     hierarchy = json.get("hierarchy")
     if hierarchy is not None and basin is not None:
-        query = filter_hierarchy(query, json=hierarchy, basin=basin[0].get("name"))
+        query = filter_hierarchy(query, json=hierarchy, basin=basin["name"])
 
     return query
 

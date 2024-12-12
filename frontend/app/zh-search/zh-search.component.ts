@@ -95,6 +95,8 @@ export class ZhSearchComponent implements OnInit {
   onReset() {
     this._searchService.reset();
     // Emit empty object to search all ZH
+    this.hierarchySearchToggled = false;
+    this.advancedSearchToggled = false;
     this.onSearch.emit();
   }
 
