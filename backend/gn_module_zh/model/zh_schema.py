@@ -885,13 +885,6 @@ class CorZhProtection(DB.Model):
     id_zh = DB.Column(DB.Integer, ForeignKey(TZH.id_zh), primary_key=True)
 
 
-class InseeRegions(DB.Model):
-    __tablename__ = "insee_regions"
-    __table_args__ = {"schema": "ref_geo"}
-    insee_reg = DB.Column(DB.Unicode(length=2), primary_key=True)
-    region_name = DB.Column(DB.Unicode(length=50), nullable=False)
-
-
 class TManagementStructures(DB.Model):
     __tablename__ = "t_management_structures"
     __table_args__ = {"schema": "pr_zh"}
