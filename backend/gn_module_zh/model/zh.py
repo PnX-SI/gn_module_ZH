@@ -256,12 +256,12 @@ class ZH(TZH):
             if municipality.LiMunicipalities.insee_reg not in region_list:
                 region_list.append(municipality.LiMunicipalities.insee_reg)
         q_region = DB.session.scalars(
-            select(LAreas)
-            .select_from(LAreas, BibAreasTypes)
-            .where(
-                and_(LAreas.area_code.in_(region_list)),
-                LAreas.id_type == BibAreasTypes.id_type,
-                BibAreasTypes.type_name == "Régions",
+            select(LAreas, BibAreasTypes).where(
+                and_(
+                    LAreas.area_code.in_(region_list),
+                    LAreas.id_type == BibAreasTypes.id_type,
+                    BibAreasTypes.type_name == "Régions",
+                )
             )
         ).all()
         regions = [region.area_name for region in q_region]
