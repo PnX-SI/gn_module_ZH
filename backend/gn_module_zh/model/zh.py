@@ -1,6 +1,8 @@
 # instance de la BDD
 from geonature.utils.env import DB
+from sqlalchemy import and_
 from sqlalchemy.sql import select
+from ref_geo.models import BibAreasTypes, LAreas
 
 from .zh_schema import (
     TZH,
@@ -14,7 +16,6 @@ from .zh_schema import (
     CorZhLimFs,
     CorZhProtection,
     CorZhRef,
-    InseeRegions,
     TActions,
     TActivity,
     TFunctions,
@@ -255,9 +256,15 @@ class ZH(TZH):
             if municipality.LiMunicipalities.insee_reg not in region_list:
                 region_list.append(municipality.LiMunicipalities.insee_reg)
         q_region = DB.session.scalars(
-            select(InseeRegions).where(InseeRegions.insee_reg.in_(region_list))
+            select(LAreas, BibAreasTypes).where(
+                and_(
+                    LAreas.area_code.in_(region_list),
+                    LAreas.id_type == BibAreasTypes.id_type,
+                    BibAreasTypes.type_name == "Régions",
+                )
+            )
         ).all()
-        regions = [region.region_name for region in q_region]
+        regions = [region.area_name for region in q_region]
         return regions
 
     def get_area(self):
