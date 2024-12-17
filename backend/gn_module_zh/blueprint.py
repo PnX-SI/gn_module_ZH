@@ -81,6 +81,7 @@ from .utils import (
     get_last_pdf_export,
     get_main_picture_id,
     get_user_cruved,
+    delete_notes,
 )
 import gn_module_zh.tasks
 
@@ -501,6 +502,22 @@ def delete_one_file(id_media):
         if e.__class__.__name__ == "ZHApiError":
             raise ZHApiError(message=str(e.message), details=str(e.details))
         raise ZHApiError(message="delete_one_file_error", details=str(e))
+    finally:
+        DB.session.close()
+
+
+@blueprint.route("notes/<int:id_zh>", methods=["DELETE"])
+@json_resp
+@permissions.check_cruved_scope("D", module_code="ZONES_HUMIDES")
+def delete_one_zh_notes(id_zh):
+    """delete all hierarchy notes for one zh"""
+    try:
+        delete_notes(id_zh)
+    except Exception as e:
+        DB.session.rollback()
+        if e.__class__.__name__ == "ZHApiError":
+            raise ZHApiError(message=str(e.message), details=str(e.details))
+        raise ZHApiError(message="delete_notes_error", details=str(e))
     finally:
         DB.session.close()
 

@@ -7,6 +7,8 @@ import { ZhDataService } from '../../../services/zh-data.service';
 import { TabsService } from '../../../services/tabs.service';
 import { ModalService } from '../../../services/modal.service';
 import { ErrorTranslatorService } from '../../../services/error-translator.service';
+import { HierarchyService } from '../../../services/hierarchy.service';
+
 @Component({
   selector: 'zh-form-tab4',
   templateUrl: './zh-form-tab4.component.html',
@@ -99,7 +101,8 @@ export class ZhFormTab4Component implements OnInit {
     private _dataService: ZhDataService,
     private _modalService: ModalService,
     private _error: ErrorTranslatorService,
-    private _tabService: TabsService
+    private _tabService: TabsService,
+    public hierarchy: HierarchyService
   ) {}
 
   ngOnInit() {
@@ -456,6 +459,9 @@ export class ZhFormTab4Component implements OnInit {
             this._toastr.success('Vos données sont bien enregistrées', '', {
               positionClass: 'toast-top-right',
             });
+            if (this.currentZh.properties.main_id_rb) {
+              this.hierarchy.getHierarchy(this.currentZh.properties.id_zh);
+            }
             this.nextTab.emit(5);
           });
         },
@@ -470,5 +476,7 @@ export class ZhFormTab4Component implements OnInit {
     }
   }
 
-  ngOnDestroy() {}
+  ngOnDestroy() {
+    this.hierarchy.warning = '';
+  }
 }

@@ -10,6 +10,7 @@ import { ModalService } from '../../../services/modal.service';
 import { TaxaFile } from './zh-form-tab5.models';
 import { ErrorTranslatorService } from '../../../services/error-translator.service';
 import { FilesService } from '../../../services/files.service';
+import { HierarchyService } from '../../../services/hierarchy.service';
 
 @Component({
   selector: 'zh-form-tab5',
@@ -192,7 +193,8 @@ export class ZhFormTab5Component implements OnInit {
     private _modalService: ModalService,
     private _error: ErrorTranslatorService,
     private _tabService: TabsService,
-    public _filesService: FilesService
+    public _filesService: FilesService,
+    public hierarchy: HierarchyService
   ) {}
 
   ngOnInit() {
@@ -1143,6 +1145,9 @@ export class ZhFormTab5Component implements OnInit {
             this._toastr.success('Vos données sont bien enregistrées', '', {
               positionClass: 'toast-top-right',
             });
+            if (this.currentZh.properties.main_id_rb) {
+              this.hierarchy.getHierarchy(this.currentZh.properties.id_zh);
+            }
             this.nextTab.emit(6);
           });
         },
@@ -1177,5 +1182,6 @@ export class ZhFormTab5Component implements OnInit {
   ngOnDestroy() {
     if (this.$_getTabChangeSub) this.$_getTabChangeSub.unsubscribe();
     if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
+    this.hierarchy.warning = '';
   }
 }

@@ -59,11 +59,17 @@ export class HierarchyService {
               (i) => error.error['message'] === i.api
             )[0].front;
           }
+          this.deleteNotes(zhId);
         },
         () => {
           this.isLoading = false;
         }
-      );
+    );
+  }
+
+
+  deleteNotes(idZH: number) {
+    return this._dataService.deleteNotes(idZH).subscribe();
   }
 
   // set list of hierarchy items

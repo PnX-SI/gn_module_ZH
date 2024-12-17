@@ -10,6 +10,7 @@ import { ZhDataService } from '../../../services/zh-data.service';
 import { TabsService } from '../../../services/tabs.service';
 import { ErrorTranslatorService } from '../../../services/error-translator.service';
 import { PbfService } from '../../../services/pbf.service';
+import { HierarchyService } from '../../../services/hierarchy.service';
 
 const GEOM_CONTAINED_ID = 1;
 
@@ -47,7 +48,8 @@ export class ZhFormTab0Component implements OnInit {
     private _router: Router,
     private _toastr: ToastrService,
     private _error: ErrorTranslatorService,
-    private _pbfService: PbfService
+    private _pbfService: PbfService,
+    public hierarchy: HierarchyService
   ) {}
 
   ngOnInit() {
@@ -209,6 +211,10 @@ export class ZhFormTab0Component implements OnInit {
                 closeButton: true,
                 positionClass: 'toast-top-right',
               });
+              console.log(this._currentZh);
+              if (this._currentZh.properties.main_id_rb) {
+                this.hierarchy.getHierarchy(this._currentZh.properties.id_zh);
+              }
               this.nextTab.emit(1);
             });
           },
@@ -281,6 +287,7 @@ export class ZhFormTab0Component implements OnInit {
   ngOnDestroy() {
     if (this.$_geojsonSub) this.$_geojsonSub.unsubscribe();
     if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
+    this.hierarchy.warning = '';
   }
 
   featureCollectionToMultipolygon(featureCollection) {
