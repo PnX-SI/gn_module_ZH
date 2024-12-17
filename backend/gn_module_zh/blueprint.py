@@ -522,6 +522,20 @@ def delete_one_zh_notes(id_zh):
         DB.session.close()
 
 
+@blueprint.route("/all/hierarchy", methods=["GET"])
+@permissions.check_cruved_scope("C", module_code="ZONES_HUMIDES")
+@json_resp
+def generate_all_notes():
+    result = DB.session.scalars(select(TZH.id_zh)).all()
+    if result:
+        for id_zh in result:
+            try:
+                get_hierarchy(id_zh)
+            except Exception as e:
+                pass
+    return ("", 204)
+
+
 @blueprint.route("files/<int:id_media>", methods=["GET"])
 @permissions.check_cruved_scope("C", module_code="ZONES_HUMIDES")
 def download_file(id_media):
