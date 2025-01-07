@@ -27,7 +27,7 @@ from utils_flask_sqla.generic import GenericQuery
 from utils_flask_sqla.response import json_resp_accept_empty_list, json_resp
 
 from .api_error import ZHApiError
-from . import tasks  # noqa: F401
+
 from .forms import (
     create_zh,
     post_file_info,
@@ -52,8 +52,7 @@ from .forms import (
     update_zh_tab6,
 )
 
-# from .forms import *
-from .geometry import set_area, set_geom, get_main_rb
+from .geometry import set_area, set_geom
 from .hierarchy import Hierarchy, get_all_hierarchy_fields
 from .model.cards import Card
 from .model.repositories import ZhRepository
@@ -83,7 +82,6 @@ from .utils import (
     get_user_cruved,
     delete_notes,
 )
-import gn_module_zh.tasks
 
 blueprint = Blueprint("pr_zh", __name__, "./static", template_folder="templates")
 
@@ -523,7 +521,6 @@ def delete_one_zh_notes(id_zh):
 
 
 @blueprint.route("/all/hierarchy", methods=["GET"])
-@permissions.check_cruved_scope("C", module_code="ZONES_HUMIDES")
 @json_resp
 def generate_all_notes():
     result = DB.session.scalars(select(TZH.id_zh)).all()
