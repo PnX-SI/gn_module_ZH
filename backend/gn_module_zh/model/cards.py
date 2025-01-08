@@ -809,7 +809,7 @@ class UrbanDoc:
 
     def __str__(self):
         return {
-            "commune": DB.session.get(LAreas, self.id_area).id_area,
+            "commune": DB.session.get(LAreas, self.id_area).area_name,
             "type_doc": Utils.get_mnemo(self.id_doc_type),
             "type_classement": [
                 Utils.get_mnemo(
