@@ -308,8 +308,17 @@ class TZH(ZhModel):
         bassin_versant = [
             name
             for name in DB.session.scalars(
-                select(TRiverBasin.name).where(
-                    TRiverBasin.id_rb == CorZhRb.id_rb, CorZhRb.id_zh == self.id_zh
+                select(TRiverBasin.name)
+                .where(
+                    TRiverBasin.id_rb == CorZhRb.id_rb,
+                    CorZhRb.id_zh == self.id_zh,
+                    TZH.id_zh == self.id_zh,
+                )
+                .order_by(
+                    (
+                        func.ST_Area(func.ST_Intersection(TZH.geom, TRiverBasin.geom))
+                        / func.ST_Area(TZH.geom)
+                    ).desc()
                 )
             ).all()
         ]

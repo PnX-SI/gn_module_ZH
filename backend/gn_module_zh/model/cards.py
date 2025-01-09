@@ -3,7 +3,7 @@ from werkzeug.exceptions import NotFound
 
 from ref_geo.models import BibAreasTypes, LAreas
 from geonature.utils.env import DB
-from sqlalchemy.sql import select
+from sqlalchemy.sql import select, func
 from pypn_habref_api.models import Habref
 from pypnnomenclature.models import TNomenclatures
 
@@ -500,8 +500,17 @@ class Basin:
         return [
             name
             for name in DB.session.scalars(
-                select(TRiverBasin.name).where(
-                    TRiverBasin.id_rb == CorZhRb.id_rb, CorZhRb.id_zh == self.id_zh
+                select(TRiverBasin.name)
+                .where(
+                    TRiverBasin.id_rb == CorZhRb.id_rb,
+                    CorZhRb.id_zh == self.id_zh,
+                    TZH.id_zh == self.id_zh,
+                )
+                .order_by(
+                    (
+                        func.ST_Area(func.ST_Intersection(TZH.geom, TRiverBasin.geom))
+                        / func.ST_Area(TZH.geom)
+                    ).desc()
                 )
             )
         ]
@@ -511,8 +520,17 @@ class Basin:
             name
             for name in DB.session.scalars(
                 select(THydroArea.name)
-                .where(THydroArea.id_hydro == CorZhHydro.id_hydro, CorZhHydro.id_zh == self.id_zh)
-                .distinct()
+                .where(
+                    THydroArea.id_hydro == CorZhHydro.id_hydro,
+                    CorZhHydro.id_zh == self.id_zh,
+                    TZH.id_zh == self.id_zh,
+                )
+                .order_by(
+                    (
+                        func.ST_Area(func.ST_Intersection(TZH.geom, THydroArea.geom))
+                        / func.ST_Area(TZH.geom)
+                    ).desc()
+                )
             )
         ]
 
