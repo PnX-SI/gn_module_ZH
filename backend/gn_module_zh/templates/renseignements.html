@@ -1,31 +1,30 @@
-<div class="flex-container">
-  <div class="left">
-    <section class="content col">
-      <div class="fieldset">
-        <label>Nom usuel de la zone humide</label>
-        <span>{{ data['renseignements']['identification']['nom'] }}</span>
-      </div>
-      <div class="fieldset">
-        <label>Code de la zone humide</label>
-        <span>{{ data['renseignements']['identification']['code'] }}</span>
-      </div>
-      <div class="fieldset">
-        <label>Typologie SDAGE</label>
-        <span>{{ data['description']['presentation']['sdage'] }}</span>
-      </div>
-      <div class="fieldset">
-        <label>Bassin versant</label>
-        {% for basin in data['description']['basin']['basins'] %}
-        <span>{{ basin }}</span><br>
-        {% endfor %}
-      </div>
-    </section>
+<div class="row">
+  <div class="col" id="col-r">
+    <div class="fieldset" id="fieldset-r">
+      <label>Nom usuel de la zone humide</label>
+      <span>{{ data['renseignements']['identification']['nom'] }}</span>
+    </div>
+    <div class="fieldset" id="fieldset-r">
+      <label>Code de la zone humide</label>
+      <span>{{ data['renseignements']['identification']['code'] }}</span>
+    </div>
+    <div class="fieldset" id="fieldset-r">
+      <label>Typologie SDAGE</label>
+      <span>{{ data['description']['presentation']['sdage'] }}</span>
+    </div>
+    <div class="fieldset" id="fieldset-r">
+      <label>Bassin versant</label>
+      {% for basin in data['description']['basin']['basins'] %}
+      <span>{{ basin }}</span><br>
+      {% endfor %}
+    </div>
   </div>
-  <div class="right">
-    <section>
-      <div class="flex-container">
+
+  <div class="col" id="col-r">
+    <div class="row">
+      <section class="content"></section>
         <div class="left">
-          <div class="fieldset">
+          <div class="fieldset" id="fieldset-r">
             <label>Région</label>
             {% for region in data['renseignements']['localisation']['region'] %}
             <span>{{ region }}</span><br>
@@ -33,63 +32,70 @@
           </div>
         </div>
         <div class="right">
-          <div class="fieldset">
+          <div class="fieldset" id="fieldset-r">
             <label>Département</label>
             {% for dep in data['renseignements']['localisation']['departement'] %}
             <span>{{ dep['nom'] }} ({{ dep['code'] }})</span><br>
             {% endfor %}
           </div>
         </div>
-      </div>
-      <div class="fieldset">
-        <label>Commune [surface ZH/surface commune]</label>
-        {% for com in data['renseignements']['localisation']['commune'] %}
-        <span>{{ com['nom'] }} ({{ com['insee'] }}) [{{ com['couverture'] }}%]</span><br>
-        {% endfor %}
-      </div>
-    </section>
+      </section>
+    </div>
+    <div class="row">
+      <section>
+        <div class="fieldset" id="fieldset-r">
+          <label>Commune [surface ZH/surface commune]</label>
+          {% for com in data['renseignements']['localisation']['commune'] %}
+          <span>{{ com['nom'] }} ({{ com['insee'] }}) [{{ com['couverture'] }}%]</span><br>
+          {% endfor %}
+        </div>
+      </section>
+    </div>
   </div>
 </div>
-<div class="flex-container">
-  <div class="left">
-    <section class="content col">
-      <div class="fieldset">
-        <label>Date d'établissement</label>
-        <span>{{ data['renseignements']['auteur']['date'] | datetime_format }}</span>
-      </div>
-      <div class="fieldset">
-        <label>Auteur de la fiche</label>
-        <span>{{ data['renseignements']['auteur']['auteur'] }}</span>
-      </div>
-      <div class="fieldset">
-        <label>Organisme</label>
-        <span>{{ data['renseignements']['auteur']['organism'] }}</span>
-      </div>
-    </section>
+
+<div class="separator"></div>
+
+<div class="row">
+  <div class="col" id="col-r">
+    <div class="fieldset" id="fieldset-r">
+      <label>Date d'établissement</label>
+      <span>{{ data['renseignements']['auteur']['date'] | datetime_format }}</span>
+    </div>
+    <div class="fieldset" id="fieldset-r">
+      <label>Auteur de la fiche</label>
+      <span>{{ data['renseignements']['auteur']['auteur'] }}</span>
+    </div>
+    <div class="fieldset" id="fieldset-r">
+      <label>Organisme</label>
+      <span>{{ data['renseignements']['auteur']['organism'] }}</span>
+    </div>
   </div>
-  <div class="right">
-    <div class="fieldset">
+  <div class="col" id="col-r">
+    <div class="fieldset" id="fieldset-r">
       <label>Date des dernières modifications</label>
-      {# Hack to keep only seconds and no microseconds: split('.')[0] #}
       <span>{{ data['renseignements']['auteur']['date_modif'].split('.')[0] | datetime_format }}</span>
     </div>
-    <div class="fieldset">
+    <div class="fieldset" id="fieldset-r">
       <label>Auteur des dernières modifications</label>
       <span>{{ data['renseignements']['auteur']['auteur_modif'] }}</span>
     </div>
-    <div class="fieldset">
+    <div class="fieldset" id="fieldset-r">
       <label>Organisme des dernières modifications</label>
       <span>{{ data['renseignements']['auteur']['coorganism'] }}</span>
     </div>
   </div>
 </div>
 
-<section class="content">
+<div class="separator"></div>
+
+
+<div class="row" id="part">
   {% if data['map'] is not none %}
-  <img src="{{ data['map'] }}">
+  <img src="{{ data['map'] }}" style="width: 100%; margin-bottom: 20px;">
   {% endif %}
-  <div class="left">
-    <div class="fieldset">
+  <div class="col" id="col-r">
+    <div class="fieldset" id="fieldset-r">
       <label>Superficie de la zone humide</label>
       {% if data['description']['presentation']['area'] %}
       <span>{{ "%.3f" | format(data['description']['presentation']['area']) | replace(".",",") }} ha</span>
@@ -98,8 +104,8 @@
       {% endif %}
     </div>
   </div>
-  <div class="right">
-    <div class="fieldset">
+  <div class="col" id="col-r">
+    <div class="fieldset" id="fieldset-r">
       <label>Superficie de l'espace de fonctionnalité</label>
       {% if data['description']['presentation']['ef_area'] %}
       <span>{{ "%.2f" | format(data['description']['presentation']['ef_area']) | replace(".",",") }} ha</span>
@@ -108,4 +114,4 @@
       {% endif %}
     </div>
   </div>
-</section>
+</div>
