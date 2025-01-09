@@ -115,6 +115,9 @@ invertebrates_view_name = {
 
 flora_view_name = {"schema_name": "pr_zh", "table_name": "vm_flora", "category": "flora"}
 
+# Fréquence de mise à jour des vm de taxons
+TAXON_VM_CRONTAB = "0 0,12 * * *"
+
 # Name of the source of species data (tab5)
 species_source_name = "GeoNature"
 
@@ -178,4 +181,4 @@ class GnModuleSchemaConf(Schema):
     pdf_small_layer_number = fields.Integer(load_default=pdf_small_layer_number)
     pdf_last_page_img = fields.String(load_default=pdf_last_page_img)
     pdf_title = fields.String(load_default=pdf_title)
-    TAXON_VM_CRONTAB = fields.String(load_default="0 0,12 * * *")
+    TAXON_VM_CRONTAB = fields.String(load_default=TAXON_VM_CRONTAB)

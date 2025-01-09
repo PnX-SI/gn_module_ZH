@@ -76,15 +76,21 @@ ref_geo_referentiels = [
 
 # Renseigne le nom de la table permettant de remonter les observations
 # de vertebrés effectuées à l'intérieur de la zones humide
-vertebrates_view_name = { schema_name = "pr_zh", table_name = "vertebrates", category = "vertebrates" }
+vertebrates_view_name = { schema_name = "pr_zh", table_name = "vm_vertebrates", category = "vertebrates" }
 
 # Renseigne le nom de la table permettant de remonter les observations
 # d'invertebrés effectuées à l'intérieur de la zones humide
-invertebrates_view_name = { schema_name = "pr_zh", table_name = "invertebrates", category = "invertebrates" }
+invertebrates_view_name = { schema_name = "pr_zh", table_name = "vm_invertebrates", category = "invertebrates" }
 
 # Renseigne le nom de la table permettant de remonter les observations
 # de flore effectuées à l'intérieur de la zones humide
-flora_view_name = { schema_name = "pr_zh", table_name = "flora", category = "flora" }
+flora_view_name = { schema_name = "pr_zh", table_name = "vm_flora", category = "flora" }
+
+# Fréquence de mise à jour des vm de taxons
+TAXON_VM_CRONTAB = "0 0,12 * * *"
+
+# Nom de la source de données pour la liste des taxons (tab5)
+species_source_name = "GeoNature"
 
 # Extensions autorisées pour le téléversement
 allowed_extensions = ['.pdf', '.jpg']
@@ -124,7 +130,7 @@ pdf_layer_number = 0
 pdf_small_layer_number = 0
 # Nom de l'image (dans le dossier static) qui sera utilisée comme 
 # pied de page
-# Si None => ne sera pas affichée
-pdf_last_page_img = 'entree_sortie.svg'
+# Si "" => ne sera pas affichée
+pdf_last_page_img = ''
 # Titre du document
 pdf_title = 'Inventaire des zones humides'
