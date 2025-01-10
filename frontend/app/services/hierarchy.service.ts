@@ -64,9 +64,8 @@ export class HierarchyService {
         () => {
           this.isLoading = false;
         }
-    );
+      );
   }
-
 
   deleteNotes(idZH: number) {
     return this._dataService.deleteNotes(idZH).subscribe();
