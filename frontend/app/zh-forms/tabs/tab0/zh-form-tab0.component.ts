@@ -211,10 +211,7 @@ export class ZhFormTab0Component implements OnInit {
                 closeButton: true,
                 positionClass: 'toast-top-right',
               });
-              console.log(this._currentZh);
-              if (this._currentZh.properties.main_id_rb) {
-                this.hierarchy.getHierarchy(this._currentZh.properties.id_zh);
-              }
+              this.hierarchy.getHierarchyFromZh(this._currentZh);
               this.nextTab.emit(1);
             });
           },

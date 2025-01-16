@@ -1145,9 +1145,7 @@ export class ZhFormTab5Component implements OnInit {
             this._toastr.success('Vos données sont bien enregistrées', '', {
               positionClass: 'toast-top-right',
             });
-            if (this.currentZh.properties.main_id_rb) {
-              this.hierarchy.getHierarchy(this.currentZh.properties.id_zh);
-            }
+            this.hierarchy.getHierarchyFromZh(this.currentZh);
             this.nextTab.emit(6);
           });
         },
