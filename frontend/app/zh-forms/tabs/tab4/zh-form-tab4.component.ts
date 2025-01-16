@@ -475,6 +475,6 @@ export class ZhFormTab4Component implements OnInit {
   }
 
   ngOnDestroy() {
-    this.hierarchy.warning = '';
+    this.hierarchy.clear();
   }
 }

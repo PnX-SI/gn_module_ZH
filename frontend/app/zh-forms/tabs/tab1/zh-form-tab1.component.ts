@@ -199,6 +199,6 @@ export class ZhFormTab1Component implements OnInit {
   ngOnDestroy() {
     if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
     this.ngbModal.dismissAll();
-    this.hierarchy.warning = '';
+    this.hierarchy.clear();
   }
 }

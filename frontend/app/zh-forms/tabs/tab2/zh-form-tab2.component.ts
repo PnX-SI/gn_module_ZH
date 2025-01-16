@@ -141,6 +141,6 @@ export class ZhFormTab2Component implements OnInit, AfterViewInit {
   ngOnDestroy() {
     if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
     if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
-    this.hierarchy.warning = '';
+    this.hierarchy.clear();
   }
 }

@@ -37,6 +37,10 @@ export class HierarchyService {
     this.isLoading = false;
   }
 
+  clear(): void {
+    this.warning = '';
+  }
+
   getHierarchyFromZh(zh) {
     if (zh.properties.main_id_rb) {
       this.getHierarchy(zh.properties.id_zh);

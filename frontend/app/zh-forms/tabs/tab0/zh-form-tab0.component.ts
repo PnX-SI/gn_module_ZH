@@ -284,7 +284,7 @@ export class ZhFormTab0Component implements OnInit {
   ngOnDestroy() {
     if (this.$_geojsonSub) this.$_geojsonSub.unsubscribe();
     if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
-    this.hierarchy.warning = '';
+    this.hierarchy.clear();
   }
 
   featureCollectionToMultipolygon(featureCollection) {
