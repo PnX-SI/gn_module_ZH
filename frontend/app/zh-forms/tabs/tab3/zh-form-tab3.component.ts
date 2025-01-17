@@ -8,6 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { TabsService } from '../../../services/tabs.service';
 import { ModalService } from '../../../services/modal.service';
 import { ErrorTranslatorService } from '../../../services/error-translator.service';
+import { HierarchyService } from '../../../services/hierarchy.service';
 
 @Component({
   selector: 'zh-form-tab3',
@@ -91,7 +92,8 @@ export class ZhFormTab3Component implements OnInit {
     public ngbModal: NgbModal,
     private _modalService: ModalService,
     private _error: ErrorTranslatorService,
-    private _toastr: ToastrService
+    private _toastr: ToastrService,
+    public hierarchy: HierarchyService
   ) {}
 
   ngOnInit() {
@@ -423,6 +425,7 @@ export class ZhFormTab3Component implements OnInit {
             this._toastr.success('Vos données sont bien enregistrées', '', {
               positionClass: 'toast-top-right',
             });
+            this.hierarchy.getHierarchyFromZh(this.currentZh);
             this.nextTab.emit(4);
           });
         },
@@ -468,5 +471,6 @@ export class ZhFormTab3Component implements OnInit {
   ngOnDestroy() {
     if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
     if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
+    this.hierarchy.clear();
   }
 }

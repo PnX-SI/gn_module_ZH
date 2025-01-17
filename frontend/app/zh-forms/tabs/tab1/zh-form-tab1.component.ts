@@ -8,6 +8,7 @@ import { ZhDataService } from '../../../services/zh-data.service';
 import { TabsService } from '../../../services/tabs.service';
 import { ErrorTranslatorService } from '../../../services/error-translator.service';
 import { ConfigService } from '@geonature/services/config.service';
+import { HierarchyService } from '../../../services/hierarchy.service';
 
 @Component({
   selector: 'zh-form-tab1',
@@ -47,7 +48,8 @@ export class ZhFormTab1Component implements OnInit {
     private _tabService: TabsService,
     private _error: ErrorTranslatorService,
     public ngbModal: NgbModal,
-    private _config: ConfigService
+    private _config: ConfigService,
+    public hierarchy: HierarchyService
   ) {}
 
   ngOnInit() {
@@ -159,6 +161,7 @@ export class ZhFormTab1Component implements OnInit {
             this._toastr.success('Vos données sont bien enregistrées', '', {
               positionClass: 'toast-top-right',
             });
+            this.hierarchy.getHierarchyFromZh(this.currentZh);
             this.nextTab.emit(2);
           });
         },
@@ -196,5 +199,6 @@ export class ZhFormTab1Component implements OnInit {
   ngOnDestroy() {
     if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
     this.ngbModal.dismissAll();
+    this.hierarchy.clear();
   }
 }

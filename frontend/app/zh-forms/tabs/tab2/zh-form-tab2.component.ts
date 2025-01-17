@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { ErrorTranslatorService } from '../../../services/error-translator.service';
 import { TabsService } from '../../../services/tabs.service';
 import { ZhDataService } from '../../../services/zh-data.service';
+import { HierarchyService } from '../../../services/hierarchy.service';
 
 @Component({
   selector: 'zh-form-tab2',
@@ -29,7 +30,8 @@ export class ZhFormTab2Component implements OnInit, AfterViewInit {
     private _dataService: ZhDataService,
     private _toastr: ToastrService,
     private _error: ErrorTranslatorService,
-    private _tabService: TabsService
+    private _tabService: TabsService,
+    public hierarchy: HierarchyService
   ) {}
 
   ngOnInit() {
@@ -121,6 +123,7 @@ export class ZhFormTab2Component implements OnInit, AfterViewInit {
             this._toastr.success('Vos données sont bien enregistrées', '', {
               positionClass: 'toast-top-right',
             });
+            this.hierarchy.getHierarchyFromZh(this.currentZh);
             this.nextTab.emit(3);
           });
         },
@@ -138,5 +141,6 @@ export class ZhFormTab2Component implements OnInit, AfterViewInit {
   ngOnDestroy() {
     if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
     if (this.$_fromChangeSub) this.$_fromChangeSub.unsubscribe();
+    this.hierarchy.clear();
   }
 }

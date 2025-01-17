@@ -27,7 +27,7 @@ from utils_flask_sqla.generic import GenericQuery
 from utils_flask_sqla.response import json_resp_accept_empty_list, json_resp
 
 from .api_error import ZHApiError
-from . import tasks  # noqa: F401
+
 from .forms import (
     create_zh,
     post_file_info,
@@ -52,8 +52,7 @@ from .forms import (
     update_zh_tab6,
 )
 
-# from .forms import *
-from .geometry import set_area, set_geom, get_main_rb
+from .geometry import set_area, set_geom
 from .hierarchy import Hierarchy, get_all_hierarchy_fields
 from .model.cards import Card
 from .model.repositories import ZhRepository
@@ -81,8 +80,8 @@ from .utils import (
     get_last_pdf_export,
     get_main_picture_id,
     get_user_cruved,
+    delete_notes,
 )
-import gn_module_zh.tasks
 
 blueprint = Blueprint("pr_zh", __name__, "./static", template_folder="templates")
 
@@ -503,6 +502,35 @@ def delete_one_file(id_media):
         raise ZHApiError(message="delete_one_file_error", details=str(e))
     finally:
         DB.session.close()
+
+
+@blueprint.route("notes/<int:id_zh>", methods=["DELETE"])
+@json_resp
+@permissions.check_cruved_scope("D", module_code="ZONES_HUMIDES")
+def delete_one_zh_notes(id_zh):
+    """delete all hierarchy notes for one zh"""
+    try:
+        delete_notes(id_zh)
+    except Exception as e:
+        DB.session.rollback()
+        if e.__class__.__name__ == "ZHApiError":
+            raise ZHApiError(message=str(e.message), details=str(e.details))
+        raise ZHApiError(message="delete_notes_error", details=str(e))
+    finally:
+        DB.session.close()
+
+
+@blueprint.route("/all/hierarchy", methods=["GET"])
+@json_resp
+def generate_all_notes():
+    result = DB.session.scalars(select(TZH.id_zh)).all()
+    if result:
+        for id_zh in result:
+            try:
+                get_hierarchy(id_zh)
+            except Exception as e:
+                pass
+    return ("", 204)
 
 
 @blueprint.route("files/<int:id_media>", methods=["GET"])

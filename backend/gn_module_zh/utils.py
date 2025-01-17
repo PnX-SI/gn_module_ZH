@@ -10,7 +10,7 @@ from sqlalchemy.orm import Query
 from sqlalchemy.sql import select, update, delete, func
 
 from .api_error import ZHApiError
-from .model.zh_schema import TZH, BibAreasTypes, LAreas
+from .model.zh_schema import TZH, BibAreasTypes, LAreas, CorZhNotes
 
 
 def get_main_picture_id(id_zh, media_list=None):
@@ -88,6 +88,15 @@ def delete_file(id_media):
         raise ZHApiError(
             message="delete_file_error", details=str(exc_type) + ": " + str(e.with_traceback(tb))
         )
+
+
+def delete_notes(id_zh):
+    notes_to_delete = DB.session.execute(
+        select(CorZhNotes).where(CorZhNotes.id_zh == id_zh)
+    ).scalars()
+    for note in notes_to_delete:
+        DB.session.delete(note)
+    DB.session.commit()
 
 
 def check_ref_geo_schema():
