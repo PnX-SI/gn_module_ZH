@@ -44,6 +44,7 @@ from .model.zh_schema import (
     TOwnership,
     TUrbanPlanningDocs,
 )
+from .geometry import get_main_rb
 
 
 def update_tzh(data):
@@ -65,6 +66,12 @@ def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referenti
     # temporary code
     code = str(uuid.uuid4())[0:12]
 
+    # main river basin
+    rbs = TZH.get_zh_area_intersected(
+        "river_basin", func.ST_GeomFromGeoJSON(str(form_data["geom"]["geometry"]))
+    )
+    main_id_rb = get_main_rb(rbs, form_data["geom"]["geometry"])
+
     # create zh : fill pr_zh.t_zh
     new_zh = TZH(
         main_name=form_data["main_name"],
@@ -78,6 +85,7 @@ def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referenti
         id_sdage=form_data["sdage"],
         geom=polygon,
         area=zh_area,
+        main_id_rb=main_id_rb,
     )
     DB.session.add(new_zh)
     DB.session.flush()
@@ -111,7 +119,7 @@ def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referenti
         )
 
     # fill cor_zh_rb
-    post_cor_zh_rb(form_data["geom"]["geometry"], new_zh.id_zh)
+    post_cor_zh_rb(form_data["geom"]["geometry"], new_zh.id_zh, rbs)
     # fill cor_zh_hydro
     post_cor_zh_hydro(form_data["geom"]["geometry"], new_zh.id_zh)
     # fill cor_zh_fct_area
@@ -131,22 +139,6 @@ def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referenti
 
     DB.session.flush()
     return new_zh.id_zh
-
-
-# except ZHApiError:
-#     raise
-# except Exception as e:
-#     if e.__class__.__name__ == "DataError":
-#         raise ZHApiError(
-#             message="create_zh_post_db_error",
-#             details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-#             status_code=400,
-#         )
-#     exc_type, value, tb = sys.exc_info()
-#     raise ZHApiError(
-#         message="create_zh_post_error",
-#         details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-#     )
 
 
 def post_cor_lim_list(uuid_lim, criteria):
@@ -171,13 +163,14 @@ def post_cor_lim_list(uuid_lim, criteria):
 
 def post_cor_zh_area(polygon, id_zh, id_type):
     # try:
+    local_srid = DB.session.execute(func.Find_SRID("ref_geo", "l_areas", "geom")).scalar()
     elements = [
         getattr(element, "id_area")
         for element in DB.session.scalars(
             select(LAreas)
             .where(
                 LAreas.geom.ST_Intersects(
-                    func.ST_Transform(func.ST_SetSRID(func.ST_AsText(polygon), 4326), 2154)
+                    func.ST_Transform(func.ST_SetSRID(func.ST_AsText(polygon), 4326), local_srid)
                 )
             )
             .where(LAreas.id_type == id_type)
@@ -188,7 +181,9 @@ def post_cor_zh_area(polygon, id_zh, id_type):
         if id_type == CorZhArea.get_id_type("Communes"):
             municipality_geom = getattr(DB.session.get(LAreas, element), "geom")
             polygon_2154 = DB.session.scalar(
-                select(func.ST_Transform(func.ST_SetSRID(func.ST_AsText(polygon), 4326), 2154))
+                select(
+                    func.ST_Transform(func.ST_SetSRID(func.ST_AsText(polygon), 4326), local_srid)
+                )
             )
             intersect_area = DB.session.scalar(
                 select(func.ST_Area(func.ST_Intersection(municipality_geom, polygon_2154)))
@@ -201,36 +196,12 @@ def post_cor_zh_area(polygon, id_zh, id_type):
             cover = None
         DB.session.add(CorZhArea(id_area=element, id_zh=id_zh, cover=cover))
         DB.session.flush()
-    # except Exception as e:
-    #     if e.__class__.__name__ == "DataError":
-    #         raise ZHApiError(
-    #             message="post_cor_zh_area_db_error",
-    #             details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-    #         )
-    #     exc_type, value, tb = sys.exc_info()
-    #     raise ZHApiError(
-    #         message="post_cor_zh_area_error",
-    #         details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-    #     )
 
 
-def post_cor_zh_rb(geom, id_zh):
-    # try:
-    rbs = TZH.get_zh_area_intersected("river_basin", func.ST_GeomFromGeoJSON(str(geom)))
+def post_cor_zh_rb(geom, id_zh, rbs):
     for rb in rbs:
         DB.session.add(CorZhRb(id_zh=id_zh, id_rb=rb.id_rb))
         DB.session.flush()
-    # except Exception as e:
-    #     if e.__class__.__name__ == "DataError":
-    #         raise ZHApiError(
-    #             message="post_cor_zh_rb_db_error",
-    #             details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-    #         )
-    #     exc_type, value, tb = sys.exc_info()
-    #     raise ZHApiError(
-    #         message="post_cor_zh_rb_error",
-    #         details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-    #     )
 
 
 def post_cor_zh_hydro(geom, id_zh):
@@ -289,10 +260,15 @@ def update_zh_tab0(form_data, polygon, area, info_role, zh_date, geo_refs):
 
     DB.session.execute(delete(CorLimList).where(CorLimList.id_lim_list == id_lim_list))
     post_cor_lim_list(id_lim_list, form_data["critere_delim"])
+    main_id_rb = DB.session.get(TZH, form_data["id_zh"]).main_id_rb
 
     if is_geom_new:
+        rbs = TZH.get_zh_area_intersected(
+            "river_basin", func.ST_GeomFromGeoJSON(str(form_data["geom"]["geometry"]))
+        )
+        main_id_rb = get_main_rb(rbs, form_data["geom"]["geometry"])
         update_cor_zh_area(polygon, form_data["id_zh"], geo_refs)
-        update_cor_zh_rb(form_data["geom"]["geometry"], form_data["id_zh"])
+        update_cor_zh_rb(form_data["geom"]["geometry"], form_data["id_zh"], rbs)
         update_cor_zh_hydro(form_data["geom"]["geometry"], form_data["id_zh"])
         ef_area = update_cor_zh_fct_area(form_data["geom"]["geometry"], form_data["id_zh"])
 
@@ -309,22 +285,12 @@ def update_zh_tab0(form_data, polygon, area, info_role, zh_date, geo_refs):
             geom=polygon,
             area=area,
             ef_area=ef_area,
+            main_id_rb=main_id_rb,
         )
     )
 
     DB.session.flush()
     return form_data["id_zh"]
-    # except Exception as e:
-    #     if e.__class__.__name__ == "DataError":
-    #         raise ZHApiError(
-    #             message="update_tab0_db_error",
-    #             details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-    #             status_code=400,
-    #         )
-    #     exc_type, value, tb = sys.exc_info()
-    #     raise ZHApiError(
-    #         message="update_tab0_error", details=str(exc_type) + ": " + str(e.with_traceback(tb))
-    #     )
 
 
 def check_polygon(polygon, id_zh):
@@ -386,9 +352,9 @@ def update_cor_zh_area(polygon, id_zh, geo_refs):
         )
 
 
-def update_cor_zh_rb(geom, id_zh):
+def update_cor_zh_rb(geom, id_zh, rbs):
     DB.session.execute(delete(CorZhRb).where(CorZhRb.id_zh == id_zh))
-    post_cor_zh_rb(geom, id_zh)
+    post_cor_zh_rb(geom, id_zh, rbs)
 
 
 def update_cor_zh_hydro(geom, id_zh):
@@ -604,7 +570,7 @@ def post_outflow(id_zh, outflows):
 
 def update_inflow(id_zh, inflows):
     try:
-        DB.session.execute(select(TInflow).where(TInflow.id_zh == id_zh))
+        DB.session.execute(delete(TInflow).where(TInflow.id_zh == id_zh))
         post_inflow(id_zh, inflows)
     except Exception as e:
         if e.__class__.__name__ == "DataError":
@@ -820,7 +786,7 @@ def post_instruments(id_zh, instruments):
 
 def update_protections(id_zh, protections):
     try:
-        DB.session.execute(select(CorZhProtection).where(CorZhProtection.id_zh == id_zh))
+        DB.session.execute(delete(CorZhProtection).where(CorZhProtection.id_zh == id_zh))
         post_protections(id_zh, protections)
     except Exception as e:
         if e.__class__.__name__ == "DataError":
@@ -928,7 +894,7 @@ def post_urban_docs(id_zh, urban_docs):
 def update_actions(id_zh, actions):
     try:
         # delete cascade actions
-        DB.session.execute(select(TActions).where(TActions.id_zh == id_zh))
+        DB.session.execute(delete(TActions).where(TActions.id_zh == id_zh))
         # post new actions
         post_actions(id_zh, actions)
     except Exception as e:

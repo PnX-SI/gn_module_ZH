@@ -7,7 +7,7 @@ import { HierarchyField, HierarchyFields, Note, RiverBasin } from '../../models/
 import { TableColumn } from '../../commonComponents/table/table-interface';
 
 type Data = {
-  kownledges: string[];
+  knowledges: string[];
   field: string;
   attributes: string;
 };
@@ -87,7 +87,9 @@ export class ZhHierarchySearchTableComponent implements OnInit {
           this.fields = [];
           this.notes = [];
         })
-        .finally(() => {});
+        .finally(() => {
+          this.updateAttributesAndKnowledgeForm();
+        });
     }
   }
 
@@ -110,9 +112,6 @@ export class ZhHierarchySearchTableComponent implements OnInit {
   }
 
   fieldChanged(event) {
-    this.localForm.controls['attributes'].reset();
-    this.localForm.controls['knowledges'].reset();
-
     const filteredNotes = this.notes.filter(
       (item) =>
         (item.volet == event && item.rubrique == null && item.sousrubrique == null) ||
@@ -131,11 +130,29 @@ export class ZhHierarchySearchTableComponent implements OnInit {
       this.knowledges = this.getKnowledge(this.attributes[0]);
     }
 
-    if (this.attributes.length > 0) {
-      this.localForm.controls['attributes'].setValue([this.attributes[0]]);
+    // Update the form
+    this.updateAttributesAndKnowledgeForm();
+  }
+
+  updateAttributesAndKnowledgeForm() {
+    const knowledgeControl = this.localForm.controls['knowledges'];
+    const attributesControl = this.localForm.controls['attributes'];
+
+    attributesControl.reset();
+    knowledgeControl.reset();
+
+    if (this.attributes.length) {
+      attributesControl.enable();
+      attributesControl.setValue([this.attributes[0]]);
+    } else {
+      attributesControl.disable();
     }
+
     if (this.knowledges.length > 0) {
-      this.localForm.controls['knowledges'].setValue([this.knowledges[0]]);
+      knowledgeControl.enable();
+      knowledgeControl.setValue(this.knowledges[0]);
+    } else {
+      knowledgeControl.disable();
     }
   }
 
@@ -170,9 +187,17 @@ export class ZhHierarchySearchTableComponent implements OnInit {
       const form = this.initialForm();
       form.patchValue(this.localForm.value);
       this.data.push(form);
-      // Reset all form data
-      this.reset();
+      let knowledges_array = [];
+      this.data.value.forEach((element) => {
+        if (element['knowledges'] !== null && !Array.isArray(element['knowledges'])) {
+          // avoid object object in 'connaissance' column of the frontend table
+          knowledges_array.push(element['knowledges']);
+          element['knowledges'] = knowledges_array;
+          knowledges_array = [];
+        }
+      });
     }
+    this.reset();
   }
 
   onDeleteFilter(event) {

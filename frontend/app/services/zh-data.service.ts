@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ConfigService } from '@geonature/services/config.service';
@@ -115,10 +115,14 @@ export class ZhDataService {
     return this._api.get(`${this.config.API_ENDPOINT}/zones_humides/${zhId}/taxa`);
   }
 
-  getHierZh(zhId: string) {
-    return this._api.get<HierarchyModel>(
-      `${this.config.API_ENDPOINT}/zones_humides/${zhId}/hierarchy`
-    );
+  getHierZh(zhId: string, headers?: HttpHeaders | { [header: string]: string | string[] }) {
+    return this._api.get(`${this.config.API_ENDPOINT}/zones_humides/${zhId}/hierarchy`, {
+      headers,
+    });
+  }
+
+  deleteNotes(zhId: number) {
+    return this._api.delete(`${this.config.API_ENDPOINT}/zones_humides/notes/${zhId}`);
   }
 
   getPdf(zhId: number) {

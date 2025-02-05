@@ -15,6 +15,7 @@ export class ZhFormTab9Component implements OnInit {
   public $_fromChangeSub: Subscription;
   public $_getTabChangeSub: Subscription;
   public currentZh: any;
+  public main_rb_name: string;
 
   constructor(
     private _dataService: ZhDataService,
@@ -36,8 +37,12 @@ export class ZhFormTab9Component implements OnInit {
   getCurrentZh() {
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
-        this.currentZh = zh;
-        this.hierarchy.getHierarchy(zh.id, zh.properties.bassin_versant);
+        if (zh.properties.main_rb_name != null) {
+          this.main_rb_name = zh.properties.main_rb_name;
+          this.hierarchy.getHierarchy(zh.id);
+        } else {
+          this.main_rb_name = 'aucun';
+        }
       }
     });
   }
@@ -46,5 +51,6 @@ export class ZhFormTab9Component implements OnInit {
   ngOnDestroy() {
     if (this.$_getTabChangeSub) this.$_getTabChangeSub.unsubscribe();
     if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
+    this.hierarchy.clear();
   }
 }

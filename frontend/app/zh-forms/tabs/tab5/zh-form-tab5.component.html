@@ -16,7 +16,10 @@
           Fonction
         </button>
       </div>
-      <div *ngIf="fctHydroTable && fctHydroTable.length > 0" class="table-responsive">
+      <div
+        *ngIf="fctHydroTable && fctHydroTable.length > 0"
+        class="table-responsive"
+      >
         <zh-table
           [tableCols]="hydroFctTableCol"
           [data]="fctHydroTable"
@@ -42,7 +45,10 @@
           Fonction
         </button>
       </div>
-      <div *ngIf="bioFctTable && bioFctTable.length > 0" class="table-responsive">
+      <div
+        *ngIf="bioFctTable && bioFctTable.length > 0"
+        class="table-responsive"
+      >
         <zh-table
           [tableCols]="bioFctTableCol"
           [data]="bioFctTable"
@@ -67,7 +73,10 @@
           <mat-icon>add_box</mat-icon>
           Intérêt
         </button>
-        <div *ngIf="interetPatTable && interetPatTable.length > 0" class="table-responsive">
+        <div
+          *ngIf="interetPatTable && interetPatTable.length > 0"
+          class="table-responsive"
+        >
           <zh-table
             [tableCols]="interetsTableCol"
             [data]="interetPatTable"
@@ -97,7 +106,8 @@
           <small
             *ngIf="formTab5.controls.nb_hab.value && formTab5.controls.nb_hab.errors?.min"
             class="error-msg"
-            >Le nombre d'habitat(s) doit être supérieur à 0
+          >
+            Le nombre d'habitat(s) doit être supérieur à 0
           </small>
         </div>
         <div class="form-group col-md-4">
@@ -116,7 +126,8 @@
                 formTab5.controls.total_hab_cover.errors?.max)
             "
             class="error-msg"
-            >La valeur doit être comprise entre 0 et 100
+          >
+            La valeur doit être comprise entre 0 et 100
           </small>
         </div>
       </div>
@@ -133,10 +144,13 @@
           <mat-icon>add_box</mat-icon>
           Habitat
         </button>
-        <div *ngIf="corineBioTable && corineBioTable.length > 0" class="table-responsive">
-          <i class="hint-text"
-            >*I.C. = Intérêt communautaire; P.R. = Intérêt communautaire prioritaire</i
-          >
+        <div
+          *ngIf="corineBioTable && corineBioTable.length > 0"
+          class="table-responsive"
+        >
+          <i class="hint-text">
+            *I.C. = Intérêt communautaire; P.R. = Intérêt communautaire prioritaire
+          </i>
           <zh-table
             [tableCols]="corineTableCol"
             [data]="corineBioTable"
@@ -153,9 +167,18 @@
           <small>Liste des espèces à statut de protection et/ou de conservation</small>
         </div>
         <div class="mb-2 col-12">
-          <button mat-raised-button class="mb-3" color="primary" (click)="onGenerateTaxa()">
+          <button
+            mat-raised-button
+            class="mb-3"
+            color="primary"
+            (click)="onGenerateTaxa()"
+          >
             <mat-icon>add_box</mat-icon>
-            <mat-spinner *ngIf="taxaLoading" color="warn" diameter="25"></mat-spinner>
+            <mat-spinner
+              *ngIf="taxaLoading"
+              color="warn"
+              diameter="25"
+            ></mat-spinner>
             Générer la liste des espèces
           </button>
           <mat-icon
@@ -204,11 +227,14 @@
               (onDownload)="_filesService.downloadFile($event)"
             ></zh-table>
             <p class="hint">
-              Vous pouvez retrouver ces fichiers dans l'onglet des ressources documentaires (<a
+              Vous pouvez retrouver ces fichiers dans l'onglet des ressources documentaires (
+              <a
                 [routerLink]=""
                 (click)="nextTab.emit(8)"
-                >onglet 8</a
-              >)
+              >
+                onglet 8
+              </a>
+              )
             </p>
           </ng-container>
         </div>
@@ -223,7 +249,8 @@
           <small
             *ngIf="formTab5.controls.nb_flora_sp.value && formTab5.controls.nb_flora_sp.errors?.min"
             class="error-msg"
-            >Le nombre d'espèce(s) doit être supérieur à 0
+          >
+            Le nombre d'espèce(s) doit être supérieur à 0
           </small>
         </div>
         <div class="form-group col-md-4">
@@ -240,7 +267,8 @@
               formTab5.controls.nb_vertebrate_sp.errors?.min
             "
             class="error-msg"
-            >Le nombre d'espèce(s) doit être supérieur à 0
+          >
+            Le nombre d'espèce(s) doit être supérieur à 0
           </small>
         </div>
         <div class="form-group col-md-4">
@@ -257,7 +285,8 @@
               formTab5.controls.nb_invertebrate_sp.errors?.min
             "
             class="error-msg"
-            >Le nombre d'espèce(s) doit être supérieur à 0
+          >
+            Le nombre d'espèce(s) doit être supérieur à 0
           </small>
         </div>
       </div>
@@ -276,7 +305,10 @@
           <mat-icon>add_box</mat-icon>
           Valeur
         </button>
-        <div *ngIf="valSocEcoTable && valSocEcoTable.length > 0" class="table-responsive">
+        <div
+          *ngIf="valSocEcoTable && valSocEcoTable.length > 0"
+          class="table-responsive"
+        >
           <zh-table
             [tableCols]="socioEcoTableCol"
             [data]="valSocEcoTable"
@@ -289,7 +321,10 @@
       </div>
     </fieldset>
     <div class="footer-btn">
-      <zh-cancelButton *ngIf="currentZh" [zhId]="currentZh.properties.id_zh"></zh-cancelButton>
+      <zh-cancelButton
+        *ngIf="currentZh"
+        [zhId]="currentZh.properties.id_zh"
+      ></zh-cancelButton>
       <button
         type="submit"
         mat-raised-button
@@ -299,17 +334,28 @@
         (click)="onFormSubmit()"
       >
         <mat-icon *ngIf="!posted">save_outline</mat-icon>
-        <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
+        <mat-spinner
+          *ngIf="posted"
+          [diameter]="20"
+        ></mat-spinner>
         Enregistrer
       </button>
     </div>
   </form>
 </div>
 <!-- Modal fonctions hydrologiques -->
-<ng-template #hydroFctModal let-c="close" let-d="dismiss">
+<ng-template
+  #hydroFctModal
+  let-c="close"
+  let-d="dismiss"
+>
   <div class="modal-header">
     <h6>{{ modalTitle }}</h6>
-    <button mat-icon-button class="closeModalBtn" (click)="c()">
+    <button
+      mat-icon-button
+      class="closeModalBtn"
+      (click)="c()"
+    >
       <mat-icon class="cancel-icon">cancel</mat-icon>
     </button>
   </div>
@@ -323,8 +369,15 @@
             ngbAutofocus
             [formControl]="hydroFctForm.controls.function"
           >
-            <optgroup *ngFor="let group of fctHydroInput" label="{{ group[0].category }}">
-              <option *ngFor="let item of group" [ngValue]="item" [disabled]="item.disabled">
+            <optgroup
+              *ngFor="let group of fctHydroInput"
+              label="{{ group[0].category }}"
+            >
+              <option
+                *ngFor="let item of group"
+                [ngValue]="item"
+                [disabled]="item.disabled"
+              >
                 {{ item.mnemonique }}
               </option>
             </optgroup>
@@ -335,13 +388,20 @@
               hydroFctForm.controls.function.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-6">
           <small class="required">Qualifications</small>
-          <select class="form-control" [formControl]="hydroFctForm.controls.qualification">
-            <option *ngFor="let qualif of formMetaData.FONCTIONS_QUALIF" [ngValue]="qualif">
+          <select
+            class="form-control"
+            [formControl]="hydroFctForm.controls.qualification"
+          >
+            <option
+              *ngFor="let qualif of formMetaData.FONCTIONS_QUALIF"
+              [ngValue]="qualif"
+            >
               {{ qualif.mnemonique }}
             </option>
           </select>
@@ -351,12 +411,16 @@
               hydroFctForm.controls.qualification.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-6">
           <small class="required">Connaissance</small>
-          <select class="form-control" [formControl]="hydroFctForm.controls.knowledge">
+          <select
+            class="form-control"
+            [formControl]="hydroFctForm.controls.knowledge"
+          >
             <option
               *ngFor="let knowledge of formMetaData.FONCTIONS_CONNAISSANCE"
               [ngValue]="knowledge"
@@ -370,8 +434,9 @@
               hydroFctForm.controls.knowledge.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
 
         <div class="form-group col-md-12">
@@ -399,10 +464,18 @@
 </ng-template>
 
 <!-- Modal fonctions biologiques -->
-<ng-template #bioFctModal let-c="close" let-d="dismiss">
+<ng-template
+  #bioFctModal
+  let-c="close"
+  let-d="dismiss"
+>
   <div class="modal-header">
     <h6>{{ modalTitle }}</h6>
-    <button mat-icon-button class="closeModalBtn" (click)="c()">
+    <button
+      mat-icon-button
+      class="closeModalBtn"
+      (click)="c()"
+    >
       <mat-icon class="cancel-icon">cancel</mat-icon>
     </button>
   </div>
@@ -421,7 +494,11 @@
               label="{{ group[0].category }}"
               class="test"
             >
-              <option *ngFor="let item of group" [ngValue]="item" [disabled]="item.disabled">
+              <option
+                *ngFor="let item of group"
+                [ngValue]="item"
+                [disabled]="item.disabled"
+              >
                 {{ item.mnemonique }}
               </option>
             </optgroup>
@@ -432,13 +509,20 @@
               bioFctForm.controls.function.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-6">
           <small class="required">Qualifications</small>
-          <select class="form-control" [formControl]="bioFctForm.controls.qualification">
-            <option *ngFor="let qualif of formMetaData.FONCTIONS_QUALIF" [ngValue]="qualif">
+          <select
+            class="form-control"
+            [formControl]="bioFctForm.controls.qualification"
+          >
+            <option
+              *ngFor="let qualif of formMetaData.FONCTIONS_QUALIF"
+              [ngValue]="qualif"
+            >
               {{ qualif.mnemonique }}
             </option>
           </select>
@@ -448,12 +532,16 @@
               bioFctForm.controls.qualification.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-6">
           <small class="required">Connaissance</small>
-          <select class="form-control" [formControl]="bioFctForm.controls.knowledge">
+          <select
+            class="form-control"
+            [formControl]="bioFctForm.controls.knowledge"
+          >
             <option
               *ngFor="let knowledge of formMetaData.FONCTIONS_CONNAISSANCE"
               [ngValue]="knowledge"
@@ -467,8 +555,9 @@
               bioFctForm.controls.knowledge.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
 
         <div class="form-group col-md-12">
@@ -496,10 +585,18 @@
 </ng-template>
 
 <!-- Modal Intérêt patrimonial -->
-<ng-template #interetPatModal let-c="close" let-d="dismiss">
+<ng-template
+  #interetPatModal
+  let-c="close"
+  let-d="dismiss"
+>
   <div class="modal-header">
     <h6>{{ modalTitle }}</h6>
-    <button mat-icon-button class="closeModalBtn" (click)="c()">
+    <button
+      mat-icon-button
+      class="closeModalBtn"
+      (click)="c()"
+    >
       <mat-icon class="cancel-icon">cancel</mat-icon>
     </button>
   </div>
@@ -513,8 +610,15 @@
             ngbAutofocus
             [formControl]="interetPatForm.controls.function"
           >
-            <optgroup *ngFor="let group of interetPatInput" label="{{ group[0].category }}">
-              <option *ngFor="let item of group" [ngValue]="item" [disabled]="item.disabled">
+            <optgroup
+              *ngFor="let group of interetPatInput"
+              label="{{ group[0].category }}"
+            >
+              <option
+                *ngFor="let item of group"
+                [ngValue]="item"
+                [disabled]="item.disabled"
+              >
                 {{ item.mnemonique }}
               </option>
             </optgroup>
@@ -525,13 +629,20 @@
               interetPatForm.controls.function.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-6">
           <small class="required">Qualifications</small>
-          <select class="form-control" [formControl]="interetPatForm.controls.qualification">
-            <option *ngFor="let qualif of formMetaData.FONCTIONS_QUALIF" [ngValue]="qualif">
+          <select
+            class="form-control"
+            [formControl]="interetPatForm.controls.qualification"
+          >
+            <option
+              *ngFor="let qualif of formMetaData.FONCTIONS_QUALIF"
+              [ngValue]="qualif"
+            >
               {{ qualif.mnemonique }}
             </option>
           </select>
@@ -541,12 +652,16 @@
               interetPatForm.controls.qualification.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-6">
           <small class="required">Connaissance</small>
-          <select class="form-control" [formControl]="interetPatForm.controls.knowledge">
+          <select
+            class="form-control"
+            [formControl]="interetPatForm.controls.knowledge"
+          >
             <option
               *ngFor="let knowledge of formMetaData.FONCTIONS_CONNAISSANCE"
               [ngValue]="knowledge"
@@ -560,8 +675,9 @@
               interetPatForm.controls.knowledge.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
 
         <div class="form-group col-md-12">
@@ -589,10 +705,18 @@
 </ng-template>
 
 <!-- Modal Valeurs socio-économiques-->
-<ng-template #valSocEcoModal let-c="close" let-d="dismiss">
+<ng-template
+  #valSocEcoModal
+  let-c="close"
+  let-d="dismiss"
+>
   <div class="modal-header">
     <h6>{{ modalTitle }}</h6>
-    <button mat-icon-button class="closeModalBtn" (click)="c()">
+    <button
+      mat-icon-button
+      class="closeModalBtn"
+      (click)="c()"
+    >
       <mat-icon class="cancel-icon">cancel</mat-icon>
     </button>
   </div>
@@ -606,7 +730,11 @@
             ngbAutofocus
             [formControl]="valSocEcoForm.controls.function"
           >
-            <option *ngFor="let item of valSocEcoInput" [ngValue]="item" [disabled]="item.disabled">
+            <option
+              *ngFor="let item of valSocEcoInput"
+              [ngValue]="item"
+              [disabled]="item.disabled"
+            >
               {{ item.mnemonique }}
             </option>
           </select>
@@ -616,13 +744,20 @@
               valSocEcoForm.controls.function.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-6">
           <small class="required">Qualifications</small>
-          <select class="form-control" [formControl]="valSocEcoForm.controls.qualification">
-            <option *ngFor="let qualif of formMetaData.FONCTIONS_QUALIF" [ngValue]="qualif">
+          <select
+            class="form-control"
+            [formControl]="valSocEcoForm.controls.qualification"
+          >
+            <option
+              *ngFor="let qualif of formMetaData.FONCTIONS_QUALIF"
+              [ngValue]="qualif"
+            >
               {{ qualif.mnemonique }}
             </option>
           </select>
@@ -632,12 +767,16 @@
               valSocEcoForm.controls.qualification.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-6">
           <small class="required">Connaissance</small>
-          <select class="form-control" [formControl]="valSocEcoForm.controls.knowledge">
+          <select
+            class="form-control"
+            [formControl]="valSocEcoForm.controls.knowledge"
+          >
             <option
               *ngFor="let knowledge of formMetaData.FONCTIONS_CONNAISSANCE"
               [ngValue]="knowledge"
@@ -651,8 +790,9 @@
               valSocEcoForm.controls.knowledge.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
 
         <div class="form-group col-md-12">
@@ -680,10 +820,18 @@
 </ng-template>
 
 <!-- Modal corine biotope-->
-<ng-template #corineBioModal let-c="close" let-d="dismiss">
+<ng-template
+  #corineBioModal
+  let-c="close"
+  let-d="dismiss"
+>
   <div class="modal-header">
     <h6>{{ modalTitle }}</h6>
-    <button mat-icon-button class="closeModalBtn" (click)="c()">
+    <button
+      mat-icon-button
+      class="closeModalBtn"
+      (click)="c()"
+    >
       <mat-icon class="cancel-icon">cancel</mat-icon>
     </button>
   </div>
@@ -709,12 +857,16 @@
               corineBioForm.controls.corinBio.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-6">
           <small class="required">Cahier habitats</small>
-          <select class="form-control" [formControl]="corineBioForm.controls.cahierHab">
+          <select
+            class="form-control"
+            [formControl]="corineBioForm.controls.cahierHab"
+          >
             <option value=""></option>
             <option
               *ngFor="let habitat of cahierHabInput"
@@ -730,13 +882,20 @@
               corineBioForm.controls.cahierHab.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-6">
           <small class="required">État de conservation</small>
-          <select class="form-control" [formControl]="corineBioForm.controls.preservationState">
-            <option *ngFor="let state of formMetaData.ETAT_CONSERVATION" [ngValue]="state">
+          <select
+            class="form-control"
+            [formControl]="corineBioForm.controls.preservationState"
+          >
+            <option
+              *ngFor="let state of formMetaData.ETAT_CONSERVATION"
+              [ngValue]="state"
+            >
               {{ state.mnemonique }}
             </option>
           </select>
@@ -746,8 +905,9 @@
               corineBioForm.controls.preservationState.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-12">
           <small>Recouvrement sur la ZH (%)</small>
@@ -765,7 +925,8 @@
                 corineBioForm.controls.habCover.errors?.max)
             "
             class="error-msg"
-            >La valeur doit être comprise entre 0 et 100
+          >
+            La valeur doit être comprise entre 0 et 100
           </small>
         </div>
       </div>

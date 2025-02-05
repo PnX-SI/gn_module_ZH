@@ -1,6 +1,13 @@
 <div class="container-fluid">
-  <mat-drawer-container [hasBackdrop]="false" [autosize]="true">
-    <mat-drawer #drawer mode="push" [opened]="false">
+  <mat-drawer-container
+    [hasBackdrop]="false"
+    [autosize]="true"
+  >
+    <mat-drawer
+      #drawer
+      mode="push"
+      [opened]="false"
+    >
       <zh-search
         [data]="metaData"
         (onClose)="drawer.close()"
@@ -9,7 +16,10 @@
     </mat-drawer>
     <mat-drawer-content>
       <div class="map-list-container">
-        <div [hidden]="drawer.opened" class="float-btns">
+        <div
+          [hidden]="drawer.opened"
+          class="float-btns"
+        >
           <ng-container *ngIf="userCruved?.C != '0'">
             <button
               mat-raised-button
@@ -28,17 +38,26 @@
             (click)="drawer.toggle()"
           >
             Filtrer
-            <i class="fa fa-sliders" aria-hidden="true"></i>
+            <i
+              class="fa fa-sliders"
+              aria-hidden="true"
+            ></i>
           </button>
         </div>
-        <div id="map-list" class="row">
+        <div
+          id="map-list"
+          class="row"
+        >
           <div
             [hidden]="drawer.opened"
             class="col-xs-12 col-sm-12 col-md-6 col-lg-6 padding-sm-occ"
             [ngStyle]="{ 'min-height.px': cardContentHeight }"
           >
             <!-- MAP -->
-            <pnx-map-list [idName]="idName" height="100%"> </pnx-map-list>
+            <pnx-map-list
+              [idName]="idName"
+              height="100%"
+            ></pnx-map-list>
           </div>
           <div
             class="col-xs-12 col-sm-12 col-md-6 col-lg-6 padding-sm-occ"
@@ -81,10 +100,12 @@
                     aria-expanded="false"
                     matTooltip="{{ 'List.Columns' | translate }}"
                     (click)="openModalCol($event, modalCol)"
-                  >
-                  </i>
+                  ></i>
                 </ng-template>
-                <ng-template let-row="row" ngx-datatable-cell-template>
+                <ng-template
+                  let-row="row"
+                  ngx-datatable-cell-template
+                >
                   <ng-container *ngIf="row.rights.U; else disabledEditBlc">
                     <a
                       class="btn btn-outline-shadow btn-no-padding btn-ghost"
@@ -108,10 +129,12 @@
                     aria-expanded="false"
                     matTooltip="Afficher toutes les zones humides"
                     (click)="displayAllZh()"
-                  >
-                  </i>
+                  ></i>
                 </ng-template>
-                <ng-template let-row="row" ngx-datatable-cell-template>
+                <ng-template
+                  let-row="row"
+                  ngx-datatable-cell-template
+                >
                   <ng-container *ngIf="row.rights.R; else disabledInfoBlc">
                     <a
                       class="btn btn-outline-shadow btn-no-padding btn-ghost"
@@ -125,7 +148,10 @@
                     </a>
                   </ng-container>
                   <ng-template #disabledInfoBlc>
-                    <button class="btn btn-outline-shadow btn-no-padding btn-ghost" disabled="true">
+                    <button
+                      class="btn btn-outline-shadow btn-no-padding btn-ghost"
+                      disabled="true"
+                    >
                       <i
                         class="fa fa-info-circle disabled"
                         matTooltip="{{ 'Fiche complète de la zone humide' }}"
@@ -136,7 +162,10 @@
                 </ng-template>
               </ngx-datatable-column>
               <ngx-datatable-column maxWidth="10">
-                <ng-template let-row="row" ngx-datatable-cell-template>
+                <ng-template
+                  let-row="row"
+                  ngx-datatable-cell-template
+                >
                   <ng-container *ngIf="row.rights.D">
                     <button
                       class="btn btn-outline-shadow btn-no-padding btn-ghost"
@@ -160,8 +189,7 @@
                   [prop]="col.prop"
                   [name]="col.name"
                   [sortable]="col.sortable"
-                >
-                </ngx-datatable-column>
+                ></ngx-datatable-column>
               </ng-container>
             </ngx-datatable>
           </div>
@@ -171,20 +199,40 @@
   </mat-drawer-container>
 </div>
 <!-- MODAL COLUMNS -->
-<ng-template #modalCol let-c="close" let-d="dismiss">
+<ng-template
+  #modalCol
+  let-c="close"
+  let-d="dismiss"
+>
   <div class="modal-header">
-    <h4>{{ "List.DisplayColumns" | translate }}</h4>
+    <h4>{{ 'List.DisplayColumns' | translate }}</h4>
   </div>
   <div class="modal-body">
     <div
       class="d-flex p-2 justify-content-start"
       *ngFor="let col of mapListService.availableColumns"
     >
-      <input type="checkbox" [id]="col.name" (click)="toggle(col)" [checked]="isChecked(col)" />
-      <label class="ml-1" [attr.for]="col.name">{{ col.name | readablePropertie }}</label>
+      <input
+        type="checkbox"
+        [id]="col.name"
+        (click)="toggle(col)"
+        [checked]="isChecked(col)"
+      />
+      <label
+        class="ml-1"
+        [attr.for]="col.name"
+      >
+        {{ col.name | readablePropertie }}
+      </label>
     </div>
     <div class="d-flex justify-content-end">
-      <button type="button" mat-raised-button color="primary" class="uppercase" (click)="c()">
+      <button
+        type="button"
+        mat-raised-button
+        color="primary"
+        class="uppercase"
+        (click)="c()"
+      >
         Fermer
       </button>
     </div>
@@ -192,7 +240,11 @@
 </ng-template>
 
 <!-- MODAL DELETE -->
-<ng-template #modalConfirm let-c="close" let-d="dismiss">
+<ng-template
+  #modalConfirm
+  let-c="close"
+  let-d="dismiss"
+>
   <div class="modal-header">
     <h5 class="modal-title"><i class="fa fa-trash"></i></h5>
   </div>
@@ -203,7 +255,14 @@
     Sa suppression sera définitive
   </div>
   <div class="modal-footer">
-    <button type="button" mat-raised-button class="mr-1 uppercase" (click)="c()">Annuler</button>
+    <button
+      type="button"
+      mat-raised-button
+      class="mr-1 uppercase"
+      (click)="c()"
+    >
+      Annuler
+    </button>
     <button
       type="button"
       mat-raised-button

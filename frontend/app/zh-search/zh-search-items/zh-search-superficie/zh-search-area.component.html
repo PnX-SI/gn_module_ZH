@@ -1,12 +1,18 @@
 <div class="form-row">
   <div class="form-group col-md-6">
-    <zh-label label="Superficie de la zone humide"> </zh-label>
+    <zh-label label="Superficie de la zone humide"></zh-label>
   </div>
   <div class="form-group col-md-6">
     <div class="input-group mb-3">
       <div class="input-group-prepend">
-        <select class="form-control" [formControl]="form.controls.symbol">
-          <option *ngFor="let symbol of symbols" [ngValue]="symbol.value">
+        <select
+          class="form-control"
+          [formControl]="form.controls.symbol"
+        >
+          <option
+            *ngFor="let symbol of symbols"
+            [ngValue]="symbol.value"
+          >
             {{ symbol.value }}
           </option>
         </select>
@@ -23,7 +29,10 @@
         <span>Ha</span>
       </div>
     </div>
-    <small class="error-msg" *ngIf="form.controls.ha.errors?.pattern">
+    <small
+      class="error-msg"
+      *ngIf="form.controls.ha.errors?.pattern"
+    >
       La superficie doit être supérieure à 0
     </small>
   </div>

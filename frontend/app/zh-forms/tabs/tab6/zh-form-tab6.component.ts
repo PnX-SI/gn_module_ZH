@@ -14,6 +14,7 @@ import { DatepickerI18n, I18n } from '../../../services/datepicker-i18n.service'
 
 import { ZhDataService } from '../../../services/zh-data.service';
 import { ErrorTranslatorService } from '../../../services/error-translator.service';
+import { HierarchyService } from '../../../services/hierarchy.service';
 
 @Component({
   selector: 'zh-form-tab6',
@@ -135,7 +136,8 @@ export class ZhFormTab6Component implements OnInit {
     private _modalService: ModalService,
     private _error: ErrorTranslatorService,
     private _tabService: TabsService,
-    public config: ConfigService
+    public config: ConfigService,
+    public hierarchy: HierarchyService
   ) {}
 
   ngOnInit() {
@@ -990,6 +992,7 @@ export class ZhFormTab6Component implements OnInit {
             this._toastr.success('Vos données sont bien enregistrées', '', {
               positionClass: 'toast-top-right',
             });
+            this.hierarchy.getHierarchyFromZh(this.currentZh);
             this.nextTab.emit(7);
           });
         },
@@ -1018,5 +1021,6 @@ export class ZhFormTab6Component implements OnInit {
   ngOnDestroy() {
     if (this.$_getTabChangeSub) this.$_getTabChangeSub.unsubscribe();
     if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();
+    this.hierarchy.clear();
   }
 }

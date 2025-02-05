@@ -3,7 +3,7 @@ from werkzeug.exceptions import NotFound
 
 from ref_geo.models import BibAreasTypes, LAreas
 from geonature.utils.env import DB
-from sqlalchemy.sql import select
+from sqlalchemy.sql import select, func
 from pypn_habref_api.models import Habref
 from pypnnomenclature.models import TNomenclatures
 
@@ -499,21 +499,39 @@ class Basin:
     def __get_river_basins(self):
         return [
             name
-            for (name,) in DB.session.execute(
-                select(TRiverBasin.name).where(
-                    TRiverBasin.id_rb == CorZhRb.id_rb, CorZhRb.id_zh == self.id_zh
+            for name in DB.session.scalars(
+                select(TRiverBasin.name)
+                .where(
+                    TRiverBasin.id_rb == CorZhRb.id_rb,
+                    CorZhRb.id_zh == self.id_zh,
+                    TZH.id_zh == self.id_zh,
                 )
-            ).all()
+                .order_by(
+                    (
+                        func.ST_Area(func.ST_Intersection(TZH.geom, TRiverBasin.geom))
+                        / func.ST_Area(TZH.geom)
+                    ).desc()
+                )
+            )
         ]
 
     def __get_hydro_zones(self):
         return [
             name
-            for name in DB.session.execute(
+            for name in DB.session.scalars(
                 select(THydroArea.name)
-                .where(THydroArea.id_hydro == CorZhHydro.id_hydro, CorZhHydro.id_zh == self.id_zh)
-                .distinct()
-            ).all()
+                .where(
+                    THydroArea.id_hydro == CorZhHydro.id_hydro,
+                    CorZhHydro.id_zh == self.id_zh,
+                    TZH.id_zh == self.id_zh,
+                )
+                .order_by(
+                    (
+                        func.ST_Area(func.ST_Intersection(TZH.geom, THydroArea.geom))
+                        / func.ST_Area(TZH.geom)
+                    ).desc()
+                )
+            )
         ]
 
 
@@ -809,7 +827,7 @@ class UrbanDoc:
 
     def __str__(self):
         return {
-            "commune": DB.session.get(LAreas, self.id_area).id_area,
+            "commune": DB.session.get(LAreas, self.id_area).area_name,
             "type_doc": Utils.get_mnemo(self.id_doc_type),
             "type_classement": [
                 Utils.get_mnemo(
@@ -1004,8 +1022,9 @@ class Action:
 
 
 class Card(ZH):
-    def __init__(self, id_zh, type, ref_geo_config):
+    def __init__(self, id_zh, main_id_rb, type, ref_geo_config):
         self.id_zh = id_zh
+        self.main_id_rb = main_id_rb
         self.type = type
         self.ref_geo_config = ref_geo_config
         self.properties = self.get_properties()
@@ -1018,7 +1037,7 @@ class Card(ZH):
         self.status = Status()
         self.evaluation = Evaluation()
         try:
-            self.hierarchy = Hierarchy(id_zh)
+            self.hierarchy = Hierarchy(id_zh, main_id_rb)
         except (NotFound, ZHApiError):
             self.hierarchy = None
 
@@ -1183,7 +1202,12 @@ class Card(ZH):
         return self.status.__str__()
 
     def __set_hierarchy(self):
-        return self.hierarchy.as_dict() if self.hierarchy is not None else None
+        return {
+            "main_basin_name": DB.session.scalar(
+                select(TRiverBasin.name).where(TRiverBasin.id_rb == self.main_id_rb)
+            ),
+            "hierarchy": self.hierarchy.as_dict() if self.hierarchy is not None else None,
+        }
 
     def __set_evaluation(self):
         self.__set_main_functions()

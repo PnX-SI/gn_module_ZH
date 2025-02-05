@@ -4,10 +4,9 @@
       <span class="mr-1">OU</span>
       <mat-slide-toggle
         [formControl]="form.controls.and"
-        matTooltip="Si OU est choisi, les zones humides recherchées respecteront au moins 1 critère listé ci-dessous. 
+        matTooltip="Si OU est choisi, les zones humides recherchées respecteront au moins 1 critère listé ci-dessous.
         Si ET est choisi: elles respecteront tous les critères"
-      >
-      </mat-slide-toggle>
+      ></mat-slide-toggle>
       <span class="ml-1">ET</span>
     </div>
   </div>
@@ -19,17 +18,36 @@
         [formControl]="localForm?.controls.field"
         (change)="fieldChanged($event.target.value)"
       >
-        <option [ngValue]="null" selected>Sélectionner</option>
+        <option
+          [ngValue]="null"
+          selected
+        >
+          Sélectionner
+        </option>
         <ng-container *ngFor="let field of fields; let index = index">
-          <option class="option-title" [value]="field.name">{{ field.name | uppercase }}</option>
+          <option
+            class="option-title"
+            [value]="field.name"
+            disabled
+          >
+            {{ field.name | uppercase }}
+          </option>
           <ng-container *ngFor="let cat of field.subcategory; let subIndex = index">
             <!-- &nbsp; because css does not work -->
-            <option *ngIf="cat?.name" [value]="cat.name">
+            <option
+              *ngIf="cat?.name"
+              [value]="cat.name"
+              [disabled]="cat.subcategory.length !== 1"
+            >
               <span>&nbsp;{{ cat.name | capitalize }}</span>
             </option>
             <ng-container *ngFor="let cat2 of cat.subcategory; let subsubIndex = index">
               <!-- &nbsp; because css does not work -->
-              <option class="option-subsubtitle" *ngIf="cat2?.name" [value]="cat2.name">
+              <option
+                class="option-subsubtitle"
+                *ngIf="cat2?.name"
+                [value]="cat2.name"
+              >
                 <span>&nbsp;&nbsp;&nbsp;{{ cat2.name | capitalize }}</span>
               </option>
             </ng-container>
@@ -39,21 +57,21 @@
     </div>
     <div class="pr-0 col-lg-3 col-6">
       <h5>Attribut</h5>
-      <zh-multiselect 
+      <zh-multiselect
         [values]="attributes"
         [parentFormControl]="localForm.controls.attributes"
         keyLabel="attribut"
         (onChange)="attributesChanged($event)"
-        [multiple]="knowledges.length"
       />
     </div>
     <div class="pr-0 col-lg-3 col-6">
       <h5>Connaissance</h5>
-      <zh-multiselect 
+      <zh-multiselect
         [values]="knowledges"
         [parentFormControl]="localForm.controls.knowledges"
         keyLabel="note_type"
         (onChange)="attributesChanged($event)"
+        [multiple]="false"
       />
     </div>
     <div class="pr-0 col-lg-2 col-6">
@@ -78,13 +96,12 @@
         [data]="data.value"
         [deletable]="true"
         (onDelete)="onDeleteFilter($event)"
-      >
-      </zh-table>
+      ></zh-table>
     </div>
   </div>
 </ng-container>
 <ng-template #noFields>
-  <span
-    >Le bassin versant sélectionné ne contient aucune règle, veuillez en sélectionner un autre</span
-  >
+  <span>
+    Le bassin versant sélectionné ne contient aucune règle, veuillez en sélectionner un autre
+  </span>
 </ng-template>

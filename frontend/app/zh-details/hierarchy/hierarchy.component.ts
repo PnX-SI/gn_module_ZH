@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { HierarchyModel } from '../models/hierarchy.model';
+import { HierarchyTotalModel } from '../models/hierarchy.model';
 import { HierarchyService } from '../../services/hierarchy.service';
 
 @Component({
@@ -8,11 +8,16 @@ import { HierarchyService } from '../../services/hierarchy.service';
   styleUrls: ['./hierarchy.component.scss'],
 })
 export class HierarchyComponent {
-  @Input() data: HierarchyModel;
+  @Input() main_rb_name: string;
+  main_river_basin: string;
 
   constructor(public hierarchy: HierarchyService) {}
-
   ngOnInit() {
-    this.hierarchy.setItems(this.data);
+    this.main_river_basin = '';
+    if (this.main_rb_name != null) {
+      this.main_river_basin = this.main_rb_name;
+    } else {
+      this.main_river_basin = 'aucun';
+    }
   }
 }

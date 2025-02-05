@@ -50,13 +50,13 @@ CREATE SEQUENCE pr_zh.t_zh_id_zh_seq START WITH 1 INCREMENT BY 1;
 
 CREATE EXTENSION IF NOT EXISTS "unaccent";
 
-CREATE  TABLE pr_zh.bib_actions ( 
+CREATE  TABLE pr_zh.bib_actions (
 	id_action            integer DEFAULT nextval('pr_zh.bib_actions_id_action_seq'::regclass) NOT NULL ,
 	name                 varchar(255)  NOT NULL ,
 	CONSTRAINT pk_bib_actions_id_action PRIMARY KEY ( id_action )
  );
 
-CREATE  TABLE pr_zh.bib_cb ( 
+CREATE  TABLE pr_zh.bib_cb (
 	lb_code              varchar(50)  NOT NULL ,
 	humidity             varchar(1)  NOT NULL ,
 	is_ch                boolean  NOT NULL ,
@@ -69,7 +69,7 @@ COMMENT ON COLUMN pr_zh.bib_cb.humidity IS 'H = humide ou P = potentiellement hu
 
 COMMENT ON COLUMN pr_zh.bib_cb.is_ch IS 'true si le Corine Biotope est utilisé pour la liste des cahiers habitats des zones humides';
 
-CREATE  TABLE pr_zh.bib_organismes ( 
+CREATE  TABLE pr_zh.bib_organismes (
 	id_org               integer DEFAULT nextval('pr_zh.bib_organismes_id_org_seq'::regclass) NOT NULL ,
 	name                 varchar(255)  NOT NULL ,
 	abbrevation          varchar(6) DEFAULT 'XXXXXX' NOT NULL ,
@@ -83,7 +83,7 @@ COMMENT ON COLUMN pr_zh.bib_organismes.abbrevation IS 'abbreviation used for cre
 
 COMMENT ON COLUMN pr_zh.bib_organismes.is_op_org IS 'is it an operator organism (not management structure)';
 
-CREATE  TABLE pr_zh.bib_site_space ( 
+CREATE  TABLE pr_zh.bib_site_space (
 	id_site_space        integer DEFAULT nextval('pr_zh.bib_site_space_id_bib_seq'::regclass) NOT NULL ,
 	name                 varchar(255)  NOT NULL ,
 	CONSTRAINT pk_bib_site_space_id_site_space PRIMARY KEY ( id_site_space )
@@ -93,7 +93,7 @@ COMMENT ON TABLE pr_zh.bib_site_space IS 'Liste of site space';
 
 COMMENT ON COLUMN pr_zh.bib_site_space.name IS 'site space name';
 
-CREATE  TABLE pr_zh.cor_impact_types ( 
+CREATE  TABLE pr_zh.cor_impact_types (
 	id_cor_impact_types  integer  NOT NULL ,
 	id_impact            integer  NOT NULL ,
 	id_impact_type       integer   ,
@@ -102,7 +102,7 @@ CREATE  TABLE pr_zh.cor_impact_types (
 	CONSTRAINT pk_cor_impact_types_id_impact PRIMARY KEY ( id_cor_impact_types )
  );
 
-CREATE  TABLE pr_zh.cor_lim_list ( 
+CREATE  TABLE pr_zh.cor_lim_list (
 	id_lim_list          uuid  NOT NULL ,
 	id_lim               integer  NOT NULL ,
 	CONSTRAINT pk_cor_lim_list PRIMARY KEY ( id_lim_list, id_lim )
@@ -110,7 +110,7 @@ CREATE  TABLE pr_zh.cor_lim_list (
 
 COMMENT ON TABLE pr_zh.cor_lim_list IS 'Correspondance entre zh et critères de délimitation de la zone humide';
 
-CREATE  TABLE pr_zh.cor_main_fct ( 
+CREATE  TABLE pr_zh.cor_main_fct (
 	id_function          integer  NOT NULL ,
 	id_main_function     integer   ,
 	active               boolean DEFAULT true NOT NULL ,
@@ -119,7 +119,7 @@ CREATE  TABLE pr_zh.cor_main_fct (
 
 COMMENT ON TABLE pr_zh.cor_main_fct IS 'Correspondance entre grandes fonctions et fonctions';
 
-CREATE  TABLE pr_zh.cor_protection_level_type ( 
+CREATE  TABLE pr_zh.cor_protection_level_type (
 	id_protection        integer  NOT NULL ,
 	id_protection_status integer  NOT NULL ,
 	id_protection_type   integer   ,
@@ -129,7 +129,7 @@ CREATE  TABLE pr_zh.cor_protection_level_type (
 
 COMMENT ON TABLE pr_zh.cor_protection_level_type IS 'statuts de protection';
 
-CREATE  TABLE pr_zh.cor_sdage_sage ( 
+CREATE  TABLE pr_zh.cor_sdage_sage (
 	id_sdage             integer  NOT NULL ,
 	id_sage              integer  NOT NULL ,
 	CONSTRAINT pk_cor_sdage_sage PRIMARY KEY ( id_sdage, id_sage )
@@ -139,20 +139,20 @@ COMMENT ON TABLE pr_zh.cor_sdage_sage IS 'table de correspondance entre les type
 
 COMMENT ON COLUMN pr_zh.cor_sdage_sage.id_sage IS 'id_nomenclature sage dans ref_nomenclatures.t_nomenclatures';
 
-CREATE  TABLE pr_zh.cor_urban_type_range ( 
+CREATE  TABLE pr_zh.cor_urban_type_range (
 	id_cor               integer  NOT NULL ,
 	id_doc_type          integer  NOT NULL ,
 	id_range_type        integer  NOT NULL ,
 	CONSTRAINT pk_cor_urban_type_range PRIMARY KEY ( id_cor )
  );
 
-CREATE  TABLE pr_zh.cor_zh_doc_range ( 
+CREATE  TABLE pr_zh.cor_zh_doc_range (
 	id_doc         uuid  NOT NULL ,
 	id_cor         integer  NOT NULL ,
 	CONSTRAINT pk_cor_zh_doc_range PRIMARY KEY ( id_doc, id_cor )
  );
 
-CREATE  TABLE pr_zh.cor_zh_area ( 
+CREATE  TABLE pr_zh.cor_zh_area (
 	id_area              integer  NOT NULL ,
 	id_zh                integer  NOT NULL ,
 	cover                integer   ,
@@ -161,7 +161,7 @@ CREATE  TABLE pr_zh.cor_zh_area (
 
 COMMENT ON COLUMN pr_zh.cor_zh_area.cover IS 'couverture de la zh par rapport à la municipalité (en pourcentage)';
 
-CREATE  TABLE pr_zh.t_fct_area ( 
+CREATE  TABLE pr_zh.t_fct_area (
 	id_fct_area          integer  NOT NULL ,
 	geom                 geometry  NOT NULL ,
 	area                 real  NOT NULL ,
@@ -170,7 +170,7 @@ CREATE  TABLE pr_zh.t_fct_area (
 
 COMMENT ON TABLE pr_zh.t_fct_area IS 'Espaces de fonctionnalités';
 
-CREATE  TABLE pr_zh.cor_zh_cb ( 
+CREATE  TABLE pr_zh.cor_zh_cb (
 	id_zh                integer  NOT NULL ,
 	lb_code              varchar(50)  NOT NULL ,
 	CONSTRAINT pk_cor_zh_cb PRIMARY KEY ( id_zh, lb_code )
@@ -178,7 +178,7 @@ CREATE  TABLE pr_zh.cor_zh_cb (
 
 COMMENT ON TABLE pr_zh.cor_zh_cb IS 'Correspondance zh et corine biotope';
 
-CREATE  TABLE pr_zh.cor_ch_status ( 
+CREATE  TABLE pr_zh.cor_ch_status (
 	lb_code               varchar(50)  NOT NULL,
 	priority              varchar(10)  NOT NULL
  );
@@ -187,7 +187,7 @@ COMMENT ON TABLE pr_zh.cor_zh_cb IS 'Correspondance cahier habitat, prioritaire'
 COMMENT ON COLUMN pr_zh.cor_ch_status.lb_code IS 'Id cahier habitat';
 COMMENT ON COLUMN pr_zh.cor_ch_status.priority IS 'IC/PR';
 
-CREATE  TABLE pr_zh.t_hydro_area ( 
+CREATE  TABLE pr_zh.t_hydro_area (
 	id_hydro             integer  DEFAULT nextval('pr_zh.t_hydro_area_id_hydro_seq'::regclass) NOT NULL ,
 	name                 varchar(100)  NOT NULL ,
 	geom                 geometry  NOT NULL ,
@@ -200,7 +200,7 @@ COMMENT ON COLUMN pr_zh.t_hydro_area.name IS 'nom de la zone hydrographique';
 
 COMMENT ON COLUMN pr_zh.t_hydro_area.geom IS 'emprise geographique de la zone hydro (polygone)';
 
-CREATE  TABLE pr_zh.t_references ( 
+CREATE  TABLE pr_zh.t_references (
 	id_reference         integer DEFAULT nextval('pr_zh.t_references_id_reference_seq'::regclass) NOT NULL ,
 	ref_number			 varchar(20)   ,
 	reference			 varchar(1000)   ,
@@ -217,7 +217,7 @@ COMMENT ON TABLE pr_zh.t_references IS 'Liste des références bibliographiques'
 
 COMMENT ON COLUMN pr_zh.t_references.pub_year IS 'published_year';
 
-CREATE  TABLE pr_zh.t_river_basin ( 
+CREATE  TABLE pr_zh.t_river_basin (
 	id_rb                integer  NOT NULL ,
 	name                 varchar(100)  NOT NULL ,
 	geom                 geometry  NOT NULL ,
@@ -234,7 +234,7 @@ COMMENT ON COLUMN pr_zh.t_river_basin.id_climate_class IS 'classe de climat';
 
 COMMENT ON COLUMN pr_zh.t_river_basin.id_river_flow IS 'régime des cours d''eau';
 
-CREATE  TABLE pr_zh.t_zh ( 
+CREATE  TABLE pr_zh.t_zh (
 	id_zh                integer DEFAULT nextval('pr_zh.t_zh_id_zh_seq'::regclass) NOT NULL ,
 	zh_uuid              uuid DEFAULT uuid_generate_v4() NOT NULL ,
 	code                 varchar(12)  NOT NULL ,
@@ -281,7 +281,7 @@ CREATE  TABLE pr_zh.t_zh (
 	area				 real	,
 	CONSTRAINT pk_t_zh_zh_id PRIMARY KEY ( id_zh ),
 	CONSTRAINT unq_t_zh_code UNIQUE ( code ) ,
-	CONSTRAINT unq_t_zh UNIQUE ( zh_uuid ) 
+	CONSTRAINT unq_t_zh UNIQUE ( zh_uuid )
  );
 
 COMMENT ON TABLE pr_zh.t_zh IS 'list of zh';
@@ -364,7 +364,7 @@ COMMENT ON COLUMN pr_zh.t_zh.remark_eval_actions IS 'remarque sur les orientatio
 
 COMMENT ON COLUMN pr_zh.t_zh.remark_is_other_inventory IS 'remarque pour préciser les autres études / inventaires naturalistes';
 
-CREATE  TABLE pr_zh.cor_impact_list ( 
+CREATE  TABLE pr_zh.cor_impact_list (
 	id_impact_list       uuid NOT NULL ,
 	id_cor_impact_types  integer  NOT NULL ,
 	CONSTRAINT pk_cor_activity_impact PRIMARY KEY ( id_impact_list, id_cor_impact_types )
@@ -372,7 +372,7 @@ CREATE  TABLE pr_zh.cor_impact_list (
 
 COMMENT ON TABLE pr_zh.cor_impact_list IS 'liste des impacts liés aux activités';
 
-CREATE  TABLE pr_zh.cor_rb_org ( 
+CREATE  TABLE pr_zh.cor_rb_org (
 	id_rb                integer  NOT NULL ,
 	id_org               integer  NOT NULL ,
 	CONSTRAINT pk_t_rb_org PRIMARY KEY ( id_rb, id_org )
@@ -380,7 +380,7 @@ CREATE  TABLE pr_zh.cor_rb_org (
 
 COMMENT ON TABLE pr_zh.cor_rb_org IS 'Structures de gestion rattachées au bassin versant';
 
-CREATE  TABLE pr_zh.cor_rb_ref ( 
+CREATE  TABLE pr_zh.cor_rb_ref (
 	id_rb                integer  NOT NULL ,
 	id_ref               integer  NOT NULL ,
 	CONSTRAINT pk_cor_zh_ref PRIMARY KEY ( id_rb, id_ref )
@@ -388,7 +388,7 @@ CREATE  TABLE pr_zh.cor_rb_ref (
 
 COMMENT ON TABLE pr_zh.cor_rb_ref IS 'correspondance between river basin and references';
 
-CREATE  TABLE pr_zh.cor_zh_corine_cover ( 
+CREATE  TABLE pr_zh.cor_zh_corine_cover (
 	id_cover             integer  NOT NULL ,
 	id_zh                integer  NOT NULL ,
 	CONSTRAINT pk_cor_zh_cover PRIMARY KEY ( id_cover, id_zh )
@@ -398,7 +398,7 @@ COMMENT ON TABLE pr_zh.cor_zh_corine_cover IS 'Correspondance zh / Corine Land C
 
 COMMENT ON COLUMN pr_zh.cor_zh_corine_cover.id_cover IS 'id_nomenclature de la nomenclature ''Corine Land Cover''';
 
-CREATE  TABLE pr_zh.cor_zh_fct_area ( 
+CREATE  TABLE pr_zh.cor_zh_fct_area (
 	id_zh                integer  NOT NULL ,
 	id_fct_area          integer  NOT NULL ,
 	CONSTRAINT pk_cor_zh_fct_area PRIMARY KEY ( id_zh, id_fct_area )
@@ -406,7 +406,7 @@ CREATE  TABLE pr_zh.cor_zh_fct_area (
 
 COMMENT ON TABLE pr_zh.cor_zh_fct_area IS 'Correspondance entre espaces de fonctionnalité et zh';
 
-CREATE  TABLE pr_zh.cor_zh_hydro ( 
+CREATE  TABLE pr_zh.cor_zh_hydro (
 	id_zh                integer  NOT NULL ,
 	id_hydro             integer  NOT NULL ,
 	CONSTRAINT pk_cor_zh_hydro PRIMARY KEY ( id_zh, id_hydro )
@@ -416,7 +416,7 @@ COMMENT ON TABLE pr_zh.cor_zh_hydro IS 'Correspondance between zh and hydro area
 
 COMMENT ON COLUMN pr_zh.cor_zh_hydro.id_hydro IS 'id hydro area';
 
-CREATE  TABLE pr_zh.cor_zh_lim_fs ( 
+CREATE  TABLE pr_zh.cor_zh_lim_fs (
 	id_zh                integer  NOT NULL ,
 	id_lim_fs            integer DEFAULT ref_nomenclatures.get_default_nomenclature_value('CRIT_DEF_ESP_FCT') NOT NULL ,
 	CONSTRAINT pk_cor_zh_lim_fs PRIMARY KEY ( id_zh, id_lim_fs )
@@ -426,7 +426,7 @@ COMMENT ON TABLE pr_zh.cor_zh_lim_fs IS 'correspondance between fonctionnal spac
 
 COMMENT ON COLUMN pr_zh.cor_zh_lim_fs.id_lim_fs IS 'id of fonctional space limit in id_nomenclatures';
 
-CREATE  TABLE pr_zh.cor_zh_protection ( 
+CREATE  TABLE pr_zh.cor_zh_protection (
 	id_protection        integer  NOT NULL ,
 	id_zh                integer  NOT NULL ,
 	CONSTRAINT pk_cor_zh_protection_id_protection_status PRIMARY KEY ( id_protection, id_zh )
@@ -434,7 +434,7 @@ CREATE  TABLE pr_zh.cor_zh_protection (
 
 COMMENT ON TABLE pr_zh.cor_zh_protection IS 'Correspondance entre zh et statuts de protection';
 
-CREATE  TABLE pr_zh.cor_zh_rb ( 
+CREATE  TABLE pr_zh.cor_zh_rb (
 	id_zh                integer  NOT NULL ,
 	id_rb                integer  NOT NULL ,
 	CONSTRAINT pk_cor_zh_river_basin_id_zh PRIMARY KEY ( id_zh, id_rb )
@@ -444,7 +444,7 @@ COMMENT ON TABLE pr_zh.cor_zh_rb IS 'Correspondance between zh and river basin, 
 
 COMMENT ON COLUMN pr_zh.cor_zh_rb.id_rb IS 'id river basin';
 
-CREATE  TABLE pr_zh.cor_zh_ref ( 
+CREATE  TABLE pr_zh.cor_zh_ref (
 	id_ref               integer  NOT NULL ,
 	id_zh                integer  NOT NULL ,
 	CONSTRAINT pk_cor_zh_references PRIMARY KEY ( id_ref, id_zh )
@@ -452,7 +452,7 @@ CREATE  TABLE pr_zh.cor_zh_ref (
 
 COMMENT ON TABLE pr_zh.cor_zh_ref IS 'Table de correspondance entre zh et references bibliographiques';
 
-CREATE  TABLE pr_zh.t_actions ( 
+CREATE  TABLE pr_zh.t_actions (
 	id_action            integer  NOT NULL ,
 	id_zh                integer  NOT NULL ,
 	id_priority_level    integer   ,
@@ -462,7 +462,7 @@ CREATE  TABLE pr_zh.t_actions (
 
 COMMENT ON TABLE pr_zh.t_actions IS 'propositions d''actions et niveau de priorite';
 
-CREATE  TABLE pr_zh.t_activity ( 
+CREATE  TABLE pr_zh.t_activity (
 	id_activity          integer  NOT NULL ,
 	id_zh                integer  NOT NULL ,
 	id_position          integer  NOT NULL ,
@@ -479,7 +479,7 @@ COMMENT ON COLUMN pr_zh.t_activity.id_position IS 'localisation';
 
 COMMENT ON COLUMN pr_zh.t_activity.id_impact_list IS 'id pour lier une activité à un ou plusieurs impacts';
 
-CREATE  TABLE pr_zh.t_functions ( 
+CREATE  TABLE pr_zh.t_functions (
 	id_function          integer  NOT NULL ,
 	id_zh                integer  NOT NULL ,
 	justification        varchar(2000)   ,
@@ -490,7 +490,7 @@ CREATE  TABLE pr_zh.t_functions (
 
 COMMENT ON TABLE pr_zh.t_functions IS 'liste des fonctions par type pour les zh';
 
-CREATE  TABLE pr_zh.t_hab_heritage ( 
+CREATE  TABLE pr_zh.t_hab_heritage (
 	id_zh                integer  NOT NULL ,
 	id_corine_bio        varchar(50)  NOT NULL ,
 	id_cahier_hab        varchar(50)  NOT NULL ,
@@ -509,7 +509,7 @@ COMMENT ON COLUMN pr_zh.t_hab_heritage.id_preservation_state IS 'etat de conserv
 
 COMMENT ON COLUMN pr_zh.t_hab_heritage.hab_cover IS 'recouvrement sur la zh en pourcentage';
 
-CREATE  TABLE pr_zh.t_inflow ( 
+CREATE  TABLE pr_zh.t_inflow (
 	id_inflow            integer  NOT NULL ,
 	id_zh                integer  NOT NULL ,
 	id_permanance        integer DEFAULT ref_nomenclatures.get_default_nomenclature_value('PERMANENCE_ENTREE')  ,
@@ -521,7 +521,7 @@ COMMENT ON TABLE pr_zh.t_inflow IS 'régime hydrique : entrée d''eau';
 
 COMMENT ON COLUMN pr_zh.t_inflow.topo IS 'toponymie';
 
-CREATE  TABLE pr_zh.t_instruments ( 
+CREATE  TABLE pr_zh.t_instruments (
 	id_instrument        integer  NOT NULL ,
 	id_zh                integer  NOT NULL ,
 	instrument_date      timestamp   ,
@@ -530,17 +530,17 @@ CREATE  TABLE pr_zh.t_instruments (
 
 COMMENT ON TABLE pr_zh.t_instruments IS 'Instruments contractuels et financiers';
 
-CREATE  TABLE pr_zh.t_management_structures ( 
+CREATE  TABLE pr_zh.t_management_structures (
 	id_structure         integer DEFAULT nextval('pr_zh.t_management_structures_id_structure_seq'::regclass) NOT NULL ,
 	id_zh                integer  NOT NULL ,
 	id_org               integer  NOT NULL ,
 	CONSTRAINT pk_t_management_structure PRIMARY KEY ( id_structure ),
-	CONSTRAINT unq_t_management_structure UNIQUE ( id_zh, id_org ) 
+	CONSTRAINT unq_t_management_structure UNIQUE ( id_zh, id_org )
  );
 
 COMMENT ON TABLE pr_zh.t_management_structures IS 'liste des structures de gestion des zh';
 
-CREATE  TABLE pr_zh.t_outflow ( 
+CREATE  TABLE pr_zh.t_outflow (
 	id_outflow           integer  NOT NULL ,
 	id_zh                integer  NOT NULL ,
 	id_permanance        integer DEFAULT ref_nomenclatures.get_default_nomenclature_value('PERMANENCE_SORTIE')  ,
@@ -552,7 +552,7 @@ COMMENT ON TABLE pr_zh.t_outflow IS 'régime hydrique : sortie d''eau';
 
 COMMENT ON COLUMN pr_zh.t_outflow.topo IS 'toponymie';
 
-CREATE  TABLE pr_zh.t_ownership ( 
+CREATE  TABLE pr_zh.t_ownership (
 	id_status            integer DEFAULT ref_nomenclatures.get_default_nomenclature_value('STATUT_PROPRIETE') NOT NULL ,
 	id_zh                integer  NOT NULL ,
 	remark               varchar(2000)   ,
@@ -561,7 +561,7 @@ CREATE  TABLE pr_zh.t_ownership (
 
 COMMENT ON TABLE pr_zh.t_ownership IS 'regime foncier : statut de propriete';
 
-CREATE  TABLE pr_zh.t_urban_planning_docs ( 
+CREATE  TABLE pr_zh.t_urban_planning_docs (
 	id_area              integer  NOT NULL ,
 	id_zh                integer  NOT NULL ,
 	id_doc_type          integer NOT NULL ,
@@ -572,7 +572,7 @@ CREATE  TABLE pr_zh.t_urban_planning_docs (
 
 COMMENT ON TABLE pr_zh.t_urban_planning_docs IS 'liste zonage des documents d''urbanisme';
 
-CREATE  TABLE pr_zh.t_management_plans ( 
+CREATE  TABLE pr_zh.t_management_plans (
 	id_plan              integer DEFAULT nextval('pr_zh.t_management_plans_id_plan_seq'::regclass) NOT NULL ,
 	id_nature            integer  NOT NULL ,
 	id_structure         integer  NOT NULL ,
@@ -588,7 +588,7 @@ COMMENT ON COLUMN pr_zh.t_management_plans.plan_date IS 'date de resiliation';
 
 COMMENT ON COLUMN pr_zh.t_management_plans.duration IS 'en année';
 
-CREATE  TABLE pr_zh.cor_zh_notes ( 
+CREATE  TABLE pr_zh.cor_zh_notes (
 	id_zh                integer  NOT NULL ,
 	cor_rule_id          integer  NOT NULL ,
 	note                 real  NOT NULL ,
@@ -599,7 +599,7 @@ CREATE  TABLE pr_zh.cor_zh_notes (
 
 COMMENT ON TABLE pr_zh.cor_zh_notes IS 'Table correspondance entre une ZH, ses règles et ses notes';
 
-CREATE  TABLE pr_zh.bib_hier_categories ( 
+CREATE  TABLE pr_zh.bib_hier_categories (
 	cat_id               integer  NOT NULL ,
 	abbreviation		 varchar(4)  NOT NULL,
 	label                varchar(100)  NOT NULL ,
@@ -608,7 +608,7 @@ CREATE  TABLE pr_zh.bib_hier_categories (
 
 COMMENT ON TABLE pr_zh.bib_hier_categories IS 'Liste des rubriques pour la hiérarchisation';
 
-CREATE  TABLE pr_zh.bib_hier_panes ( 
+CREATE  TABLE pr_zh.bib_hier_panes (
 	pane_id              integer  NOT NULL ,
 	label                varchar(50)  NOT NULL ,
 	CONSTRAINT pk_bib_panes_pane_id PRIMARY KEY ( pane_id )
@@ -616,19 +616,19 @@ CREATE  TABLE pr_zh.bib_hier_panes (
 
 COMMENT ON TABLE pr_zh.bib_hier_panes IS 'liste des volets';
 
-CREATE  TABLE pr_zh.bib_hier_subcategories ( 
+CREATE  TABLE pr_zh.bib_hier_subcategories (
 	subcat_id            integer  NOT NULL ,
 	label                varchar(100)  NOT NULL ,
 	CONSTRAINT pk_bib_subcategories_id_subcat PRIMARY KEY ( subcat_id )
  );
 
-CREATE  TABLE pr_zh.bib_note_types ( 
+CREATE  TABLE pr_zh.bib_note_types (
 	note_id              integer  NOT NULL ,
 	id_knowledge         integer,
 	CONSTRAINT pk_bib_note_types_note_id PRIMARY KEY ( note_id )
  );
 
-CREATE  TABLE pr_zh.t_rules ( 
+CREATE  TABLE pr_zh.t_rules (
 	rule_id              integer  NOT NULL ,
 	abbreviation		 varchar(15)  NOT NULL,
 	pane_id              integer  NOT NULL ,
@@ -637,7 +637,7 @@ CREATE  TABLE pr_zh.t_rules (
 	CONSTRAINT pk_t_items_item_id PRIMARY KEY ( rule_id )
  );
 
-CREATE  TABLE pr_zh.cor_rb_rules ( 
+CREATE  TABLE pr_zh.cor_rb_rules (
 	cor_rule_id          integer  NOT NULL ,
 	rb_id                integer  NOT NULL ,
 	rule_id              integer  NOT NULL ,
@@ -647,7 +647,7 @@ CREATE  TABLE pr_zh.cor_rb_rules (
 
 COMMENT ON TABLE pr_zh.cor_rb_rules IS 'list of selected rules by river basin';
 
-CREATE  TABLE pr_zh.t_items ( 
+CREATE  TABLE pr_zh.t_items (
 	val_id               integer  NOT NULL ,
 	cor_rule_id          integer  NOT NULL ,
 	attribute_id         integer  NOT NULL ,
@@ -655,21 +655,21 @@ CREATE  TABLE pr_zh.t_items (
 	note_type_id         integer  NOT NULL ,
 	CONSTRAINT pk_t_attribute_values_id_val PRIMARY KEY ( val_id )
  );
- 
-CREATE  TABLE pr_zh.cor_item_value ( 
+
+CREATE  TABLE pr_zh.cor_item_value (
 	attribute_id         integer  NOT NULL ,
 	val_min              real  NOT NULL ,
 	val_max              real  NOT NULL ,
 	CONSTRAINT pk_cor_item_value_id_val PRIMARY KEY ( attribute_id )
  );
 
-CREATE  TABLE pr_zh.t_cor_qualif ( 
+CREATE  TABLE pr_zh.t_cor_qualif (
 	combination          varchar(4)  NOT NULL ,
 	id_qualification        integer  NOT NULL,
 	CONSTRAINT pk_t_cor_qualif_combination PRIMARY KEY ( combination )
 );
 
-CREATE  TABLE pr_zh.cor_rule_nomenc ( 
+CREATE  TABLE pr_zh.cor_rule_nomenc (
 	rule_id              integer  NOT NULL ,
 	nomenc_id            integer  NOT NULL ,
 	qualif_id			 integer ,
@@ -930,13 +930,13 @@ AS SELECT rb.id_rb,
 CREATE OR REPLACE FUNCTION pr_zh.get_cat_note_without_subcats(
 	category_id integer
 	)
-    RETURNS TABLE(rb_id integer, note integer) 
+    RETURNS TABLE(rb_id integer, note integer)
     LANGUAGE 'plpgsql'
 
 AS $$
 BEGIN
    RETURN QUERY
-SELECT 
+SELECT
 	rb.id_rb AS id_rb,
 	max(items.note::integer) FILTER (WHERE rules.cat_id = category_id) AS note
 FROM pr_zh.t_river_basin rb
@@ -952,17 +952,17 @@ $$;
 CREATE OR REPLACE FUNCTION pr_zh.get_cat_note_with_subcats(
 	category_id integer
 	)
-    RETURNS TABLE(rb_id integer, note integer) 
+    RETURNS TABLE(rb_id integer, note integer)
     LANGUAGE 'plpgsql'
 
 AS $$
 BEGIN
    RETURN QUERY
 
-SELECT 
+SELECT
 	id_rb,
 	SUM(max_note)::integer
-FROM (		
+FROM (
 		SELECT
 			rb.id_rb AS id_rb,
 			MAX(items.note) FILTER (WHERE rules.cat_id = category_id) AS max_note
@@ -983,11 +983,11 @@ $$;
 -------------
 
 CREATE OR REPLACE VIEW pr_zh.vertebrates AS
-	WITH 
+	WITH
 		synthese_taxa AS (
-			SELECT 
+			SELECT
 				synthese.id_synthese,
-				( 
+				(
 					SELECT t_zh.id_zh
 					FROM pr_zh.t_zh
 					WHERE st_intersects(st_setsrid(t_zh.geom, 4326), st_setsrid(synthese.the_geom_point, 4326))
@@ -995,9 +995,9 @@ CREATE OR REPLACE VIEW pr_zh.vertebrates AS
 				synthese.cd_nom,
 				synthese.date_max,
 				synthese.observers,
-				(	
-					SELECT organisme 
-					FROM utilisateurs.v_userslist_forall_applications 
+				(
+					SELECT organisme
+					FROM utilisateurs.v_userslist_forall_applications
 					WHERE nom_role || ' ' || prenom_role = synthese.observers limit 1
 				)
 			FROM gn_synthese.synthese
@@ -1009,7 +1009,7 @@ CREATE OR REPLACE VIEW pr_zh.vertebrates AS
 				ORDER BY id_zh, cd_nom, date_max DESC
 		),
 		bdc_statut AS (
-			SELECT 
+			SELECT
 				cd_nom,
 				cd_sig,
 				regroupement_type AS statut_type,
@@ -1026,7 +1026,7 @@ CREATE OR REPLACE VIEW pr_zh.vertebrates AS
 			)
 		)
 
-		SELECT 
+		SELECT
 			synthese_zh.id_zh,
 			taxref.cd_nom,
 			taxref.classe AS group_class,
@@ -1051,7 +1051,7 @@ CREATE OR REPLACE VIEW pr_zh.vertebrates AS
 			bdc_statut.cd_sig = 'ETATFRA'
 			OR bdc_statut.cd_sig IN
 				(
-					SELECT 
+					SELECT
 						DISTINCT('INSEER' || lim.insee_reg) AS cd_sig
 					FROM pr_zh.t_zh tzh
 					LEFT JOIN pr_zh.cor_zh_area cza ON cza.id_zh = tzh.id_zh
@@ -1060,9 +1060,9 @@ CREATE OR REPLACE VIEW pr_zh.vertebrates AS
 					WHERE tzh.id_zh = synthese_zh.id_zh
 					AND lim.insee_reg IS NOT NULL
 				)
-			OR bdc_statut.cd_sig IN 
+			OR bdc_statut.cd_sig IN
 				(
-					SELECT 
+					SELECT
 						DISTINCT('INSEED' || lareas.area_code) AS cd_sig
 					FROM pr_zh.t_zh tzh
 					LEFT JOIN pr_zh.cor_zh_area cza ON cza.id_zh = tzh.id_zh
@@ -1076,11 +1076,11 @@ CREATE OR REPLACE VIEW pr_zh.vertebrates AS
 		GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, taxref.cd_nom, bdc_statut.statut_type, bdc_statut.article, bdc_statut.statut, bdc_statut.doc_url, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;
 
 CREATE OR REPLACE VIEW pr_zh.invertebrates AS
-	WITH 
+	WITH
 		synthese_taxa AS (
-			SELECT 
+			SELECT
 				synthese.id_synthese,
-				( 
+				(
 					SELECT t_zh.id_zh
 					FROM pr_zh.t_zh
 					WHERE st_intersects(st_setsrid(t_zh.geom, 4326), st_setsrid(synthese.the_geom_point, 4326))
@@ -1088,9 +1088,9 @@ CREATE OR REPLACE VIEW pr_zh.invertebrates AS
 				synthese.cd_nom,
 				synthese.date_max,
 				synthese.observers,
-				(	
-					SELECT organisme 
-					FROM utilisateurs.v_userslist_forall_applications 
+				(
+					SELECT organisme
+					FROM utilisateurs.v_userslist_forall_applications
 					WHERE nom_role || ' ' || prenom_role = synthese.observers limit 1
 				)
 			FROM gn_synthese.synthese
@@ -1102,7 +1102,7 @@ CREATE OR REPLACE VIEW pr_zh.invertebrates AS
 				ORDER BY id_zh, cd_nom, date_max DESC
 		),
 		bdc_statut AS (
-			SELECT 
+			SELECT
 				cd_nom,
 				cd_sig,
 				regroupement_type AS statut_type,
@@ -1119,7 +1119,7 @@ CREATE OR REPLACE VIEW pr_zh.invertebrates AS
 			)
 		)
 
-		SELECT 
+		SELECT
 			synthese_zh.id_zh,
 			taxref.cd_nom,
 			taxref.classe AS group_class,
@@ -1145,7 +1145,7 @@ CREATE OR REPLACE VIEW pr_zh.invertebrates AS
 			bdc_statut.cd_sig = 'ETATFRA'
 			OR bdc_statut.cd_sig IN
 				(
-					SELECT 
+					SELECT
 						DISTINCT('INSEER' || lim.insee_reg) AS cd_sig
 					FROM pr_zh.t_zh tzh
 					LEFT JOIN pr_zh.cor_zh_area cza ON cza.id_zh = tzh.id_zh
@@ -1154,9 +1154,9 @@ CREATE OR REPLACE VIEW pr_zh.invertebrates AS
 					WHERE tzh.id_zh = synthese_zh.id_zh
 					AND lim.insee_reg IS NOT NULL
 				)
-			OR bdc_statut.cd_sig IN 
+			OR bdc_statut.cd_sig IN
 				(
-					SELECT 
+					SELECT
 						DISTINCT('INSEED' || lareas.area_code) AS cd_sig
 					FROM pr_zh.t_zh tzh
 					LEFT JOIN pr_zh.cor_zh_area cza ON cza.id_zh = tzh.id_zh
@@ -1168,13 +1168,13 @@ CREATE OR REPLACE VIEW pr_zh.invertebrates AS
 			OR (bdc_statut.statut_type in ('Liste rouge', 'Réglementation', 'Protection', 'Directives européennes') and bdc_statut.cd_sig = 'TERFXFR')
 		)
 		GROUP BY taxref.nom_complet, taxref.nom_vern, taxref.classe, synthese_zh.id_zh, taxref.cd_nom, bdc_statut.statut_type, bdc_statut.article, bdc_statut.statut, bdc_statut.doc_url, synthese_zh.date_max, synthese_zh.observers, synthese_zh.organisme;
-	
+
 CREATE OR REPLACE VIEW pr_zh.flora AS
-	WITH 
+	WITH
 		synthese_taxa AS (
-			SELECT 
+			SELECT
 				synthese.id_synthese,
-				( 
+				(
 					SELECT t_zh.id_zh
 					FROM pr_zh.t_zh
 					WHERE st_intersects(st_setsrid(t_zh.geom, 4326), st_setsrid(synthese.the_geom_point, 4326))
@@ -1182,9 +1182,9 @@ CREATE OR REPLACE VIEW pr_zh.flora AS
 				synthese.cd_nom,
 				synthese.date_max,
 				synthese.observers,
-				(	
-					SELECT organisme 
-					FROM utilisateurs.v_userslist_forall_applications 
+				(
+					SELECT organisme
+					FROM utilisateurs.v_userslist_forall_applications
 					WHERE nom_role || ' ' || prenom_role = synthese.observers limit 1
 				)
 			FROM gn_synthese.synthese
@@ -1196,7 +1196,7 @@ CREATE OR REPLACE VIEW pr_zh.flora AS
 				ORDER BY id_zh, cd_nom, date_max DESC
 		),
 		bdc_statut AS (
-			SELECT 
+			SELECT
 				cd_nom,
 				cd_sig,
 				regroupement_type AS statut_type,
@@ -1213,7 +1213,7 @@ CREATE OR REPLACE VIEW pr_zh.flora AS
 			)
 		)
 
-		SELECT 
+		SELECT
 			synthese_zh.id_zh,
 			taxref.cd_nom,
 			taxref.classe AS group_class,
@@ -1238,7 +1238,7 @@ CREATE OR REPLACE VIEW pr_zh.flora AS
 			bdc_statut.cd_sig = 'ETATFRA'
 			OR bdc_statut.cd_sig IN
 				(
-					SELECT 
+					SELECT
 						DISTINCT('INSEER' || lim.insee_reg) AS cd_sig
 					FROM pr_zh.t_zh tzh
 					LEFT JOIN pr_zh.cor_zh_area cza ON cza.id_zh = tzh.id_zh
@@ -1247,9 +1247,9 @@ CREATE OR REPLACE VIEW pr_zh.flora AS
 					WHERE tzh.id_zh = synthese_zh.id_zh
 					AND lim.insee_reg IS NOT NULL
 				)
-			OR bdc_statut.cd_sig IN 
+			OR bdc_statut.cd_sig IN
 				(
-					SELECT 
+					SELECT
 						DISTINCT('INSEED' || lareas.area_code) AS cd_sig
 					FROM pr_zh.t_zh tzh
 					LEFT JOIN pr_zh.cor_zh_area cza ON cza.id_zh = tzh.id_zh

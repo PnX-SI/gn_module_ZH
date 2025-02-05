@@ -105,7 +105,7 @@ def main_search(query, json):
     # --- Hierarchy search
     hierarchy = json.get("hierarchy")
     if hierarchy is not None and basin is not None:
-        query = filter_hierarchy(query, json=hierarchy, basin=basin[0].get("name"))
+        query = filter_hierarchy(query, json=hierarchy, basin=basin["name"])
 
     return query
 
@@ -154,7 +154,11 @@ def filter_area_size(query, json: dict):
 
 
 def filter_area(query, json: dict, type_code: str):
-    codes = [area.get("code", None) for area in json]
+    if type_code == "COM":
+        codes = [area.get("code", None) for area in json]
+    else:
+        codes = json["code"].split()
+
     if any(code is None for code in codes):
         return query
 
@@ -194,15 +198,14 @@ def filter_hydro(query, json):
 
 
 def filter_basin(query, json):
-    codes = [area.get("code", None) for area in json]
-
-    if codes is not None:
+    code = json["code"]
+    if code is not None:
         subquery = (
             select(
                 TRiverBasin.id_rb,
                 TRiverBasin.geom,
             )
-            .where(TRiverBasin.id_rb.in_(codes))
+            .where(TRiverBasin.id_rb == code)
             .subquery()
         )
         # SET_SRID does not return a valid geom...

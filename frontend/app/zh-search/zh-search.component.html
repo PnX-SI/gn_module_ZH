@@ -3,7 +3,10 @@
     <div class="card-header title">
       <div class="d-flex justify-content-between">
         <h4>Recherche multi-critères</h4>
-        <button mat-icon-button (click)="onCloseClicked()">
+        <button
+          mat-icon-button
+          (click)="onCloseClicked()"
+        >
           <mat-icon>arrow_back</mat-icon>
         </button>
       </div>
@@ -14,14 +17,13 @@
         [form]="_searchService.searchForm.get('basin')"
         [data]="basins"
         (onSelected)="onBasinSelected($event)"
-      >
-      </zh-search-input>
+        [multiple]="false"
+      ></zh-search-input>
       <zh-search-dependant
         label="Zones hydrographiques"
         [form]="_searchService.searchForm.get('zones')"
         [inputData]="hydrographicZones"
-      >
-      </zh-search-dependant>
+      ></zh-search-dependant>
       <hr />
       <zh-search-input
         label="Département"
@@ -29,42 +31,44 @@
         [displayCode]="true"
         [data]="departements"
         (onSelected)="onDepartmentSelected($event)"
-      >
-      </zh-search-input>
+      ></zh-search-input>
       <zh-search-dependant
         label="Communes"
         [inputData]="communes"
         [form]="_searchService.searchForm.get('communes')"
-      >
-      </zh-search-dependant>
+      ></zh-search-dependant>
       <hr />
-      <zh-search-code [form]="_searchService.searchForm.get('nameorcode')"> </zh-search-code>
+      <zh-search-code [form]="_searchService.searchForm.get('nameorcode')"></zh-search-code>
       <hr />
-      <zh-search-sdage [data]="data?.SDAGE" [form]="_searchService.searchForm.get('sdage')">
-      </zh-search-sdage>
+      <zh-search-sdage
+        [data]="data?.SDAGE"
+        [form]="_searchService.searchForm.get('sdage')"
+      ></zh-search-sdage>
       <hr />
       <zh-search-ensemble
         [data]="data?.BIB_SITE_SPACE"
         [form]="_searchService.searchForm.get('ensemble')"
-      >
-      </zh-search-ensemble>
+      ></zh-search-ensemble>
       <hr />
-      <zh-search-area [form]="_searchService.searchForm.get('ha_area')"> </zh-search-area>
+      <zh-search-area [form]="_searchService.searchForm.get('ha_area')"></zh-search-area>
       <hr />
 
       <div class="row">
         <div class="col-12">
-          <mat-slide-toggle [checked]="advancedSearchToggled" (change)="onAdvancedSearchToggled()">
-            Recherche avancée</mat-slide-toggle
+          <mat-slide-toggle
+            [checked]="advancedSearchToggled"
+            (change)="onAdvancedSearchToggled()"
           >
+            Recherche avancée
+          </mat-slide-toggle>
         </div>
         <div class="col-12">
           <mat-slide-toggle
             [checked]="hierarchySearchToggled"
             (change)="onHierarchySearchToggled()"
           >
-            Recherche hiérarchisation</mat-slide-toggle
-          >
+            Recherche hiérarchisation
+          </mat-slide-toggle>
         </div>
       </div>
       <div class="d-flex justify-content-start searchButtons">
@@ -98,10 +102,19 @@
       </div>
     </div>
   </div>
-  <div *ngIf="advancedSearchToggled" class="card">
-    <zh-advanced-search [data]="data" [form]="_searchService.advancedForm"></zh-advanced-search>
+  <div
+    *ngIf="advancedSearchToggled"
+    class="card"
+  >
+    <zh-advanced-search
+      [data]="data"
+      [form]="_searchService.advancedForm"
+    ></zh-advanced-search>
   </div>
-  <div *ngIf="hierarchySearchToggled" class="card">
+  <div
+    *ngIf="hierarchySearchToggled"
+    class="card"
+  >
     <zh-hierarchy-search
       [riverBasin]="_searchService.searchForm.get('basin')"
       [zones]="_searchService.searchForm.get('zones')"
@@ -110,7 +123,11 @@
   </div>
 </div>
 
-<ng-template #modalHelp let-c="close" let-d="dismiss">
+<ng-template
+  #modalHelp
+  let-c="close"
+  let-d="dismiss"
+>
   <div class="modal-header">
     <h4>Aide sur les différentes recherches</h4>
   </div>
@@ -128,7 +145,13 @@
       les zones humides possédant au moins UNE de ces fonctions apparaitront dans les résultats.
     </p>
     <div class="d-flex justify-content-end">
-      <button type="button" mat-raised-button color="primary" class="uppercase" (click)="c()">
+      <button
+        type="button"
+        mat-raised-button
+        color="primary"
+        class="uppercase"
+        (click)="c()"
+      >
         Fermer
       </button>
     </div>

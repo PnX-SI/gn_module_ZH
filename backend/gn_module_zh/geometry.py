@@ -86,27 +86,15 @@ def set_area(geom):
     )
 
 
-def get_main_rb(query: list) -> int:
+def get_main_rb(rbs, geom):
     rb_id = None
     area = 0
-    for q_ in query:
-        zh_polygon = DB.session.execute(
-            select(TZH.geom).where(TZH.id_zh == getattr(q_, "id_zh"))
-        ).scalar_one()
-
-        rb_polygon = DB.session.execute(
-            select(TRiverBasin.geom)
-            .select_from(CorZhRb)
-            .join(TRiverBasin, TRiverBasin.id_rb == CorZhRb.id_rb)
-            .where(TRiverBasin.id_rb == getattr(q_, "id_rb"))
-            .limit(1)
-        ).scalar_one()
-
+    for q_ in rbs:
         intersection = DB.session.scalar(
             select(
                 func.ST_Intersection(
-                    func.ST_GeomFromText(func.ST_AsText(zh_polygon)),
-                    func.ST_GeomFromText(func.ST_AsText(rb_polygon)),
+                    func.ST_GeomFromText(func.ST_AsText(func.ST_GeomFromGeoJSON(str(geom)))),
+                    func.ST_GeomFromText(func.ST_AsText(getattr(q_, "geom"))),
                 )
             )
         )

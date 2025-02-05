@@ -5,8 +5,14 @@
         <legend>
           <h5 class="section-title">Régime hydrique</h5>
         </legend>
-        <zh-table [tableCols]="entryTableCols" [data]="data.regime.entree"></zh-table>
-        <zh-table [tableCols]="exitTableCols" [data]="data.regime.sortie"></zh-table>
+        <zh-table
+          [tableCols]="entryTableCols"
+          [data]="data.regime.entree"
+        ></zh-table>
+        <zh-table
+          [tableCols]="exitTableCols"
+          [data]="data.regime.sortie"
+        ></zh-table>
         <div class="row">
           <div class="col-12 col-xl-6 col-lg-6 col-md-6">
             <zh-label label="Submersion fréquence :">
@@ -28,13 +34,23 @@
         </legend>
         <zh-label label="Type de connexion :">
           <p *ngIf="!connectionImg">non renseigné</p>
-          <div *ngIf="connectionImg" class="img-container">
-            <label class="form-check-label p-3" for="inlineRadio3">
+          <div
+            *ngIf="connectionImg"
+            class="img-container"
+          >
+            <label
+              class="form-check-label p-3"
+              for="inlineRadio3"
+            >
               <p>
                 <b>{{ data.connexion }}</b>
               </p>
             </label>
-            <img [src]="connectionImg" width="90" alt="" />
+            <img
+              [src]="connectionImg"
+              width="90"
+              alt=""
+            />
           </div>
         </zh-label>
       </fieldset>

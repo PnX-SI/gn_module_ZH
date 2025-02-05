@@ -2,12 +2,18 @@
   <thead class="thead-inverse table-header">
     <tr>
       <!-- size can be provided in the columns object -->
-      <th *ngFor="let col of tableCols" [style.width]="col.size">{{ col.label }}</th>
+      <th
+        *ngFor="let col of tableCols"
+        [style.width]="col.size"
+      >
+        {{ col.label }}
+      </th>
       <th *ngIf="editable || deletable || downloadable"></th>
     </tr>
   </thead>
   <tbody>
     <ng-container *ngIf="data && data.length > 0">
+      <!-- prettier-ignore -->
       <tr
         [ngStyle]="{
           background: item[color_col_name] == color_value ? '#EBFFE5' : 'rgba(67, 175, 0, 0.04)'
@@ -17,7 +23,10 @@
         <td *ngFor="let col of tableCols">
           <ng-container *ngIf="col.subcell; else elseBlockSub">
             <ul *ngIf="isArray(item[col.name][col.subcell.key]); else elseBlockSubArr">
-              <li class="item" *ngFor="let item of item[col.name][col.subcell.key]">
+              <li
+                class="item"
+                *ngFor="let item of item[col.name][col.subcell.key]"
+              >
                 {{ item[col.subcell.name] }}
               </li>
             </ul>
@@ -28,24 +37,30 @@
           <ng-template #elseBlockSub>
             <ul *ngIf="isArray(item[col.name]); else elseBlockSub2">
               <ng-container *ngIf="col.subarr; else elseNotSubname">
-                <li class="item" *ngFor="let subitem of item[col.name]">
+                <li
+                  class="item"
+                  *ngFor="let subitem of item[col.name]"
+                >
                   {{ subitem[col.subarr.name] }}
                 </li>
               </ng-container>
               <ng-template #elseNotSubname>
-                <li class="item" *ngFor="let subitem of item[col.name]">
+                <li
+                  class="item"
+                  *ngFor="let subitem of item[col.name]"
+                >
                   {{ subitem }}
                 </li>
               </ng-template>
             </ul>
             <ng-template #elseBlockSub2>
-              <b *ngIf="bold_row_values.includes(item['name']); else italic">{{
-                item[col.name]
-              }}</b>
+              <b *ngIf="bold_row_values.includes(item['name']); else italic">
+                {{ item[col.name] }}
+              </b>
               <ng-template #italic>
-                <i *ngIf="italic_row_values.includes(item['name']); else normal">{{
-                  item[col.name]
-                }}</i>
+                <i *ngIf="italic_row_values.includes(item['name']); else normal">
+                  {{ item[col.name] }}
+                </i>
               </ng-template>
               <ng-template #normal>
                 {{ item[col.name] }}
@@ -53,7 +68,10 @@
             </ng-template>
           </ng-template>
         </td>
-        <td class="tab-buttons" *ngIf="editable || deletable || downloadable">
+        <td
+          class="tab-buttons"
+          *ngIf="editable || deletable || downloadable"
+        >
           <ng-container *ngIf="editable">
             <button
               mat-icon-button
@@ -95,8 +113,15 @@
     </tr>
   </tbody>
 </table>
-<ng-template #content let-c="close" let-d="dismiss">
-  <zh-delete-modal (onCancel)="d()" (onDelete)="c()">
+<ng-template
+  #content
+  let-c="close"
+  let-d="dismiss"
+>
+  <zh-delete-modal
+    (onCancel)="d()"
+    (onDelete)="c()"
+  >
     <p>Etes-vous sûr de vouloir supprimer cette ligne ?</p>
   </zh-delete-modal>
 </ng-template>

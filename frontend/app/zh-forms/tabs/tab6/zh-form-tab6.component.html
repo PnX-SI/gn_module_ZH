@@ -15,7 +15,10 @@
           <mat-icon>add_box</mat-icon>
           Statut de propriété
         </button>
-        <div *ngIf="statusTable && statusTable.length > 0" class="table-responsive">
+        <div
+          *ngIf="statusTable && statusTable.length > 0"
+          class="table-responsive"
+        >
           <zh-table
             [tableCols]="statusTableCol"
             [data]="statusTable"
@@ -59,7 +62,10 @@
             Ajouter
           </button>
         </div>
-        <div *ngIf="managements && managements.length > 0" class="table-responsive">
+        <div
+          *ngIf="managements && managements.length > 0"
+          class="table-responsive"
+        >
           <table class="table">
             <thead class="thead-inverse table-header">
               <tr>
@@ -79,7 +85,7 @@
                       matBadgePosition="above before"
                       (click)="onMoreDetails(item)"
                     >
-                      {{ item.moreDetails ? "expand_more" : "expand_less" }}
+                      {{ item.moreDetails ? 'expand_more' : 'expand_less' }}
                     </mat-icon>
                     {{ item.name }}
                   </td>
@@ -109,7 +115,10 @@
                   class="tr-plans"
                   *ngIf="item.moreDetails && item.plans && item.plans.length > 0"
                 >
-                  <td colspan="3" class="tr-plans">
+                  <td
+                    colspan="3"
+                    class="tr-plans"
+                  >
                     <table class="table subtable">
                       <thead class="thead-inverse table-header">
                         <tr>
@@ -172,7 +181,10 @@
           <mat-icon>add_box</mat-icon>
           Instruments contractuels et financiers
         </button>
-        <div *ngIf="instrumentTable && instrumentTable.length > 0" class="table-responsive">
+        <div
+          *ngIf="instrumentTable && instrumentTable.length > 0"
+          class="table-responsive"
+        >
           <zh-table
             [tableCols]="instrumentTableCol"
             [data]="instrumentTable"
@@ -190,10 +202,12 @@
       </legend>
       <div class="form-row">
         <div class="form-group col-md-6">
-          <small
-            >Les inventaires sont disponibles dans
+          <small>
+            Les inventaires sont disponibles dans
             <a
-              routerLink="{{ config['ZONES_HUMIDES']['MODULE_URL'] }}/zhDetails/{{ currentZh?.properties.id_zh }}"
+              routerLink="{{ config['ZONES_HUMIDES']['MODULE_URL'] }}/zhDetails/{{
+                currentZh?.properties.id_zh
+              }}"
               target="_blank"
             >
               la fiche complete
@@ -203,8 +217,8 @@
       </div>
       <div class="form-row">
         <div class="form-group col-md-6">
-          <small style="display: block; margin-bottom: 8px"
-            >Autres études / inventaires naturalistes
+          <small style="display: block; margin-bottom: 8px">
+            Autres études / inventaires naturalistes
           </small>
           <div class="ml-3">
             <mat-label ngClass="labelBeforeSlide">Non</mat-label>
@@ -254,7 +268,10 @@
           <mat-icon>add_box</mat-icon>
           Zonage d'urbanisme
         </button>
-        <div *ngIf="urbanDocTable && urbanDocTable.length > 0" class="table-responsive">
+        <div
+          *ngIf="urbanDocTable && urbanDocTable.length > 0"
+          class="table-responsive"
+        >
           <zh-table
             [tableCols]="urbanDocTableCol"
             [data]="urbanDocTable"
@@ -267,7 +284,10 @@
       </div>
     </fieldset>
     <div class="footer-btn">
-      <zh-cancelButton *ngIf="currentZh" [zhId]="currentZh.properties.id_zh"></zh-cancelButton>
+      <zh-cancelButton
+        *ngIf="currentZh"
+        [zhId]="currentZh.properties.id_zh"
+      ></zh-cancelButton>
       <button
         type="submit"
         mat-raised-button
@@ -277,7 +297,10 @@
         (click)="onFormSubmit()"
       >
         <mat-icon *ngIf="!posted">save_outline</mat-icon>
-        <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
+        <mat-spinner
+          *ngIf="posted"
+          [diameter]="20"
+        ></mat-spinner>
         Enregistrer
       </button>
     </div>
@@ -285,10 +308,18 @@
 </div>
 
 <!-- Modal Statut de propriété -->
-<ng-template #statusModal let-c="close" let-d="dismiss">
+<ng-template
+  #statusModal
+  let-c="close"
+  let-d="dismiss"
+>
   <div class="modal-header">
     <h6>{{ modalTitle }}</h6>
-    <button mat-icon-button class="closeModalBtn" (click)="c()">
+    <button
+      mat-icon-button
+      class="closeModalBtn"
+      (click)="c()"
+    >
       <mat-icon class="cancel-icon">cancel</mat-icon>
     </button>
   </div>
@@ -302,7 +333,11 @@
             ngbAutofocus
             [formControl]="statusForm.controls.status"
           >
-            <option *ngFor="let item of statusInput" [ngValue]="item" [disabled]="item.disabled">
+            <option
+              *ngFor="let item of statusInput"
+              [ngValue]="item"
+              [disabled]="item.disabled"
+            >
               {{ item.mnemonique }}
             </option>
           </select>
@@ -312,8 +347,9 @@
               statusForm.controls.status.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-12">
           <small>Remarques</small>
@@ -340,10 +376,18 @@
 </ng-template>
 
 <!-- Modal Instruments contractuels et financiers -->
-<ng-template #instrumentModal let-c="close" let-d="dismiss">
+<ng-template
+  #instrumentModal
+  let-c="close"
+  let-d="dismiss"
+>
   <div class="modal-header">
     <h6>{{ modalTitle }}</h6>
-    <button mat-icon-button class="closeModalBtn" (click)="c()">
+    <button
+      mat-icon-button
+      class="closeModalBtn"
+      (click)="c()"
+    >
       <mat-icon class="cancel-icon">cancel</mat-icon>
     </button>
   </div>
@@ -371,8 +415,9 @@
               instrumentForm.controls.instrument.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-6">
           <small>Date de mise en oeuvre</small>
@@ -386,8 +431,16 @@
               #d2="ngbDatepicker"
             />
             <div class="input-group-append">
-              <button class="btn btn-sm btn-outline-shadow" (click)="d2.toggle()" type="button">
-                <i _ngcontent-c41="" aria-hidden="true" class="fa fa-calendar"></i>
+              <button
+                class="btn btn-sm btn-outline-shadow"
+                (click)="d2.toggle()"
+                type="button"
+              >
+                <i
+                  _ngcontent-c41=""
+                  aria-hidden="true"
+                  class="fa fa-calendar"
+                ></i>
               </button>
             </div>
           </div>
@@ -397,8 +450,9 @@
               instrumentForm.controls.instrument_date.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
       </div>
     </form>
@@ -417,10 +471,18 @@
 </ng-template>
 
 <!-- Modal Zonage des documents d'urbanisme -->
-<ng-template #urbanDocModal let-c="close" let-d="dismiss">
+<ng-template
+  #urbanDocModal
+  let-c="close"
+  let-d="dismiss"
+>
   <div class="modal-header">
     <h6>{{ modalTitle }}</h6>
-    <button mat-icon-button class="closeModalBtn" (click)="c()">
+    <button
+      mat-icon-button
+      class="closeModalBtn"
+      (click)="c()"
+    >
       <mat-icon class="cancel-icon">cancel</mat-icon>
     </button>
   </div>
@@ -434,7 +496,11 @@
             ngbAutofocus
             [formControl]="urbanDocForm.controls.area"
           >
-            <option *ngFor="let item of municipalities" [ngValue]="item" [disabled]="item.disabled">
+            <option
+              *ngFor="let item of municipalities"
+              [ngValue]="item"
+              [disabled]="item.disabled"
+            >
               {{ item.municipality_name }}
             </option>
           </select>
@@ -444,8 +510,9 @@
               urbanDocForm.controls.area.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-6">
           <small class="required">Type de document communal</small>
@@ -454,7 +521,10 @@
             ngbAutofocus
             [formControl]="urbanDocForm.controls.urbanType"
           >
-            <option *ngFor="let item of formMetaData.TYP_DOC_COMM" [ngValue]="item">
+            <option
+              *ngFor="let item of formMetaData.TYP_DOC_COMM"
+              [ngValue]="item"
+            >
               {{ item.mnemonique }}
             </option>
           </select>
@@ -464,24 +534,26 @@
               urbanDocForm.controls.urbanType.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-12">
           <small class="required">Type de classement</small>
-            <zh-multiselect
-              [values]="typeClassementInput"
-              [parentFormControl]="urbanDocForm.controls.typeClassement"
-              keyLabel="mnemonique"
-            />
+          <zh-multiselect
+            [values]="typeClassementInput"
+            [parentFormControl]="urbanDocForm.controls.typeClassement"
+            keyLabel="mnemonique"
+          />
           <small
             *ngIf="
               (urbanDocForm.controls.typeClassement.touched || modalFormSubmitted) &&
               urbanDocForm.controls.typeClassement.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-12">
           <small>Remarques</small>
@@ -508,10 +580,18 @@
 </ng-template>
 
 <!-- Modal Zonage des plans de gestion -->
-<ng-template #planModal let-c="close" let-d="dismiss">
+<ng-template
+  #planModal
+  let-c="close"
+  let-d="dismiss"
+>
   <div class="modal-header">
     <h6>{{ modalTitle }}</h6>
-    <button mat-icon-button class="closeModalBtn" (click)="c()">
+    <button
+      mat-icon-button
+      class="closeModalBtn"
+      (click)="c()"
+    >
       <mat-icon class="cancel-icon">cancel</mat-icon>
     </button>
   </div>
@@ -525,7 +605,11 @@
             ngbAutofocus
             [formControl]="planForm.controls.plan"
           >
-            <option *ngFor="let item of planInput" [ngValue]="item" [disabled]="item.disabled">
+            <option
+              *ngFor="let item of planInput"
+              [ngValue]="item"
+              [disabled]="item.disabled"
+            >
               {{ item.mnemonique }}
             </option>
           </select>
@@ -535,8 +619,9 @@
               planForm.controls.plan.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-6">
           <small class="required">Date de réalisation</small>
@@ -550,8 +635,16 @@
               #d1="ngbDatepicker"
             />
             <div class="input-group-append">
-              <button class="btn btn-sm btn-outline-shadow" (click)="d1.toggle()" type="button">
-                <i _ngcontent-c41="" aria-hidden="true" class="fa fa-calendar"></i>
+              <button
+                class="btn btn-sm btn-outline-shadow"
+                (click)="d1.toggle()"
+                type="button"
+              >
+                <i
+                  _ngcontent-c41=""
+                  aria-hidden="true"
+                  class="fa fa-calendar"
+                ></i>
               </button>
             </div>
           </div>
@@ -561,8 +654,9 @@
               planForm.controls.plan_date.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-6">
           <small class="required">Durée (années)</small>
@@ -578,8 +672,9 @@
               planForm.controls.duration.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-12">
           <small>Remarques</small>
@@ -604,8 +699,15 @@
     </button>
   </div>
 </ng-template>
-<ng-template #content let-c="close" let-d="dismiss">
-  <zh-delete-modal (onCancel)="d()" (onDelete)="c()">
+<ng-template
+  #content
+  let-c="close"
+  let-d="dismiss"
+>
+  <zh-delete-modal
+    (onCancel)="d()"
+    (onDelete)="c()"
+  >
     <p>Etes-vous sûr de vouloir supprimer cette ligne ?</p>
   </zh-delete-modal>
 </ng-template>

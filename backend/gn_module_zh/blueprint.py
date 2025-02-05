@@ -9,7 +9,7 @@ import sqlalchemy.exc as exc
 from flask import Blueprint, Response, jsonify, request, send_file, g
 from flask.helpers import send_file
 from geojson import FeatureCollection
-from werkzeug.exceptions import Forbidden, BadRequest
+from werkzeug.exceptions import Forbidden, BadRequest, NotFound
 
 from geonature.core.gn_commons.models import TMedias
 
@@ -27,7 +27,7 @@ from utils_flask_sqla.generic import GenericQuery
 from utils_flask_sqla.response import json_resp_accept_empty_list, json_resp
 
 from .api_error import ZHApiError
-from . import tasks  # noqa: F401
+
 from .forms import (
     create_zh,
     post_file_info,
@@ -52,7 +52,6 @@ from .forms import (
     update_zh_tab6,
 )
 
-# from .forms import *
 from .geometry import set_area, set_geom
 from .hierarchy import Hierarchy, get_all_hierarchy_fields
 from .model.cards import Card
@@ -81,8 +80,8 @@ from .utils import (
     get_last_pdf_export,
     get_main_picture_id,
     get_user_cruved,
+    delete_notes,
 )
-import gn_module_zh.tasks
 
 blueprint = Blueprint("pr_zh", __name__, "./static", template_folder="templates")
 
@@ -225,7 +224,8 @@ def get_complete_info(id_zh):
 
 def get_complete_card(id_zh: int) -> Card:
     ref_geo_config = [ref for ref in blueprint.config["ref_geo_referentiels"] if ref["active"]]
-    return Card(id_zh, "full", ref_geo_config).__repr__()
+    main_id_rb = DB.session.scalar(select(TZH.main_id_rb).where(TZH.id_zh == id_zh))
+    return Card(id_zh, main_id_rb, "full", ref_geo_config).__repr__()
 
 
 @blueprint.route("/eval/<int:id_zh>", methods=["GET"])
@@ -504,6 +504,35 @@ def delete_one_file(id_media):
         DB.session.close()
 
 
+@blueprint.route("notes/<int:id_zh>", methods=["DELETE"])
+@json_resp
+@permissions.check_cruved_scope("D", module_code="ZONES_HUMIDES")
+def delete_one_zh_notes(id_zh):
+    """delete all hierarchy notes for one zh"""
+    try:
+        delete_notes(id_zh)
+    except Exception as e:
+        DB.session.rollback()
+        if e.__class__.__name__ == "ZHApiError":
+            raise ZHApiError(message=str(e.message), details=str(e.details))
+        raise ZHApiError(message="delete_notes_error", details=str(e))
+    finally:
+        DB.session.close()
+
+
+@blueprint.route("/all/hierarchy", methods=["GET"])
+@json_resp
+def generate_all_notes():
+    result = DB.session.scalars(select(TZH.id_zh)).all()
+    if result:
+        for id_zh in result:
+            try:
+                get_hierarchy(id_zh)
+            except Exception as e:
+                pass
+    return ("", 204)
+
+
 @blueprint.route("files/<int:id_media>", methods=["GET"])
 @permissions.check_cruved_scope("C", module_code="ZONES_HUMIDES")
 def download_file(id_media):
@@ -599,6 +628,7 @@ def get_tab_data(id_tab):
             raise BadRequest(
                 "Géométrie manquante",
             )
+
         # POST / PATCH
         if "id_zh" not in form_data.keys():
             # set geometry from coordinates
@@ -994,7 +1024,10 @@ def get_hydro_zones_from_bassin() -> dict:
 @permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
 def get_hierarchy(id_zh):
     """Get zh note"""
-    hierarchy = Hierarchy(id_zh)
+    main_id_rb = DB.session.scalar(select(TZH.main_id_rb).where(TZH.id_zh == id_zh))
+    if not main_id_rb:
+        raise NotFound("The ZH is not in a river basin")
+    hierarchy = Hierarchy(id_zh, main_id_rb)
     return hierarchy.as_dict()
 
 

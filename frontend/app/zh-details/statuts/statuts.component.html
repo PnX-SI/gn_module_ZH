@@ -6,7 +6,10 @@
           <h5 class="section-title">Régime foncier - Statut de propriété</h5>
         </legend>
         <div>
-          <zh-table [tableCols]="regimeTableCol" [data]="data.regime"></zh-table>
+          <zh-table
+            [tableCols]="regimeTableCol"
+            [data]="data.regime"
+          ></zh-table>
         </div>
       </fieldset>
     </div>
@@ -15,10 +18,16 @@
         <legend>
           <h5 class="section-title">Structure de gestion</h5>
         </legend>
-        <div class="mb-3" *ngFor="let struct of data.structure">
+        <div
+          class="mb-3"
+          *ngFor="let struct of data.structure"
+        >
           <p class="structure-label">{{ struct.structure }} :</p>
           <div>
-            <zh-table [tableCols]="plansTableCol" [data]="struct.plans"></zh-table>
+            <zh-table
+              [tableCols]="plansTableCol"
+              [data]="struct.plans"
+            ></zh-table>
           </div>
         </div>
       </fieldset>
@@ -29,7 +38,10 @@
           <h5 class="section-title">Instruments contractuels et financiers</h5>
         </legend>
         <div>
-          <zh-table [tableCols]="instrumentsTableCol" [data]="data.instruments"></zh-table>
+          <zh-table
+            [tableCols]="instrumentsTableCol"
+            [data]="data.instruments"
+          ></zh-table>
         </div>
       </fieldset>
     </div>
@@ -46,9 +58,17 @@
                 <td>
                   <ul>
                     <ng-container *ngIf="table[geo.type_code_ref_geo]?.length > 0; else elseBlock">
-                      <li class="label-item" *ngFor="let ref of table[geo.type_code_ref_geo]">
+                      <li
+                        class="label-item"
+                        *ngFor="let ref of table[geo.type_code_ref_geo]"
+                      >
                         {{ ref.area_code }} -
-                        <a href="{{ ref.url }}" target="_blank">{{ ref.area_name }}</a>
+                        <a
+                          href="{{ ref.url }}"
+                          target="_blank"
+                        >
+                          {{ ref.area_name }}
+                        </a>
                       </li>
                     </ng-container>
                     <ng-template #elseBlock>
@@ -67,7 +87,10 @@
             </zh-label>
           </div>
           <div class="col-12 col-lg-8">
-            <zh-label *ngIf="data?.autre_etude == 'Oui'" label="Commentaires : ">
+            <zh-label
+              *ngIf="data?.autre_etude == 'Oui'"
+              label="Commentaires : "
+            >
               <span>{{ data?.autre_etude_commentaire }}</span>
             </zh-label>
           </div>
@@ -81,10 +104,16 @@
         </legend>
         <zh-label label="Statuts : ">
           <ul>
-            <li class="label-item" *ngFor="let item of data.statuts">
+            <li
+              class="label-item"
+              *ngFor="let item of data.statuts"
+            >
               <span>{{ item.category }}</span>
               <ul>
-                <li class="label-item ml-1" *ngFor="let status of item.items">
+                <li
+                  class="label-item ml-1"
+                  *ngFor="let status of item.items"
+                >
                   <span>{{ status.status }}</span>
                 </li>
               </ul>
@@ -100,7 +129,10 @@
           <h5 class="section-title">Zonage des documents d'urbanisme</h5>
         </legend>
         <div>
-          <zh-table [tableCols]="zonageTableCol" [data]="data.zonage"></zh-table>
+          <zh-table
+            [tableCols]="zonageTableCol"
+            [data]="data.zonage"
+          ></zh-table>
         </div>
       </fieldset>
     </div>

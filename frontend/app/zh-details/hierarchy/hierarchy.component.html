@@ -1,5 +1,12 @@
-<h4 class="tabsSubtitle">Bassin versant : {{ data?.river_basin_name }}</h4>
+<h4 class="tabsSubtitle">Bassin versant : {{ main_river_basin }}</h4>
+<div
+  *ngIf="hierarchy.warning"
+  class="alert alert-warning mat-alert"
+>
+  {{ hierarchy.warning }}
+</div>
 <zh-table
+  *ngIf="hierarchy.items?.length"
   [tableCols]="hierarchy.hierTableCols"
   [data]="hierarchy.items"
   [bold_row_values]="hierarchy.bold_row_values"

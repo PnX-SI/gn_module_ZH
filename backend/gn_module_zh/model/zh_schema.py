@@ -247,6 +247,7 @@ class TZH(ZhModel):
     remark_is_other_inventory = DB.Column(DB.Unicode)
     main_pict_id = DB.Column(DB.Integer)
     area = DB.Column(DB.Float)
+    main_id_rb = DB.Column(DB.Integer, nullable=True)
 
     sdage = DB.relationship(
         TNomenclatures,
@@ -307,12 +308,27 @@ class TZH(ZhModel):
         bassin_versant = [
             name
             for name in DB.session.scalars(
-                select(TRiverBasin.name).where(
-                    TRiverBasin.id_rb == CorZhRb.id_rb, CorZhRb.id_zh == self.id_zh
+                select(TRiverBasin.name)
+                .where(
+                    TRiverBasin.id_rb == CorZhRb.id_rb,
+                    CorZhRb.id_zh == self.id_zh,
+                    TZH.id_zh == self.id_zh,
+                )
+                .order_by(
+                    (
+                        func.ST_Area(func.ST_Intersection(TZH.geom, TRiverBasin.geom))
+                        / func.ST_Area(TZH.geom)
+                    ).desc()
                 )
             ).all()
         ]
         return ", ".join([str(item) for item in bassin_versant])
+
+    @hybrid_property
+    def main_rb_name(self):
+        return DB.session.scalar(
+            select(TRiverBasin.name).where(TRiverBasin.id_rb == self.main_id_rb)
+        )
 
 
 @serializable
@@ -876,13 +892,6 @@ class CorZhProtection(DB.Model):
         DB.Integer, ForeignKey(CorProtectionLevelType.id_protection), primary_key=True
     )
     id_zh = DB.Column(DB.Integer, ForeignKey(TZH.id_zh), primary_key=True)
-
-
-class InseeRegions(DB.Model):
-    __tablename__ = "insee_regions"
-    __table_args__ = {"schema": "ref_geo"}
-    insee_reg = DB.Column(DB.Unicode(length=2), primary_key=True)
-    region_name = DB.Column(DB.Unicode(length=50), nullable=False)
 
 
 class TManagementStructures(DB.Model):

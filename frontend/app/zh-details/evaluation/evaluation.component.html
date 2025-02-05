@@ -9,22 +9,41 @@
               class="info-icon"
               ngbTooltip="Cette rubrique met en avant les principaux enjeux liés à la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
               placement="right"
-              >info
+            >
+              info
             </mat-icon>
           </h5>
         </legend>
-        <zh-table [tableCols]="hydroFunctionsCols" [data]="data.fonctions?.hydrologique"></zh-table>
-        <zh-table [tableCols]="bioFunctionsCols" [data]="data.fonctions?.biologique"></zh-table>
-        <zh-table [tableCols]="patrimonialInterestsCols" [data]="data.interet?.interet"></zh-table>
+        <zh-table
+          [tableCols]="hydroFunctionsCols"
+          [data]="data.fonctions?.hydrologique"
+        ></zh-table>
+        <zh-table
+          [tableCols]="bioFunctionsCols"
+          [data]="data.fonctions?.biologique"
+        ></zh-table>
+        <zh-table
+          [tableCols]="patrimonialInterestsCols"
+          [data]="data.interet?.interet"
+        ></zh-table>
         <div class="row">
           <div class="col-12 col-xl-6">
-            <zh-table [tableCols]="nbFauneFloreCols" [data]="getFauneFloreData()"></zh-table>
+            <zh-table
+              [tableCols]="nbFauneFloreCols"
+              [data]="getFauneFloreData()"
+            ></zh-table>
           </div>
           <div class="col-12 col-xl-6">
-            <zh-table [tableCols]="nbHabCols" [data]="getHabitatData()"></zh-table>
+            <zh-table
+              [tableCols]="nbHabCols"
+              [data]="getHabitatData()"
+            ></zh-table>
           </div>
         </div>
-        <zh-table [tableCols]="valCols" [data]="data.interet?.valeur"></zh-table>
+        <zh-table
+          [tableCols]="valCols"
+          [data]="data.interet?.valeur"
+        ></zh-table>
         <zh-label label="Commentaires :">
           <span>{{ data.interet?.Commentaire }}</span>
         </zh-label>
@@ -37,13 +56,17 @@
               class="info-icon"
               ngbTooltip="Cette rubrique met en avant les menaces et l’état fonctionnel de la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
               placement="right"
-              >info
+            >
+              info
             </mat-icon>
           </h5>
         </legend>
         <div class="row">
           <div class="col-12">
-            <zh-table [tableCols]="menacesCols" [data]="getBilanData()"></zh-table>
+            <zh-table
+              [tableCols]="menacesCols"
+              [data]="getBilanData()"
+            ></zh-table>
           </div>
           <div class="col-12">
             <zh-label label="Commentaires :">
@@ -59,7 +82,10 @@
         <zh-label label="Stratégie de gestion :">
           <span>{{ data.strategie?.mgmt_strategy }}</span>
         </zh-label>
-        <zh-table [tableCols]="propositionsCol" [data]="data.strategie?.propositions"></zh-table>
+        <zh-table
+          [tableCols]="propositionsCol"
+          [data]="data.strategie?.propositions"
+        ></zh-table>
         <zh-label label="Commentaires :">
           <span>{{ data.strategie?.commentaires }}</span>
         </zh-label>

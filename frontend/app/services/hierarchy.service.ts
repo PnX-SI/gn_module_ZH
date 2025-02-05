@@ -24,8 +24,8 @@ export class HierarchyService {
   public currentZh: any;
   //public hierZh: HierarchyModel = null;
   public items: ItemModel[];
-  public rb_name: string;
   public isLoading: boolean = false;
+  public warning: string = '';
 
   constructor(
     private _dataService: ZhDataService,
@@ -37,35 +37,48 @@ export class HierarchyService {
     this.isLoading = false;
   }
 
+  clear(): void {
+    this.warning = '';
+  }
+
+  getHierarchyFromZh(zh) {
+    if (zh.properties.main_id_rb) {
+      this.getHierarchy(zh.properties.id_zh);
+    }
+  }
+
   // get current zone humides
-  getHierarchy(zhId, rb_name) {
+  getHierarchy(zhId) {
     this.isLoading = true;
-    this.rb_name = rb_name;
-    this._dataService.getHierZh(zhId).subscribe(
-      (data: HierarchyModel) => {
-        this.items = this.setItems(data);
-      },
-      (error) => {
-        this.isLoading = false;
-        this.items = [];
-        if (error.status === 404) {
-          this._toastr.warning("La ZH n'est présente dans aucun bassin versant", '', {
-            closeButton: true,
-          });
-        } else if (error.status === 400) {
-          this._toastr.warning(
-            this._error['errors'].filter((i) => error.error['message'] === i.api)[0].front,
-            '',
-            {
-              closeButton: true,
-            }
-          );
+    this.warning = '';
+    this._dataService
+      .getHierZh(zhId, {
+        'not-to-handle': '1',
+      })
+      .subscribe(
+        (data: HierarchyModel) => {
+          this.setItems(data);
+        },
+        (error) => {
+          this.isLoading = false;
+          this.items = [];
+          if (error.status === 404) {
+            this.warning = "La ZH n'est présente dans aucun bassin versant";
+          } else if (error.status === 400) {
+            this.warning = this._error['errors'].filter(
+              (i) => error.error['message'] === i.api
+            )[0].front;
+          }
+          this.deleteNotes(zhId);
+        },
+        () => {
+          this.isLoading = false;
         }
-      },
-      () => {
-        this.isLoading = false;
-      }
-    );
+      );
+  }
+
+  deleteNotes(idZH: number) {
+    return this._dataService.deleteNotes(idZH).subscribe();
   }
 
   // set list of hierarchy items
@@ -347,7 +360,5 @@ export class HierarchyService {
       note: data.final_note,
     });
     //this.bold_row_values.push("NOTE FINALE");
-
-    return this.items;
   }
 }
