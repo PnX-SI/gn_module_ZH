@@ -776,8 +776,10 @@ def post_instruments(id_zh, instruments):
             TInstruments(
                 id_instrument=instrument["id_instrument"],
                 id_zh=id_zh,
-                instrument_date=datetime.datetime.strptime(
-                    instrument["instrument_date"], "%d/%m/%Y"
+                instrument_date=(
+                    datetime.datetime.strptime(instrument["instrument_date"], "%d/%m/%Y")
+                    if instrument.get("instrument_date")
+                    else None
                 ),
             )
         )
