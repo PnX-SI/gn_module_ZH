@@ -112,9 +112,6 @@ fileformat_validated = true
 # téléversements
 file_path = "static"
 
-# Name of the source of species data (tab5)
-species_source_name = 'GeoNature'
-
 # -- Configuration relative à la génération de la fiche de synthèse pdf
 # Limite de superficie de la zone humide en dessous de laquelle
 # la couche définie par pdf_small_layer_number sera utilisée

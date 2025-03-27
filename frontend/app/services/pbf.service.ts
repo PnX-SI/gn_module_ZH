@@ -43,7 +43,7 @@ export class PbfService {
   // FIXME : return a L.vectorGrid
   setVectorGrid(geojson) {
     const vector = (L as any).vectorGrid.slicer(geojson, {
-      rendererFactory: (L as any).canvas.tile,
+      rendererFactory: (L as any).svg.tile,
       vectorTileLayerStyles: {
         sliced: function (properties, zoom) {
           let opacity = 0.8;
