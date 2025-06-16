@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgis/postgis:16-3.5
+#    env_file:
+#      - .env
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_DB=geonature2db
+      - POSTGRES_PASSWORD=geonatpasswd
+      - POSTGRES_USER=geonatadmin
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "geonatadmin", "-d", "geonature2db"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 5s
+
+volumes:
+  postgres:

@@ -42,6 +42,7 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
+cache
 nosetests.xml
 coverage.xml
 *.cover
@@ -106,6 +107,7 @@ venv.bak/
 
 # vscode
 .vscode/
+.idea
 # config module
 frontend/app/module.config.ts
 
