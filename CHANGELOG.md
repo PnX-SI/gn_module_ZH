@@ -6,6 +6,8 @@
 
 **🐛 Corrections**
 
+- Correction de la génération de PDF (#110, by @juggler31)
+
 ## 1.4.0 - La Narse de Nouvialle (2025-03-27)
 
 Compatibilité avec GeoNature 2.15.0 minimum.
