@@ -37,6 +37,7 @@ export class ZhFormTab9Component implements OnInit {
   getCurrentZh() {
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
+        this.currentZh = zh;
         if (zh.properties.main_rb_name != null) {
           this.main_rb_name = zh.properties.main_rb_name;
           this.hierarchy.getHierarchy(zh.id);
