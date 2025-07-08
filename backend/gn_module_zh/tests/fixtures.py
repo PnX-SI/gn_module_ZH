@@ -7,6 +7,7 @@ import geoalchemy2
 
 import uuid
 
+
 def create_zh(
     main_name,
     code,
@@ -21,6 +22,7 @@ def create_zh(
 ):
     # Import here because TZH class need to be imported after "app instanced"
     from gn_module_zh.model.zh_schema import TZH
+
     zh = TZH(
         main_name=main_name,
         code=code,
@@ -36,9 +38,10 @@ def create_zh(
     )
     return zh
 
+
 @pytest.fixture(scope="function")
 def zh_data(users):
-    coords = ((0., 0.), (0., 1.), (1., 1.), (1., 0.), (0., 0.))
+    coords = ((0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0))
     polygon = Polygon(coords)
     date = datetime.datetime(2024, 10, 2, 11, 22, 33)
     id_sdage = 967
@@ -59,7 +62,7 @@ def zh_data(users):
             (
                 "zh1",
                 "05CEN0189",
-                2, # id_org = 2 (not dynamic) because not same table bib_organismes used with the users
+                2,  # id_org = 2 (not dynamic) because not same table bib_organismes used with the users
                 user.id_role,
                 date,
                 uuid.uuid4(),
