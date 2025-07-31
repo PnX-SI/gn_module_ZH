@@ -26,6 +26,7 @@ interface Identification {
 }
 
 interface Auteur {
+  product_owner: string;
   auteur: string;
   organism: string;
   coorganism: string;

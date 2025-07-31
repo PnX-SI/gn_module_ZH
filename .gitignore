@@ -106,6 +106,9 @@ venv.bak/
 
 # vscode
 .vscode/
+
+.idea
+cache
 # config module
 frontend/app/module.config.ts
 

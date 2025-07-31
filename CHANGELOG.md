@@ -4,6 +4,10 @@
 
 (à déterminer)
 
+**🚀 Nouveautés**
+
+- Ajout de 3 nouveau champs "product_owner", "input_scale", "input_ref_geo"(#52, by @juggler31)
+
 **🐛 Corrections**
 
 - Ajout du boutton "quitter" sur l'onglet 9 (#114, by @juggler31)

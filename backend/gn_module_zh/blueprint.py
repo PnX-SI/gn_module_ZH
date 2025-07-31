@@ -28,7 +28,7 @@ from geonature.core.gn_permissions.tools import get_scopes_by_action
 from ref_geo.models import BibAreasTypes, LAreas, LiMunicipalities
 from geonature.utils.config import config
 from geonature.utils.env import DB, ROOT_DIR, BACKEND_DIR
-from pypnnomenclature.models import TNomenclatures
+from pypnnomenclature.models import TNomenclatures, BibNomenclaturesTypes
 from pypnusershub.db.models import Organisme, User
 from sqlalchemy import desc, func, text, select, update, delete
 from sqlalchemy.orm import aliased
@@ -375,6 +375,8 @@ def get_pbf_complete():
                tz.menaces,
                tz.diagnostic_bio,
                tz.diagnostic_hydro,
+               tz.product_owner,
+               tz.input_scale,
                Json_build_object('criteres_delim', tz.criteres_delim,
                          'communes',
                          tz.communes,
@@ -435,24 +437,16 @@ def get_geometries():
         DB.session.close()
 
 
-@blueprint.route("/references/autocomplete", methods=["GET"])
+@blueprint.route("/product_owners", methods=["GET"])
 @permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
 @json_resp
-def get_ref_autocomplete():
+def get_product_owners():
     try:
-        params = request.args
-        search_title = params.get("search_title")
-        # search_title = 'MCD'
-        q = select(TReferences, func.similarity(TReferences.title, search_title).label("idx_trgm"))
-
-        search_title = search_title.replace(" ", "%")
-        q = q.where(TReferences.title.ilike("%" + search_title + "%")).order_by(desc("idx_trgm"))
-
+        q = select(BibOrganismes).where(BibOrganismes.is_product_owner == True)
         limit = request.args.get("limit", 20)
-
         data = DB.session.execute(q.limit(limit)).all()
         if data:
-            return [d[0].as_dict() for d in data]
+            return [d[0].as_dict() if hasattr(d[0], "as_dict") else d[0] for d in data]
         else:
             return "No Result", 404
     except Exception as e:
@@ -460,7 +454,100 @@ def get_ref_autocomplete():
             raise ZHApiError(message=str(e.message), details=str(e.details))
         exc_type, value, tb = sys.exc_info()
         raise ZHApiError(
-            message="get_ref_autocomplete_error",
+            message="get_product_owners",
+            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
+        )
+    finally:
+        DB.session.close()
+
+
+@blueprint.route("/input_ref_geo", methods=["GET"])
+@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
+@json_resp
+def get_input_ref_geo():
+    try:
+        id_nommenclature_type = DB.session.execute(
+            select(BibNomenclaturesTypes.id_type).where(
+                BibNomenclaturesTypes.mnemonique.like("INPUT_REF_GEO")
+            )
+        ).scalar_one()
+        q = select(TNomenclatures.mnemonique).where(TNomenclatures.id_type == id_nommenclature_type)
+        data = DB.session.execute(q).all()
+        if data:
+            return [d[0].as_dict() if hasattr(d[0], "as_dict") else d[0] for d in data]
+        else:
+            return "No Result", 404
+    except Exception as e:
+        if e.__class__.__name__ == "ZHApiError":
+            raise ZHApiError(message=str(e.message), details=str(e.details))
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="get_product_owners",
+            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
+        )
+    finally:
+        DB.session.close()
+
+
+@blueprint.route("/input_scale", methods=["GET"])
+@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
+@json_resp
+def get_input_scale():
+    try:
+        id_nommenclature_type = DB.session.execute(
+            select(BibNomenclaturesTypes.id_type).where(
+                BibNomenclaturesTypes.mnemonique.like("INPUT_SCALE")
+            )
+        ).scalar_one()
+        q = select(TNomenclatures.mnemonique).where(TNomenclatures.id_type == id_nommenclature_type)
+        data = DB.session.execute(q).all()
+        if data:
+            return [d[0].as_dict() if hasattr(d[0], "as_dict") else d[0] for d in data]
+        else:
+            return "No Result", 404
+    except Exception as e:
+        if e.__class__.__name__ == "ZHApiError":
+            raise ZHApiError(message=str(e.message), details=str(e.details))
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="get_product_owners",
+            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
+        )
+    finally:
+        DB.session.close()
+
+
+@blueprint.route("/autocomplete/<string:field>", methods=["GET"])
+@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
+@json_resp
+def get_autocomplete(field):
+    try:
+        params = request.args
+        if field == "references":
+            search_title = params.get("search_title")
+            # search_title = 'MCD'
+            q = select(
+                TReferences, func.similarity(TReferences.title, search_title).label("idx_trgm")
+            )
+
+            search_title = search_title.replace(" ", "%")
+            q = q.where(TReferences.title.ilike("%" + search_title + "%")).order_by(
+                desc("idx_trgm")
+            )
+        else:
+            raise NotFound(f"Field {field} not found for autocomplete")
+        limit = request.args.get("limit", 20)
+        data = DB.session.execute(q.limit(limit)).all()
+        if data:
+            return [d[0].as_dict() if hasattr(d[0], "as_dict") else d[0] for d in data]
+        else:
+            return "No Result", 404
+    except Exception as e:
+        if e.__class__.__name__ == "ZHApiError":
+            raise ZHApiError(message=str(e.message), details=str(e.details))
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message=f"get_autocomplete_error on field: {field}",
             details=str(exc_type) + ": " + str(e.with_traceback(tb)),
         )
     finally:
@@ -643,7 +730,6 @@ def get_tab_data(id_tab):
             raise BadRequest(
                 "Géométrie manquante",
             )
-
         # POST / PATCH
         if "id_zh" not in form_data.keys():
             # set geometry from coordinates

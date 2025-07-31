@@ -23,6 +23,10 @@ export const ModuleConfig = {
       sortable: true,
     },
     {
+      name: 'Échelle de saisie',
+      prop: 'echelle_saisie',
+    },
+    {
       name: 'Crit\u00e8res d\u00e9limitation (de la zh)',
       prop: 'delims',
       sortable: true,
@@ -70,6 +74,10 @@ export const ModuleConfig = {
       name: 'Bassin versant',
       prop: 'bassin_versant',
       sortable: true,
+    },
+    {
+      name: 'Échelle de saisie',
+      prop: 'echelle_saisie',
     },
   ],
   file_path: 'static',

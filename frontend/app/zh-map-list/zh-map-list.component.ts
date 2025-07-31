@@ -182,6 +182,13 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     return sdage.mnemonique;
   }
 
+  displayEchelleSaisie(element): string {
+    if (!element) {
+      return 'Non renseignée';
+    }
+    return `1/${element}ème`;
+  }
+
   displayOrganism(authors): string {
     return authors.organisme.nom_organisme;
   }
@@ -196,6 +203,9 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     // format Date
     feature['properties']['create_date'] = this.displayDate(feature['properties']['create_date']);
     feature['properties']['update_date'] = this.displayDate(feature['properties']['update_date']);
+    feature['properties']['input_scale'] = this.displayEchelleSaisie(
+      feature['properties']['input_scale']
+    );
 
     feature['properties']['sdage'] = this.displaySdageName(feature['properties']['id_sdage']);
 

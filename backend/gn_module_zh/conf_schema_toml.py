@@ -26,6 +26,7 @@ available_maplist_column = [
     {"prop": "code", "name": "Code"},
     {"prop": "sdage", "name": "Typologie SDAGE", "sortable": True},
     {"prop": "bassin_versant", "name": "Bassin versant", "sortable": True},
+    {"prop": "input_scale", "name": "Échelle de saisie"},
     {"prop": "delims", "name": "Critères délimitation (de la zh)", "sortable": True},
     {"prop": "create_date", "name": "Date de création"},
     {"prop": "author", "name": "Auteur"},
