@@ -28,6 +28,10 @@ export const ModuleConfig = {
    "sortable": true
   },
   {
+   "name": "\u00c9chelle de saisie",
+   "prop": "echelle_saisie"
+  },
+  {
    "name": "Crit\u00e8res d\u00e9limitation (de la zh)",
    "prop": "delims",
    "sortable": true
@@ -75,6 +79,10 @@ export const ModuleConfig = {
    "name": "Bassin versant",
    "prop": "bassin_versant",
    "sortable": true
+  },
+  {
+   "name": "\u00c9chelle de saisie",
+   "prop": "echelle_saisie"
   }
  ],
  "display_other_zh_by_default": false,

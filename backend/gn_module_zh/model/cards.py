@@ -76,7 +76,8 @@ class Utils(ZH):
 
 
 class Limits:
-    def __init__(self):
+    def __init__(self, zh_props):
+        self.zh_props = zh_props
         self.area_limits = Criteria
         self.function_limits = Criteria
 
@@ -100,7 +101,17 @@ class Limits:
         return {
             "delimitation_zone": self.area_limits.__str__(),
             "delimitation_fonctions": self.function_limits.__str__(),
+            "input_scale": self.__get_input_scale(),
+            "input_ref_geo": self.__get_input_ref_geo(),
         }
+
+    def __get_input_scale(self):
+        input_scale = self.zh_props["input_scale"]
+        return input_scale if input_scale is not None else ""
+
+    def __get_input_ref_geo(self):
+        input_ref_geo = self.zh_props["input_ref_geo"]
+        return input_ref_geo if input_ref_geo is not None else ""
 
 
 class Criteria:
@@ -186,10 +197,12 @@ class Author:
         self.create_author = self.__get_author()
         self.edit_author = self.__get_author(type="coauthors")
         self.organism = self.__get_organism()
+        self.product_owner = self.__get_product_owner()
         self.coorganism = self.__get_organism(type="coauthors")
 
     def __str__(self):
         return {
+            "product_owner": self.product_owner,
             "auteur": self.create_author,
             "auteur_modif": self.edit_author,
             "date": self.create_date,
@@ -210,6 +223,10 @@ class Author:
     def __get_organism(self, type="authors"):
         author = getattr(self.zh, type)
         return author.organisme.nom_organisme if author.organisme is not None else ""
+
+    def __get_product_owner(self):
+        product_owner = getattr(self.zh, "product_owner")
+        return product_owner if product_owner is not None else ""
 
 
 class Municipalities:
@@ -1030,7 +1047,7 @@ class Card(ZH):
         self.properties = self.get_properties()
         self.eval = self.get_eval()
         self.info = Info()
-        self.limits = Limits()
+        self.limits = Limits(self.properties)
         self.functioning = Functioning()
         self.functions = Functions()
         self.description = Description()

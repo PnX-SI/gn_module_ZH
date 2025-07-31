@@ -63,6 +63,30 @@
     </fieldset>
     <fieldset>
       <legend>
+        <h5 class="section-title">Maitre d'ouvrage de l'inventaire</h5>
+      </legend>
+      <small>Maitre d'ouvrage</small>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <zh-multiselect
+            [values]="listProductOwner"
+            keyLabel="name"
+            [parentFormControl]="formProductOwner.controls.productOwner"
+            (onOpen)="allListProductOwner()"
+            [multiple]="false"
+          />
+        </div>
+      </div>
+      <span
+        class="form-row"
+        class="bib-hint"
+      >
+        Si vous ne trouvez pas le maitre d'ouvrage que vous cherchez, veuillez contacter
+        l'administrateur
+      </span>
+    </fieldset>
+    <fieldset>
+      <legend>
         <h5 class="section-title">Principales références bibliographiques</h5>
       </legend>
       <div class="form-row">

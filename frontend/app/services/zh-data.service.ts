@@ -47,8 +47,20 @@ export class ZhDataService {
 
   autocompletBib(search_title: string) {
     return this._api.get<any>(
-      `${this.config.API_ENDPOINT}/zones_humides/references/autocomplete?search_title=${search_title}`
+      `${this.config.API_ENDPOINT}/zones_humides/autocomplete/references?search_title=${search_title}`
     );
+  }
+
+  getProductOwners() {
+    return this._api.get<any>(`${this.config.API_ENDPOINT}/zones_humides/product_owners`);
+  }
+
+  getRefGeoSaisie() {
+    return this._api.get<any>(`${this.config.API_ENDPOINT}/zones_humides/input_ref_geo`);
+  }
+
+  getEchelleSaisie() {
+    return this._api.get<any>(`${this.config.API_ENDPOINT}/zones_humides/input_scale`);
   }
 
   checkRefGeo() {

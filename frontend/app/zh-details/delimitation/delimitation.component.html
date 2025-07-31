@@ -1,5 +1,30 @@
 <div>
   <div class="row my-3">
+    <div class="col-12 h-100">
+      <fieldset>
+        <legend>
+          <h5 class="section-title">Échelle et référentiel de saisie</h5>
+        </legend>
+        <div class="row">
+          <div class="col-12 col-xl-6">
+            <zh-label label="Échelle de saisie :">
+              <div *ngIf="data?.input_scale; then thenEchelleSaisie; else elseEchelleSaisie"></div>
+              <ng-template #thenEchelleSaisie>1/{{ data.input_scale }}ème</ng-template>
+              <ng-template #elseEchelleSaisie>Non identifié</ng-template>
+            </zh-label>
+          </div>
+          <div class="col-12 col-xl-6">
+            <zh-label label="Référentiel de saisie :">
+              <div *ngIf="data?.input_ref_geo; then thenRefGeoSaisie; else elseRefGeoSaisie"></div>
+              <ng-template #thenRefGeoSaisie>{{ data.input_ref_geo }}</ng-template>
+              <ng-template #elseRefGeoSaisie>Non identifié</ng-template>
+            </zh-label>
+          </div>
+        </div>
+        <p class="label"><b></b></p>
+      </fieldset>
+    </div>
+
     <div class="col-12 col-xl-6 col-lg-6 col-md-6">
       <fieldset>
         <legend>
