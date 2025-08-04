@@ -1,41 +1,38 @@
-<div class="flex-container">
-  {% if data['image_name'] is not none %}
-  <div class="left">
-  {% else %}
-  <div>
-  {% endif %}
-    <section class="content">
+<div class="milieux-container">
+  <section>
+    <div class="content">
       <h5 class="subtitle">Corine Biotope</h5>
       <table class="custom-table">
         <thead>
-            <tr>
-                <th>Code Corine Biotope</th>
-                <th>Libellé Corine Biotope</th>
-                <th>Humidité</th>
-            </tr>
+          <tr>
+            <th>Code Corine Biotope</th>
+            <th>Libellé Corine Biotope</th>
+            <th>Humidité</th>
+          </tr>
         </thead>
         <tbody>
-            {% for corine in data['description']['presentation']['corine_biotope'] %}
+          {% for corine in data['description']['presentation']['corine_biotope'] %}
             <tr>
               <td>{{ corine['code'] }}</td>
               <td>{{ corine['label'] }}</td>
               <td>{{ corine['Humidité'] }}</td>
             </tr>
-            {% else %}
-              <tr>
-                <td colspan="3">Inconnu</td>
-              </tr>
-            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="3">Inconnu</td>
+            </tr>
+          {% endfor %}
         </tbody>
       </table>
-    </section>
-  </div>
+    </div>
+  </section>
   {% if data['image_name'] is not none %}
-      <div class="right">
-        <section class="content"></section>
-          <img class="image" src="{{ url_for('pr_zh.media_attachment', filename=data['image_name']) }}">
-        </section>
-      </div>
+    <div>
+      <img
+        class="image"
+        src="{{ url_for('pr_zh.media_attachment', filename=data['image_name']) }}"
+      />
+    </div>
   {% endif %}
   <!--
   {% if data['image'] %}
@@ -45,4 +42,5 @@
     </div>
   {% endif %}
   -->
+  <div class="milieux-clear"></div>
 </div>
