@@ -35,6 +35,10 @@ from .model.zh_schema import (
     TRules,
 )
 
+from .utils import (
+    delete_notes,
+)
+
 
 class Item:
     def __init__(self, id_zh, rb_id, abb):
@@ -1136,8 +1140,11 @@ class Hierarchy(ZH):
         self.id_zh = id_zh
         self.rb_id = main_id_rb
         self.is_rules = self.__check_if_rules()
+        print("-- before volet 1")
         self.volet1 = Volet1(self.id_zh, self.rb_id)
+        print("-- before volet 2")
         self.volet2 = Volet2(self.id_zh, self.rb_id)
+        print("-- after volet 2")
         self.total_denom = self.__get_total_denom()
         self.global_note = self.__get_global_note()
         self.final_note = self.__get_final_note()
@@ -1258,3 +1265,15 @@ def get_all_hierarchy_fields(id_rb: int):
             )
     fields["items"] = notes
     return fields
+
+
+def update_hierarchy(id_zh):
+    """Update zh note"""
+    try:
+        delete_notes(id_zh)
+        main_id_rb = DB.session.scalar(select(TZH.main_id_rb).where(TZH.id_zh == id_zh))
+        if main_id_rb:
+            hierarchy = Hierarchy(id_zh, main_id_rb)
+            return hierarchy.as_dict()
+    except Exception as e:
+        pass

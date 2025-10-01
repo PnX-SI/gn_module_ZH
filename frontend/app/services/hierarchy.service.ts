@@ -69,7 +69,6 @@ export class HierarchyService {
               (i) => error.error['message'] === i.api
             )[0].front;
           }
-          this.deleteNotes(zhId);
         },
         () => {
           this.isLoading = false;

@@ -769,6 +769,7 @@ def get_tab_data(id_tab):
     if id_tab == 1:
         update_tzh(form_data)
         update_refs(form_data)
+        update_hierarchy(form_data["id_zh"])
         DB.session.commit()
         return jsonify({"id_zh": form_data["id_zh"]})
 
@@ -776,6 +777,7 @@ def get_tab_data(id_tab):
         update_tzh(form_data)
         update_delim(form_data["id_zh"], form_data["critere_delim"])
         update_fct_delim(form_data["id_zh"], form_data["critere_delim_fs"])
+        update_hierarchy(form_data["id_zh"])
         DB.session.commit()
         return jsonify({"id_zh": form_data["id_zh"]})
 
@@ -786,6 +788,7 @@ def get_tab_data(id_tab):
         update_activities(
             form_data["id_zh"], form_data["activities"]
         )  # , form_data['id_cor_impact_types'])
+        update_hierarchy(form_data["id_zh"])
         DB.session.commit()
         return jsonify({"id_zh": form_data["id_zh"]})
 
@@ -793,6 +796,7 @@ def get_tab_data(id_tab):
         update_outflow(form_data["id_zh"], form_data["outflows"])
         update_inflow(form_data["id_zh"], form_data["inflows"])
         update_tzh(form_data)
+        update_hierarchy(form_data["id_zh"])
         DB.session.commit()
         return jsonify({"id_zh": form_data["id_zh"]})
 
@@ -805,6 +809,7 @@ def get_tab_data(id_tab):
         update_functions(form_data["id_zh"], form_data["val_soc_eco"], "VAL_SOC_ECO")
         update_tzh(form_data)
         update_hab_heritages(form_data["id_zh"], form_data["hab_heritages"])
+        update_hierarchy(form_data["id_zh"])
         DB.session.commit()
         return jsonify({"id_zh": form_data["id_zh"]})
 
@@ -815,12 +820,14 @@ def get_tab_data(id_tab):
         update_protections(form_data["id_zh"], form_data["protections"])
         update_zh_tab6(form_data)
         update_urban_docs(form_data["id_zh"], form_data["urban_docs"])
+        update_hierarchy(form_data["id_zh"])
         DB.session.commit()
         return jsonify({"id_zh": form_data["id_zh"]})
 
     if id_tab == 7:
         update_tzh(form_data)
         update_actions(form_data["id_zh"], form_data["actions"])
+        update_hierarchy(form_data["id_zh"])
         DB.session.commit()
         return jsonify({"id_zh": form_data["id_zh"]})
 
@@ -1136,6 +1143,18 @@ def get_hierarchy(id_zh):
         raise NotFound("The ZH is not in a river basin")
     hierarchy = Hierarchy(id_zh, main_id_rb)
     return hierarchy.as_dict()
+
+
+def update_hierarchy(id_zh):
+    """Update zh note"""
+    try:
+        delete_notes(id_zh)
+        main_id_rb = DB.session.scalar(select(TZH.main_id_rb).where(TZH.id_zh == id_zh))
+        if main_id_rb:
+            hierarchy = Hierarchy(id_zh, main_id_rb)
+            return hierarchy.as_dict()
+    except Exception as e:
+        pass
 
 
 @blueprint.route("/hierarchy/fields/<int:id_rb>", methods=["GET"])
