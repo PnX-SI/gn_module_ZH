@@ -1140,11 +1140,8 @@ class Hierarchy(ZH):
         self.id_zh = id_zh
         self.rb_id = main_id_rb
         self.is_rules = self.__check_if_rules()
-        print("-- before volet 1")
         self.volet1 = Volet1(self.id_zh, self.rb_id)
-        print("-- before volet 2")
         self.volet2 = Volet2(self.id_zh, self.rb_id)
-        print("-- after volet 2")
         self.total_denom = self.__get_total_denom()
         self.global_note = self.__get_global_note()
         self.final_note = self.__get_final_note()
