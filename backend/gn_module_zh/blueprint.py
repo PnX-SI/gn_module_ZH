@@ -63,7 +63,7 @@ from .forms import (
 )
 
 from .geometry import set_area, set_geom
-from .hierarchy import Hierarchy, get_all_hierarchy_fields
+from .hierarchy import Hierarchy, get_all_hierarchy_fields, update_hierarchy
 from .model.cards import Card
 from .model.repositories import ZhRepository
 from .model.zh import ZH
@@ -1143,18 +1143,6 @@ def get_hierarchy(id_zh):
         raise NotFound("The ZH is not in a river basin")
     hierarchy = Hierarchy(id_zh, main_id_rb)
     return hierarchy.as_dict()
-
-
-def update_hierarchy(id_zh):
-    """Update zh note"""
-    try:
-        delete_notes(id_zh)
-        main_id_rb = DB.session.scalar(select(TZH.main_id_rb).where(TZH.id_zh == id_zh))
-        if main_id_rb:
-            hierarchy = Hierarchy(id_zh, main_id_rb)
-            return hierarchy.as_dict()
-    except Exception as e:
-        pass
 
 
 @blueprint.route("/hierarchy/fields/<int:id_rb>", methods=["GET"])
