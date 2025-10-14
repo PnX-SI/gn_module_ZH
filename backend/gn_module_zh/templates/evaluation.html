@@ -20,6 +20,10 @@
             <td>{{ fct['qualification'] }}</td>
             <td>{{ fct['connaissance'] }}</td>
           </tr>
+          {% else %}
+          <tr>
+            <td>Fonctions non évaluées ou évaluées trop faiblement.</td>
+          </tr>
           {% endfor %}
       </tbody>
       </table>
@@ -42,6 +46,10 @@
             <td>{{ fct['qualification'] }}</td>
             <td>{{ fct['connaissance'] }}</td>
           </tr>
+          {% else %}
+          <tr>
+            <td>Fonctions non évaluées ou évaluées trop faiblement.</td>
+          </tr>
           {% endfor %}
         </tbody>
       </table>
@@ -63,6 +71,10 @@
               <td>{{ interet['justification'] }}</td>
               <td>{{ interet['qualification'] }}</td>
               <td>{{ interet['connaissance'] }}</td>
+            </tr>
+          {% else %}
+            <tr>
+              <td>Valeurs non évaluées ou évaluées trop faiblement.</td>
             </tr>
           {% endfor %}
         </tbody>
@@ -125,6 +137,10 @@
               <td>{{ socio['justification'] }}</td>
               <td>{{ socio['qualification'] }}</td>
               <td>{{ socio['connaissance'] }}</td>
+            </tr>
+          {% else %}
+            <tr>
+              <td>Valeurs non évaluées ou évaluées trop faiblement.</td>
             </tr>
           {% endfor %}
         </tbody>
