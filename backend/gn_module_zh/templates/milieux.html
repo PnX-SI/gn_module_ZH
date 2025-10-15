@@ -24,6 +24,9 @@
             {% endfor %}
         </tbody>
       </table>
+      {% if data['config']['pdf_all_description'] %}
+        <span class="small-title"><b>Remarques : </b>{{ data['description']['presentation']['remarques'] or 'Aucune' }}</span>
+      {% endif %}
     </section>
   </div>
   {% if data['image_name'] is not none %}
