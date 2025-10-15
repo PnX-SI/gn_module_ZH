@@ -22,6 +22,10 @@
     {% include 'fonctionnement.html' %}
     <h1 class="title">Usages ou processus naturels</h1>
     {% include 'usages.html' %}
+    {% if data['config']['pdf_all_description'] %}
+    <h1 class="title">Fonctions et valeurs de la zone humide</h1>
+    {% include 'fonctions.html' %}
+    {% endif %}
     <h1 class="title">Statuts et gestion de la zone humide</h1>
     {% include 'statuts.html' %}
     <div class="new-page">
