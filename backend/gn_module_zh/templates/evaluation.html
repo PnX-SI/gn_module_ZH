@@ -92,9 +92,13 @@
           <tr>
             {% if data['evaluation']['interet']['faunistique'] is not none %}
               <td>{{ data['evaluation']['interet']['faunistique'] }}</td>
+            {% else %}
+              <td>Non défini</td>
             {% endif %}
             {% if data['evaluation']['interet']['floristique'] is not none %}
               <td>{{ data['evaluation']['interet']['floristique'] }}</td>
+            {% else %}
+              <td>Non défini</td>
             {% endif %}
           </tr>
         </tbody>
@@ -112,9 +116,13 @@
           <tr>
             {% if data['evaluation']['interet']['nb_hab'] is not none %}
               <td>{{ data['evaluation']['interet']['nb_hab'] }}</td>
+            {% else %}
+              <td>Non défini</td>
             {% endif %}
             {% if data['evaluation']['interet']['total_hab_cover'] is not none %}
               <td>{{ data['evaluation']['interet']['total_hab_cover'] }}</td>
+            {% else %}
+              <td>Non défini</td>
             {% endif %}
           </tr>
         </tbody>
@@ -200,6 +208,10 @@
             <td>{{ prop['niveau'] }}</td>
             <td>{{ prop['remarque'] }}</td>
           </tr>
+          {% else %}
+            <tr>
+              <td>Non défini</td>
+            </tr>
           {% endfor %}
       </tbody>
     </table>
