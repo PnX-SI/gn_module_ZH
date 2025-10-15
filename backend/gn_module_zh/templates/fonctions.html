@@ -1,0 +1,106 @@
+<div>
+  <section class="content">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Principales fonctions hydrologiques / biogéochimiques</th>
+          <th>Justifications</th>
+          <th>Qualifications</th>
+          <th>Connaissance</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for fct in data['fonctions']['hydrologie'] %}
+        <tr>
+          <td>{{ fct['type'] }}</td>
+          <td>{{ fct['justification'] }}</td>
+          <td>{{ fct['qualification'] }}</td>
+          <td>{{ fct['connaissance'] }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td>Aucune fonctionnalité définie pour la zone.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  <section class="content">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Principales fonctions biologiques / écologiques</th>
+          <th>Justifications</th>
+          <th>Qualifications</th>
+          <th>Connaissance</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for fct in data['fonctions']['biologie'] %}
+        <tr>
+          <td>{{ fct['type'] }}</td>
+          <td>{{ fct['justification'] }}</td>
+          <td>{{ fct['qualification'] }}</td>
+          <td>{{ fct['connaissance'] }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td>Aucune fonctionnalité définie pour la zone.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  <section class="content">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Intérêts patrimoniaux</th>
+          <th>Justifications</th>
+          <th>Qualifications</th>
+          <th>Connaissance</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for interet in data['fonctions']['interet'] %}
+        <tr>
+          <td>{{ interet['type'] }}</td>
+          <td>{{ interet['justification'] }}</td>
+          <td>{{ interet['qualification'] }}</td>
+          <td>{{ interet['connaissance'] }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td>Aucun intérêt défini pour la zone.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  <section class="content">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Principales valeurs socio-économiques</th>
+          <th>Justifications</th>
+          <th>Qualifications</th>
+          <th>Connaissance</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for socio in data['fonctions']['socio'] %}
+        <tr>
+          <td>{{ socio['type'] }}</td>
+          <td>{{ socio['justification'] }}</td>
+          <td>{{ socio['qualification'] }}</td>
+          <td>{{ socio['connaissance'] }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td>Aucune valeur définie pour la zone.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
