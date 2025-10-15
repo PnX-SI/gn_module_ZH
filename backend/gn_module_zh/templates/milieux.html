@@ -21,6 +21,10 @@
               <td>{{ corine['label'] }}</td>
               <td>{{ corine['Humidité'] }}</td>
             </tr>
+            {% else %}
+              <tr>
+                <td>Inconnu</td>
+              </tr>
             {% endfor %}
         </tbody>
       </table>
