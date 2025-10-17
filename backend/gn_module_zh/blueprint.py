@@ -6,7 +6,16 @@ from pathlib import Path
 from urllib.parse import urljoin
 
 import sqlalchemy.exc as exc
-from flask import Blueprint, Response, jsonify, request, send_file, g
+from flask import (
+    Blueprint,
+    Response,
+    jsonify,
+    request,
+    send_file,
+    g,
+    current_app,
+    send_from_directory,
+)
 from flask.helpers import send_file
 from geojson import FeatureCollection
 from werkzeug.exceptions import Forbidden, BadRequest, NotFound
@@ -84,6 +93,12 @@ from .utils import (
 )
 
 blueprint = Blueprint("pr_zh", __name__, "./static", template_folder="templates")
+
+
+# Route pour retourner les images téléversées dans les pdf
+@blueprint.route("/media/attachment/<path:filename>")
+def media_attachment(filename):
+    return send_from_directory(current_app.config["MEDIA_FOLDER"] + "/attachments", filename)
 
 
 # Route pour afficher liste des zones humides

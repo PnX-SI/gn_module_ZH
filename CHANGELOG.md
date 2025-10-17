@@ -7,6 +7,7 @@
 **🐛 Corrections**
 
 - Ajout du boutton "quitter" sur l'onglet 9 (#114, by @juggler31)
+- Correction de la gestion des images lors de la génération (#110, by @juggler31)
 
 ## 1.4.0 - La Narse de Nouvialle (2025-03-27)
 
