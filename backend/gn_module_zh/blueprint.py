@@ -19,6 +19,7 @@ from flask import (
 from flask.helpers import send_file
 from geojson import FeatureCollection
 from werkzeug.exceptions import Forbidden, BadRequest, NotFound
+from werkzeug.utils import secure_filename
 
 from geonature.core.gn_commons.models import TMedias
 
@@ -946,11 +947,12 @@ def download(id_zh: int):
     author = f"{author_role.prenom_role} {author_role.nom_role.upper()}"
     last_date = zh.update_date
     media = get_last_pdf_export(id_zh=id_zh, last_date=last_date)
+    filename = secure_filename(f"{zh.code}_{dt.now().strftime('%d-%m-%Y')}_fiche.pdf")
+
     if media is None:
         dataset = get_complete_card(id_zh)
         dataset["config"] = blueprint.config
-        filename = f'{id_zh}_fiche_{dt.now().strftime("%Y-%m-%d")}.pdf'
-        stored_filename = f"zh_{uuid.uuid4()}.pdf"
+        stored_filename = secure_filename(f"zh_{uuid.uuid4()}.pdf")
         media_path = Path(BACKEND_DIR, config["MEDIA_FOLDER"], "pdf", stored_filename)
         pdf_file = gen_pdf(id_zh=id_zh, dataset=dataset, filename=media_path)
         post_file_info(
@@ -962,9 +964,13 @@ def download(id_zh: int):
             media_path=str(media_path),
         )
 
-        return send_file(pdf_file, as_attachment=True)
+        response = send_file(pdf_file, mimetype="application/pdf")
+        response.headers["Content-Disposition"] = f'inline; filename="{filename}"'
+        return response
     else:
-        return send_file(get_file_path(media.id_media), as_attachment=True)
+        response = send_file(get_file_path(media.id_media), mimetype="application/pdf")
+        response.headers["Content-Disposition"] = f'inline; filename="{filename}"'
+        return response
 
 
 @blueprint.route("/departments", methods=["GET"])

@@ -126,9 +126,8 @@ export class ZhDataService {
   }
 
   getPdf(zhId: number) {
-    return this._api.get(`${this.config.API_ENDPOINT}/zones_humides/export_pdf/${zhId}`, {
-      responseType: 'blob',
-    });
+    const baseUrl = `${this.config.API_ENDPOINT}/zones_humides/export_pdf/${zhId}`;
+    return baseUrl;
   }
 
   getDepartments() {
