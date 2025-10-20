@@ -132,4 +132,6 @@ pdf_last_page_img = ''
 # Titre du document
 pdf_title = 'Inventaire des zones humides'
 # Afficher l'ensemble des détails dans l'export pdf
-pdf_all_description = false
+[pdf_sections_included]
+milieux_presentation_remarques = false
+fonctions = false

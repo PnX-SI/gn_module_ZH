@@ -158,8 +158,11 @@ pdf_small_layer_number = 0
 pdf_last_page_img = ""
 # Name of the source
 pdf_title = "Inventaire des zones humides"
-# Afficher l'ensemble des détails dans l'export pdf
-pdf_all_description = False
+
+# Afficher ou non certaines sections dans l'export PDF
+class PdfSectionsIncludedConfig(Schema):
+    milieux_presentation_remarques = fields.Boolean(load_default=False)
+    fonctions = fields.Boolean(load_default=False)
 
 
 class GnModuleSchemaConf(Schema):
@@ -184,4 +187,6 @@ class GnModuleSchemaConf(Schema):
     pdf_last_page_img = fields.String(load_default=pdf_last_page_img)
     pdf_title = fields.String(load_default=pdf_title)
     TAXON_VM_CRONTAB = fields.String(load_default=TAXON_VM_CRONTAB)
-    pdf_all_description = fields.Boolean(load_default=pdf_all_description)
+    pdf_sections_included = fields.Nested(
+        PdfSectionsIncludedConfig, load_default=PdfSectionsIncludedConfig().load({})
+    )
