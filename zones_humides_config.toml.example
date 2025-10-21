@@ -112,6 +112,9 @@ fileformat_validated = true
 # téléversements
 file_path = "static"
 
+# Affiche par défaut les autres zones humides sur la carte du formulaire
+display_other_zh_by_default = false
+
 # -- Configuration relative à la génération de la fiche de synthèse pdf
 # Limite de superficie de la zone humide en dessous de laquelle
 # la couche définie par pdf_small_layer_number sera utilisée

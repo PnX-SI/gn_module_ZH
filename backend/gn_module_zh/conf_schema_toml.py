@@ -140,6 +140,9 @@ file_path = "static"
 
 module_dir_name = "gn_module_zones_humides"
 
+# Display settings
+display_other_zh_by_default = False
+
 
 # pdf settings :
 
@@ -175,6 +178,7 @@ class GnModuleSchemaConf(Schema):
     filename_validated = fields.Boolean(load_default=filename_validated)
     file_path = fields.String(load_default=file_path)
     module_dir_name = fields.String(load_default=module_dir_name)
+    display_other_zh_by_default = fields.Boolean(load_default=display_other_zh_by_default)
     species_source_name = fields.String(load_default=species_source_name)
     pdf_layer_threashold_ha = fields.Float(load_default=pdf_layer_threashold_ha)
     pdf_layer_number = fields.Integer(load_default=pdf_layer_number)
