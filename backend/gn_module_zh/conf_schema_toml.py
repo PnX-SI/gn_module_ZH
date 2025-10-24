@@ -159,6 +159,7 @@ pdf_last_page_img = ""
 # Name of the source
 pdf_title = "Inventaire des zones humides"
 
+
 # Afficher ou non certaines sections dans l'export PDF
 class PdfSectionsIncludedConfig(Schema):
     milieux_presentation_remarques = fields.Boolean(load_default=False)
