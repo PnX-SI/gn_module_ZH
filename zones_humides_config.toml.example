@@ -138,6 +138,7 @@ pdf_title = 'Inventaire des zones humides'
 
 # Afficher l'ensemble des détails dans l'export pdf
 [pdf_sections_included]
+    presentation_typo_sage = false
     milieux_presentation_remarques = false
     fonctionnement_submersions = false
     fonctions = false
