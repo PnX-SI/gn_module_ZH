@@ -1,6 +1,4 @@
 name: pytest
-env:
-  MODULE_DIR: /home/runner/work/gn_module_ZH/gn_module_ZH/ #${{ github.workspace }}/extra/${{ github.event.repository.name }}
 on:
   push:
     branches:
@@ -19,7 +17,7 @@ jobs:
           "master",
           "develop"
         ] # Mettre version compatible
-    uses: pnx-si/geonature/.github/workflows/gn-module-pytest.yml@develop
+    uses: pnx-si/geonature/.github/workflows/gn-module-pytest.yml@master
     with:
       geonature_ref: ${{ matrix.geonature_ref }}
       upload_coverage: true
