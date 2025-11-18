@@ -11,6 +11,7 @@ import { TabsService } from '../../../services/tabs.service';
 import { ErrorTranslatorService } from '../../../services/error-translator.service';
 import { PbfService } from '../../../services/pbf.service';
 import { HierarchyService } from '../../../services/hierarchy.service';
+import { ConfigService } from '@geonature/services/config.service';
 
 const GEOM_CONTAINED_ID = 1;
 
@@ -38,7 +39,7 @@ export class ZhFormTab0Component implements OnInit {
   public posted = false;
   private geomLayers: any;
   public zhId: number;
-  public toggleChecked: boolean = false; // TODO: PUT INTO PARAMETER ?
+  public toggleChecked: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -49,10 +50,12 @@ export class ZhFormTab0Component implements OnInit {
     private _toastr: ToastrService,
     private _error: ErrorTranslatorService,
     private _pbfService: PbfService,
+    private _config: ConfigService,
     public hierarchy: HierarchyService
   ) {}
 
   ngOnInit() {
+    this.initToggleDefault();
     this.getMetaData();
     this.createForm();
 
@@ -78,7 +81,8 @@ export class ZhFormTab0Component implements OnInit {
       .then((data) => {
         // Do not show the data on the map by default
         if (data) {
-          data = data.setOpacity(0);
+          const initialOpacity = this.toggleChecked ? 1 : 0;
+          data = data.setOpacity(initialOpacity);
           this.geomLayers.push(data.addTo(this._mapService.map));
         }
       });
@@ -232,6 +236,15 @@ export class ZhFormTab0Component implements OnInit {
       this._toastr.error('Veuillez tracer une zone humide sur la carte', '', {
         positionClass: 'toast-top-right',
       });
+    }
+  }
+
+  private initToggleDefault(): void {
+    const moduleConfig = this._config && this._config['ZONES_HUMIDES'];
+    if (moduleConfig) {
+      this.toggleChecked = Boolean(moduleConfig['display_other_zh_by_default']);
+    } else {
+      this.toggleChecked = false;
     }
   }
 
