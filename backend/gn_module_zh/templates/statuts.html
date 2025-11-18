@@ -16,6 +16,10 @@
             <td>{{ regime['status'] }}</td>
             <td>{{ regime['remarques'] }}</td>
           </tr>
+          {% else %}
+            <tr>
+              <td colspan="2">Inconnu</td>
+            </tr>
           {% endfor %}
       </tbody>
     </table>
@@ -48,6 +52,8 @@
         {% else %}
         <span class="small-title">Aucun plan de gestion renseigné</span><br>
         {% endif %}
+      {% else %}
+        <span class="small-title">Inconnue</span>
     {% endfor %}
   </section>
   <br>
@@ -68,6 +74,10 @@
             <td>{{ instru['instrument'] }}</td>
             <td>{{ instru['date'] or "" }}</td>
           </tr>
+          {% else %}
+            <tr>
+              <td colspan="2">Inconnu</td>
+            </tr>
           {% endfor %}
       </tbody>
     </table>
@@ -81,6 +91,8 @@
     {% for item in status['items'] %}
     <span class="small-title">{{ item['status'] }}</span><br>
     {% endfor %}
+    {% else %}
+    <span class="small-title">Inconnu</span><br>
     {% endfor %}
   </section>
   <br>
@@ -141,6 +153,10 @@
             </td>
             <td>{{ zonage['remarque']}}</td>
           </tr>
+          {% else %}
+            <tr>
+              <td colspan="4">Inconnu</td>
+            </tr>
           {% endfor %}
       </tbody>
     </table>
