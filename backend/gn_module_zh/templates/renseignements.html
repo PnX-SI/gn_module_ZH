@@ -12,10 +12,12 @@
       <label>Typologie SDAGE</label>
       <span>{{ data['description']['presentation']['sdage'] }}</span>
     </div>
+      {% if data['config']['pdf_sections_included']['presentation_typologie_sage'] %}
     <div class="fieldset" id="fieldset-r">
       <label>Typologie SAGE</label>
       <span>{{ data['description']['presentation']['typologie_locale'] or '' }}</span>
     </div>
+      {% endif %}
     <div class="fieldset" id="fieldset-r">
       <label>Bassin versant</label>
       {% for basin in data['description']['basin']['basins'] %}
