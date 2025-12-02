@@ -15,13 +15,17 @@
           </tr>
         </thead>
         <tbody>
-          {% for corine in data['description']['presentation']['corine_biotope'] %}
-          <tr>
-            <td>{{ corine['code'] }}</td>
-            <td>{{ corine['label'] }}</td>
-            <td>{{ corine['Humidité'] }}</td>
-          </tr>
-          {% endfor %}
+            {% for corine in data['description']['presentation']['corine_biotope'] %}
+            <tr>
+              <td>{{ corine['code'] }}</td>
+              <td>{{ corine['label'] }}</td>
+              <td>{{ corine['Humidité'] }}</td>
+            </tr>
+            {% else %}
+              <tr>
+                <td colspan="3">Inconnu</td>
+              </tr>
+            {% endfor %}
         </tbody>
       </table>
       {% if data['config']['pdf_sections_included']['presentation_milieux_remarques'] %}

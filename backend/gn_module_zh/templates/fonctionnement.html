@@ -16,6 +16,10 @@
           <td>{{ entree['permanence'] }}</td>
           <td>{{ entree['toponymie'] }}</td>
         </tr>
+        {% else %}
+          <tr>
+            <td colspan="3">Inconnu</td>
+          </tr>
         {% endfor %}
       </tbody>
     </table>
@@ -34,6 +38,10 @@
           <td>{{ sortie['permanence'] }}</td>
           <td>{{ sortie['toponymie'] }}</td>
         </tr>
+        {% else %}
+          <tr>
+            <td colspan="3">Inconnu</td>
+          </tr>
         {% endfor %}
       </tbody>
     </table>
@@ -48,6 +56,7 @@
   </section>
   <section class="content">
     <h5 class="subtitle">Connexion de la zone humide dans son environnement</h5>
+    {% if data['fonctionnement']['connexion'] %}
     <span class="small-title">
       <b>{{ data['fonctionnement']['connexion'] }}</b>
     </span>
@@ -60,5 +69,8 @@
     "Passe à coté": "passe_a_cote.svg",
     } %}
     <img src="{{ url_for('pr_zh.static', filename=connexions[data['fonctionnement']['connexion']]) }}">
+    {% else %}
+    <span class="small-title">Inconnue</span>
+    {% endif %}
   </section>
 </div>
