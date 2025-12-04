@@ -1,0 +1,63 @@
+SQLALCHEMY_DATABASE_URI = "postgresql://geonatadmin:geonatpasswd@127.0.0.1:5432/geonature2db"
+URL_APPLICATION = 'http://127.0.0.1:4200'
+API_ENDPOINT = 'http://127.0.0.1:8000'
+SECRET_KEY = '5fdc2c8fb46f44033144d07396ba082a95b8b3cc827b611a7aaaefbef414f13b'
+DEFAULT_LANGUAGE='fr'
+[MAPCONFIG]
+ZOOM_LEVEL_RELEVE = 1
+REF_LAYERS=[
+    {
+        code="znieff1",
+        type="wms",
+        label="Znieff de Bretagne",
+        activate=false,
+        url="https://geobretagne.fr/geoserver/dreal_b/znieff1/wms",
+        params={layers="znieff1", crs="EPSG:4326", service="wms", format="image/png", version="1.3.0", request="GetMap", transparent=true}
+    }, {
+        code="COM_LYON",
+        type="wfs",
+        label="Communes du Grand Lyon",
+        activate=false,
+        style={
+            color= "red",
+            fill= true,
+            fillOpacity= "0.2",
+            weight= 2,
+            fillColor= "blue"
+        },
+        url="https://download.data.grandlyon.com/wfs/grandlyon?SERVICE=WFS&VERSION=2.0.0&request=GetFeature&typename=adr_voie_lieu.adrcomgl&outputFormat=geojson&SRSNAME=EPSG:4326"
+    }, {
+        code="VEGE_POST_ELEC",
+        type="geojson",
+        label="Végétation dans les postes élec.",
+        activate=false,
+        style={
+            color= "#ffa43b",
+            fill= false,
+            fillOpacity= "0.0",
+            weight= 2
+        },
+        url="https://www.data.gouv.fr/fr/datasets/r/02aaadfa-f774-4b92-b81f-9f1436182701"
+    }, {
+        code="COM",
+        label="Communes",
+        activate=true,
+        type="area",
+        style={
+            color= "grey",
+            fill= false,
+            fillOpacity= "0.0",
+            weight= 2
+        },
+        params= {limit= 2000}
+    },
+]
+
+[SYNTHESE]
+AREA_AGGREGATION_TYPE = "M5"
+STATUS_FILTERS = [
+    { "id" = "protections", "show" = true, "display_name" = "Taxons protégés", "status_types" = ["PN", "PR", "PD"] },
+    { "id" = "regulations", "show" = true, "display_name" = "Taxons réglementés", "status_types" = ["REGLII", "REGL", "REGLSO"] },
+    { "id" = "invasive", "show" = true, "display_name" = "Espèces envahissantes", "status_types" = ["REGLLUTTE"] },
+    { "id" = "znief", "show" = true, "display_name" = "Espèces déterminantes ZNIEFF", "status_types" = ["ZDET"] },
+]

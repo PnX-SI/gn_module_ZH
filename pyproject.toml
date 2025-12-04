@@ -3,6 +3,9 @@ minversion = "6.0"
 testpaths = [
     "backend",
 ]
+env = [
+    "GEONATURE_CONFIG_FILE=config/test_config.toml",
+]
 
 [tool.coverage.run]
 source = [

@@ -61,8 +61,6 @@ class Item:
                 message="Item class: __get_rule_id",
                 details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
-        finally:
-            DB.session.close()
 
     def __is_rb_rule(self):
         try:
@@ -83,8 +81,6 @@ class Item:
                 message="Item class: __is_rb_rule",
                 details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
-        finally:
-            DB.session.close()
 
     def __get_cor_rule_id(self):
         try:
@@ -103,8 +99,6 @@ class Item:
                 message="Item class: __get_cor_rule_id",
                 details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
-        finally:
-            DB.session.close()
 
     def __get_id_nomenc(self, id_type: int, cd_nomenc: str) -> int:
         return DB.session.scalars(
@@ -197,8 +191,6 @@ class Item:
                 message="Item class: __get_qualif_val",
                 details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
-        finally:
-            DB.session.close()
 
     def __get_qualif_val(self):
         try:
@@ -230,8 +222,6 @@ class Item:
                 message="Item class: __get_qualif_val",
                 details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
-        finally:
-            DB.session.close()
 
     def __get_qualif_heritage(self):
         try:
@@ -275,8 +265,6 @@ class Item:
                 message="Item class: __get_qualif_heritage",
                 details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
-        finally:
-            DB.session.close()
 
     def __get_qualif_status(self):
         try:
@@ -312,8 +300,6 @@ class Item:
                 message="Item class: __get_qualif_status",
                 details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
-        finally:
-            DB.session.close()
 
     def __get_qualif_eco(self):
         try:
@@ -354,8 +340,6 @@ class Item:
                 message="Item class: __get_qualif_eco",
                 details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
-        finally:
-            DB.session.close()
 
     def __get_selected_status(self):
         try:
@@ -387,8 +371,6 @@ class Item:
                 message="Item class: __get_selected_status",
                 details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
-        finally:
-            DB.session.close()
 
     def __get_selected_functions(self, nomenc_ids):
         try:
@@ -418,8 +400,6 @@ class Item:
                 message="Item class: __get_selected_functions",
                 details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
-        finally:
-            DB.session.close()
 
     def __get_id_type(self, mnemo):
         try:
@@ -435,8 +415,6 @@ class Item:
                 message="Item class: __get_id_type",
                 details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
-        finally:
-            DB.session.close()
 
     def __get_count(self, id_list, function_id):
         count = 0
@@ -505,8 +483,6 @@ class Item:
                 message="Item class: __get_qualif_cat4_cat5",
                 details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
-        finally:
-            DB.session.close()
 
     def __get_tzh_val(self, field):
         try:
@@ -519,8 +495,6 @@ class Item:
                 message="Item class: __get_tzh_val",
                 details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
-        finally:
-            DB.session.close()
 
     def __get_qualif(self):
         try:
@@ -559,8 +533,6 @@ class Item:
                 message="Item class: __get_qualif",
                 details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
-        finally:
-            DB.session.close()
 
     def __get_qualif_management(self):
         try:
@@ -624,8 +596,6 @@ class Item:
                 message="Item class: __get_qualif_management",
                 details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
-        finally:
-            DB.session.close()
 
     def __get_knowledge(self):
         try:
@@ -696,8 +666,6 @@ class Item:
                 message="Item class: __get_knowledge",
                 details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
-        finally:
-            DB.session.close()
 
     def __set_protection_knowledge(self):
         try:
@@ -735,8 +703,6 @@ class Item:
                 message="Item class: __set_protection_knowledge",
                 details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
-        finally:
-            DB.session.close()
 
     def __get_id_plan(self):
         q_plans = DB.session.execute(
@@ -797,8 +763,6 @@ class Item:
                 message="Item class: __check_qualif",
                 details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
-        finally:
-            DB.session.close()
 
     def __set_note(self):
         try:
@@ -1176,8 +1140,6 @@ class Hierarchy(ZH):
                 message="Hierarchy class: __get_is_rules",
                 details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
-        finally:
-            DB.session.close()
 
     @staticmethod
     def get_denom(rb_id, col_name):
