@@ -162,6 +162,23 @@ pdf_last_page_img = ""
 # Name of the source
 pdf_title = "Inventaire des zones humides"
 
+pdf_display_presentation_typologie_sage = False
+pdf_display_presentation_milieux_remarques = False
+pdf_display_fonctionnement_submersions = False
+pdf_display_fonctions = False
+
+
+# Afficher ou non certaines sections dans l'export PDF
+class PdfSectionsIncludedConfig(Schema):
+    presentation_typologie_sage = fields.Boolean(
+        load_default=pdf_display_presentation_typologie_sage
+    )
+    presentation_milieux_remarques = fields.Boolean(
+        load_default=pdf_display_presentation_milieux_remarques
+    )
+    fonctionnement_submersions = fields.Boolean(load_default=pdf_display_fonctionnement_submersions)
+    fonctions = fields.Boolean(load_default=pdf_display_fonctions)
+
 
 # Afficher ou non certaines sections dans l'export PDF
 class PdfSectionsIncludedConfig(Schema):
