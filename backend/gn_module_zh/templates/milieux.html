@@ -8,11 +8,11 @@
       <h5 class="subtitle">Corine Biotope</h5>
       <table class="custom-table">
         <thead>
-            <tr>
-                <th>Code Corine Biotope</th>
-                <th>Libellé Corine Biotope</th>
-                <th>Humidité</th>
-            </tr>
+          <tr>
+              <th>Code Corine Biotope</th>
+              <th>Libellé Corine Biotope</th>
+              <th>Humidité</th>
+          </tr>
         </thead>
         <tbody>
             {% for corine in data['description']['presentation']['corine_biotope'] %}
@@ -28,14 +28,17 @@
             {% endfor %}
         </tbody>
       </table>
+      {% if data['config']['pdf_sections_included']['presentation_milieux_remarques'] %}
+        <span class="small-title"><b>Remarques : </b>{{ data['description']['presentation']['remarques'] or 'Aucune' }}</span>
+      {% endif %}
     </section>
   </div>
   {% if data['image_name'] is not none %}
-      <div class="right">
-        <section class="content"></section>
-          <img class="image" src="{{ url_for('pr_zh.media_attachment', filename=data['image_name']) }}">
-        </section>
-      </div>
+  <div class="right">
+    <section class="content"></section>
+      <img class="image" src="{{ url_for('pr_zh.media_attachment', filename=data['image_name']) }}" />
+    </section>
+  </div>
   {% endif %}
   <!--
   {% if data['image'] %}

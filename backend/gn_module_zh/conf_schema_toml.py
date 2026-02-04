@@ -162,6 +162,19 @@ pdf_last_page_img = ""
 # Name of the source
 pdf_title = "Inventaire des zones humides"
 
+pdf_display_presentation_typologie_sage = False
+pdf_display_presentation_milieux_remarques = False
+pdf_display_fonctionnement_submersions = False
+pdf_display_fonctions = False
+
+
+# Afficher ou non certaines sections dans l'export PDF
+class PdfSectionsIncludedConfig(Schema):
+    presentation_typologie_sage = fields.Boolean(load_default=pdf_display_presentation_typologie_sage)
+    presentation_milieux_remarques = fields.Boolean(load_default=pdf_display_presentation_milieux_remarques)
+    fonctionnement_submersions = fields.Boolean(load_default=pdf_display_fonctionnement_submersions)
+    fonctions = fields.Boolean(load_default=pdf_display_fonctions)
+
 
 class GnModuleSchemaConf(Schema):
     default_maplist_columns = fields.List(fields.Dict(), load_default=default_map_list_conf)
@@ -186,3 +199,6 @@ class GnModuleSchemaConf(Schema):
     pdf_last_page_img = fields.String(load_default=pdf_last_page_img)
     pdf_title = fields.String(load_default=pdf_title)
     TAXON_VM_CRONTAB = fields.String(load_default=TAXON_VM_CRONTAB)
+    pdf_sections_included = fields.Nested(
+        PdfSectionsIncludedConfig, load_default=PdfSectionsIncludedConfig().load({})
+    )
