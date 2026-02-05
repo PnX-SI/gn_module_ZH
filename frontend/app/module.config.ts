@@ -29,7 +29,7 @@ export const ModuleConfig = {
   },
   {
    "name": "\u00c9chelle de saisie",
-   "prop": "echelle_saisie"
+   "prop": "input_scale"
   },
   {
    "name": "Crit\u00e8res d\u00e9limitation (de la zh)",
@@ -82,7 +82,7 @@ export const ModuleConfig = {
   },
   {
    "name": "\u00c9chelle de saisie",
-   "prop": "echelle_saisie"
+   "prop": "input_scale"
   }
  ],
  "display_other_zh_by_default": false,
