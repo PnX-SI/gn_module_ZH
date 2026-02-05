@@ -2,16 +2,9 @@
   <section>
     <div class="content">
       <h5 class="subtitle">Échelle et référentiel de saisie</h5>
-      <span class="small-title"><b>Échelle de saisie : </b>
-          {% if data['delimitation']['input_scale'] %}
-              1/{{ data['delimitation']['input_scale']}}ème
-          {% else %}
-              Non identifié
-          {% endif %}
-      </span>
-      <span class="small-title"><b>Référentiel de saisie : </b>
-          {{ data['delimitation']['input_ref_geo'] or 'Non identifié' }}
-      </span>
+      <span class="small-title"><b>Échelle de saisie : </b></span><span class="small-title">{% if data['delimitation']['input_scale'] %}1/{{ data['delimitation']['input_scale']}}ème{% else %}Non identifié{% endif %}</span>
+      <br>
+      <span class="small-title"><b>Référentiel de saisie :</b></span><span class="small-title">{{ data['delimitation']['input_ref_geo'] or 'Non identifié' }}</span>
     </div>
   </section>
   <section>
