@@ -179,15 +179,6 @@ class PdfSectionsIncludedConfig(Schema):
     fonctionnement_submersions = fields.Boolean(load_default=pdf_display_fonctionnement_submersions)
     fonctions = fields.Boolean(load_default=pdf_display_fonctions)
 
-
-# Afficher ou non certaines sections dans l'export PDF
-class PdfSectionsIncludedConfig(Schema):
-    presentation_typologie_sage = fields.Boolean(load_default=False)
-    presentation_milieux_remarques = fields.Boolean(load_default=False)
-    fonctionnement_submersions = fields.Boolean(load_default=False)
-    fonctions = fields.Boolean(load_default=False)
-
-
 class GnModuleSchemaConf(Schema):
     default_maplist_columns = fields.List(fields.Dict(), load_default=default_map_list_conf)
     available_maplist_column = fields.List(fields.Dict(), load_default=available_maplist_column)
