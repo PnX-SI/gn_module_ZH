@@ -79,10 +79,6 @@ export const ModuleConfig = {
    "name": "Bassin versant",
    "prop": "bassin_versant",
    "sortable": true
-  },
-  {
-   "name": "\u00c9chelle de saisie",
-   "prop": "input_scale"
   }
  ],
  "display_other_zh_by_default": false,
@@ -140,6 +136,12 @@ export const ModuleConfig = {
  "pdf_last_page_img": "",
  "pdf_layer_number": 0,
  "pdf_layer_threashold_ha": 1000,
+ "pdf_sections_included": {
+  "fonctionnement_submersions": false,
+  "fonctions": false,
+  "presentation_milieux_remarques": false,
+  "presentation_typologie_sage": false
+ },
  "pdf_small_layer_number": 0,
  "pdf_title": "Inventaire des zones humides",
  "ref_geo_referentiels": [
