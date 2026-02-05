@@ -216,11 +216,11 @@ tr {
   float: right;
 }
 
-#fieldset-r {
+.fieldset-r {
   margin-bottom: 10px;
 }
 
-#fieldset-r label {
+.fieldset-r label {
   font-size: 0.75rem;
   font-weight: normal;
 }
