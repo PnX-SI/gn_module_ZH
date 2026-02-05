@@ -119,18 +119,29 @@ display_other_zh_by_default = false
 # Limite de superficie de la zone humide en dessous de laquelle
 # la couche définie par pdf_small_layer_number sera utilisée
 pdf_layer_threashold_ha = 1000
+
 # Numéro de la couche (dans la configuration de GeoNature) utilisée
 # par défaut dans la génération du pdf.
 # Attention ! Commence à 0
 pdf_layer_number = 0
+
 # Numéro de la couche (dans la configuration de GeoNature) utilisée
 # lorsque la superficie de la Zone Humide est inférieure à 
 # pdf_layer_threashold_ha
 # Attention ! Commence à 0
 pdf_small_layer_number = 0
+
 # Nom de l'image (dans le dossier static) qui sera utilisée comme 
 # pied de page
 # Si "" => ne sera pas affichée
 pdf_last_page_img = ''
+
 # Titre du document
 pdf_title = 'Inventaire des zones humides'
+
+# Afficher l'ensemble des détails dans l'export pdf
+[pdf_sections_included]
+    presentation_typologie_sage = false
+    presentation_milieux_remarques = false
+    fonctionnement_submersions = false
+    fonctions = false

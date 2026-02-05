@@ -170,6 +170,10 @@
               </td>
               <td>{{ zonage['remarque']}}</td>
             </tr>
+          {% else %}
+            <tr>
+              <td colspan="4">Inconnu</td>
+            </tr>
           {% endfor %}
         </tbody>
       </table>

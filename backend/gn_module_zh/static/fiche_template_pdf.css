@@ -167,7 +167,6 @@ tr {
 .image {
   max-height: 300px;
   max-width: 300px;
-  margin-left: 5px;
 }
 
 .banner {
@@ -201,9 +200,8 @@ tr {
   width: 100%;
   display: flex;
   flex-flow: row nowrap;
+  column-gap: 10px;
 }
-
-
 
 .milieux-clear {
   clear: both;

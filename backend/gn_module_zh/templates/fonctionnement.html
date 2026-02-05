@@ -48,6 +48,14 @@
           {% endfor %}
         </tbody>
       </table>
+      {% if data['config']['pdf_sections_included']['fonctionnement_submersions'] %}
+        <span class="small-title">
+          <b>Fréquence des submersions : </b>{{ data['fonctionnement']['regime']['entree']['frequence'] or 'Non déterminé' }}
+        </span><br>
+        <span class="small-title">
+          <b>Étendue des submersions : </b>{{ data['fonctionnement']['regime']['entree']['etendue'] or 'Non déterminé' }}
+        </span>
+      {% endif %}
     </div>
   </section>
   <section>

@@ -23,13 +23,17 @@
     {% include 'fonctionnement.html' %}
     <h1 class="title">Usages ou processus naturels</h1>
     {% include 'usages.html' %}
+    {% if data['config']['pdf_sections_included']['fonctions'] %}
+    <h1 class="title">Fonctions et valeurs de la zone humide</h1>
+    {% include 'fonctions.html' %}
+    {% endif %}
     <h1 class="title">Statuts et gestion de la zone humide</h1>
     {% include 'statuts.html' %}
     <div class="new-page">
       <h1 class="title">Évaluation générale du site</h1>
       {% include 'evaluation.html' %}
     </div>
-    <br>
+    <br />
     {% if data['config']['pdf_last_page_img'] %}
     <div>
       <img class="banner" src="{{ url_for('pr_zh.static', filename=data['config']['pdf_last_page_img']) }}">
