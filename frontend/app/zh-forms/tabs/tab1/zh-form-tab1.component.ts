@@ -150,7 +150,7 @@ export class ZhFormTab1Component implements OnInit {
       id_zh: Number(this.currentZh.properties.id_zh),
       id_site_space: formValues.id_site_space,
       is_id_site_space: formValues.is_id_site_space,
-      product_owner: this.formProductOwner.value.productOwner.name,
+      product_owner: this.formProductOwner.value.productOwner?.name || null,
       id_references: [],
     };
 

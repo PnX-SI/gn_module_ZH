@@ -114,8 +114,10 @@ export class ZhFormTab2Component implements OnInit, AfterViewInit {
       id_zh: Number(this.currentZh.properties.id_zh),
       remark_lim_fs: formValues.remark_lim_fs,
       remark_lim: formValues.remark_lim,
-      input_scale: Number(this.formTab2.value.echelleSaisie.name),
-      input_ref_geo: this.formTab2.value.refGeoSaisie.name,
+      input_scale: this.formTab2.value.echelleSaisie?.name
+        ? Number(this.formTab2.value.echelleSaisie.name)
+        : null,
+      input_ref_geo: this.formTab2.value.refGeoSaisie?.name || null,
       critere_delim_fs: [],
     };
 
