@@ -347,7 +347,23 @@ def downgrade():
     op.execute(
         """
         DELETE FROM ref_nomenclatures.t_nomenclatures
-        WHERE mnemonique IN ('2500', '5000', '10000', '25000', 'BD ORTHO®', 'SCAN 25®', 'SCAN 100®', 'OpenStreetMap', 'OpenTopoMap');
+        WHERE mnemonique IN ('2500', '5000', '10000', '25000')
+          AND id_type = (
+            SELECT id_type
+            FROM ref_nomenclatures.bib_nomenclatures_types
+            WHERE mnemonique = 'INPUT_SCALE'
+          );
+        """
+    )
+    op.execute(
+        """
+        DELETE FROM ref_nomenclatures.t_nomenclatures
+        WHERE mnemonique IN ('BD ORTHO®', 'SCAN 25®', 'SCAN 100®', 'OpenStreetMap', 'OpenTopoMap')
+          AND id_type = (
+            SELECT id_type
+            FROM ref_nomenclatures.bib_nomenclatures_types
+            WHERE mnemonique = 'INPUT_REF_GEO'
+          );
         """
     )
     op.execute(
