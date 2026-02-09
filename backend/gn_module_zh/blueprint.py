@@ -238,10 +238,10 @@ def get_complete_info(id_zh):
     raise Forbidden("You are not allowed to see this zh")
 
 
-def get_complete_card(id_zh: int) -> Card:
+def get_complete_card(id_zh: int, read_only_hierarchy: bool = False) -> Card:
     ref_geo_config = [ref for ref in blueprint.config["ref_geo_referentiels"] if ref["active"]]
     main_id_rb = DB.session.scalar(select(TZH.main_id_rb).where(TZH.id_zh == id_zh))
-    return Card(id_zh, main_id_rb, "full", ref_geo_config).__repr__()
+    return Card(id_zh, main_id_rb, "full", ref_geo_config, read_only_hierarchy).__repr__()
 
 
 @blueprint.route("/eval/<int:id_zh>", methods=["GET"])
@@ -1045,7 +1045,7 @@ def download(id_zh: int):
     filename = secure_filename(f"{zh.code}_{dt.now().strftime('%d-%m-%Y')}_fiche.pdf")
 
     if media is None:
-        dataset = get_complete_card(id_zh)
+        dataset = get_complete_card(id_zh, read_only_hierarchy=True)
         dataset["config"] = blueprint.config
         stored_filename = secure_filename(f"zh_{uuid.uuid4()}.pdf")
         media_path = Path(BACKEND_DIR, config["MEDIA_FOLDER"], "pdf", stored_filename)
