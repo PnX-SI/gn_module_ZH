@@ -747,6 +747,7 @@ def get_tab_data(id_tab):
                 active_geo_refs,
             )
             intersection = geom["is_intersected"]
+            update_hierarchy(zh)
         else:
             # edit geometry
             geom = set_geom(form_data["geom"]["geometry"], form_data["id_zh"])
@@ -762,6 +763,7 @@ def get_tab_data(id_tab):
                 active_geo_refs,
             )
             intersection = geom["is_intersected"]
+            update_hierarchy(form_data["id_zh"])
 
         DB.session.commit()
         return jsonify({"id_zh": zh, "is_intersected": intersection})
