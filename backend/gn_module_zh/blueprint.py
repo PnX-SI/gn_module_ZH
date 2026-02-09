@@ -1148,6 +1148,15 @@ def get_hierarchy(id_zh):
     return hierarchy.as_dict()
 
 
+@blueprint.route("/<int:id_zh>/hierarchy/regenerate", methods=["POST"])
+@permissions.check_cruved_scope("C", module_code="ZONES_HUMIDES")
+def regenerate_hierarchy(id_zh):
+    """Regenerate zh hierarchy notes"""
+    update_hierarchy(id_zh)
+    DB.session.commit()
+    return ("", 204)
+
+
 @blueprint.route("/hierarchy/fields/<int:id_rb>", methods=["GET"])
 @permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
 @json_resp
