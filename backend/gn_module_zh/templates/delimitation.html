@@ -1,6 +1,14 @@
 <div>
   <section>
     <div class="content">
+      <h5 class="subtitle">Échelle et référentiel de saisie</h5>
+      <span class="small-title"><b>Échelle de saisie : </b></span><span class="small-title">{% if data['delimitation']['input_scale'] %}1/{{ data['delimitation']['input_scale']}}ème{% else %}Non identifié{% endif %}</span>
+      <br>
+      <span class="small-title"><b>Référentiel de saisie :</b></span><span class="small-title">{{ data['delimitation']['input_ref_geo'] or 'Non identifié' }}</span>
+    </div>
+  </section>
+  <section>
+    <div class="content">
       <h5 class="subtitle">Critères de délimitation de la zone humide</h5>
       <span class="small-title"><b>Critères utilisés :</b></span><br>
       {% for critere in data['delimitation']['delimitation_zone']['critere'] %}

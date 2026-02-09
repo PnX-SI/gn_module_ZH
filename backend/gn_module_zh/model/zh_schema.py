@@ -142,6 +142,7 @@ class BibOrganismes(DB.Model):
     name = DB.Column(DB.Unicode(length=6), nullable=False)
     abbrevation = DB.Column(DB.Unicode, nullable=False)
     is_op_org = DB.Column(DB.Boolean, default=False, nullable=False)
+    is_product_owner = DB.Column(DB.Boolean, default=True, nullable=False)
 
     @staticmethod
     def get_abbrevation(id_org):
@@ -248,6 +249,9 @@ class TZH(ZhModel):
     main_pict_id = DB.Column(DB.Integer)
     area = DB.Column(DB.Float)
     main_id_rb = DB.Column(DB.Integer, nullable=True)
+    product_owner = DB.Column(DB.Unicode, nullable=True)
+    input_scale = DB.Column(DB.Integer, nullable=True)
+    input_ref_geo = DB.Column(DB.Unicode, nullable=True)
 
     sdage = DB.relationship(
         TNomenclatures,
