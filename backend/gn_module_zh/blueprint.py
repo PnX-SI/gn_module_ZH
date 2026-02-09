@@ -613,7 +613,7 @@ def delete_one_file(id_media):
 def delete_one_zh_notes(id_zh):
     """delete all hierarchy notes for one zh"""
     try:
-        delete_notes(id_zh)
+        delete_notes(id_zh, commit=True)
     except Exception as e:
         DB.session.rollback()
         if e.__class__.__name__ == "ZHApiError":
@@ -1142,6 +1142,7 @@ def get_hierarchy(id_zh):
     if not main_id_rb:
         raise NotFound("The ZH is not in a river basin")
     hierarchy = Hierarchy(id_zh, main_id_rb)
+    DB.session.commit()
     return hierarchy.as_dict()
 
 

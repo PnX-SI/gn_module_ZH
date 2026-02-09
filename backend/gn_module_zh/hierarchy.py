@@ -826,7 +826,6 @@ class Item:
                     attribute_id=attribute_id,
                     note_type_id=note_type_id,
                 )
-                DB.session.commit()
                 return note
         except ZHApiError as e:
             raise ZHApiError(
@@ -1266,11 +1265,21 @@ def get_all_hierarchy_fields(id_rb: int):
 
 def update_hierarchy(id_zh):
     """Update zh note"""
+    main_id_rb = DB.session.scalar(select(TZH.main_id_rb).where(TZH.id_zh == id_zh))
+    if not main_id_rb:
+        return None
+
     try:
-        delete_notes(id_zh)
-        main_id_rb = DB.session.scalar(select(TZH.main_id_rb).where(TZH.id_zh == id_zh))
-        if main_id_rb:
+        with DB.session.begin_nested():
+            delete_notes(id_zh, commit=False)
             hierarchy = Hierarchy(id_zh, main_id_rb)
-            return hierarchy.as_dict()
+            DB.session.flush()
+        return hierarchy.as_dict()
+    except ZHApiError:
+        raise
     except Exception as e:
-        pass
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="update_hierarchy_error",
+            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
+        )
