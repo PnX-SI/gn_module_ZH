@@ -41,6 +41,12 @@ export class HierarchyService {
     this.warning = '';
   }
 
+  getHierarchyFromZh(zh) {
+    if (zh && zh.properties && zh.properties.main_id_rb) {
+      this.getHierarchy(zh.properties.id_zh);
+    }
+  }
+
   // get current zone humides
   getHierarchy(zhId) {
     this.isLoading = true;

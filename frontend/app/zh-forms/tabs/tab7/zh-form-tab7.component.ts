@@ -466,6 +466,7 @@ export class ZhFormTab7Component implements OnInit {
             this._toastr.success('Vos données sont bien enregistrées', '', {
               positionClass: 'toast-top-right',
             });
+            this.hierarchy.getHierarchyFromZh(this.currentZh);
             this.nextTab.emit(8);
           });
         },
