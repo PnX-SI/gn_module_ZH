@@ -1,6 +1,4 @@
 name: pytest
-env:
-  MODULE_DIR: /home/runner/work/gn_module_ZH/gn_module_ZH/ #${{ github.workspace }}/extra/${{ github.event.repository.name }}
 on:
   push:
     branches:
