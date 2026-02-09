@@ -1143,8 +1143,7 @@ def get_hierarchy(id_zh):
     main_id_rb = DB.session.scalar(select(TZH.main_id_rb).where(TZH.id_zh == id_zh))
     if not main_id_rb:
         raise NotFound("The ZH is not in a river basin")
-    hierarchy = Hierarchy(id_zh, main_id_rb)
-    DB.session.commit()
+    hierarchy = Hierarchy(id_zh, main_id_rb, write_notes=False)
     return hierarchy.as_dict()
 
 
