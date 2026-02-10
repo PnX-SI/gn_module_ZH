@@ -8,7 +8,7 @@ Create Date: 2026-02-09 16:30:00.000000
 
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.engine.reflection import Inspector
+from sqlalchemy import inspect
 
 
 # revision identifiers, used by Alembic.
@@ -25,7 +25,7 @@ def upgrade():
     # #########################################################################
 
     conn = op.get_bind()
-    inspector = Inspector.from_engine(conn)
+    inspector = inspect(conn)
 
     def constraint_exists(table, constraint_name, schema=None):
         fks = inspector.get_foreign_keys(table, schema=schema)
