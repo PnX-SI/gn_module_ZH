@@ -26,6 +26,9 @@
           [tableCols]="patrimonialInterestsCols"
           [data]="data.interet?.interet"
         ></zh-table>
+        <zh-label label="Commentaires :">
+          <span>{{ data.interet?.Commentaire_heritage }}</span>
+        </zh-label>
         <div class="row">
           <div class="col-12 col-xl-6">
             <zh-table
@@ -45,7 +48,7 @@
           [data]="data.interet?.valeur"
         ></zh-table>
         <zh-label label="Commentaires :">
-          <span>{{ data.interet?.Commentaire }}</span>
+          <span>{{ data.interet?.Commentaire_fonctions }}</span>
         </zh-label>
       </fieldset>
       <fieldset>

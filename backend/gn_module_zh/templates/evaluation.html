@@ -88,6 +88,14 @@
   </section>
   <section>
     <div class="content">
+      <div class="fieldset">
+        <label>Commentaires : </label>
+        <span>{{ data['evaluation']['interet']['Commentaire_heritage'] or '' }}</span>
+      </div>
+    </div>
+  </section>
+  <section>
+    <div class="content">
       <table class="custom-table">
         <thead>
           <tr>
@@ -170,7 +178,7 @@
     <div class="content">
       <div class="fieldset">
         <label>Commentaires : </label>
-        <span>{{ data['evaluation']['interet']['Commentaire'] or '' }}</span>
+        <span>{{ data['evaluation']['interet']['Commentaire_fonctions'] or '' }}</span>
       </div>
     </div>
   </section>
