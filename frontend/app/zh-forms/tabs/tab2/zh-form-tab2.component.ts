@@ -105,6 +105,12 @@ export class ZhFormTab2Component implements OnInit, AfterViewInit {
   getMetaData() {
     this.critDelim = this.formMetaData.CRIT_DELIM;
     this.critDelimFct = this.formMetaData.CRIT_DEF_ESP_FCT;
+    this.listEchelleSaisie = (this.formMetaData.INPUT_SCALE || []).map((elem) => ({
+      name: elem,
+    }));
+    this.listRefGeoSaisie = (this.formMetaData.INPUT_REF_GEO || []).map((elem) => ({
+      name: elem,
+    }));
   }
 
   onFormSubmit(formValues: any) {
@@ -153,24 +159,6 @@ export class ZhFormTab2Component implements OnInit, AfterViewInit {
       );
     }
   }
-
-  allListEchelleSaisie = () => {
-    this._dataService.getEchelleSaisie().subscribe((res) => {
-      this.listEchelleSaisie = [];
-      res.map((elem) => {
-        this.listEchelleSaisie.push({ name: elem });
-      });
-    });
-  };
-
-  allListRefGeoSaisie = () => {
-    this._dataService.getRefGeoSaisie().subscribe((res) => {
-      this.listRefGeoSaisie = [];
-      res.map((elem) => {
-        this.listRefGeoSaisie.push({ name: elem });
-      });
-    });
-  };
 
   ngOnDestroy() {
     if (this.$_currentZhSub) this.$_currentZhSub.unsubscribe();

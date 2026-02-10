@@ -55,14 +55,6 @@ export class ZhDataService {
     return this._api.get<any>(`${this.config.API_ENDPOINT}/zones_humides/product_owners`);
   }
 
-  getRefGeoSaisie() {
-    return this._api.get<any>(`${this.config.API_ENDPOINT}/zones_humides/input_ref_geo`);
-  }
-
-  getEchelleSaisie() {
-    return this._api.get<any>(`${this.config.API_ENDPOINT}/zones_humides/input_scale`);
-  }
-
   checkRefGeo() {
     return this._api.get<any>(`${this.config.API_ENDPOINT}/zones_humides/check_ref_geo`);
   }
