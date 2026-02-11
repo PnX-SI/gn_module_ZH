@@ -34,100 +34,129 @@ def upgrade():
                 return True
         return False
 
+    def create_fk_with_message_if_missing(
+        name,
+        table,
+        referent_table,
+        local_cols,
+        remote_cols,
+        source_schema,
+        referent_schema,
+        **kwargs,
+    ):
+        if constraint_exists(table, name, schema=source_schema):
+            return
+        try:
+            op.create_foreign_key(
+                name,
+                table,
+                referent_table,
+                local_cols,
+                remote_cols,
+                source_schema=source_schema,
+                referent_schema=referent_schema,
+                **kwargs,
+            )
+        except (sa.exc.IntegrityError, sa.exc.ProgrammingError, Exception):
+            local_col = local_cols[0] if local_cols else "?"
+            remote_col = remote_cols[0] if remote_cols else "?"
+            print(
+                "Impossible de créer la contrainte de clé étrangère "
+                f"'{name}' sur la table '{source_schema}.{table}'."
+            )
+            print(
+                "Cela peut être dû à des valeurs orphelines dans le champ "
+                f"'{source_schema}.{table}.{local_col}' (qui ne correspondent pas "
+                f"à '{referent_schema}.{referent_table}.{remote_col}')."
+            )
+            raise
+
     # #########################################################################
     # Add FK - TZH.main_id_rb -> TRiverBasin.id_rb
     # #########################################################################
 
-    if not constraint_exists("t_zh", "fk_t_zh_main_id_rb", schema="pr_zh"):
-        op.create_foreign_key(
-            "fk_t_zh_main_id_rb",
-            "t_zh",
-            "t_river_basin",
-            ["main_id_rb"],
-            ["id_rb"],
-            source_schema="pr_zh",
-            referent_schema="pr_zh",
-        )
+    create_fk_with_message_if_missing(
+        "fk_t_zh_main_id_rb",
+        "t_zh",
+        "t_river_basin",
+        ["main_id_rb"],
+        ["id_rb"],
+        source_schema="pr_zh",
+        referent_schema="pr_zh",
+    )
 
     # #########################################################################
     # Add FK - CorZhArea.id_zh -> TZH.id_zh
     # #########################################################################
 
-    if not constraint_exists("cor_zh_area", "fk_cor_zh_area_t_zh", schema="pr_zh"):
-        op.create_foreign_key(
-            "fk_cor_zh_area_t_zh",
-            "cor_zh_area",
-            "t_zh",
-            ["id_zh"],
-            ["id_zh"],
-            source_schema="pr_zh",
-            referent_schema="pr_zh",
-        )
+    create_fk_with_message_if_missing(
+        "fk_cor_zh_area_t_zh",
+        "cor_zh_area",
+        "t_zh",
+        ["id_zh"],
+        ["id_zh"],
+        source_schema="pr_zh",
+        referent_schema="pr_zh",
+    )
 
     # #########################################################################
     # Add FK - TUrbanPlanningDocs.id_area -> LAreas.id_area
     # #########################################################################
 
-    if not constraint_exists(
-        "t_urban_planning_docs", "fk_t_urban_planning_docs_id_area", schema="pr_zh"
-    ):
-        op.create_foreign_key(
-            "fk_t_urban_planning_docs_id_area",
-            "t_urban_planning_docs",
-            "l_areas",
-            ["id_area"],
-            ["id_area"],
-            source_schema="pr_zh",
-            referent_schema="ref_geo",
-        )
+    create_fk_with_message_if_missing(
+        "fk_t_urban_planning_docs_id_area",
+        "t_urban_planning_docs",
+        "l_areas",
+        ["id_area"],
+        ["id_area"],
+        source_schema="pr_zh",
+        referent_schema="ref_geo",
+    )
 
     # #########################################################################
     # Add FK - CorRbRules.rb_id -> TRiverBasin.id_rb
     # #########################################################################
 
-    if not constraint_exists("cor_rb_rules", "fk_cor_rb_rules_rb_id", schema="pr_zh"):
-        op.create_foreign_key(
-            "fk_cor_rb_rules_rb_id",
-            "cor_rb_rules",
-            "t_river_basin",
-            ["rb_id"],
-            ["id_rb"],
-            source_schema="pr_zh",
-            referent_schema="pr_zh",
-        )
+    create_fk_with_message_if_missing(
+        "fk_cor_rb_rules_rb_id",
+        "cor_rb_rules",
+        "t_river_basin",
+        ["rb_id"],
+        ["id_rb"],
+        source_schema="pr_zh",
+        referent_schema="pr_zh",
+    )
 
     # #########################################################################
     # Add FK - CorZhNotes.note_type_id -> BibNoteTypes.note_id
     # #########################################################################
 
-    if not constraint_exists("cor_zh_notes", "fk_cor_zh_notes_note_type_id", schema="pr_zh"):
-        op.create_foreign_key(
-            "fk_cor_zh_notes_note_type_id",
-            "cor_zh_notes",
-            "bib_note_types",
-            ["note_type_id"],
-            ["note_id"],
-            source_schema="pr_zh",
-            referent_schema="pr_zh",
-            onupdate="CASCADE",
-        )
+    create_fk_with_message_if_missing(
+        "fk_cor_zh_notes_note_type_id",
+        "cor_zh_notes",
+        "bib_note_types",
+        ["note_type_id"],
+        ["note_id"],
+        source_schema="pr_zh",
+        referent_schema="pr_zh",
+        onupdate="CASCADE",
+    )
 
     # #########################################################################
     # Add FK - TZH.main_pict_id -> TMedias.id_media
     # #########################################################################
 
-    if not constraint_exists("t_zh", "fk_t_zh_main_pict_id", schema="pr_zh"):
-        op.create_foreign_key(
-            "fk_t_zh_main_pict_id",
-            "t_zh",
-            "t_medias",
-            ["main_pict_id"],
-            ["id_media"],
-            source_schema="pr_zh",
-            referent_schema="gn_commons",
-            ondelete="SET NULL",
-            onupdate="CASCADE",
-        )
+    create_fk_with_message_if_missing(
+        "fk_t_zh_main_pict_id",
+        "t_zh",
+        "t_medias",
+        ["main_pict_id"],
+        ["id_media"],
+        source_schema="pr_zh",
+        referent_schema="gn_commons",
+        ondelete="SET NULL",
+        onupdate="CASCADE",
+    )
 
 
 def downgrade():
