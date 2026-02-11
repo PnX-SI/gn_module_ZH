@@ -2,7 +2,7 @@
   <section>
     <div class="content">
       <h5 class="subtitle">
-        Fonctions et valeurs majeures
+        Fonctions majeures
       </h5>
       <table class="custom-table">
         <thead>
@@ -56,10 +56,17 @@
           {% endfor %}
         </tbody>
       </table>
+      <div class="fieldset">
+        <label>Commentaires</label>
+        <span>{{ data['evaluation']['interet']['Commentaire_fonctions'] or '' }}</span>
+      </div>
     </div>
   </section>
   <section>
     <div class="content">
+      <h5 class="subtitle">
+        Intérêts et valeurs majeurs
+      </h5>
       <table class="custom-table">
         <thead>
           <tr>
@@ -84,14 +91,6 @@
           {% endfor %}
         </tbody>
       </table>
-    </div>
-  </section>
-  <section>
-    <div class="content">
-      <div class="fieldset">
-        <label>Commentaires : </label>
-        <span>{{ data['evaluation']['interet']['Commentaire_heritage'] or '' }}</span>
-      </div>
     </div>
   </section>
   <section>
@@ -177,8 +176,8 @@
   <section>
     <div class="content">
       <div class="fieldset">
-        <label>Commentaires : </label>
-        <span>{{ data['evaluation']['interet']['Commentaire_fonctions'] or '' }}</span>
+        <label>Commentaires</label>
+        <span>{{ data['evaluation']['interet']['Commentaire_heritage'] or '' }}</span>
       </div>
     </div>
   </section>

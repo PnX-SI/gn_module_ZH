@@ -7,7 +7,7 @@
     <fieldset>
       <legend>
         <h5 class="section-title">
-          Fonctions et valeurs majeures
+          Fonctions majeures
           <mat-icon
             class="info-icon"
             ngbTooltip="Cette rubrique met en avant les principaux enjeux liés à la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
@@ -37,6 +37,29 @@
           [data]="bioFctData"
         ></zh-table>
       </div>
+      <div class="form-group col-md-12">
+        <small>Commentaires</small>
+        <textarea
+          class="form-control"
+          rows="3"
+          [formControl]="formTab7.controls.remark_eval_functions"
+          name="name"
+        ></textarea>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>
+        <h5 class="section-title">
+          Intérêts et valeurs majeurs
+          <mat-icon
+            class="info-icon"
+            ngbTooltip="Cette rubrique met en avant les principaux enjeux liés à la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
+            placement="right"
+          >
+            info
+          </mat-icon>
+        </h5>
+      </legend>
       <div
         *ngIf="patrimData && patrimData.length > 0"
         class="table-responsive col-md-12"
@@ -46,15 +69,6 @@
           [tableCols]="patrimTableCol"
           [data]="patrimData"
         ></zh-table>
-      </div>
-      <div class="form-group col-md-12">
-        <small>Commentaires</small>
-        <textarea
-          class="form-control"
-          rows="3"
-          [formControl]="formTab7.controls.remark_eval_heritage"
-          name="name"
-        ></textarea>
       </div>
       <div class="row col-md-12">
         <div class="col-sm">
@@ -113,7 +127,7 @@
         <textarea
           class="form-control"
           rows="3"
-          [formControl]="formTab7.controls.remark_eval_functions"
+          [formControl]="formTab7.controls.remark_eval_heritage"
           name="name"
         ></textarea>
       </div>
