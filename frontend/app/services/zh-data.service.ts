@@ -51,10 +51,6 @@ export class ZhDataService {
     );
   }
 
-  getProductOwners() {
-    return this._api.get<any>(`${this.config.API_ENDPOINT}/zones_humides/product_owners`);
-  }
-
   checkRefGeo() {
     return this._api.get<any>(`${this.config.API_ENDPOINT}/zones_humides/check_ref_geo`);
   }
