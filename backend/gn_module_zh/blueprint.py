@@ -310,8 +310,32 @@ def get_municipalities(id_zh):
 def get_tab():
     """Get form metadata for all tabs"""
     try:
+
+        def _get_nomenclature_values(mnemo):
+            id_type = DB.session.execute(
+                select(BibNomenclaturesTypes.id_type).where(
+                    BibNomenclaturesTypes.mnemonique == mnemo
+                )
+            ).scalar_one_or_none()
+            if id_type is None:
+                return []
+            return [
+                row[0]
+                for row in DB.session.execute(
+                    select(TNomenclatures.mnemonique).where(TNomenclatures.id_type == id_type)
+                ).all()
+            ]
+
         metadata = get_nomenc(blueprint.config["nomenclatures"])
+        metadata["INPUT_SCALE"] = _get_nomenclature_values("INPUT_SCALE")
+        metadata["INPUT_REF_GEO"] = _get_nomenclature_values("INPUT_REF_GEO")
         metadata["BIB_ORGANISMES"] = BibOrganismes.get_bib_organisms("operator")
+        metadata["PRODUCT_OWNERS"] = [
+            org.as_dict()
+            for org in DB.session.scalars(
+                select(BibOrganismes).where(BibOrganismes.is_product_owner == True)
+            ).all()
+        ]
         metadata["BIB_SITE_SPACE"] = BibSiteSpace.get_bib_site_spaces()
         metadata["BIB_MANAGEMENT_STRUCTURES"] = BibOrganismes.get_bib_organisms(
             "management_structure"
@@ -432,86 +456,6 @@ def get_geometries():
         exc_type, value, tb = sys.exc_info()
         raise ZHApiError(
             message="get_geometries_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
-    finally:
-        DB.session.close()
-
-
-@blueprint.route("/product_owners", methods=["GET"])
-@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
-@json_resp
-def get_product_owners():
-    try:
-        q = select(BibOrganismes).where(BibOrganismes.is_product_owner == True)
-        limit = request.args.get("limit", 20)
-        data = DB.session.execute(q.limit(limit)).all()
-        if data:
-            return [d[0].as_dict() if hasattr(d[0], "as_dict") else d[0] for d in data]
-        else:
-            return "No Result", 404
-    except Exception as e:
-        if e.__class__.__name__ == "ZHApiError":
-            raise ZHApiError(message=str(e.message), details=str(e.details))
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="get_product_owners",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
-    finally:
-        DB.session.close()
-
-
-@blueprint.route("/input_ref_geo", methods=["GET"])
-@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
-@json_resp
-def get_input_ref_geo():
-    try:
-        id_nommenclature_type = DB.session.execute(
-            select(BibNomenclaturesTypes.id_type).where(
-                BibNomenclaturesTypes.mnemonique.like("INPUT_REF_GEO")
-            )
-        ).scalar_one()
-        q = select(TNomenclatures.mnemonique).where(TNomenclatures.id_type == id_nommenclature_type)
-        data = DB.session.execute(q).all()
-        if data:
-            return [d[0].as_dict() if hasattr(d[0], "as_dict") else d[0] for d in data]
-        else:
-            return "No Result", 404
-    except Exception as e:
-        if e.__class__.__name__ == "ZHApiError":
-            raise ZHApiError(message=str(e.message), details=str(e.details))
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="get_product_owners",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
-    finally:
-        DB.session.close()
-
-
-@blueprint.route("/input_scale", methods=["GET"])
-@permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
-@json_resp
-def get_input_scale():
-    try:
-        id_nommenclature_type = DB.session.execute(
-            select(BibNomenclaturesTypes.id_type).where(
-                BibNomenclaturesTypes.mnemonique.like("INPUT_SCALE")
-            )
-        ).scalar_one()
-        q = select(TNomenclatures.mnemonique).where(TNomenclatures.id_type == id_nommenclature_type)
-        data = DB.session.execute(q).all()
-        if data:
-            return [d[0].as_dict() if hasattr(d[0], "as_dict") else d[0] for d in data]
-        else:
-            return "No Result", 404
-    except Exception as e:
-        if e.__class__.__name__ == "ZHApiError":
-            raise ZHApiError(message=str(e.message), details=str(e.details))
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="get_product_owners",
             details=str(exc_type) + ": " + str(e.with_traceback(tb)),
         )
     finally:

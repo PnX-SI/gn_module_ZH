@@ -120,6 +120,7 @@ export class ZhFormTab1Component implements OnInit {
 
   getMetaData() {
     this.siteSpaceList = this.formMetaData.BIB_SITE_SPACE;
+    this.listProductOwner = this.formMetaData.PRODUCT_OWNERS || [];
   }
 
   onSelectBib(seletedBib) {
@@ -186,12 +187,6 @@ export class ZhFormTab1Component implements OnInit {
       );
     }
   }
-
-  allListProductOwner = () => {
-    this._dataService.getProductOwners().subscribe((res) => {
-      this.listProductOwner = res;
-    });
-  };
 
   search = (text$: Observable<string>) =>
     text$.pipe(
