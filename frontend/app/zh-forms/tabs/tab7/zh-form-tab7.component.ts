@@ -184,6 +184,7 @@ export class ZhFormTab7Component implements OnInit {
   initForms() {
     this.formTab7 = this.fb.group({
       remark_eval_functions: null,
+      remark_eval_heritage: null,
       remark_eval_thread: null,
       remark_eval_actions: null,
       id_strat_gestion: null,
@@ -298,6 +299,7 @@ export class ZhFormTab7Component implements OnInit {
         // patch forms values
         this.formTab7.patchValue({
           remark_eval_functions: this.currentZh.properties.remark_eval_functions,
+          remark_eval_heritage: this.currentZh.properties.remark_eval_heritage,
           remark_eval_thread: this.currentZh.properties.remark_eval_thread,
           remark_eval_actions: this.currentZh.properties.remark_eval_actions,
           id_strat_gestion: this.currentZh.properties.id_strat_gestion,
@@ -450,6 +452,7 @@ export class ZhFormTab7Component implements OnInit {
       let formToPost = {
         id_zh: Number(this.currentZh.properties.id_zh),
         remark_eval_functions: this.formTab7.value.remark_eval_functions,
+        remark_eval_heritage: this.formTab7.value.remark_eval_heritage,
         remark_eval_thread: this.formTab7.value.remark_eval_thread,
         remark_eval_actions: this.formTab7.value.remark_eval_actions,
         id_strat_gestion: this.formTab7.value.id_strat_gestion,
