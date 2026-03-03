@@ -1,0 +1,26 @@
+name: pytest
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - add_pytest
+  pull_request:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        geonature_ref: [
+          "2.16.0",
+          "master",
+          "develop"
+        ] # Mettre version compatible
+    uses: pnx-si/geonature/.github/workflows/gn-module-pytest.yml@master
+    with:
+      geonature_ref: ${{ matrix.geonature_ref }}
+      upload_coverage: true
+
+    secrets:
+      codecov_token: ${{ secrets.CODECOV_TOKEN }}
