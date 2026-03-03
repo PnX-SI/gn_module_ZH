@@ -919,7 +919,6 @@ class EvalInterest:
         self.total_hab_cover: int
         self.val_soc_eco: list(Function)
         self.remark_eval_functions: str
-        self.remark_eval_heritage: str
 
     @property
     def interet_patrim(self):
@@ -958,8 +957,7 @@ class EvalInterest:
             "nb_hab": self.nb_hab,
             "total_hab_cover": self.total_hab_cover,
             "valeur": [val.__str__() for val in self.val_soc_eco],
-            "Commentaire_fonctions": self.remark_eval_functions,
-            "Commentaire_heritage": self.remark_eval_heritage,
+            "Commentaire": self.remark_eval_functions,
         }
 
 
@@ -1243,7 +1241,6 @@ class Card(ZH):
         self.evaluation.interest.total_hab_cover = self.eval["total_hab_cover"]
         self.evaluation.interest.val_soc_eco = self.eval["val_soc_eco"]
         self.evaluation.interest.remark_eval_functions = self.properties["remark_eval_functions"]
-        self.evaluation.interest.remark_eval_heritage = self.properties["remark_eval_heritage"]
 
     def __set_main_functions(self):
         self.evaluation.main_functions.hydro = self.eval["fonctions_hydro"]

@@ -23,8 +23,7 @@ interface InteretPatrimonialMajeur {
   floristique: number;
   nb_hab: number;
   total_hab_cover: number;
-  Commentaire_fonctions: null | string;
-  Commentaire_heritage: null | string;
+  Commentaire: null | string;
   valeur: Fonctions[];
 }
 

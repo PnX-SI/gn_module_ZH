@@ -4,7 +4,7 @@
       <fieldset>
         <legend>
           <h5 class="section-title">
-            Fonctions majeures
+            Fonctions et valeurs majeures
             <mat-icon
               class="info-icon"
               ngbTooltip="Cette rubrique met en avant les principaux enjeux liés à la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
@@ -22,23 +22,6 @@
           [tableCols]="bioFunctionsCols"
           [data]="data.fonctions?.biologique"
         ></zh-table>
-        <zh-label label="Commentaires :">
-          <span>{{ data.interet?.Commentaire_fonctions }}</span>
-        </zh-label>
-      </fieldset>
-      <fieldset>
-        <legend>
-          <h5 class="section-title">
-            Intérêts et valeurs majeurs
-            <mat-icon
-              class="info-icon"
-              ngbTooltip="Cette rubrique met en avant les principaux enjeux liés à la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
-              placement="right"
-            >
-              info
-            </mat-icon>
-          </h5>
-        </legend>
         <zh-table
           [tableCols]="patrimonialInterestsCols"
           [data]="data.interet?.interet"
@@ -62,7 +45,7 @@
           [data]="data.interet?.valeur"
         ></zh-table>
         <zh-label label="Commentaires :">
-          <span>{{ data.interet?.Commentaire_heritage }}</span>
+          <span>{{ data.interet?.Commentaire }}</span>
         </zh-label>
       </fieldset>
       <fieldset>
