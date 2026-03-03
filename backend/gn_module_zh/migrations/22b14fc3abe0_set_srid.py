@@ -9,7 +9,6 @@ Create Date: 2023-04-19 14:58:14.295664
 from alembic import op
 import sqlalchemy as sa
 
-
 # revision identifiers, used by Alembic.
 revision = "22b14fc3abe0"
 down_revision = "01cb1aaa2062"
@@ -18,8 +17,7 @@ depends_on = None
 
 
 def upgrade():
-    op.execute(
-        """
+    op.execute("""
           UPDATE pr_zh.t_hydro_area
             SET geom = ST_Force2D(ST_MakeValid(geom));
     
@@ -379,8 +377,7 @@ CREATE OR REPLACE VIEW pr_zh.flora AS
         WITH DATA;
 
                 
-        """
-    )
+        """)
 
 
 def downgrade():

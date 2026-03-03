@@ -12,7 +12,6 @@ from pathlib import Path
 from alembic import op
 from sqlalchemy.sql import text
 
-
 # revision identifiers, used by Alembic.
 revision = "c9f3b1a8e2d0"
 down_revision = "b4e1775f1e7c"

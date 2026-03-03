@@ -9,7 +9,6 @@ Create Date: 2025-07-28 15:44:17.558807
 from alembic import op
 from sqlalchemy import Column, Integer, UnicodeText, Boolean
 
-
 # revision identifiers, used by Alembic.
 revision = "6f343b68d85f"
 down_revision = "ea0eefb3744a"
@@ -61,8 +60,7 @@ def upgrade():
     )
 
     # Add nommenclature type
-    op.execute(
-        """
+    op.execute("""
         INSERT INTO
             ref_nomenclatures.bib_nomenclatures_types
         (
@@ -93,12 +91,10 @@ def upgrade():
                 'ZONES_HUMIDES',
                 'Non validé'
             )
-        """
-    )
+        """)
 
     # Add nommenclature
-    op.execute(
-        """
+    op.execute("""
         INSERT INTO
             ref_nomenclatures.t_nomenclatures
         (
@@ -163,11 +159,9 @@ def upgrade():
                 true
             )
 
-        """
-    )
+        """)
 
-    op.execute(
-        """
+    op.execute("""
         INSERT INTO
             ref_nomenclatures.t_nomenclatures
         (
@@ -244,13 +238,11 @@ def upgrade():
                 true
             )
 
-        """
-    )
+        """)
 
     # Update atlas_app view
     op.execute("DROP VIEW IF EXISTS pr_zh.atlas_app")
-    op.execute(
-        """
+    op.execute("""
         CREATE OR REPLACE VIEW pr_zh.atlas_app
             AS SELECT tzh.id_zh AS id,
                       tzh.main_name AS nom,
@@ -292,16 +284,14 @@ def upgrade():
                WHERE cza.cover IS NOT NULL
                GROUP BY tzh.id_zh, bo.nom_organisme, sdage.cd_nomenclature, sdage.mnemonique, thread.mnemonique, diag_bio.mnemonique, diag_hydro.mnemonique
                ORDER BY tzh.id_zh;
-        """
-    )
+        """)
 
 
 def downgrade():
 
     # Rollback atlas_app view
     op.execute("DROP VIEW IF EXISTS pr_zh.atlas_app")
-    op.execute(
-        """
+    op.execute("""
         CREATE OR REPLACE VIEW pr_zh.atlas_app
             AS SELECT tzh.id_zh AS id,
                       tzh.main_name AS nom,
@@ -341,11 +331,9 @@ def downgrade():
                WHERE cza.cover IS NOT NULL
                GROUP BY tzh.id_zh, bo.nom_organisme, sdage.cd_nomenclature, sdage.mnemonique, thread.mnemonique, diag_bio.mnemonique, diag_hydro.mnemonique
                ORDER BY tzh.id_zh;
-        """
-    )
+        """)
 
-    op.execute(
-        """
+    op.execute("""
         DELETE FROM ref_nomenclatures.t_nomenclatures
         WHERE mnemonique IN ('2500', '5000', '10000', '25000')
           AND id_type = (
@@ -353,10 +341,8 @@ def downgrade():
             FROM ref_nomenclatures.bib_nomenclatures_types
             WHERE mnemonique = 'INPUT_SCALE'
           );
-        """
-    )
-    op.execute(
-        """
+        """)
+    op.execute("""
         DELETE FROM ref_nomenclatures.t_nomenclatures
         WHERE mnemonique IN ('BD ORTHO®', 'SCAN 25®', 'SCAN 100®', 'OpenStreetMap', 'OpenTopoMap')
           AND id_type = (
@@ -364,14 +350,11 @@ def downgrade():
             FROM ref_nomenclatures.bib_nomenclatures_types
             WHERE mnemonique = 'INPUT_REF_GEO'
           );
-        """
-    )
-    op.execute(
-        """
+        """)
+    op.execute("""
         DELETE FROM ref_nomenclatures.bib_nomenclatures_types
         WHERE mnemonique IN ('INPUT_REF_GEO', 'INPUT_SCALE');
-        """
-    )
+        """)
 
     op.drop_column(
         schema="pr_zh",

@@ -9,7 +9,6 @@ Create Date: 2023-06-05 12:20:36.897280
 from alembic import op
 import sqlalchemy as sa
 
-
 # revision identifiers, used by Alembic.
 revision = "643743e807f6"
 down_revision = "26d6515219fe"
@@ -24,8 +23,7 @@ depends_on = None
 
 def upgrade():
     # Recreate function here if it is dropped by the
-    op.execute(
-        """
+    op.execute("""
         CREATE OR REPLACE FUNCTION pr_zh.slugify("value" TEXT)
         RETURNS TEXT AS $$
         -- removes accents (diacritic signs) from a given string --
@@ -49,11 +47,9 @@ def upgrade():
         )
         SELECT "value" FROM "trimmed";
         $$ LANGUAGE SQL STRICT IMMUTABLE;
-    """
-    )
+    """)
     op.execute("DROP MATERIALIZED VIEW IF EXISTS pr_zh.atlas_app")
-    op.execute(
-        """
+    op.execute("""
         CREATE OR REPLACE VIEW pr_zh.atlas_app
             AS SELECT tzh.id_zh AS id,
                 tzh.main_name AS nom,
@@ -93,8 +89,7 @@ def upgrade():
             WHERE cza.cover IS NOT NULL
             GROUP BY tzh.id_zh, bo.nom_organisme, sdage.cd_nomenclature, sdage.mnemonique, thread.mnemonique, diag_bio.mnemonique, diag_hydro.mnemonique
             ORDER BY tzh.id_zh;
-        """
-    )
+        """)
 
 
 def downgrade():
