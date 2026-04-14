@@ -1,25 +1,51 @@
-<div *ngIf="evalZh" class="container-fluid">
+<div
+  *ngIf="evalZh"
+  class="container-fluid"
+>
   <h2 class="tabsTitle">Evaluation génerale du site</h2>
   <form>
     <fieldset>
       <legend>
         <h5 class="section-title">
           Fonctions, intérêts et valeurs majeures
-          <mat-icon class="info-icon"
+          <mat-icon
+            class="info-icon"
             ngbTooltip="Cette rubrique met en avant les principaux enjeux liés à la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
-            placement="right">
+            placement="right"
+          >
             info
           </mat-icon>
         </h5>
       </legend>
-      <div *ngIf="hydroFctData && hydroFctData.length > 0" class="table-responsive">
-        <zh-table class="eval-table" [tableCols]="hydroFctTableCol" [data]="hydroFctData"></zh-table>
+      <div
+        *ngIf="hydroFctData && hydroFctData.length > 0"
+        class="table-responsive"
+      >
+        <zh-table
+          class="eval-table"
+          [tableCols]="hydroFctTableCol"
+          [data]="hydroFctData"
+        ></zh-table>
       </div>
-      <div *ngIf="bioFctData && bioFctData.length > 0" class="table-responsive">
-        <zh-table class="eval-table fct-table" [tableCols]="bioFctTableCol" [data]="bioFctData"></zh-table>
+      <div
+        *ngIf="bioFctData && bioFctData.length > 0"
+        class="table-responsive"
+      >
+        <zh-table
+          class="eval-table fct-table"
+          [tableCols]="bioFctTableCol"
+          [data]="bioFctData"
+        ></zh-table>
       </div>
-      <div *ngIf="patrimData && patrimData.length > 0" class="table-responsive">
-        <zh-table class="eval-table fct-table" [tableCols]="patrimTableCol" [data]="patrimData"></zh-table>
+      <div
+        *ngIf="patrimData && patrimData.length > 0"
+        class="table-responsive"
+      >
+        <zh-table
+          class="eval-table fct-table"
+          [tableCols]="patrimTableCol"
+          [data]="patrimData"
+        ></zh-table>
       </div>
       <div class="row">
         <div class="col-sm">
@@ -63,22 +89,35 @@
           </table>
         </div>
       </div>
-      <div *ngIf="socEcoData && socEcoData.length > 0" class="table-responsive">
-        <zh-table class="eval-table fct-table" [tableCols]="socEcoTableCol" [data]="socEcoData"></zh-table>
+      <div
+        *ngIf="socEcoData && socEcoData.length > 0"
+        class="table-responsive"
+      >
+        <zh-table
+          class="eval-table fct-table"
+          [tableCols]="socEcoTableCol"
+          [data]="socEcoData"
+        ></zh-table>
       </div>
       <div class="form-group col-md-12">
         <small>Commentaires</small>
-        <textarea class="form-control" rows="3" [formControl]="formTab7.controls.remark_eval_functions"
-          name="name"></textarea>
+        <textarea
+          class="form-control"
+          rows="3"
+          [formControl]="formTab7.controls.remark_eval_functions"
+          name="name"
+        ></textarea>
       </div>
     </fieldset>
     <fieldset>
       <legend>
         <h5 class="section-title">
           Bilan des menaces et de l’état fonctionnel de la zone humide
-          <mat-icon class="info-icon"
+          <mat-icon
+            class="info-icon"
             ngbTooltip="Cette rubrique met en avant les menaces et l’état fonctionnel de la zone humide en récupérant automatiquement les informations précédemment renseignées selon le niveau de qualification qui a été donné"
-            placement="right">
+            placement="right"
+          >
             info
           </mat-icon>
         </h5>
@@ -104,8 +143,12 @@
 
       <div class="form-group col-md-12">
         <small>Commentaires</small>
-        <textarea class="form-control" rows="3" [formControl]="formTab7.controls.remark_eval_thread"
-          name="name"></textarea>
+        <textarea
+          class="form-control"
+          rows="3"
+          [formControl]="formTab7.controls.remark_eval_thread"
+          name="name"
+        ></textarea>
       </div>
     </fieldset>
     <fieldset>
@@ -115,34 +158,71 @@
       <div class="form-row">
         <div class="form-group col-md-4">
           <small>Stratégie de gestion</small>
-          <select class="form-control" [formControl]="formTab7.controls.id_strat_gestion">
-            <option *ngFor="let strat of formMetaData.STRAT_GESTION" [ngValue]="strat.id_nomenclature">
+          <select
+            class="form-control"
+            [formControl]="formTab7.controls.id_strat_gestion"
+          >
+            <option
+              *ngFor="let strat of formMetaData.STRAT_GESTION"
+              [ngValue]="strat.id_nomenclature"
+            >
               {{ strat.mnemonique }}
             </option>
           </select>
         </div>
       </div>
       <div class="form-row">
-        <button mat-raised-button class="mb-3" color="primary" (click)="onAddAction($event, actionModal)">
+        <button
+          mat-raised-button
+          class="mb-3"
+          color="primary"
+          (click)="onAddAction($event, actionModal)"
+        >
           <mat-icon>add_box</mat-icon>
           proposition d’action
         </button>
-        <div *ngIf="actionTable && actionTable.length > 0" class="table-responsive">
-          <zh-table [tableCols]="actionTableCol" [data]="actionTable" [deletable]="true" [editable]="true"
-            (onDelete)="onDeleteAction($event)" (onEdit)="onEditAction(actionModal, $event)"></zh-table>
+        <div
+          *ngIf="actionTable && actionTable.length > 0"
+          class="table-responsive"
+        >
+          <zh-table
+            [tableCols]="actionTableCol"
+            [data]="actionTable"
+            [deletable]="true"
+            [editable]="true"
+            (onDelete)="onDeleteAction($event)"
+            (onEdit)="onEditAction(actionModal, $event)"
+          ></zh-table>
         </div>
       </div>
       <div class="form-group col-md-12">
         <small>Commentaires</small>
-        <textarea class="form-control" rows="3" [formControl]="formTab7.controls.remark_eval_actions"
-          name="name"></textarea>
+        <textarea
+          class="form-control"
+          rows="3"
+          [formControl]="formTab7.controls.remark_eval_actions"
+          name="name"
+        ></textarea>
       </div>
     </fieldset>
     <div class="footer-btn">
-      <zh-cancelButton *ngIf="currentZh" [zhId]="currentZh.properties.id_zh"></zh-cancelButton>
-      <button type="submit" mat-raised-button color="primary" class="ml-3" [disabled]="posted" (click)="onFormSubmit()">
+      <zh-cancelButton
+        *ngIf="currentZh"
+        [zhId]="currentZh.properties.id_zh"
+      ></zh-cancelButton>
+      <button
+        type="submit"
+        mat-raised-button
+        color="primary"
+        class="ml-3"
+        [disabled]="posted"
+        (click)="onFormSubmit()"
+      >
         <mat-icon *ngIf="!posted">save_outline</mat-icon>
-        <mat-spinner *ngIf="posted" [diameter]="20"></mat-spinner>
+        <mat-spinner
+          *ngIf="posted"
+          [diameter]="20"
+        ></mat-spinner>
         Enregistrer
       </button>
     </div>
@@ -150,10 +230,18 @@
 </div>
 
 <!-- Modal Stratégie de gestion et orientations d'actions-->
-<ng-template #actionModal let-c="close" let-d="dismiss">
+<ng-template
+  #actionModal
+  let-c="close"
+  let-d="dismiss"
+>
   <div class="modal-header">
     <h6>{{ modalTitle }}</h6>
-    <button mat-icon-button class="closeModalBtn" (click)="c()">
+    <button
+      mat-icon-button
+      class="closeModalBtn"
+      (click)="c()"
+    >
       <mat-icon class="cancel-icon">cancel</mat-icon>
     </button>
   </div>
@@ -161,38 +249,63 @@
     <div class="form-row">
       <div class="form-group col-md-6">
         <small class="required">Propositions d'actions</small>
-        <zh-multiselect [values]="actionInput" keyLabel="name" [parentFormControl]="actionForm.controls.action"
-          [multiple]="false" />
-        <small *ngIf="
+        <zh-multiselect
+          [values]="actionInput"
+          keyLabel="name"
+          [parentFormControl]="actionForm.controls.action"
+          [multiple]="false"
+        />
+        <small
+          *ngIf="
             (actionForm.controls.action.touched || modalFormSubmitted) &&
             actionForm.controls.action.errors?.required
-          " class="error-msg">
+          "
+          class="error-msg"
+        >
           Champ requis
         </small>
       </div>
       <div class="form-group col-md-6">
         <small class="required">Niveau de priorité</small>
-        <select class="form-control" [formControl]="actionForm.controls.priority">
-          <option *ngFor="let qualif of formMetaData.NIVEAU_PRIORITE" [ngValue]="qualif">
+        <select
+          class="form-control"
+          [formControl]="actionForm.controls.priority"
+        >
+          <option
+            *ngFor="let qualif of formMetaData.NIVEAU_PRIORITE"
+            [ngValue]="qualif"
+          >
             {{ qualif.mnemonique }}
           </option>
         </select>
-        <small *ngIf="
+        <small
+          *ngIf="
             (actionForm.controls.priority.touched || modalFormSubmitted) &&
             actionForm.controls.priority.errors?.required
-          " class="error-msg">
+          "
+          class="error-msg"
+        >
           Champ requis
         </small>
       </div>
       <div class="form-group col-md-12">
         <small>Remarques</small>
-        <textarea class="form-control" [formControl]="actionForm.controls.remark" rows="3"></textarea>
+        <textarea
+          class="form-control"
+          [formControl]="actionForm.controls.remark"
+          rows="3"
+        ></textarea>
       </div>
     </div>
   </div>
   <div class="modal-footer">
-    <button type="button" mat-raised-button color="primary" class="uppercase"
-      (click)="patchModal ? onPatchAction() : onPostAction()">
+    <button
+      type="button"
+      mat-raised-button
+      color="primary"
+      class="uppercase"
+      (click)="patchModal ? onPatchAction() : onPostAction()"
+    >
       {{ addModalBtnLabel }}
     </button>
   </div>
