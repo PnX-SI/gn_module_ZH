@@ -1,18 +1,47 @@
 # Changelog
 
-## 1.4.1 - (2025-XX-XX)
+## 1.5.0 - Montagne des Fanges (2026-04-14)
 
-(à déterminer)
+> Attention à bien regarder les notes de version avant de faire une mise à jour
 
 **🚀 Nouveautés**
 
-- Ajout de 3 nouveau champs "product_owner", "input_scale", "input_ref_geo"(#52, by @juggler31)
+- [DATA] Ajout des champs `is_product_owner`, `maitre_ouvrage`, `echelle_saisie`, `ref_geo_saisie`. @juggler31, @edelclaux [#126](https://github.com/PnX-SI/gn_module_ZH/pull/126) [#150](https://github.com/PnX-SI/gn_module_ZH/pull/150)
+- [FRONTEND] Focus automatique de l'input sur la recherche lors de la manipulation d'une `zh-multiselect`. @edelclaux [#133](https://github.com/PnX-SI/gn_module_ZH/pull/133)
+- [FRONTEND] Ajout de l'option "Affichage des autres ZH lors de l'ajout d'une ZH". @edelclaux [#134](https://github.com/PnX-SI/gn_module_ZH/pull/134)
+- [FRONTEND] Mise à jour d'u libellé : “Fonctions et valeurs majeures” en “Fonctions, intérêts et valeurs majeures”. @edelclaux [#147](https://github.com/PnX-SI/gn_module_ZH/pull/147)
+- [PDF] Correction de l'affichage des images. @juggler31 [#116](https://github.com/PnX-SI/gn_module_ZH/pull/116)
+- [PDF] Ajout de valeurs de remplissage en absence de valeurs. @cen-cgeier [#130](https://github.com/PnX-SI/gn_module_ZH/pull/130)
+- [PDF] Sections configurables + nettoyage de la syntaxe. @cen-cgeier [#131](https://github.com/PnX-SI/gn_module_ZH/pull/131)
+- [PDF] Correction du chargement de `pdf_last_page_img`. @cen-cgeier [#135](https://github.com/PnX-SI/gn_module_ZH/pull/135)
+- [PDF] Correction des styles, sections et contenu. @cen-cgeier, @edelclaux [#136](https://github.com/PnX-SI/gn_module_ZH/pull/136) [#140](https://github.com/PnX-SI/gn_module_ZH/pull/140)
+- [PDF] Mise à jour de la méthode de téléchargement (`application/pdf` au lieu de `blob`). @edelclaux [#138](https://github.com/PnX-SI/gn_module_ZH/pull/138)
+- [TESTS] Ajout du cadre d'execution de tests backend. @juggler31 [#120](https://github.com/PnX-SI/gn_module_ZH/pull/120)
+- [TESTS] Ajout d’une migration alembic `zh-sample-data` pour créer une ZH de test. @edelclaux [#139](https://github.com/PnX-SI/gn_module_ZH/pull/139)
+- [DOCUMENTATION] Ajout d’une doc sur les permissions dans l’admin GeoNature. @juggler31 [#124](https://github.com/PnX-SI/gn_module_ZH/pull/124)
+- [DEV] Mise à jour de black (lint backend) à la version 26.1. @edelclaux
 
 **🐛 Corrections**
 
-- Ajout du boutton "quitter" sur l'onglet 9 (#114, by @juggler31)
-- Correction de la gestion des images lors de la génération (#110, by @juggler31)
-- Correction de la génération de PDF (#110, by @juggler31)
+- [BDD] Mise en compatibilié du schéma avec le model, et inversement (ajout de clef étrangère, etc.). @edelclaux [#146](https://github.com/PnX-SI/gn_module_ZH/pull/146)
+- [CONFIG] Correction d’une double déclaration en config. @edelclaux
+- [FRONTEND] Affichage du bouton d’annulation `cancelButton` à l’onglet 9. @juggler31 [#115](https://github.com/PnX-SI/gn_module_ZH/pull/115)
+- [MODULE] Normalisation de `module.config.ts` (lint à l’installation). @edelclaux
+
+**⚠️ Notes de version**
+
+- La PR [#146](https://github.com/PnX-SI/gn_module_ZH/pull/146) ajoute plusieurs clefs étrangères manquantes.
+  - FK TZH.main_id_rb -> TRiverBasin.id_rb
+  - FK CorZhArea.id_zh -> TZH.id_zh
+  - FK TUrbanPlanningDocs.id_area -> LAreas.id_area
+  - FK CorRbRules.rb_id -> TRiverBasin.id_rb
+  - FK CorZhNotes.note_type_id -> BibNoteTypes.note_id
+  - FK TZH.main_pict_id -> TMedias.id_media
+  Il est préféable de vérifier la faisabilité de l'ajout de ces FKs, et de corriger les éventuels problèmes avant de réaliser la mise à jour.
+
+**📝 Contributeurs**
+
+@edelclaux, @cen-cgeier, @juggler31, @JulesGrillot, @JulienCorny
 
 ## 1.4.0 - La Narse de Nouvialle (2025-03-27)
 
@@ -116,6 +145,7 @@ Nécessite la version 2.12.0 (ou plus) de GeoNature.
 - Si vous mettez à jour le module indépendamment de GeoNature, suivez la procédure classique de mise à jour du module, mais sans exécuter les évolutions de la BDD dans un premier temps (`geonature install-gn-module ~/gn_module_ZH ZONES_HUMIDES --upgrade-db=false`)
 - Si vous mettez à jour le module en même temps que vous mettez à jour GeoNature, suivez la nouvelle procédure de mise à jour de GeoNature qui consiste uniquement à télécharger la nouvelle version du module, la dézipper, la renommer (ou uniquement de faire un `git pull` depuis le dossier du module si celui-ci a été installé avec git) puis lancer le script de migration de GeoNature qui se chargera de mettre à jour les modules en même temps
 - Exécutez ensuite la commande suivante afin d’indiquer à Alembic que votre base de données est dans l'état de la version 1.0.0 et appliquer automatiquement les évolutions pour la passer dans l'état de la version 1.1.0 :
+
   ```
   geonature db stamp 01cb1aaa2062
   geonature db upgrade zones_humides@head
@@ -131,6 +161,7 @@ Merci à @TheoLechemia, @mvergez, @JulienCorny, @cen-cgeier et @camillemonchicou
 **🚀 Première release**
 
 Version fonctionnelle permettant :
+
 - La création de nouvelles zones humides
 - L'édition des géométries et caractéristiques des zones humides existantes
 - La suppression de zones humides
