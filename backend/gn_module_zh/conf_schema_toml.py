@@ -26,6 +26,7 @@ available_maplist_column = [
     {"prop": "code", "name": "Code"},
     {"prop": "sdage", "name": "Typologie SDAGE", "sortable": True},
     {"prop": "bassin_versant", "name": "Bassin versant", "sortable": True},
+    {"prop": "input_scale", "name": "Échelle de saisie"},
     {"prop": "delims", "name": "Critères délimitation (de la zh)", "sortable": True},
     {"prop": "create_date", "name": "Date de création"},
     {"prop": "author", "name": "Auteur"},
@@ -140,6 +141,9 @@ file_path = "static"
 
 module_dir_name = "gn_module_zones_humides"
 
+# Display settings
+display_other_zh_by_default = False
+
 
 # pdf settings :
 
@@ -159,6 +163,23 @@ pdf_last_page_img = ""
 # Name of the source
 pdf_title = "Inventaire des zones humides"
 
+pdf_display_presentation_typologie_sage = False
+pdf_display_presentation_milieux_remarques = False
+pdf_display_fonctionnement_submersions = False
+pdf_display_fonctions = False
+
+
+# Afficher ou non certaines sections dans l'export PDF
+class PdfSectionsIncludedConfig(Schema):
+    presentation_typologie_sage = fields.Boolean(
+        load_default=pdf_display_presentation_typologie_sage
+    )
+    presentation_milieux_remarques = fields.Boolean(
+        load_default=pdf_display_presentation_milieux_remarques
+    )
+    fonctionnement_submersions = fields.Boolean(load_default=pdf_display_fonctionnement_submersions)
+    fonctions = fields.Boolean(load_default=pdf_display_fonctions)
+
 
 class GnModuleSchemaConf(Schema):
     default_maplist_columns = fields.List(fields.Dict(), load_default=default_map_list_conf)
@@ -175,6 +196,7 @@ class GnModuleSchemaConf(Schema):
     filename_validated = fields.Boolean(load_default=filename_validated)
     file_path = fields.String(load_default=file_path)
     module_dir_name = fields.String(load_default=module_dir_name)
+    display_other_zh_by_default = fields.Boolean(load_default=display_other_zh_by_default)
     species_source_name = fields.String(load_default=species_source_name)
     pdf_layer_threashold_ha = fields.Float(load_default=pdf_layer_threashold_ha)
     pdf_layer_number = fields.Integer(load_default=pdf_layer_number)
@@ -182,3 +204,6 @@ class GnModuleSchemaConf(Schema):
     pdf_last_page_img = fields.String(load_default=pdf_last_page_img)
     pdf_title = fields.String(load_default=pdf_title)
     TAXON_VM_CRONTAB = fields.String(load_default=TAXON_VM_CRONTAB)
+    pdf_sections_included = fields.Nested(
+        PdfSectionsIncludedConfig, load_default=PdfSectionsIncludedConfig().load({})
+    )

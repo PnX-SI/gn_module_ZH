@@ -3,6 +3,37 @@
     <h2 class="tabsTitle">Délimitation de la zone humide et de l'espace de fonctionnalité</h2>
     <fieldset>
       <legend>
+        <h5 class="section-title">Échelle et référentiel de saisie</h5>
+      </legend>
+      <div class="form-row">
+        <div class="form-group col-md-12">
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <small>Échelle de saisie</small>
+              <zh-multiselect
+                [values]="listEchelleSaisie"
+                keyLabel="name"
+                [parentFormControl]="formTab2.controls.echelleSaisie"
+                [multiple]="false"
+                [hightlightValue]="false"
+              />
+            </div>
+            <div class="form-group col-md-6">
+              <small>Référentiel de saisie</small>
+              <zh-multiselect
+                [values]="listRefGeoSaisie"
+                keyLabel="name"
+                [parentFormControl]="formTab2.controls.refGeoSaisie"
+                [multiple]="false"
+                [hightlightValue]="false"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>
         <h5 class="section-title">Critères de délimitation de la zone humide</h5>
       </legend>
       <div class="form-row">

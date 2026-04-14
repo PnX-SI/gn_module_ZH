@@ -6,10 +6,20 @@ from pathlib import Path
 from urllib.parse import urljoin
 
 import sqlalchemy.exc as exc
-from flask import Blueprint, Response, jsonify, request, send_file, g
+from flask import (
+    Blueprint,
+    Response,
+    jsonify,
+    request,
+    send_file,
+    g,
+    current_app,
+    send_from_directory,
+)
 from flask.helpers import send_file
 from geojson import FeatureCollection
 from werkzeug.exceptions import Forbidden, BadRequest, NotFound
+from werkzeug.utils import secure_filename
 
 from geonature.core.gn_commons.models import TMedias
 
@@ -19,7 +29,7 @@ from geonature.core.gn_permissions.tools import get_scopes_by_action
 from ref_geo.models import BibAreasTypes, LAreas, LiMunicipalities
 from geonature.utils.config import config
 from geonature.utils.env import DB, ROOT_DIR, BACKEND_DIR
-from pypnnomenclature.models import TNomenclatures
+from pypnnomenclature.models import TNomenclatures, BibNomenclaturesTypes
 from pypnusershub.db.models import Organisme, User
 from sqlalchemy import desc, func, text, select, update, delete
 from sqlalchemy.orm import aliased
@@ -84,6 +94,12 @@ from .utils import (
 )
 
 blueprint = Blueprint("pr_zh", __name__, "./static", template_folder="templates")
+
+
+# Route pour retourner les images téléversées dans les pdf
+@blueprint.route("/media/attachment/<path:filename>")
+def media_attachment(filename):
+    return send_from_directory(current_app.config["MEDIA_FOLDER"] + "/attachments", filename)
 
 
 # Route pour afficher liste des zones humides
@@ -294,8 +310,32 @@ def get_municipalities(id_zh):
 def get_tab():
     """Get form metadata for all tabs"""
     try:
+
+        def _get_nomenclature_values(mnemo):
+            id_type = DB.session.execute(
+                select(BibNomenclaturesTypes.id_type).where(
+                    BibNomenclaturesTypes.mnemonique == mnemo
+                )
+            ).scalar_one_or_none()
+            if id_type is None:
+                return []
+            return [
+                row[0]
+                for row in DB.session.execute(
+                    select(TNomenclatures.mnemonique).where(TNomenclatures.id_type == id_type)
+                ).all()
+            ]
+
         metadata = get_nomenc(blueprint.config["nomenclatures"])
+        metadata["INPUT_SCALE"] = _get_nomenclature_values("INPUT_SCALE")
+        metadata["INPUT_REF_GEO"] = _get_nomenclature_values("INPUT_REF_GEO")
         metadata["BIB_ORGANISMES"] = BibOrganismes.get_bib_organisms("operator")
+        metadata["PRODUCT_OWNERS"] = [
+            org.as_dict()
+            for org in DB.session.scalars(
+                select(BibOrganismes).where(BibOrganismes.is_product_owner == True)
+            ).all()
+        ]
         metadata["BIB_SITE_SPACE"] = BibSiteSpace.get_bib_site_spaces()
         metadata["BIB_MANAGEMENT_STRUCTURES"] = BibOrganismes.get_bib_organisms(
             "management_structure"
@@ -360,6 +400,8 @@ def get_pbf_complete():
                tz.menaces,
                tz.diagnostic_bio,
                tz.diagnostic_hydro,
+               tz.product_owner,
+               tz.input_scale,
                Json_build_object('criteres_delim', tz.criteres_delim,
                          'communes',
                          tz.communes,
@@ -420,24 +462,29 @@ def get_geometries():
         DB.session.close()
 
 
-@blueprint.route("/references/autocomplete", methods=["GET"])
+@blueprint.route("/autocomplete/<string:field>", methods=["GET"])
 @permissions.check_cruved_scope("R", module_code="ZONES_HUMIDES")
 @json_resp
-def get_ref_autocomplete():
+def get_autocomplete(field):
     try:
         params = request.args
-        search_title = params.get("search_title")
-        # search_title = 'MCD'
-        q = select(TReferences, func.similarity(TReferences.title, search_title).label("idx_trgm"))
+        if field == "references":
+            search_title = params.get("search_title")
+            # search_title = 'MCD'
+            q = select(
+                TReferences, func.similarity(TReferences.title, search_title).label("idx_trgm")
+            )
 
-        search_title = search_title.replace(" ", "%")
-        q = q.where(TReferences.title.ilike("%" + search_title + "%")).order_by(desc("idx_trgm"))
-
+            search_title = search_title.replace(" ", "%")
+            q = q.where(TReferences.title.ilike("%" + search_title + "%")).order_by(
+                desc("idx_trgm")
+            )
+        else:
+            raise NotFound(f"Field {field} not found for autocomplete")
         limit = request.args.get("limit", 20)
-
         data = DB.session.execute(q.limit(limit)).all()
         if data:
-            return [d[0].as_dict() for d in data]
+            return [d[0].as_dict() if hasattr(d[0], "as_dict") else d[0] for d in data]
         else:
             return "No Result", 404
     except Exception as e:
@@ -445,7 +492,7 @@ def get_ref_autocomplete():
             raise ZHApiError(message=str(e.message), details=str(e.details))
         exc_type, value, tb = sys.exc_info()
         raise ZHApiError(
-            message="get_ref_autocomplete_error",
+            message=f"get_autocomplete_error on field: {field}",
             details=str(exc_type) + ": " + str(e.with_traceback(tb)),
         )
     finally:
@@ -628,7 +675,6 @@ def get_tab_data(id_tab):
             raise BadRequest(
                 "Géométrie manquante",
             )
-
         # POST / PATCH
         if "id_zh" not in form_data.keys():
             # set geometry from coordinates
@@ -931,11 +977,12 @@ def download(id_zh: int):
     author = f"{author_role.prenom_role} {author_role.nom_role.upper()}"
     last_date = zh.update_date
     media = get_last_pdf_export(id_zh=id_zh, last_date=last_date)
+    filename = secure_filename(f"{zh.code}_{dt.now().strftime('%d-%m-%Y')}_fiche.pdf")
+
     if media is None:
         dataset = get_complete_card(id_zh)
         dataset["config"] = blueprint.config
-        filename = f'{id_zh}_fiche_{dt.now().strftime("%Y-%m-%d")}.pdf'
-        stored_filename = f"zh_{uuid.uuid4()}.pdf"
+        stored_filename = secure_filename(f"zh_{uuid.uuid4()}.pdf")
         media_path = Path(BACKEND_DIR, config["MEDIA_FOLDER"], "pdf", stored_filename)
         pdf_file = gen_pdf(id_zh=id_zh, dataset=dataset, filename=media_path)
         post_file_info(
@@ -947,9 +994,13 @@ def download(id_zh: int):
             media_path=str(media_path),
         )
 
-        return send_file(pdf_file, as_attachment=True)
+        response = send_file(pdf_file, mimetype="application/pdf")
+        response.headers["Content-Disposition"] = f'inline; filename="{filename}"'
+        return response
     else:
-        return send_file(get_file_path(media.id_media), as_attachment=True)
+        response = send_file(get_file_path(media.id_media), mimetype="application/pdf")
+        response.headers["Content-Disposition"] = f'inline; filename="{filename}"'
+        return response
 
 
 @blueprint.route("/departments", methods=["GET"])

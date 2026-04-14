@@ -20,6 +20,10 @@ export class ZhFormTab1Component implements OnInit {
   @Output() canChangeTab = new EventEmitter<boolean>();
   @Output() nextTab = new EventEmitter<number>();
   public generalInfoForm: FormGroup;
+  public formProductOwner: FormGroup;
+  public listProductOwner: {
+    name: string;
+  }[] = [];
   public bibForm: FormGroup;
   public siteSpaceList: any[];
   public hasSiteSpace = false;
@@ -70,6 +74,9 @@ export class ZhFormTab1Component implements OnInit {
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
         this.currentZh = zh;
+        this.formProductOwner = this.fb.group({
+          productOwner: { name: this.currentZh.properties.product_owner },
+        });
         this.listBib = [...this.currentZh.properties.id_references];
         this.generalInfoForm.patchValue({
           main_name: this.currentZh.properties.main_name,
@@ -94,6 +101,9 @@ export class ZhFormTab1Component implements OnInit {
       is_id_site_space: null,
     });
     this.onFormValueChanges();
+    this.formProductOwner = this.fb.group({
+      productOwner: null,
+    });
   }
 
   onFormValueChanges(): void {
@@ -110,6 +120,7 @@ export class ZhFormTab1Component implements OnInit {
 
   getMetaData() {
     this.siteSpaceList = this.formMetaData.BIB_SITE_SPACE;
+    this.listProductOwner = this.formMetaData.PRODUCT_OWNERS || [];
   }
 
   onSelectBib(seletedBib) {
@@ -140,6 +151,7 @@ export class ZhFormTab1Component implements OnInit {
       id_zh: Number(this.currentZh.properties.id_zh),
       id_site_space: formValues.id_site_space,
       is_id_site_space: formValues.is_id_site_space,
+      product_owner: this.formProductOwner.value.productOwner?.name || null,
       id_references: [],
     };
 

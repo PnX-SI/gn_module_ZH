@@ -1,18 +1,17 @@
 <div>
-  <section class="content">
-    <h5 class="subtitle">
-      Fonctions et valeurs majeures
-    </h5>
-    <table class="custom-table">
-      <thead>
+  <section>
+    <div class="content">
+      <h5 class="subtitle">Fonctions, intérêts et valeurs majeures</h5>
+      <table class="custom-table">
+        <thead>
           <tr>
             <th>Principales fonctions hydrologiques / biogéochimiques</th>
             <th>Justifications</th>
             <th>Qualifications</th>
             <th>Connaissance</th>
           </tr>
-      </thead>
-      <tbody>
+        </thead>
+        <tbody>
           {% for fct in data['evaluation']['fonctions']['hydrologique'] %}
           <tr>
             <td>{{ fct['type'] }}</td>
@@ -20,19 +19,27 @@
             <td>{{ fct['qualification'] }}</td>
             <td>{{ fct['connaissance'] }}</td>
           </tr>
+          {% else %}
+          <tr>
+            <td colspan="4">
+              Fonctions non évaluées ou évaluées trop faiblement.
+            </td>
+          </tr>
           {% endfor %}
-      </tbody>
+        </tbody>
       </table>
-    </section>
-    <section class="content">
+    </div>
+  </section>
+  <section>
+    <div class="content">
       <table class="custom-table">
         <thead>
-            <tr>
-              <th>Principales fonctions biologiques / écologiques</th>
-              <th>Justifications</th>
-              <th>Qualifications</th>
-              <th>Connaissance</th>
-            </tr>
+          <tr>
+            <th>Principales fonctions biologiques / écologiques</th>
+            <th>Justifications</th>
+            <th>Qualifications</th>
+            <th>Connaissance</th>
+          </tr>
         </thead>
         <tbody>
           {% for fct in data['evaluation']['fonctions']['biologique'] %}
@@ -42,154 +49,199 @@
             <td>{{ fct['qualification'] }}</td>
             <td>{{ fct['connaissance'] }}</td>
           </tr>
+          {% else %}
+          <tr>
+            <td colspan="4">
+              Fonctions non évaluées ou évaluées trop faiblement.
+            </td>
+          </tr>
           {% endfor %}
         </tbody>
       </table>
-    </section>
-    <section class="content">
+    </div>
+  </section>
+  <section>
+    <div class="content">
       <table class="custom-table">
         <thead>
-            <tr>
-              <th>Intérêts patrimoniaux</th>
-              <th>Justifications</th>
-              <th>Qualifications</th>
-              <th>Connaissance</th>
-            </tr>
+          <tr>
+            <th>Intérêts patrimoniaux</th>
+            <th>Justifications</th>
+            <th>Qualifications</th>
+            <th>Connaissance</th>
+          </tr>
         </thead>
         <tbody>
           {% for interet in data['evaluation']['interet']['interet'] %}
-            <tr>
-              <td>{{ interet['type'] }}</td>
-              <td>{{ interet['justification'] }}</td>
-              <td>{{ interet['qualification'] }}</td>
-              <td>{{ interet['connaissance'] }}</td>
-            </tr>
+          <tr>
+            <td>{{ interet['type'] }}</td>
+            <td>{{ interet['justification'] }}</td>
+            <td>{{ interet['qualification'] }}</td>
+            <td>{{ interet['connaissance'] }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="4">
+              Valeurs non évaluées ou évaluées trop faiblement.
+            </td>
+          </tr>
           {% endfor %}
         </tbody>
       </table>
-    </section>
-    <section class="content">
+    </div>
+  </section>
+  <section>
+    <div class="content">
       <table class="custom-table">
         <thead>
-            <tr>
-              <th>Nombre d'espèces faunistiques patrimoniales</th>
-              <th>Nombre d'espèces floristiques patrimoniales</th>
-            </tr>
+          <tr>
+            <th>Nombre d'espèces faunistiques patrimoniales</th>
+            <th>Nombre d'espèces floristiques patrimoniales</th>
+          </tr>
         </thead>
         <tbody>
           <tr>
             {% if data['evaluation']['interet']['faunistique'] is not none %}
-              <td>{{ data['evaluation']['interet']['faunistique'] }}</td>
-            {% endif %}
-            {% if data['evaluation']['interet']['floristique'] is not none %}
-              <td>{{ data['evaluation']['interet']['floristique'] }}</td>
+            <td>{{ data['evaluation']['interet']['faunistique'] }}</td>
+            {% else %}
+            <td>Non défini</td>
+            {% endif %} {% if data['evaluation']['interet']['floristique'] is
+            not none %}
+            <td>{{ data['evaluation']['interet']['floristique'] }}</td>
+            {% else %}
+            <td>Non défini</td>
             {% endif %}
           </tr>
         </tbody>
       </table>
-    </section>
-    <section class="content">
+    </div>
+  </section>
+  <section>
+    <div class="content">
       <table class="custom-table">
         <thead>
-            <tr>
-              <th>Nombre d'habitats naturels humides patrimoniaux</th>
-              <th>Recouvrement total sur la ZH (%)</th>
-            </tr>
+          <tr>
+            <th>Nombre d'habitats naturels humides patrimoniaux</th>
+            <th>Recouvrement total sur la ZH (%)</th>
+          </tr>
         </thead>
         <tbody>
           <tr>
             {% if data['evaluation']['interet']['nb_hab'] is not none %}
-              <td>{{ data['evaluation']['interet']['nb_hab'] }}</td>
-            {% endif %}
-            {% if data['evaluation']['interet']['total_hab_cover'] is not none %}
-              <td>{{ data['evaluation']['interet']['total_hab_cover'] }}</td>
+            <td>{{ data['evaluation']['interet']['nb_hab'] }}</td>
+            {% else %}
+            <td>Non défini</td>
+            {% endif %} {% if data['evaluation']['interet']['total_hab_cover']
+            is not none %}
+            <td>{{ data['evaluation']['interet']['total_hab_cover'] }}</td>
+            {% else %}
+            <td>Non défini</td>
             {% endif %}
           </tr>
         </tbody>
       </table>
-    </section>
-    <section class="content">
+    </div>
+  </section>
+  <section>
+    <div class="content">
       <table class="custom-table">
         <thead>
-            <tr>
-              <th>Principales valeurs socio-économiques</th>
-              <th>Justifications</th>
-              <th>Qualifications</th>
-              <th>Connaissance</th>
-            </tr>
+          <tr>
+            <th>Principales valeurs socio-économiques</th>
+            <th>Justifications</th>
+            <th>Qualifications</th>
+            <th>Connaissance</th>
+          </tr>
         </thead>
         <tbody>
           {% for socio in data['evaluation']['interet']['valeur'] %}
-            <tr>
-              <td>{{ socio['type'] }}</td>
-              <td>{{ socio['justification'] }}</td>
-              <td>{{ socio['qualification'] }}</td>
-              <td>{{ socio['connaissance'] }}</td>
-            </tr>
+          <tr>
+            <td>{{ socio['type'] }}</td>
+            <td>{{ socio['justification'] }}</td>
+            <td>{{ socio['qualification'] }}</td>
+            <td>{{ socio['connaissance'] }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="4">
+              Valeurs non évaluées ou évaluées trop faiblement.
+            </td>
+          </tr>
           {% endfor %}
         </tbody>
       </table>
-    </section>
-    <section class="content">
+    </div>
+  </section>
+  <section>
+    <div class="content">
       <div class="fieldset">
         <label>Commentaires : </label>
         <span>{{ data['evaluation']['interet']['Commentaire'] or '' }}</span>
+      </div>
     </div>
   </section>
-  <section class="content col">
-    <h5 class="subtitle">
-      Bilan des menaces et de l’état fonctionnel de la zone humide
-    </h5>
-    <table class="custom-table">
-      <thead>
+  <section>
+    <div class="content">
+      <h5 class="subtitle">
+        Bilan des menaces et de l’état fonctionnel de la zone humide
+      </h5>
+      <table class="custom-table">
+        <thead>
           <tr>
             <th>Évaluation globale des menaces potentielles ou avérées</th>
             <th>Fonctionnalité hydrologique / biogéochimique</th>
             <th>Fonctionnalité biologique / écologique</th>
           </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>{{ data['evaluation']['bilan']['menaces'] }}</td>
-          <td>{{ data['evaluation']['bilan']['hydrologique'] }}</td>
-          <td>{{ data['evaluation']['bilan']['biologique'] }}</td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="fieldset">
-      <label>Commentaires</label>
-      <span>{{ data['evaluation']['bilan']['Commentaire'] or '' }}</span>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ data['evaluation']['bilan']['menaces'] }}</td>
+            <td>{{ data['evaluation']['bilan']['hydrologique'] }}</td>
+            <td>{{ data['evaluation']['bilan']['biologique'] }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="fieldset">
+        <label>Commentaires</label>
+        <span>{{ data['evaluation']['bilan']['Commentaire'] or '' }}</span>
+      </div>
     </div>
   </section>
-  <section class="content col">
-    <h5 class="subtitle">
-      Stratégie de gestion et orientations d'actions 
-    </h5>
-    <div class="fieldset">
-      <label>Stratégie de gestion</label>
-      <span>{{ data['evaluation']['strategie']['mgmt_strategy'] or '' }}</span>
-    </div>
-    <table class="custom-table">
-      <thead>
+  <section>
+    <div class="content">
+      <h5 class="subtitle">Stratégie de gestion et orientations d'actions</h5>
+      <div class="fieldset">
+        <label>Stratégie de gestion</label>
+        <span
+          >{{ data['evaluation']['strategie']['mgmt_strategy'] or '' }}</span
+        >
+      </div>
+      <table class="custom-table">
+        <thead>
           <tr>
             <th>Propositions d'actions</th>
             <th>Niveau de priorité</th>
             <th>Remarques</th>
           </tr>
-      </thead>
-      <tbody>
+        </thead>
+        <tbody>
           {% for prop in data['evaluation']['strategie']['propositions'] %}
           <tr>
             <td>{{ prop['proposition'] }}</td>
             <td>{{ prop['niveau'] }}</td>
             <td>{{ prop['remarque'] }}</td>
           </tr>
+          {% else %}
+          <tr>
+            <td colspan="3">Non défini</td>
+          </tr>
           {% endfor %}
-      </tbody>
-    </table>
-    <div class="fieldset">
-      <label>Commentaires</label>
-      <span>{{ data['evaluation']['strategie']['commentaires'] or '' }}</span>
+        </tbody>
+      </table>
+      <div class="fieldset">
+        <label>Commentaires</label>
+        <span>{{ data['evaluation']['strategie']['commentaires'] or '' }}</span>
+      </div>
     </div>
   </section>
 </div>

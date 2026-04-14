@@ -1,41 +1,48 @@
 <div>
-  <section class="content col">
-    <h5 class="subtitle">
-      Régime foncier - Statut de propriété
-    </h5>
-    <table class="custom-table">
-      <thead>
+  <section>
+    <div class="content">
+      <h5 class="subtitle">
+        Régime foncier - Statut de propriété
+      </h5>
+      <table class="custom-table">
+        <thead>
           <tr>
             <th>Statut</th>
             <th>Remarques</th>
           </tr>
-      </thead>
-      <tbody>
+        </thead>
+        <tbody>
           {% for regime in data['statuts']['regime'] %}
-          <tr>
-            <td>{{ regime['status'] }}</td>
-            <td>{{ regime['remarques'] }}</td>
-          </tr>
+            <tr>
+              <td>{{ regime['status'] }}</td>
+              <td>{{ regime['remarques'] }}</td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="2">Inconnu</td>
+            </tr>
           {% endfor %}
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </div>
   </section>
-  <section class="content col">
-    <h5 class="subtitle">
-      Structure de gestion
-    </h5>
+  <section>
+    <div class="content">
+      <h5 class="subtitle">
+        Structure de gestion
+      </h5>
       {% for structure in data['statuts']['structure'] %}
         <span class="small-title"><b>{{ structure['structure'] }} : </b></span>
         {% if structure['plans'] %}
-        <table class="custom-table">
-          <thead>
+          <table class="custom-table">
+            <thead>
               <tr>
                 <th>Nature du plan</th>
                 <th>Date de réalisation</th>
                 <th>Durée (années)</th>
               </tr>
-          </thead>
-          <tbody>
+            </thead>
+            <tbody>
               {% for plan in structure['plans'] %}
               <tr>
                 <td>{{ plan['plan'] }} </td>
@@ -43,106 +50,133 @@
                 <td>{{ plan['duree'] }} </td>
               </tr>
               {% endfor %}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
         {% else %}
-        <span class="small-title">Aucun plan de gestion renseigné</span><br>
+          <span class="small-title">Aucun plan de gestion renseigné</span><br>
         {% endif %}
-    {% endfor %}
+      {% else %}
+        <span class="small-title">Inconnue</span>
+      {% endfor %}
+    </div>
   </section>
   <br>
-  <section class="content col">
-    <h5 class="subtitle">
-      Instruments contractuels et financiers
-    </h5>
-    <table class="custom-table">
-      <thead>
+  <section>
+    <div class="content">
+      <h5 class="subtitle">
+        Instruments contractuels et financiers
+      </h5>
+      <table class="custom-table">
+        <thead>
           <tr>
             <th>Instruments contractuels et financiers</th>
             <th>Date de mise en oeuvre</th>
           </tr>
-      </thead>
-      <tbody>
+        </thead>
+        <tbody>
           {% for instru in data['statuts']['instruments'] %}
-          <tr>
-            <td>{{ instru['instrument'] }}</td>
-            <td>{{ instru['date'] or "" }}</td>
-          </tr>
+            <tr>
+              <td>{{ instru['instrument'] }}</td>
+              <td>{{ instru['date'] or "" }}</td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="2">Inconnu</td>
+            </tr>
           {% endfor %}
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </div>
   </section>
-  <section class="content col">
-    <h5 class="subtitle">
-      Principaux statuts
-    </h5>
-    {% for status in data['statuts']['statuts'] %}
-    <span class="small-title">{{ status['category'] }}</span><br>
-    {% for item in status['items'] %}
-    <span class="small-title">{{ item['status'] }}</span><br>
-    {% endfor %}
-    {% endfor %}
+  <section>
+    <div class="content">
+      <h5 class="subtitle">
+        Principaux statuts
+      </h5>
+      {% for status in data['statuts']['statuts'] %}
+        <span class="small-title">{{ status['category'] }}</span><br>
+        {% for item in status['items'] %}
+          <span class="small-title">{{ item['status'] }}</span><br>
+        {% endfor %}
+      {% else %}
+        <span class="small-title">Inconnu</span><br>
+      {% endfor %}
+    </div>
   </section>
   <br>
-  <section class="content col">
-    <h5 class="subtitle">
-      Autres inventaires
-    </h5>
-    <table class="custom-table">
-      <tbody>
-        {% for type in data['config']['ref_geo_referentiels'] %}
-        {% if type["active"] %}
-        <tr>
-          <td class="border-bottom">{{ type['zh_name'] }}</td>
-          <td class="border-bottom">
-            {% if not data['statuts']['autres_inventaires'][type['zh_name']] %}
-            <span>Aucun</span><br>
+  <section>
+    <div class="content">
+      <h5 class="subtitle">
+        Autres inventaires
+      </h5>
+      <table class="custom-table">
+        <tbody>
+          {% for type in data['config']['ref_geo_referentiels'] %}
+            {% if type["active"] %}
+              <tr>
+                <td class="border-bottom">{{ type['zh_name'] }}</td>
+                <td class="border-bottom">
+                  {% if not data['statuts']['autres_inventaires'][type['zh_name']] %}
+                    <span>Aucun</span>
+                    <br>
+                  {% else %}
+                    {% for ref in data['statuts']['autres_inventaires'][type['zh_name']] %}
+                      <span>
+                        {{ ref.area_code }} -
+                        <a href="{{ ref.url }}">{{ ref.area_name }}</a>
+                      </span>
+                      <br>
+                    {% endfor %}
+                  {% endif %}
+                </td>
+              </tr>
             {% else %}
-            {% for ref in data['statuts']['autres_inventaires'][type['zh_name']] %}
-            <span>
-              {{ ref.area_code }} -
-              <a href="{{ ref.url }}">{{ ref.area_name }}</a>
-            </span><br>
-            {% endfor %}
+              <tr>
+                <td colspan="2">Inconnu</td>
+              </tr>
             {% endif %}
-          </td>
-        </tr>
-        {% endif %}
-        {% endfor %}
-        <tr>
-          <td class="border-bottom">Autres études / inventaires naturalistes</td>
-          <td class="border-bottom">{{ data['statuts']['autre_etude'] }}</td>
-        </tr>
-      </tbody>
-    </table>
+          {% endfor %}
+          <tr>
+            <td class="border-bottom">Autres études / inventaires naturalistes</td>
+            <td class="border-bottom">{{ data['statuts']['autre_etude'] }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </section>
-  <section class="content col">
-    <h5 class="subtitle">
-      Zonage des documents d'urbanisme
-    </h5>
-    <table class="custom-table">
-      <thead>
+  <section>
+    <div class="content">
+      <h5 class="subtitle">
+        Zonage des documents d'urbanisme
+      </h5>
+      <table class="custom-table">
+        <thead>
           <tr>
             <th>Commune</th>
             <th>Type de document communal</th>
             <th>Type de classement</th>
             <th>Remarques</th>
           </tr>
-      </thead>
-      <tbody>
+        </thead>
+        <tbody>
           {% for zonage in data['statuts']['zonage'] %}
-          <tr>
-            <td>{{ zonage['commune'] }}</td>
-            <td>{{ zonage['type_doc'] }}</td>
-            <td>
-            {% for classement in zonage['type_classement'] %}
-            <span>{{ classement }}</span><br>
-            {% endfor %}
-            </td>
-            <td>{{ zonage['remarque']}}</td>
-          </tr>
+            <tr>
+              <td>{{ zonage['commune'] }}</td>
+              <td>{{ zonage['type_doc'] }}</td>
+              <td>
+                {% for classement in zonage['type_classement'] %}
+                  <span>{{ classement }}</span><br>
+                {% endfor %}
+              </td>
+              <td>{{ zonage['remarque']}}</td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="4">Inconnu</td>
+            </tr>
           {% endfor %}
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </div>
   </section>
 </div>

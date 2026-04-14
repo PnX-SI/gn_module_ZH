@@ -9,7 +9,6 @@ Create Date: 2024-12-13 16:16:43.446953
 from alembic import op
 import sqlalchemy as sa
 
-
 # revision identifiers, used by Alembic.
 revision = "da5b95b24f06"
 down_revision = "72a8378567pa"
@@ -22,8 +21,7 @@ def upgrade():
 
 
 def downgrade():
-    op.execute(
-        """
+    op.execute("""
         CREATE TABLE IF NOT EXISTS ref_geo.insee_regions (
             insee_reg varchar(2) NOT NULL, 
             region_name varchar(50) NOT NULL,
@@ -52,5 +50,4 @@ def downgrade():
             ('94','Corse')
             ON CONFLICT (insee_reg) DO NOTHING
         ;
-        """
-    )
+        """)

@@ -5,6 +5,7 @@ from ref_geo.models import BibAreasTypes, LAreas, LiMunicipalities
 from geonature.utils.env import DB
 from pypn_habref_api.models import CorespHab, Habref
 from pypnnomenclature.models import BibNomenclaturesTypes, TNomenclatures
+from geonature.core.gn_commons.models import TMedias
 from pypnusershub.db.models import User
 from pypnusershub.db.tools import InsufficientRightsError
 from sqlalchemy import ForeignKey
@@ -142,6 +143,7 @@ class BibOrganismes(DB.Model):
     name = DB.Column(DB.Unicode(length=6), nullable=False)
     abbrevation = DB.Column(DB.Unicode, nullable=False)
     is_op_org = DB.Column(DB.Boolean, default=False, nullable=False)
+    is_product_owner = DB.Column(DB.Boolean, default=True, nullable=False)
 
     @staticmethod
     def get_abbrevation(id_org):
@@ -192,7 +194,7 @@ class TZH(ZhModel):
     create_date = DB.Column(DB.DateTime)
     update_date = DB.Column(DB.DateTime)
     geom = DB.Column(geoalchemy2.Geometry("GEOMETRY", 4326), nullable=False)
-    id_lim_list = DB.Column(UUID(as_uuid=True), ForeignKey(CorLimList.id_lim_list), nullable=False)
+    id_lim_list = DB.Column(UUID(as_uuid=True), nullable=False)
     remark_lim = DB.Column(DB.Unicode)
     remark_lim_fs = DB.Column(DB.Unicode)
     id_sdage = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), nullable=False)
@@ -245,9 +247,12 @@ class TZH(ZhModel):
     remark_eval_thread = DB.Column(DB.Unicode)
     remark_eval_actions = DB.Column(DB.Unicode)
     remark_is_other_inventory = DB.Column(DB.Unicode)
-    main_pict_id = DB.Column(DB.Integer)
+    main_pict_id = DB.Column(DB.Integer, ForeignKey(TMedias.id_media))
     area = DB.Column(DB.Float)
-    main_id_rb = DB.Column(DB.Integer, nullable=True)
+    main_id_rb = DB.Column(DB.Integer, ForeignKey("pr_zh.t_river_basin.id_rb"), nullable=True)
+    product_owner = DB.Column(DB.Unicode, nullable=True)
+    input_scale = DB.Column(DB.Integer, nullable=True)
+    input_ref_geo = DB.Column(DB.Unicode, nullable=True)
 
     sdage = DB.relationship(
         TNomenclatures,
@@ -336,7 +341,7 @@ class CorZhArea(DB.Model):
     __tablename__ = "cor_zh_area"
     __table_args__ = {"schema": "pr_zh"}
     id_area = DB.Column(DB.Integer, ForeignKey(LAreas.id_area), primary_key=True)
-    id_zh = DB.Column(DB.Integer, primary_key=True)
+    id_zh = DB.Column(DB.Integer, ForeignKey(TZH.id_zh), primary_key=True)
     cover = DB.Column(DB.Integer)
 
     @staticmethod
@@ -654,7 +659,7 @@ class CorZhCb(DB.Model):
     __tablename__ = "cor_zh_cb"
     __table_args__ = {"schema": "pr_zh"}
     id_zh = DB.Column(DB.Integer, ForeignKey(TZH.id_zh), primary_key=True)
-    lb_code = DB.Column(DB.Integer, ForeignKey(BibCb.lb_code), primary_key=True)
+    lb_code = DB.Column(DB.Unicode, ForeignKey(BibCb.lb_code), primary_key=True)
 
 
 class CorZhCorineCover(DB.Model):
@@ -690,7 +695,7 @@ class TActivity(DB.Model):
         DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), primary_key=True
     )
     id_zh = DB.Column(DB.Integer, ForeignKey(TZH.id_zh), primary_key=True)
-    id_position = DB.Column(DB.Integer, ForeignKey(TZH.id_zh), nullable=False)
+    id_position = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), nullable=False)
     id_impact_list = DB.Column(UUID(as_uuid=True), nullable=False)
     remark_activity = DB.Column(DB.Unicode)
     child = relationship(CorImpactList, backref="parent", passive_deletes=True)
@@ -814,7 +819,7 @@ class CorUrbanTypeRange(DB.Model):
 class TUrbanPlanningDocs(DB.Model):
     __tablename__ = "t_urban_planning_docs"
     __table_args__ = {"schema": "pr_zh"}
-    id_area = DB.Column(DB.Integer, primary_key=True)
+    id_area = DB.Column(DB.Integer, ForeignKey(LAreas.id_area), primary_key=True)
     id_zh = DB.Column(DB.Integer, ForeignKey(TZH.id_zh), primary_key=True)
     id_doc_type = DB.Column(
         DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), primary_key=True
@@ -826,7 +831,7 @@ class TUrbanPlanningDocs(DB.Model):
 class CorZhDocRange(DB.Model):
     __tablename__ = "cor_zh_doc_range"
     __table_args__ = {"schema": "pr_zh"}
-    id_doc = DB.Column(DB.Integer, ForeignKey(TUrbanPlanningDocs.id_doc), primary_key=True)
+    id_doc = DB.Column(UUID(as_uuid=True), ForeignKey(TUrbanPlanningDocs.id_doc), primary_key=True)
     id_cor = DB.Column(DB.Integer, ForeignKey(CorUrbanTypeRange.id_cor), primary_key=True)
 
 
@@ -1009,7 +1014,7 @@ class CorRuleNomenc(DB.Model):
     __table_args__ = {"schema": "pr_zh"}
     rule_id = DB.Column(DB.Integer, ForeignKey(TRules.rule_id), primary_key=True)
     nomenc_id = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), primary_key=True)
-    qualif_id = DB.Column(DB.Integer)
+    qualif_id = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature))
 
 
 class CorZhNotes(DB.Model):

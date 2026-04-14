@@ -12,7 +12,6 @@ from alembic import op
 from sqlalchemy import func
 from sqlalchemy.sql import text
 
-
 # revision identifiers, used by Alembic.
 revision = "b4e1775f1e7c"
 down_revision = None

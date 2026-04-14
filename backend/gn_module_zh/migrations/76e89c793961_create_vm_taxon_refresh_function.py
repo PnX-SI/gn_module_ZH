@@ -9,7 +9,6 @@ Create Date: 2024-04-16 08:12:41.346540
 from alembic import op
 import sqlalchemy as sa
 
-
 # revision identifiers, used by Alembic.
 revision = "76e89c793961"
 down_revision = "c0c4748a597a"
@@ -18,8 +17,7 @@ depends_on = None
 
 
 def upgrade():
-    op.execute(
-        """
+    op.execute("""
             CREATE OR REPLACE FUNCTION pr_zh.refresh_taxon_materialized_views()
                 RETURNS void
                 LANGUAGE plpgsql
@@ -31,13 +29,10 @@ def upgrade():
             END;
             $function$
             ;
-        """
-    )
+        """)
 
 
 def downgrade():
-    op.execute(
-        """
+    op.execute("""
             DROP FUNCTION pr_zh.refresh_taxon_materialized_views();
-        """
-    )
+        """)

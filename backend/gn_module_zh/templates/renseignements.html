@@ -1,18 +1,24 @@
 <div class="row">
   <div class="col" id="col-r">
-    <div class="fieldset" id="fieldset-r">
+    <div class="fieldset fieldset-r">
       <label>Nom usuel de la zone humide</label>
       <span>{{ data['renseignements']['identification']['nom'] }}</span>
     </div>
-    <div class="fieldset" id="fieldset-r">
+    <div class="fieldset fieldset-r">
       <label>Code de la zone humide</label>
       <span>{{ data['renseignements']['identification']['code'] }}</span>
     </div>
-    <div class="fieldset" id="fieldset-r">
+    <div class="fieldset fieldset-r">
       <label>Typologie SDAGE</label>
       <span>{{ data['description']['presentation']['sdage'] }}</span>
     </div>
-    <div class="fieldset" id="fieldset-r">
+      {% if data['config']['pdf_sections_included']['presentation_typologie_sage'] %}
+    <div class="fieldset fieldset-r">
+      <label>Typologie SAGE</label>
+      <span>{{ data['description']['presentation']['typologie_locale'] or '' }}</span>
+    </div>
+      {% endif %}
+    <div class="fieldset fieldset-r">
       <label>Bassin versant</label>
       {% for basin in data['description']['basin']['basins'] %}
       <span>{{ basin }}</span><br>
@@ -22,9 +28,9 @@
 
   <div class="col" id="col-r">
     <div class="row">
-      <section class="content"></section>
+      <section>
         <div class="left">
-          <div class="fieldset" id="fieldset-r">
+          <div class="fieldset fieldset-r">
             <label>Région</label>
             {% for region in data['renseignements']['localisation']['region'] %}
             <span>{{ region }}</span><br>
@@ -32,7 +38,7 @@
           </div>
         </div>
         <div class="right">
-          <div class="fieldset" id="fieldset-r">
+          <div class="fieldset fieldset-r">
             <label>Département</label>
             {% for dep in data['renseignements']['localisation']['departement'] %}
             <span>{{ dep['nom'] }} ({{ dep['code'] }})</span><br>
@@ -43,7 +49,7 @@
     </div>
     <div class="row">
       <section>
-        <div class="fieldset" id="fieldset-r">
+        <div class="fieldset fieldset-r">
           <label>Commune [surface ZH/surface commune]</label>
           {% for com in data['renseignements']['localisation']['commune'] %}
           <span>{{ com['nom'] }} ({{ com['insee'] }}) [{{ com['couverture'] }}%]</span><br>
@@ -58,29 +64,38 @@
 
 <div class="row">
   <div class="col" id="col-r">
-    <div class="fieldset" id="fieldset-r">
+    <div class="fieldset fieldset-r">
+      <label>Maitre d'ouvrage de l'inventaire</label>
+      <span>{{ data['renseignements']['auteur']['product_owner'] or 'Non identifié' }}</span>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col" id="col-r">
+    <div class="fieldset fieldset-r">
       <label>Date d'établissement</label>
       <span>{{ data['renseignements']['auteur']['date'] | datetime_format }}</span>
     </div>
-    <div class="fieldset" id="fieldset-r">
+    <div class="fieldset fieldset-r">
       <label>Auteur de la fiche</label>
       <span>{{ data['renseignements']['auteur']['auteur'] }}</span>
     </div>
-    <div class="fieldset" id="fieldset-r">
+    <div class="fieldset fieldset-r">
       <label>Organisme</label>
       <span>{{ data['renseignements']['auteur']['organism'] }}</span>
     </div>
   </div>
   <div class="col" id="col-r">
-    <div class="fieldset" id="fieldset-r">
+    <div class="fieldset fieldset-r">
       <label>Date des dernières modifications</label>
       <span>{{ data['renseignements']['auteur']['date_modif'].split('.')[0] | datetime_format }}</span>
     </div>
-    <div class="fieldset" id="fieldset-r">
+    <div class="fieldset fieldset-r">
       <label>Auteur des dernières modifications</label>
       <span>{{ data['renseignements']['auteur']['auteur_modif'] }}</span>
     </div>
-    <div class="fieldset" id="fieldset-r">
+    <div class="fieldset fieldset-r">
       <label>Organisme des dernières modifications</label>
       <span>{{ data['renseignements']['auteur']['coorganism'] }}</span>
     </div>
@@ -95,7 +110,7 @@
   <img src="{{ data['map'] }}" style="width: 100%; margin-bottom: 20px;">
   {% endif %}
   <div class="col" id="col-r">
-    <div class="fieldset" id="fieldset-r">
+    <div class="fieldset fieldset-r">
       <label>Superficie de la zone humide</label>
       {% if data['description']['presentation']['area'] %}
       <span>{{ "%.3f" | format(data['description']['presentation']['area']) | replace(".",",") }} ha</span>
@@ -105,7 +120,7 @@
     </div>
   </div>
   <div class="col" id="col-r">
-    <div class="fieldset" id="fieldset-r">
+    <div class="fieldset fieldset-r">
       <label>Superficie de l'espace de fonctionnalité</label>
       {% if data['description']['presentation']['ef_area'] %}
       <span>{{ "%.2f" | format(data['description']['presentation']['ef_area']) | replace(".",",") }} ha</span>

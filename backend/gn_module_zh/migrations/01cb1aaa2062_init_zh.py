@@ -12,7 +12,6 @@ from alembic import op
 from sqlalchemy import func
 from sqlalchemy.sql import text
 
-
 # revision identifiers, used by Alembic.
 revision = "01cb1aaa2062"
 down_revision = None
@@ -59,8 +58,7 @@ def upgrade():
 
 
 def downgrade():
-    op.execute(
-        """
+    op.execute("""
         DROP SCHEMA IF EXISTS pr_zh CASCADE;
         DELETE FROM gn_commons.t_medias where id_table_location = (SELECT id_table_location FROM gn_commons.bib_tables_location WHERE table_desc = 'Liste des zones humides');
 
@@ -74,5 +72,4 @@ def downgrade():
 
         DELETE FROM ref_nomenclatures.bib_nomenclatures_types WHERE source IN ('ZONES_HUMIDES', 'BASSINS_VERSANTS');
 
-        """
-    )
+        """)

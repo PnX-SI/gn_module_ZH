@@ -9,7 +9,6 @@ Create Date: 2024-09-11 17:18:21.165324
 from alembic import op
 import sqlalchemy as sa
 
-
 # revision identifiers, used by Alembic.
 revision = "72a8378567pa"
 down_revision = "58ab8aba8512"
@@ -18,8 +17,7 @@ depends_on = None
 
 
 def upgrade():
-    op.execute(
-        """
+    op.execute("""
         UPDATE pr_zh.t_zh tzh
         SET main_id_rb =
         (
@@ -38,14 +36,11 @@ def upgrade():
                 LIMIT 1
             ) AS a
         )
-        """
-    )
+        """)
 
 
 def downgrade():
-    op.execute(
-        """
+    op.execute("""
         UPDATE pr_zh.t_zh tzh
         SET main_id_rb = null
-        """
-    )
+        """)

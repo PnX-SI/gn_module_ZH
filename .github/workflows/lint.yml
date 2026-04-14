@@ -11,6 +11,8 @@ jobs:
           fetch-depth: 0
       - name: Backend code formatting check (Black)
         uses: psf/black@stable
+        with:
+          version: "26.1"
 
   frontend:
     runs-on: ubuntu-latest

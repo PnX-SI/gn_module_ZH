@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, AfterViewInit, Output } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { Subscription } from 'rxjs';
+import { Subscription, of, Observable } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from 'rxjs/operators';
 import { ErrorTranslatorService } from '../../../services/error-translator.service';
 import { TabsService } from '../../../services/tabs.service';
 import { ZhDataService } from '../../../services/zh-data.service';
@@ -24,6 +25,12 @@ export class ZhFormTab2Component implements OnInit, AfterViewInit {
   public critDelimFct: any;
   public submitted: boolean;
   public posted: boolean;
+  public listRefGeoSaisie: {
+    name: string;
+  }[] = [];
+  public listEchelleSaisie: {
+    name: string;
+  }[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -66,12 +73,15 @@ export class ZhFormTab2Component implements OnInit, AfterViewInit {
             selectedCritDelimFs.push(critere);
           }
         });
+
         this.formTab2.patchValue({
           critere_delim: selectedCritDelim,
           id_zh: this.currentZh.properties.id_zh,
           remark_lim: this.currentZh.properties.remark_lim,
           critere_delim_fs: selectedCritDelimFs,
           remark_lim_fs: this.currentZh.properties.remark_lim_fs,
+          echelleSaisie: { name: this.currentZh.properties.input_scale },
+          refGeoSaisie: { name: this.currentZh.properties.input_ref_geo },
         });
         this.$_fromChangeSub = this.formTab2.valueChanges.subscribe(() => {
           this.canChangeTab.emit(false);
@@ -85,6 +95,8 @@ export class ZhFormTab2Component implements OnInit, AfterViewInit {
       critere_delim: [null, Validators.required],
       id_zh: [{ value: null, disabled: true }, Validators.required],
       remark_lim: null,
+      echelleSaisie: null,
+      refGeoSaisie: null,
       critere_delim_fs: null,
       remark_lim_fs: null,
     });
@@ -93,6 +105,12 @@ export class ZhFormTab2Component implements OnInit, AfterViewInit {
   getMetaData() {
     this.critDelim = this.formMetaData.CRIT_DELIM;
     this.critDelimFct = this.formMetaData.CRIT_DEF_ESP_FCT;
+    this.listEchelleSaisie = (this.formMetaData.INPUT_SCALE || []).map((elem) => ({
+      name: elem,
+    }));
+    this.listRefGeoSaisie = (this.formMetaData.INPUT_REF_GEO || []).map((elem) => ({
+      name: elem,
+    }));
   }
 
   onFormSubmit(formValues: any) {
@@ -102,6 +120,10 @@ export class ZhFormTab2Component implements OnInit, AfterViewInit {
       id_zh: Number(this.currentZh.properties.id_zh),
       remark_lim_fs: formValues.remark_lim_fs,
       remark_lim: formValues.remark_lim,
+      input_scale: this.formTab2.value.echelleSaisie?.name
+        ? Number(this.formTab2.value.echelleSaisie.name)
+        : null,
+      input_ref_geo: this.formTab2.value.refGeoSaisie?.name || null,
       critere_delim_fs: [],
     };
 

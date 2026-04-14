@@ -47,7 +47,7 @@ export class ZhDataService {
 
   autocompletBib(search_title: string) {
     return this._api.get<any>(
-      `${this.config.API_ENDPOINT}/zones_humides/references/autocomplete?search_title=${search_title}`
+      `${this.config.API_ENDPOINT}/zones_humides/autocomplete/references?search_title=${search_title}`
     );
   }
 
@@ -126,9 +126,8 @@ export class ZhDataService {
   }
 
   getPdf(zhId: number) {
-    return this._api.get(`${this.config.API_ENDPOINT}/zones_humides/export_pdf/${zhId}`, {
-      responseType: 'blob',
-    });
+    const baseUrl = `${this.config.API_ENDPOINT}/zones_humides/export_pdf/${zhId}`;
+    return baseUrl;
   }
 
   getDepartments() {

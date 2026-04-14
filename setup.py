@@ -1,7 +1,6 @@
 import setuptools
 from pathlib import Path
 
-
 root_dir = Path(__file__).absolute().parent
 with (root_dir / "VERSION").open() as f:
     version = f.read()
@@ -24,6 +23,15 @@ setuptools.setup(
     package_dir={"": "backend"},
     package_data={"gn_module_zh.migrations": ["data/*.sql"]},
     install_requires=requirements,
+    extras_require={
+        "tests": [
+            "pytest",
+            "pytest-flask",
+            "pytest-benchmark",
+            "pytest-cov",
+            "jsonschema",
+        ]
+    },
     entry_points={
         "gn_module": [
             "code = gn_module_zh:MODULE_CODE",
