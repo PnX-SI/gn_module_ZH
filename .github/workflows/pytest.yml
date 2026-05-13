@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         geonature_ref: [
-          "2.16.0",
+          "2.17.0",
           "master",
           "develop"
         ] # Mettre version compatible
