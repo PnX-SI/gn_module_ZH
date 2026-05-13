@@ -40,6 +40,11 @@
       <hr />
       <zh-search-code [form]="_searchService.searchForm.get('nameorcode')"></zh-search-code>
       <hr />
+      <zh-search-delim
+        [data]="data?.CRIT_DELIM"
+        [form]="_searchService.searchForm.get('delim')"
+      ></zh-search-delim>
+      <hr />
       <zh-search-sdage
         [data]="data?.SDAGE"
         [form]="_searchService.searchForm.get('sdage')"

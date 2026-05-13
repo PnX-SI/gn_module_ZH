@@ -22,6 +22,7 @@ from .model.zh_schema import (
     TZH,
     BibHierCategories,
     BibHierPanes,
+    CorLimList,
     CorRbRules,
     CorZhNotes,
     TFunctions,
@@ -65,6 +66,10 @@ def main_search(query, json):
         query = filter_area(query, departement, type_code="DEP")
     if communes is not None:
         query = filter_area(query, communes, type_code="COM")
+
+    delim = json.get("delim")
+    if delim is not None:
+        query = filter_crit_delim(query, delim)
 
     # TODO: Bassin versant and Zones hydrographiques
     basin = json.get("basin")
@@ -113,6 +118,15 @@ def main_search(query, json):
 def filter_sdage(query, json: dict):
     ids = [obj.get("id_nomenclature") for obj in json]
     return query.where(TZH.id_sdage.in_(ids))
+
+
+def filter_crit_delim(query, json: dict):
+    ids_nomenclature = [obj.get("id_nomenclature") for obj in json]
+    subquery = (
+        select(CorLimList.id_lim_list).where(CorLimList.id_lim.in_(ids_nomenclature)).subquery()
+    )
+    query = query.where(TZH.id_lim_list.in_(subquery))
+    return query
 
 
 def filter_nameorcode(query, json: dict):
