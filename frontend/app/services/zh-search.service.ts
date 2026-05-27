@@ -29,6 +29,7 @@ export class SearchFormService {
       communes: [null],
       sdage: [null],
       nameorcode: [null],
+      delim: [null],
       zones: [null],
       ensemble: [null],
       ha_area: this._fb.group({
