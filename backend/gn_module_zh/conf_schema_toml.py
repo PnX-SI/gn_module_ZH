@@ -137,7 +137,7 @@ filename_validated = False
 # if False, add target extension in 'allowed_extensions' list
 fileformat_validated = False
 
-file_path = "static"
+file_path = "media/attachment"
 
 module_dir_name = "gn_module_zones_humides"
 

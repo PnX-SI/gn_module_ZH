@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.5.1 - (2026-XX-XX)
+
+(à déterminer)
+
+**🚀 Nouveautés**
+
+- Ajout d'un filtre de recherche basé sur des critères de délimitation (#121, by @juggler31)
+
+**🐛 Corrections**
+
+- Fix url renvoyé par l'API pour certaines images (#156, by @juggler31)
+
 ## 1.5.0 - Montagne des Fanges (2026-04-14)
 
 > Attention à bien regarder les notes de version avant de faire une mise à jour
