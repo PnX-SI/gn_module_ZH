@@ -90,13 +90,14 @@ def delete_file(id_media):
         )
 
 
-def delete_notes(id_zh):
+def delete_notes(id_zh, commit=True):
     notes_to_delete = DB.session.execute(
         select(CorZhNotes).where(CorZhNotes.id_zh == id_zh)
     ).scalars()
     for note in notes_to_delete:
         DB.session.delete(note)
-    DB.session.commit()
+    if commit:
+        DB.session.commit()
 
 
 def check_ref_geo_schema():

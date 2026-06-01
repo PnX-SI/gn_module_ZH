@@ -19,6 +19,7 @@ from .model.zh_schema import (
     BibHierCategories,
     BibHierSubcategories,
     BibNoteTypes,
+    CorZhNotes,
     CorItemValue,
     CorProtectionLevelType,
     CorRbRules,
@@ -35,19 +36,30 @@ from .model.zh_schema import (
     TRules,
 )
 
+from .utils import (
+    delete_notes,
+)
+
 
 class Item:
-    def __init__(self, id_zh, rb_id, abb):
+    def __init__(self, id_zh, rb_id, abb, write_notes=True):
         self.id_zh = id_zh
         self.abb = abb
+        self.write_notes = write_notes
         self.rule_id = self.__get_rule_id(abb)
         self.rb_id = rb_id
         self.active = self.__is_rb_rule()
         self.cor_rule_id = self.__get_cor_rule_id()
-        self.nomenc_ids = self.__get_nomenc_ids()
-        self.qualif_id = self.__check_qualif(self.__get_qualif())
-        self.knowledge = self.__get_knowledge()
-        self.note = self.__set_note()
+        if self.write_notes:
+            self.nomenc_ids = self.__get_nomenc_ids()
+            self.qualif_id = self.__check_qualif(self.__get_qualif())
+            self.knowledge = self.__get_knowledge()
+            self.note = self.__set_note()
+        else:
+            self.nomenc_ids = None
+            self.qualif_id = None
+            self.knowledge = None
+            self.note = self.__get_note_from_db()
         self.denominator = self.__get_denominator()
 
     def __get_rule_id(self, abb):
@@ -822,7 +834,6 @@ class Item:
                     attribute_id=attribute_id,
                     note_type_id=note_type_id,
                 )
-                DB.session.commit()
                 return note
         except ZHApiError as e:
             raise ZHApiError(
@@ -834,6 +845,27 @@ class Item:
             exc_type, value, tb = sys.exc_info()
             raise ZHApiError(
                 message="Item class: __set_note",
+                details=str(exc_type) + ": " + str(e.with_traceback(tb)),
+            )
+
+    def __get_note_from_db(self):
+        try:
+            if not self.active:
+                return None
+            note = DB.session.execute(
+                select(CorZhNotes).where(
+                    and_(CorZhNotes.id_zh == self.id_zh, CorZhNotes.cor_rule_id == self.cor_rule_id)
+                )
+            ).scalar_one_or_none()
+            if note is None:
+                return None
+            self.qualif_id = note.attribute_id
+            self.knowledge = note.note_type_id
+            return note.note
+        except Exception as e:
+            exc_type, value, tb = sys.exc_info()
+            raise ZHApiError(
+                message="Item class: __get_note_from_db",
                 details=str(exc_type) + ": " + str(e.with_traceback(tb)),
             )
 
@@ -877,6 +909,8 @@ class Item:
     def __get_knowledge_mnemo(self):
         try:
             if self.active:
+                if self.knowledge is None:
+                    return None
                 if self.knowledge == 1:
                     return None
                 else:
@@ -898,6 +932,8 @@ class Item:
     def __get_qualif_mnemo(self):
         try:
             if self.active:
+                if self.qualif_id is None:
+                    return None
                 return DB.session.execute(
                     select(TNomenclatures.label_default).where(
                         TNomenclatures.id_nomenclature == self.qualif_id
@@ -925,11 +961,11 @@ class Item:
 
 
 class Cat:
-    def __init__(self, id_zh, rb_id, abb_cat, cat_class):
+    def __init__(self, id_zh, rb_id, abb_cat, cat_class, write_notes=True):
         self.id_zh: int = id_zh
         self.rb_id: int = rb_id
         self.abb: str = abb_cat
-        self.items: cat_class = cat_class(self.id_zh, self.rb_id)
+        self.items: cat_class = cat_class(self.id_zh, self.rb_id, write_notes=write_notes)
         self.denominator: int
         self.note: int
 
@@ -981,8 +1017,8 @@ class Cat:
 
 
 class Sdage:
-    def __init__(self, id_zh, rb_id):
-        self.sdage = Item(id_zh, rb_id, "sdage")
+    def __init__(self, id_zh, rb_id, write_notes=True):
+        self.sdage = Item(id_zh, rb_id, "sdage", write_notes=write_notes)
 
     def __str__(self):
         items = []
@@ -991,11 +1027,11 @@ class Sdage:
 
 
 class Heritage:
-    def __init__(self, id_zh, rb_id):
-        self.hab = Item(id_zh, rb_id, "hab")
-        self.flora = Item(id_zh, rb_id, "flore")
-        self.vertebrates = Item(id_zh, rb_id, "vertebrates")
-        self.invertebrates = Item(id_zh, rb_id, "invertebrates")
+    def __init__(self, id_zh, rb_id, write_notes=True):
+        self.hab = Item(id_zh, rb_id, "hab", write_notes=write_notes)
+        self.flora = Item(id_zh, rb_id, "flore", write_notes=write_notes)
+        self.vertebrates = Item(id_zh, rb_id, "vertebrates", write_notes=write_notes)
+        self.invertebrates = Item(id_zh, rb_id, "invertebrates", write_notes=write_notes)
 
     def __str__(self):
         items = []
@@ -1007,8 +1043,8 @@ class Heritage:
 
 
 class EcoFunction:
-    def __init__(self, id_zh, rb_id):
-        self.eco = Item(id_zh, rb_id, "eco")
+    def __init__(self, id_zh, rb_id, write_notes=True):
+        self.eco = Item(id_zh, rb_id, "eco", write_notes=write_notes)
 
     def __str__(self):
         items = []
@@ -1017,10 +1053,10 @@ class EcoFunction:
 
 
 class HydroFunction:
-    def __init__(self, id_zh, rb_id):
-        self.protection = Item(id_zh, rb_id, "protection")
-        self.epuration = Item(id_zh, rb_id, "epuration")
-        self.soutien = Item(id_zh, rb_id, "support")
+    def __init__(self, id_zh, rb_id, write_notes=True):
+        self.protection = Item(id_zh, rb_id, "protection", write_notes=write_notes)
+        self.epuration = Item(id_zh, rb_id, "epuration", write_notes=write_notes)
+        self.soutien = Item(id_zh, rb_id, "support", write_notes=write_notes)
 
     def __str__(self):
         items = []
@@ -1031,9 +1067,9 @@ class HydroFunction:
 
 
 class SocEco:
-    def __init__(self, id_zh, rb_id):
-        self.pedagogy = Item(id_zh, rb_id, "pedagogy")
-        self.production = Item(id_zh, rb_id, "production")
+    def __init__(self, id_zh, rb_id, write_notes=True):
+        self.pedagogy = Item(id_zh, rb_id, "pedagogy", write_notes=write_notes)
+        self.production = Item(id_zh, rb_id, "production", write_notes=write_notes)
 
     def __str__(self):
         items = []
@@ -1043,9 +1079,9 @@ class SocEco:
 
 
 class Status:
-    def __init__(self, id_zh, rb_id):
-        self.status = Item(id_zh, rb_id, "status")
-        self.management = Item(id_zh, rb_id, "management")
+    def __init__(self, id_zh, rb_id, write_notes=True):
+        self.status = Item(id_zh, rb_id, "status", write_notes=write_notes)
+        self.management = Item(id_zh, rb_id, "management", write_notes=write_notes)
 
     def __str__(self):
         items = []
@@ -1055,9 +1091,9 @@ class Status:
 
 
 class FctState:
-    def __init__(self, id_zh, rb_id):
-        self.hydro = Item(id_zh, rb_id, "hydro")
-        self.bio = Item(id_zh, rb_id, "bio")
+    def __init__(self, id_zh, rb_id, write_notes=True):
+        self.hydro = Item(id_zh, rb_id, "hydro", write_notes=write_notes)
+        self.bio = Item(id_zh, rb_id, "bio", write_notes=write_notes)
 
     def __str__(self):
         items = []
@@ -1067,8 +1103,8 @@ class FctState:
 
 
 class Thread:
-    def __init__(self, id_zh, rb_id):
-        self.thread = Item(id_zh, rb_id, "thread")
+    def __init__(self, id_zh, rb_id, write_notes=True):
+        self.thread = Item(id_zh, rb_id, "thread", write_notes=write_notes)
 
     def __str__(self):
         items = []
@@ -1077,14 +1113,15 @@ class Thread:
 
 
 class Volet:
-    def __init__(self, id_zh, rb_id, view_abb):
+    def __init__(self, id_zh, rb_id, view_abb, write_notes=True):
         self.id_zh = id_zh
         self.rb_id = rb_id
         self.note = 0
+        self.write_notes = write_notes
         self.denom = Hierarchy.get_denom(self.rb_id, view_abb)
 
     def set_cat(self, cat_abb, cat_class, view_abb):
-        cat = Cat(self.id_zh, self.rb_id, cat_abb, cat_class)
+        cat = Cat(self.id_zh, self.rb_id, cat_abb, cat_class, write_notes=self.write_notes)
         cat.denominator = view_abb
         cat.note = cat.get_note(cat.items.__str__())
         if cat.note is not None:
@@ -1096,8 +1133,8 @@ class Volet:
 
 
 class Volet1(Volet):
-    def __init__(self, id_zh, rb_id):
-        self.volet = Volet(id_zh, rb_id, "volet_1")
+    def __init__(self, id_zh, rb_id, write_notes=True):
+        self.volet = Volet(id_zh, rb_id, "volet_1", write_notes=write_notes)
         self.cat1 = self.volet.set_cat("cat1", Sdage, "rub_sdage")
         self.cat2 = self.volet.set_cat("cat2", Heritage, "rub_interet_pat")
         self.cat3 = self.volet.set_cat("cat3", EcoFunction, "rub_eco")
@@ -1116,8 +1153,8 @@ class Volet1(Volet):
 
 
 class Volet2(Volet):
-    def __init__(self, id_zh, rb_id):
-        self.volet = Volet(id_zh, rb_id, "volet_2")
+    def __init__(self, id_zh, rb_id, write_notes=True):
+        self.volet = Volet(id_zh, rb_id, "volet_2", write_notes=write_notes)
         self.cat6 = self.volet.set_cat("cat6", Status, "rub_statut")
         self.cat7 = self.volet.set_cat("cat7", FctState, "rub_etat_fonct")
         self.cat8 = self.volet.set_cat("cat8", Thread, "rub_menaces")
@@ -1132,12 +1169,12 @@ class Volet2(Volet):
 
 
 class Hierarchy(ZH):
-    def __init__(self, id_zh, main_id_rb):
+    def __init__(self, id_zh, main_id_rb, write_notes=True):
         self.id_zh = id_zh
         self.rb_id = main_id_rb
         self.is_rules = self.__check_if_rules()
-        self.volet1 = Volet1(self.id_zh, self.rb_id)
-        self.volet2 = Volet2(self.id_zh, self.rb_id)
+        self.volet1 = Volet1(self.id_zh, self.rb_id, write_notes=write_notes)
+        self.volet2 = Volet2(self.id_zh, self.rb_id, write_notes=write_notes)
         self.total_denom = self.__get_total_denom()
         self.global_note = self.__get_global_note()
         self.final_note = self.__get_final_note()
@@ -1258,3 +1295,25 @@ def get_all_hierarchy_fields(id_rb: int):
             )
     fields["items"] = notes
     return fields
+
+
+def update_hierarchy(id_zh):
+    """Update zh note"""
+    main_id_rb = DB.session.scalar(select(TZH.main_id_rb).where(TZH.id_zh == id_zh))
+    if not main_id_rb:
+        return None
+
+    try:
+        with DB.session.begin_nested():
+            delete_notes(id_zh, commit=False)
+            hierarchy = Hierarchy(id_zh, main_id_rb)
+            DB.session.flush()
+        return hierarchy.as_dict()
+    except ZHApiError:
+        raise
+    except Exception as e:
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="update_hierarchy_error",
+            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
+        )

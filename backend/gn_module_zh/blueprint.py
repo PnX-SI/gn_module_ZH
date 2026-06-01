@@ -63,7 +63,7 @@ from .forms import (
 )
 
 from .geometry import set_area, set_geom
-from .hierarchy import Hierarchy, get_all_hierarchy_fields
+from .hierarchy import Hierarchy, get_all_hierarchy_fields, update_hierarchy
 from .model.cards import Card
 from .model.repositories import ZhRepository
 from .model.zh import ZH
@@ -238,10 +238,10 @@ def get_complete_info(id_zh):
     raise Forbidden("You are not allowed to see this zh")
 
 
-def get_complete_card(id_zh: int) -> Card:
+def get_complete_card(id_zh: int, read_only_hierarchy: bool = False) -> Card:
     ref_geo_config = [ref for ref in blueprint.config["ref_geo_referentiels"] if ref["active"]]
     main_id_rb = DB.session.scalar(select(TZH.main_id_rb).where(TZH.id_zh == id_zh))
-    return Card(id_zh, main_id_rb, "full", ref_geo_config).__repr__()
+    return Card(id_zh, main_id_rb, "full", ref_geo_config, read_only_hierarchy).__repr__()
 
 
 @blueprint.route("/eval/<int:id_zh>", methods=["GET"])
@@ -557,7 +557,7 @@ def delete_one_file(id_media):
 def delete_one_zh_notes(id_zh):
     """delete all hierarchy notes for one zh"""
     try:
-        delete_notes(id_zh)
+        delete_notes(id_zh, commit=True)
     except Exception as e:
         DB.session.rollback()
         if e.__class__.__name__ == "ZHApiError":
@@ -691,6 +691,7 @@ def get_tab_data(id_tab):
                 active_geo_refs,
             )
             intersection = geom["is_intersected"]
+            update_hierarchy(zh)
         else:
             # edit geometry
             geom = set_geom(form_data["geom"]["geometry"], form_data["id_zh"])
@@ -706,6 +707,7 @@ def get_tab_data(id_tab):
                 active_geo_refs,
             )
             intersection = geom["is_intersected"]
+            update_hierarchy(form_data["id_zh"])
 
         DB.session.commit()
         return jsonify({"id_zh": zh, "is_intersected": intersection})
@@ -713,6 +715,7 @@ def get_tab_data(id_tab):
     if id_tab == 1:
         update_tzh(form_data)
         update_refs(form_data)
+        update_hierarchy(form_data["id_zh"])
         DB.session.commit()
         return jsonify({"id_zh": form_data["id_zh"]})
 
@@ -720,6 +723,7 @@ def get_tab_data(id_tab):
         update_tzh(form_data)
         update_delim(form_data["id_zh"], form_data["critere_delim"])
         update_fct_delim(form_data["id_zh"], form_data["critere_delim_fs"])
+        update_hierarchy(form_data["id_zh"])
         DB.session.commit()
         return jsonify({"id_zh": form_data["id_zh"]})
 
@@ -730,6 +734,7 @@ def get_tab_data(id_tab):
         update_activities(
             form_data["id_zh"], form_data["activities"]
         )  # , form_data['id_cor_impact_types'])
+        update_hierarchy(form_data["id_zh"])
         DB.session.commit()
         return jsonify({"id_zh": form_data["id_zh"]})
 
@@ -737,6 +742,7 @@ def get_tab_data(id_tab):
         update_outflow(form_data["id_zh"], form_data["outflows"])
         update_inflow(form_data["id_zh"], form_data["inflows"])
         update_tzh(form_data)
+        update_hierarchy(form_data["id_zh"])
         DB.session.commit()
         return jsonify({"id_zh": form_data["id_zh"]})
 
@@ -749,6 +755,7 @@ def get_tab_data(id_tab):
         update_functions(form_data["id_zh"], form_data["val_soc_eco"], "VAL_SOC_ECO")
         update_tzh(form_data)
         update_hab_heritages(form_data["id_zh"], form_data["hab_heritages"])
+        update_hierarchy(form_data["id_zh"])
         DB.session.commit()
         return jsonify({"id_zh": form_data["id_zh"]})
 
@@ -759,12 +766,14 @@ def get_tab_data(id_tab):
         update_protections(form_data["id_zh"], form_data["protections"])
         update_zh_tab6(form_data)
         update_urban_docs(form_data["id_zh"], form_data["urban_docs"])
+        update_hierarchy(form_data["id_zh"])
         DB.session.commit()
         return jsonify({"id_zh": form_data["id_zh"]})
 
     if id_tab == 7:
         update_tzh(form_data)
         update_actions(form_data["id_zh"], form_data["actions"])
+        update_hierarchy(form_data["id_zh"])
         DB.session.commit()
         return jsonify({"id_zh": form_data["id_zh"]})
 
@@ -980,7 +989,7 @@ def download(id_zh: int):
     filename = secure_filename(f"{zh.code}_{dt.now().strftime('%d-%m-%Y')}_fiche.pdf")
 
     if media is None:
-        dataset = get_complete_card(id_zh)
+        dataset = get_complete_card(id_zh, read_only_hierarchy=True)
         dataset["config"] = blueprint.config
         stored_filename = secure_filename(f"zh_{uuid.uuid4()}.pdf")
         media_path = Path(BACKEND_DIR, config["MEDIA_FOLDER"], "pdf", stored_filename)
@@ -1078,8 +1087,17 @@ def get_hierarchy(id_zh):
     main_id_rb = DB.session.scalar(select(TZH.main_id_rb).where(TZH.id_zh == id_zh))
     if not main_id_rb:
         raise NotFound("The ZH is not in a river basin")
-    hierarchy = Hierarchy(id_zh, main_id_rb)
+    hierarchy = Hierarchy(id_zh, main_id_rb, write_notes=False)
     return hierarchy.as_dict()
+
+
+@blueprint.route("/<int:id_zh>/hierarchy/regenerate", methods=["POST"])
+@permissions.check_cruved_scope("C", module_code="ZONES_HUMIDES")
+def regenerate_hierarchy(id_zh):
+    """Regenerate zh hierarchy notes"""
+    update_hierarchy(id_zh)
+    DB.session.commit()
+    return ("", 204)
 
 
 @blueprint.route("/hierarchy/fields/<int:id_rb>", methods=["GET"])

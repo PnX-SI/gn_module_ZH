@@ -42,7 +42,7 @@ export class HierarchyService {
   }
 
   getHierarchyFromZh(zh) {
-    if (zh.properties.main_id_rb) {
+    if (zh && zh.properties && zh.properties.main_id_rb) {
       this.getHierarchy(zh.properties.id_zh);
     }
   }
@@ -69,7 +69,6 @@ export class HierarchyService {
               (i) => error.error['message'] === i.api
             )[0].front;
           }
-          this.deleteNotes(zhId);
         },
         () => {
           this.isLoading = false;

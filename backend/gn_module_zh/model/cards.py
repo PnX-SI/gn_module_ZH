@@ -1039,11 +1039,12 @@ class Action:
 
 
 class Card(ZH):
-    def __init__(self, id_zh, main_id_rb, type, ref_geo_config):
+    def __init__(self, id_zh, main_id_rb, type, ref_geo_config, read_only_hierarchy=False):
         self.id_zh = id_zh
         self.main_id_rb = main_id_rb
         self.type = type
         self.ref_geo_config = ref_geo_config
+        self.read_only_hierarchy = read_only_hierarchy
         self.properties = self.get_properties()
         self.eval = self.get_eval()
         self.info = Info()
@@ -1054,7 +1055,7 @@ class Card(ZH):
         self.status = Status()
         self.evaluation = Evaluation()
         try:
-            self.hierarchy = Hierarchy(id_zh, main_id_rb)
+            self.hierarchy = Hierarchy(id_zh, main_id_rb, write_notes=not read_only_hierarchy)
         except (NotFound, ZHApiError):
             self.hierarchy = None
 
