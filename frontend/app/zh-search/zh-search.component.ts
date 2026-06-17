@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { HydrographicZone } from '../models/zones';
@@ -8,6 +8,18 @@ import { ErrorTranslatorService } from '../services/error-translator.service';
 
 import { ZhDataService } from '../services/zh-data.service';
 import { SearchFormService } from '../services/zh-search.service';
+// import { inputDataType } from './zh-search-items/components/zh-search-dependant/zh-search-dependant.component'
+
+type TerritoryType = {
+  id_type: number;
+  name: string;
+  code?: string;
+};
+
+type TerritoryOption = {
+  code: string;
+  name: string;
+};
 
 @Component({
   selector: 'zh-search',
@@ -24,6 +36,9 @@ export class ZhSearchComponent implements OnInit {
   public hydrographicZones: HydrographicZone[] | undefined;
   public departements: [] | undefined;
   public communes: [] | undefined;
+  public geographic_types: [] | undefined;
+  public territories: Record<string, TerritoryOption[]> = {};
+  public types_territories: TerritoryType[] = [];
 
   constructor(
     private _dataService: ZhDataService,
@@ -40,6 +55,17 @@ export class ZhSearchComponent implements OnInit {
       .toPromise()
       .then((resp: any) => {
         this.departements = resp;
+      })
+      .catch((error) => {
+        const frontMsg: string = this._error.getFrontError(error.error.message);
+        this.displayError(frontMsg);
+      });
+
+    this._dataService
+      .getGeographicType()
+      .toPromise()
+      .then((resp: any) => {
+        this.geographic_types = resp;
       })
       .catch((error) => {
         const frontMsg: string = this._error.getFrontError(error.error.message);
@@ -69,6 +95,40 @@ export class ZhSearchComponent implements OnInit {
         .getCommuneFromDepartment(department)
         .toPromise()
         .then((resp: any) => (this.communes = resp));
+    }
+  }
+
+  onGeographicTypeSelected(event) {
+    const territoriesGroup = this._searchService.searchForm.get('territories') as FormGroup;
+
+    if (!territoriesGroup) {
+      return;
+    }
+
+    Object.keys(territoriesGroup.controls).forEach((controlName) => {
+      territoriesGroup.removeControl(controlName);
+    });
+
+    this.territories = {};
+    this.types_territories = [];
+
+    if (event && event.length > 0) {
+      this.types_territories = event[0] as TerritoryType[];
+
+      this.types_territories.forEach((element) => {
+        console.log(element);
+        const controlName = element.code;
+        territoriesGroup.addControl(controlName, new FormControl([]));
+      });
+
+      const ids_type = this.types_territories.map((element) => String(element.id_type));
+
+      this._dataService
+        .getTerritories(ids_type)
+        .toPromise()
+        .then((resp: any) => {
+          this.territories = resp || {};
+        });
     }
   }
 

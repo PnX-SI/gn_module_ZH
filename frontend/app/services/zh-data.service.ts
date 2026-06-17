@@ -139,6 +139,15 @@ export class ZhDataService {
     return this._api.post(`${this.config.API_ENDPOINT}/zones_humides/communes`, payload);
   }
 
+  getGeographicType() {
+    return this._api.get(`${this.config.API_ENDPOINT}/zones_humides/geographic_types`);
+  }
+
+  getTerritories(ids_type: string[]) {
+    const payload = { ids_type: ids_type };
+    return this._api.post(`${this.config.API_ENDPOINT}/zones_humides/territories`, payload);
+  }
+
   getBasins() {
     return this._api.get(`${this.config.API_ENDPOINT}/zones_humides/bassins`);
   }

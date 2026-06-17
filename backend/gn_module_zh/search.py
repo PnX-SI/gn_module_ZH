@@ -66,6 +66,16 @@ def main_search(query, json):
     if communes is not None:
         query = filter_area(query, communes, type_code="COM")
 
+    territories = json.get("territories")
+    if territories is not None:
+        for territory_id_type in territories:
+            codes = {"code": ""}
+            # this for is to format codes variable to be a string of codes separated by space,
+            # because the filter_area function expects a string of codes for territories
+            for elem in territories.get(territory_id_type):
+                codes["code"] += f" {elem.get('code')}"
+            query = filter_area(query, codes, type_code=territory_id_type)
+
     # TODO: Bassin versant and Zones hydrographiques
     basin = json.get("basin")
     zones = json.get("zones")
