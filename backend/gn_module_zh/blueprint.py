@@ -1039,6 +1039,46 @@ def get_area_from_department() -> dict:
     return []
 
 
+@blueprint.route("/geographic_types", methods=["GET"])
+@json_resp
+def get_geographic_types():
+    filter_ref = []
+    for ref in blueprint.config["ref_geo_referentiels"]:
+        if ref["active"]:
+            filter_ref.append(ref["type_code_ref_geo"])
+
+    query = (
+        select(BibAreasTypes)
+        .with_only_columns(BibAreasTypes.id_type, BibAreasTypes.type_name, BibAreasTypes.type_code)
+        .where(BibAreasTypes.type_code.in_(filter_ref))
+        .order_by(BibAreasTypes.type_name)
+    )
+    resp = DB.session.execute(query).all()
+    return [{"code": r.type_code, "name": r.type_name, "id_type": r.id_type} for r in resp]
+
+
+@blueprint.route("/territories", methods=["POST"])
+@json_resp
+def territories() -> dict:
+    ids_type = request.json.get("ids_type")
+    response = {}
+
+    if ids_type:
+        response = {str(type_id): [] for type_id in ids_type}
+        query = (
+            select(LAreas.area_name, LAreas.area_code, LAreas.id_type, BibAreasTypes.type_code)
+            .join(BibAreasTypes, LAreas.id_type == BibAreasTypes.id_type)
+            .where(LAreas.id_type.in_(ids_type))
+            .order_by(LAreas.area_name)
+        )
+        result = DB.session.execute(query).all()
+        for r in result:
+            if response.get(r.type_code) is None:
+                response[r.type_code] = []
+            response[r.type_code].append({"code": r.area_code, "name": r.area_name})
+    return response
+
+
 @blueprint.route("/bassins", methods=["GET"])
 @json_resp
 def bassins():
