@@ -119,6 +119,12 @@ flora_view_name = {"schema_name": "pr_zh", "table_name": "vm_flora", "category":
 # Fréquence de mise à jour des vm de taxons
 TAXON_VM_CRONTAB = "0 0,12 * * *"
 
+# Fréquence de mise à jour de la vm des règles de hiérarchisation
+RB_RULES_VM_CRONTAB = "0 * * * *"
+
+# Fréquence de mise à jour des notes
+UPDATE_NOTES_CRONTAB = "5 * * * *"
+
 # Name of the source of species data (tab5)
 species_source_name = "GeoNature"
 
@@ -204,6 +210,8 @@ class GnModuleSchemaConf(Schema):
     pdf_last_page_img = fields.String(load_default=pdf_last_page_img)
     pdf_title = fields.String(load_default=pdf_title)
     TAXON_VM_CRONTAB = fields.String(load_default=TAXON_VM_CRONTAB)
+    RB_RULES_VM_CRONTAB = fields.String(load_default=RB_RULES_VM_CRONTAB)
+    UPDATE_NOTES_CRONTAB = fields.String(load_default=UPDATE_NOTES_CRONTAB)
     pdf_sections_included = fields.Nested(
         PdfSectionsIncludedConfig, load_default=PdfSectionsIncludedConfig().load({})
     )

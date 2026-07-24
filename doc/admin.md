@@ -66,7 +66,12 @@ Les vues matérisalisées sont mises à jour automatiquement à fréquence défi
   
      TAXON_VM_CRONTAB ="0 0,12 * * *"
 
-Ce paramètre est composé de cinq valeurs, chacune séparée par un espace: minute, heure, jour du mois, mois de l'année, journée de la semaine. Dans l'exemple ci-dessus, il est indiqué que la mise à jour sera effectuée toutes les 12 heures. Pour plus d'informations, vous pouvez consulter la documentation de Celery à ce sujet : https://docs.celeryq.dev/en/stable/userguide/periodic-tasks.html#crontab-schedules.
+La fréquence de rafraîchissement de la vue matérialisée des règles de hiérarchisation et celle de mise à jour des notes sont également configurables. Par défaut, la vue des règles est rafraîchie toutes les heures, puis les notes sont recalculées cinq minutes plus tard afin d'utiliser les nouveaux dénominateurs :
+
+     RB_RULES_VM_CRONTAB = "0 * * * *"
+     UPDATE_NOTES_CRONTAB = "5 * * * *"
+
+Chaque paramètre est composé de cinq valeurs, séparées par des espaces : minute, heure, jour du mois, mois de l'année et jour de la semaine. Pour plus d'informations, vous pouvez consulter la documentation de Celery à ce sujet : https://docs.celeryq.dev/en/stable/userguide/periodic-tasks.html#crontab-schedules.
 
 **Note** : Si vous ne voulez pas définir un des paramètres de périodicité, utilisez un astérisque (``*``).
 
