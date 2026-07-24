@@ -32,7 +32,8 @@ def setup_periodic_tasks(sender, **kwargs):
 
 @celery_app.on_after_finalize.connect
 def setup_periodic_tasks_for_vm_rb_rules(sender, **kwargs):
-    minute, hour, day_of_month, month_of_year, day_of_week = "* * * * *".split(" ")
+    ct = config["ZONES_HUMIDES"]["RB_RULES_VM_CRONTAB"]
+    minute, hour, day_of_month, month_of_year, day_of_week = ct.split(" ")
     sender.add_periodic_task(
         crontab(
             minute=minute,
@@ -48,7 +49,8 @@ def setup_periodic_tasks_for_vm_rb_rules(sender, **kwargs):
 
 @celery_app.on_after_finalize.connect
 def setup_periodic_tasks_update_notes(sender, **kwargs):
-    minute, hour, day_of_month, month_of_year, day_of_week = "* * * * *".split(" ")
+    ct = config["ZONES_HUMIDES"]["UPDATE_NOTES_CRONTAB"]
+    minute, hour, day_of_month, month_of_year, day_of_week = ct.split(" ")
     sender.add_periodic_task(
         crontab(
             minute=minute,
