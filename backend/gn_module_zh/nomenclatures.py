@@ -20,86 +20,66 @@ from .model.zh_schema import (
 
 
 def get_sage_list():
-    try:
-        return [
-            {
-                int(sdage_id): [
-                    {
-                        "id_nomenclature": sage.CorSdageSage.id_sage,
-                        "mnemonique": sage.TNomenclatures.mnemonique,
-                    }
-                    for sage in CorSdageSage.get_sage_by_id(sdage_id)
-                ]
-            }
-            for sdage_id in CorSdageSage.get_id_sdage_list()
-        ]
-    except Exception as e:
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="get_sage_list_error", details=str(exc_type) + ": " + str(e.with_traceback(tb))
-        )
+    return [
+        {
+            int(sdage_id): [
+                {
+                    "id_nomenclature": sage.CorSdageSage.id_sage,
+                    "mnemonique": sage.TNomenclatures.mnemonique,
+                }
+                for sage in CorSdageSage.get_sage_by_id(sdage_id)
+            ]
+        }
+        for sdage_id in CorSdageSage.get_id_sdage_list()
+    ]
 
 
 def get_corine_biotope():
-    try:
-        return [
-            {
-                "CB_code": cb.BibCb.lb_code,
-                "CB_label": cb.Habref.lb_hab_fr,
-                "front_name": cb.BibCb.lb_code + " - " + cb.Habref.lb_hab_fr,
-                "CB_humidity": cb.BibCb.humidity,
-                "CB_is_ch": cb.BibCb.is_ch,
-            }
-            for cb in BibCb.get_label()
-        ]
-    except Exception as e:
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="get_corine_biotope_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    return [
+        {
+            "CB_code": cb.BibCb.lb_code,
+            "CB_label": cb.Habref.lb_hab_fr,
+            "front_name": cb.BibCb.lb_code + " - " + cb.Habref.lb_hab_fr,
+            "CB_humidity": cb.BibCb.humidity,
+            "CB_is_ch": cb.BibCb.is_ch,
+        }
+        for cb in BibCb.get_label()
+    ]
 
 
 def get_ch(lb_code):
-    try:
-        CH_typo = DB.session.scalar(select(TypoRef.cd_typo).where(TypoRef.cd_table == "TYPO_CH"))
-        CB_typo = DB.session.scalar(
-            select(TypoRef.cd_typo).where(TypoRef.cd_table == "TYPO_CORINE_BIOTOPES")
+    CH_typo = DB.session.scalar(select(TypoRef.cd_typo).where(TypoRef.cd_table == "TYPO_CH"))
+    CB_typo = DB.session.scalar(
+        select(TypoRef.cd_typo).where(TypoRef.cd_table == "TYPO_CORINE_BIOTOPES")
+    )
+    # get cd_hab_sortie list from lb_code of selected Corine Biotope
+    cd_hab_sortie = DB.session.scalar(
+        select(Habref.cd_hab).where(and_(Habref.lb_code == lb_code, Habref.cd_typo == CB_typo))
+    )
+    # get all cd_hab_entre corresponding to cd_hab_sortie
+    q_cd_hab_entre = DB.session.scalars(
+        select(CorespHab).where(
+            and_(CorespHab.cd_hab_sortie == cd_hab_sortie, CorespHab.cd_typo_entre == CH_typo)
         )
-        # get cd_hab_sortie list from lb_code of selected Corine Biotope
-        cd_hab_sortie = DB.session.scalar(
-            select(Habref.cd_hab).where(and_(Habref.lb_code == lb_code, Habref.cd_typo == CB_typo))
+    ).all()
+    # get list of cd_hab_entre/lb_code/lb_hab_fr for each cahier habitat
+    ch = []
+    for q in q_cd_hab_entre:
+        hab = DB.session.scalar(select(Habref).where(Habref.cd_hab == q.cd_hab_entre))
+        ch.append(
+            {
+                "cd_hab": q.cd_hab_entre,
+                "front_name": hab.lb_code + " - " + hab.lb_hab_fr,
+                "lb_code": hab.lb_code,
+                "lb_hab_fr": hab.lb_hab_fr,
+                "priority": DB.session.scalar(
+                    select(CorChStatus.priority)
+                    .where(CorChStatus.lb_code == hab.lb_code)
+                    .distinct()
+                ),
+            }
         )
-        # get all cd_hab_entre corresponding to cd_hab_sortie
-        q_cd_hab_entre = DB.session.scalars(
-            select(CorespHab).where(
-                and_(CorespHab.cd_hab_sortie == cd_hab_sortie, CorespHab.cd_typo_entre == CH_typo)
-            )
-        ).all()
-        # get list of cd_hab_entre/lb_code/lb_hab_fr for each cahier habitat
-        ch = []
-        for q in q_cd_hab_entre:
-            hab = DB.session.scalar(select(Habref).where(Habref.cd_hab == q.cd_hab_entre))
-            ch.append(
-                {
-                    "cd_hab": q.cd_hab_entre,
-                    "front_name": hab.lb_code + " - " + hab.lb_hab_fr,
-                    "lb_code": hab.lb_code,
-                    "lb_hab_fr": hab.lb_hab_fr,
-                    "priority": DB.session.scalar(
-                        select(CorChStatus.priority)
-                        .where(CorChStatus.lb_code == hab.lb_code)
-                        .distinct()
-                    ),
-                }
-            )
-        return ch
-    except Exception as e:
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="get_cahier_habitat_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    return ch
 
 
 def set_select_list(cd, mnemo):
@@ -107,25 +87,18 @@ def set_select_list(cd, mnemo):
 
 
 def get_impact_list():
-    try:
-        return [
-            {
-                "id_cor_impact_types": impact.CorImpactTypes.id_cor_impact_types,
-                "id_nomenclature": impact.CorImpactTypes.id_impact,
-                "mnemonique": set_select_list(
-                    impact.TNomenclatures.cd_nomenclature, impact.TNomenclatures.mnemonique
-                ),
-                "id_category": impact.CorImpactTypes.id_impact_type,
-                "category": get_impact_category(impact),
-            }
-            for impact in CorImpactTypes.get_impacts()
-        ]
-    except Exception as e:
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="get_impact_list_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    return [
+        {
+            "id_cor_impact_types": impact.CorImpactTypes.id_cor_impact_types,
+            "id_nomenclature": impact.CorImpactTypes.id_impact,
+            "mnemonique": set_select_list(
+                impact.TNomenclatures.cd_nomenclature, impact.TNomenclatures.mnemonique
+            ),
+            "id_category": impact.CorImpactTypes.id_impact_type,
+            "category": get_impact_category(impact),
+        }
+        for impact in CorImpactTypes.get_impacts()
+    ]
 
 
 def get_impact_category(impact):
@@ -140,126 +113,98 @@ def get_impact_category(impact):
 
 
 def get_function_list(mnemo):
-    try:
-        # get id_type of mnemo (ex : 'FONCTIONS_HYDRO') in BibNomenclatureTypes
-        id_type_main_function = DB.session.scalar(
-            select(BibNomenclaturesTypes.id_type).where(BibNomenclaturesTypes.mnemonique == mnemo)
-        )
+    # get id_type of mnemo (ex : 'FONCTIONS_HYDRO') in BibNomenclatureTypes
+    id_type_main_function = DB.session.scalar(
+        select(BibNomenclaturesTypes.id_type).where(BibNomenclaturesTypes.mnemonique == mnemo)
+    )
 
-        # get list of TNomenclatures ids by id_type
-        nomenclature_ids = [
-            nomenc.id_nomenclature
-            for nomenc in DB.session.scalars(
-                select(TNomenclatures).where(TNomenclatures.id_type == id_type_main_function)
-            ).all()
-        ]
+    # get list of TNomenclatures ids by id_type
+    nomenclature_ids = [
+        nomenc.id_nomenclature
+        for nomenc in DB.session.scalars(
+            select(TNomenclatures).where(TNomenclatures.id_type == id_type_main_function)
+        ).all()
+    ]
 
-        return [
-            {
-                "id_nomenclature": function.CorMainFct.id_function,
-                "mnemonique": function.TNomenclatures.mnemonique,
-                "id_category": function.CorMainFct.id_main_function,
-                "category": DB.session.scalar(
-                    select(TNomenclatures.mnemonique).where(
-                        TNomenclatures.id_nomenclature == function.CorMainFct.id_main_function
-                    )
-                ).upper(),
-            }
-            for function in CorMainFct.get_functions(nomenclature_ids)
-        ]
-    except Exception as e:
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="get_function_list_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    return [
+        {
+            "id_nomenclature": function.CorMainFct.id_function,
+            "mnemonique": function.TNomenclatures.mnemonique,
+            "id_category": function.CorMainFct.id_main_function,
+            "category": DB.session.scalar(
+                select(TNomenclatures.mnemonique).where(
+                    TNomenclatures.id_nomenclature == function.CorMainFct.id_main_function
+                )
+            ).upper(),
+        }
+        for function in CorMainFct.get_functions(nomenclature_ids)
+    ]
 
 
 def get_all_function_list(mnemo):
-    try:
-        # get id_type of mnemo (ex : 'FONCTIONS_HYDRO') in BibNomenclatureTypes
-        id_type_main_function = DB.session.execute(
-            select(BibNomenclaturesTypes.id_type).where(BibNomenclaturesTypes.mnemonique == mnemo)
-        ).scalar_one()
+    # get id_type of mnemo (ex : 'FONCTIONS_HYDRO') in BibNomenclatureTypes
+    id_type_main_function = DB.session.execute(
+        select(BibNomenclaturesTypes.id_type).where(BibNomenclaturesTypes.mnemonique == mnemo)
+    ).scalar_one()
 
-        # get list of TNomenclatures ids by id_type
-        nomenclature_ids = [
-            nomenc.id_nomenclature
-            for nomenc in DB.session.scalars(
-                select(TNomenclatures).where(TNomenclatures.id_type == id_type_main_function)
-            ).all()
-        ]
+    # get list of TNomenclatures ids by id_type
+    nomenclature_ids = [
+        nomenc.id_nomenclature
+        for nomenc in DB.session.scalars(
+            select(TNomenclatures).where(TNomenclatures.id_type == id_type_main_function)
+        ).all()
+    ]
 
-        return [
-            {
-                "id_nomenclature": function.CorMainFct.id_function,
-                "mnemonique": function.TNomenclatures.mnemonique,
-                "id_category": function.CorMainFct.id_main_function,
-                "category": DB.session.execute(
-                    select(TNomenclatures.mnemonique).where(
-                        TNomenclatures.id_nomenclature == function.CorMainFct.id_main_function
-                    )
+    return [
+        {
+            "id_nomenclature": function.CorMainFct.id_function,
+            "mnemonique": function.TNomenclatures.mnemonique,
+            "id_category": function.CorMainFct.id_main_function,
+            "category": DB.session.execute(
+                select(TNomenclatures.mnemonique).where(
+                    TNomenclatures.id_nomenclature == function.CorMainFct.id_main_function
                 )
-                .scalar_one()
-                .upper(),
-            }
-            for function in CorMainFct.get_all_functions(nomenclature_ids)
-        ]
-    except Exception as e:
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="get_all_function_list_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+            )
+            .scalar_one()
+            .upper(),
+        }
+        for function in CorMainFct.get_all_functions(nomenclature_ids)
+    ]
 
 
 def get_urban_docs():
-    try:
-        return [
-            {
-                "id_nomenclature": doc.id_nomenclature,
-                "mnemonique": doc.mnemonique,
-                "type_classement": CorUrbanTypeRange.get_range_by_doc(doc.id_nomenclature),
-            }
-            for doc in Nomenclatures.get_nomenclature_info("TYP_DOC_COMM")
-        ]
-    except Exception as e:
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="get_urban_docs_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    return [
+        {
+            "id_nomenclature": doc.id_nomenclature,
+            "mnemonique": doc.mnemonique,
+            "type_classement": CorUrbanTypeRange.get_range_by_doc(doc.id_nomenclature),
+        }
+        for doc in Nomenclatures.get_nomenclature_info("TYP_DOC_COMM")
+    ]
 
 
 def get_protections():
-    try:
-        return [
-            {
-                "id_protection_status": protection.id_protection_status,
-                "mnemonique_status": DB.session.scalar(
-                    select(TNomenclatures.mnemonique).where(
-                        TNomenclatures.id_nomenclature == protection.id_protection_status
-                    )
-                ),
-                "id_protection_level": protection.id_protection_level,
-                "mnemonique_level": DB.session.scalar(
-                    select(TNomenclatures.mnemonique).where(
-                        TNomenclatures.id_nomenclature == protection.id_protection_level
-                    )
-                ),
-                "category": get_protection_category(protection),
-                "category_id": protection.id_protection_type,
-            }
-            for protection in DB.session.scalars(
-                select(CorProtectionLevelType).order_by(CorProtectionLevelType.id_protection)
-            ).all()
-        ]
-    except Exception as e:
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="get_protections_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    return [
+        {
+            "id_protection_status": protection.id_protection_status,
+            "mnemonique_status": DB.session.scalar(
+                select(TNomenclatures.mnemonique).where(
+                    TNomenclatures.id_nomenclature == protection.id_protection_status
+                )
+            ),
+            "id_protection_level": protection.id_protection_level,
+            "mnemonique_level": DB.session.scalar(
+                select(TNomenclatures.mnemonique).where(
+                    TNomenclatures.id_nomenclature == protection.id_protection_level
+                )
+            ),
+            "category": get_protection_category(protection),
+            "category_id": protection.id_protection_type,
+        }
+        for protection in DB.session.scalars(
+            select(CorProtectionLevelType).order_by(CorProtectionLevelType.id_protection)
+        ).all()
+    ]
 
 
 def get_protection_category(protection):
