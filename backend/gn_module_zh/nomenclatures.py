@@ -46,7 +46,11 @@ def get_corine_biotope():
             {
                 "CB_code": cb.BibCb.lb_code,
                 "CB_label": cb.Habref.lb_hab_fr,
-                "front_name": cb.BibCb.lb_code + " - " + cb.Habref.lb_hab_fr,
+                "front_name": (
+                    cb.BibCb.lb_code + " - " + cb.Habref.lb_hab_fr
+                    if cb.Habref.lb_hab_fr
+                    else cb.BibCb.lb_code
+                ),
                 "CB_humidity": cb.BibCb.humidity,
                 "CB_is_ch": cb.BibCb.is_ch,
             }
