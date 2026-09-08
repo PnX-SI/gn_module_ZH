@@ -1,9 +1,7 @@
 import datetime
 import math
-import sys
 import uuid
 
-import sqlalchemy.exc as exc
 from geonature.core.gn_commons.models import BibTablesLocation, TMedias
 from ref_geo.models import BibAreasTypes, LAreas
 from geonature.utils.env import DB
@@ -11,7 +9,6 @@ from pypnnomenclature.models import TNomenclatures
 from sqlalchemy import and_, func
 from sqlalchemy.sql import select, delete, update
 
-from .api_error import ZHApiError
 from .model.code import Code
 from .model.zh_schema import (
     TZH,
@@ -142,23 +139,10 @@ def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referenti
 
 
 def post_cor_lim_list(uuid_lim, criteria):
-    try:
-        # fill pr_zh.cor_lim_list
-        for lim in criteria:
-            DB.session.add(CorLimList(id_lim_list=uuid_lim, id_lim=lim))
-            DB.session.flush()
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="post_cor_lim_list_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
-            )
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="post_cor_lim_list_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    # fill pr_zh.cor_lim_list
+    for lim in criteria:
+        DB.session.add(CorLimList(id_lim_list=uuid_lim, id_lim=lim))
+        DB.session.flush()
 
 
 def post_cor_zh_area(polygon, id_zh, id_type):
@@ -205,26 +189,14 @@ def post_cor_zh_rb(geom, id_zh, rbs):
 
 
 def post_cor_zh_hydro(geom, id_zh):
-    # try:
     has = TZH.get_zh_area_intersected("hydro_area", func.ST_GeomFromGeoJSON(str(geom)))
     for ha in has:
         DB.session.add(CorZhHydro(id_zh=id_zh, id_hydro=ha.id_hydro))
         DB.session.flush()
-    # except Exception as e:
-    #     if e.__class__.__name__ == "DataError":
-    #         raise ZHApiError(
-    #             message="post_cor_zh_hydro_db_error",
-    #             details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-    #         )
-    #     exc_type, value, tb = sys.exc_info()
-    #     raise ZHApiError(
-    #         message="post_cor_zh_hydro_error",
-    #         details=str(exc_type) + ": " + str(e.with_traceback(tb)),
     #     )
 
 
 def post_cor_zh_fct_area(geom, id_zh):
-    # try:
     result = TZH.get_zh_area_intersected("fct_area", func.ST_GeomFromGeoJSON(str(geom)))
 
     cor_zh_area = []
@@ -236,18 +208,6 @@ def post_cor_zh_fct_area(geom, id_zh):
     DB.session.flush()
 
     return total_cover
-
-    # except Exception as e:
-    #     if e.__class__.__name__ == "DataError":
-    #         raise ZHApiError(
-    #             message="post_cor_zh_fct_area_db_error",
-    #             details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-    #         )
-    #     exc_type, value, tb = sys.exc_info()
-    #     raise ZHApiError(
-    #         message="post_cor_zh_fct_area_error",
-    #         details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-    #     )
 
 
 def update_zh_tab0(form_data, polygon, area, info_role, zh_date, geo_refs):
@@ -294,61 +254,40 @@ def update_zh_tab0(form_data, polygon, area, info_role, zh_date, geo_refs):
 
 
 def check_polygon(polygon, id_zh):
-    try:
-        if (
-            polygon
-            != str(
-                DB.session.execute(select(TZH.geom).where(TZH.id_zh == id_zh)).scalar_one()
-            ).upper()
-        ):
-            return True
-        return False
-    except Exception as e:
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="check_polygon_error", details=str(exc_type) + ": " + str(e.with_traceback(tb))
-        )
+    if (
+        polygon
+        != str(DB.session.execute(select(TZH.geom).where(TZH.id_zh == id_zh)).scalar_one()).upper()
+    ):
+        return True
+    return False
 
 
 def update_cor_zh_area(polygon, id_zh, geo_refs):
-    try:
-        DB.session.execute(delete(CorZhArea).where(CorZhArea.id_zh == id_zh))
+    DB.session.execute(delete(CorZhArea).where(CorZhArea.id_zh == id_zh))
+    post_cor_zh_area(
+        polygon,
+        id_zh,
+        DB.session.execute(
+            select(BibAreasTypes.id_type).where(BibAreasTypes.type_code == "COM")
+        ).scalar_one(),
+    )
+    post_cor_zh_area(
+        polygon,
+        id_zh,
+        DB.session.execute(
+            select(BibAreasTypes.id_type).where(BibAreasTypes.type_code == "DEP")
+        ).scalar_one(),
+    )
+    # fill cor_zh_area for other geo referentials
+    for ref in geo_refs:
         post_cor_zh_area(
             polygon,
             id_zh,
             DB.session.execute(
-                select(BibAreasTypes.id_type).where(BibAreasTypes.type_code == "COM")
+                select(BibAreasTypes.id_type).where(
+                    BibAreasTypes.type_code == ref["type_code_ref_geo"]
+                )
             ).scalar_one(),
-        )
-        post_cor_zh_area(
-            polygon,
-            id_zh,
-            DB.session.execute(
-                select(BibAreasTypes.id_type).where(BibAreasTypes.type_code == "DEP")
-            ).scalar_one(),
-        )
-        # fill cor_zh_area for other geo referentials
-        for ref in geo_refs:
-            post_cor_zh_area(
-                polygon,
-                id_zh,
-                DB.session.execute(
-                    select(BibAreasTypes.id_type).where(
-                        BibAreasTypes.type_code == ref["type_code_ref_geo"]
-                    )
-                ).scalar_one(),
-            )
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="update_cor_zh_area_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
-            )
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="update_cor_zh_area_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
         )
 
 
@@ -371,22 +310,10 @@ def update_cor_zh_fct_area(geom, id_zh):
 
 
 def update_refs(form_data):
-    try:
-        DB.session.execute(delete(CorZhRef).where(CorZhRef.id_zh == form_data["id_zh"]))
-        for ref in form_data["id_references"]:
-            DB.session.add(CorZhRef(id_zh=form_data["id_zh"], id_ref=ref))
-            DB.session.flush()
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="update_refs_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
-            )
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="update_refs_error", details=str(exc_type) + ": " + str(e.with_traceback(tb))
-        )
+    DB.session.execute(delete(CorZhRef).where(CorZhRef.id_zh == form_data["id_zh"]))
+    for ref in form_data["id_references"]:
+        DB.session.add(CorZhRef(id_zh=form_data["id_zh"], id_ref=ref))
+        DB.session.flush()
 
 
 # tab 3
@@ -415,41 +342,15 @@ def post_activities(id_zh, activities):
 
 
 def update_activities(id_zh, activities):
-    try:
-        # delete cascade t_activity and cor_impact_list with id_zh
-        DB.session.execute(delete(TActivity).where(TActivity.id_zh == id_zh))
-        # post new activities
-        post_activities(id_zh, activities)
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="post_update_activities_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
-            )
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="post_update_activities_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    # delete cascade t_activity and cor_impact_list with id_zh
+    DB.session.execute(delete(TActivity).where(TActivity.id_zh == id_zh))
+    # post new activities
+    post_activities(id_zh, activities)
 
 
 def update_corine_biotopes(id_zh, corine_biotopes):
-    try:
-        DB.session.execute(delete(CorZhCb).where(CorZhCb.id_zh == id_zh))
-        post_corine_biotopes(id_zh, corine_biotopes)
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="post_update_corine_biotopes_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
-            )
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="post_update_corine_biotopes_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    DB.session.execute(delete(CorZhCb).where(CorZhCb.id_zh == id_zh))
+    post_corine_biotopes(id_zh, corine_biotopes)
 
 
 def post_corine_biotopes(id_zh, corine_biotopes):
@@ -459,21 +360,8 @@ def post_corine_biotopes(id_zh, corine_biotopes):
 
 
 def update_corine_landcover(id_zh, ids_cover):
-    try:
-        DB.session.execute(delete(CorZhCorineCover).where(CorZhCorineCover.id_zh == id_zh))
-        post_corine_landcover(id_zh, ids_cover)
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="post_update_corine_landcover_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
-            )
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="post_update_corine_landcover_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    DB.session.execute(delete(CorZhCorineCover).where(CorZhCorineCover.id_zh == id_zh))
+    post_corine_landcover(id_zh, ids_cover)
 
 
 def post_corine_landcover(id_zh, ids_cover):
@@ -486,22 +374,9 @@ def post_corine_landcover(id_zh, ids_cover):
 
 
 def update_delim(id_zh, criteria):
-    try:
-        uuid_lim_list = DB.session.get(TZH, id_zh).id_lim_list
-        DB.session.execute(delete(CorLimList).where(CorLimList.id_lim_list == uuid_lim_list))
-        post_delim(uuid_lim_list, criteria)
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="post_update_delim_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
-            )
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="post_update_delim_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    uuid_lim_list = DB.session.get(TZH, id_zh).id_lim_list
+    DB.session.execute(delete(CorLimList).where(CorLimList.id_lim_list == uuid_lim_list))
+    post_delim(uuid_lim_list, criteria)
 
 
 def post_delim(uuid_lim, criteria):
@@ -511,21 +386,8 @@ def post_delim(uuid_lim, criteria):
 
 
 def update_fct_delim(id_zh, criteria):
-    try:
-        DB.session.execute(delete(CorZhLimFs).where(CorZhLimFs.id_zh == id_zh))
-        post_fct_delim(id_zh, criteria)
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="post_update_fct_delim_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
-            )
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="post_update_fct_delim_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    DB.session.execute(delete(CorZhLimFs).where(CorZhLimFs.id_zh == id_zh))
+    post_fct_delim(id_zh, criteria)
 
 
 def post_fct_delim(id_zh, criteria):
@@ -538,21 +400,8 @@ def post_fct_delim(id_zh, criteria):
 
 
 def update_outflow(id_zh, outflows):
-    try:
-        DB.session.execute(delete(TOutflow).where(TOutflow.id_zh == id_zh))
-        post_outflow(id_zh, outflows)
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="post_update_outflow_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
-            )
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="post_update_outflow_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    DB.session.execute(delete(TOutflow).where(TOutflow.id_zh == id_zh))
+    post_outflow(id_zh, outflows)
 
 
 def post_outflow(id_zh, outflows):
@@ -569,21 +418,8 @@ def post_outflow(id_zh, outflows):
 
 
 def update_inflow(id_zh, inflows):
-    try:
-        DB.session.execute(delete(TInflow).where(TInflow.id_zh == id_zh))
-        post_inflow(id_zh, inflows)
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="post_update_inflow_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
-            )
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="post_update_inflow_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    DB.session.execute(delete(TInflow).where(TInflow.id_zh == id_zh))
+    post_inflow(id_zh, inflows)
 
 
 def post_inflow(id_zh, inflows):
@@ -617,51 +453,25 @@ def post_functions(id_zh, functions):
 
 
 def update_functions(id_zh, functions, function_type):
-    try:
-        id_function_list = [
-            nomenclature.id_nomenclature
-            for nomenclature in Nomenclatures.get_nomenclature_info(function_type)
-        ]
-        stmt = (
-            delete(TFunctions)
-            .where(TFunctions.id_zh == id_zh)
-            .where(TFunctions.id_function.in_(id_function_list))
-            .execution_options(synchronize_session="fetch")
-        )
-        DB.session.execute(stmt)
-        post_functions(id_zh, functions)
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="post_update_functions_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
-            )
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="post_update_functions_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    id_function_list = [
+        nomenclature.id_nomenclature
+        for nomenclature in Nomenclatures.get_nomenclature_info(function_type)
+    ]
+    stmt = (
+        delete(TFunctions)
+        .where(TFunctions.id_zh == id_zh)
+        .where(TFunctions.id_function.in_(id_function_list))
+        .execution_options(synchronize_session="fetch")
+    )
+    DB.session.execute(stmt)
+    post_functions(id_zh, functions)
 
 
 def update_hab_heritages(id_zh, hab_heritages):
-    try:
-        # delete cascade t_hab_heritages
-        DB.session.execute(delete(THabHeritage).where(THabHeritage.id_zh == id_zh))
-        # post new hab_heritages
-        post_hab_heritages(id_zh, hab_heritages)
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="post_update_hab_heritages_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
-            )
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="post_update_hab_heritages_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    # delete cascade t_hab_heritages
+    DB.session.execute(delete(THabHeritage).where(THabHeritage.id_zh == id_zh))
+    # post new hab_heritages
+    post_hab_heritages(id_zh, hab_heritages)
 
 
 def post_hab_heritages(id_zh, hab_heritages):
@@ -681,21 +491,8 @@ def post_hab_heritages(id_zh, hab_heritages):
 
 
 def update_ownerships(id_zh, ownerships):
-    try:
-        DB.session.execute(delete(TOwnership).where(TOwnership.id_zh == id_zh))
-        post_ownerships(id_zh, ownerships)
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="post_update_ownerships_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
-            )
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="post_update_ownerships_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    DB.session.execute(delete(TOwnership).where(TOwnership.id_zh == id_zh))
+    post_ownerships(id_zh, ownerships)
 
 
 def post_ownerships(id_zh, ownerships):
@@ -707,24 +504,9 @@ def post_ownerships(id_zh, ownerships):
 
 
 def update_managements(id_zh, managements):
-    try:
-        DB.session.execute(
-            delete(TManagementStructures).where(TManagementStructures.id_zh == id_zh)
-        )
-        # verifier si suppression en cascade ok dans TManagementPlans
-        post_managements(id_zh, managements)
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="post_update_managements_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
-            )
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="post_update_managements_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    DB.session.execute(delete(TManagementStructures).where(TManagementStructures.id_zh == id_zh))
+    # verifier si suppression en cascade ok dans TManagementPlans
+    post_managements(id_zh, managements)
 
 
 def post_managements(id_zh, managements):
@@ -753,21 +535,8 @@ def post_managements(id_zh, managements):
 
 
 def update_instruments(id_zh, instruments):
-    try:
-        DB.session.execute(delete(TInstruments).where(TInstruments.id_zh == id_zh))
-        post_instruments(id_zh, instruments)
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="post_update_instruments_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
-            )
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="post_update_instruments_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    DB.session.execute(delete(TInstruments).where(TInstruments.id_zh == id_zh))
+    post_instruments(id_zh, instruments)
 
 
 def post_instruments(id_zh, instruments):
@@ -787,21 +556,8 @@ def post_instruments(id_zh, instruments):
 
 
 def update_protections(id_zh, protections):
-    try:
-        DB.session.execute(delete(CorZhProtection).where(CorZhProtection.id_zh == id_zh))
-        post_protections(id_zh, protections)
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="post_update_protections_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
-            )
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="post_update_protections_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    DB.session.execute(delete(CorZhProtection).where(CorZhProtection.id_zh == id_zh))
+    post_protections(id_zh, protections)
 
 
 def post_protections(id_zh, protections):
@@ -820,51 +576,25 @@ def post_protections(id_zh, protections):
 
 
 def update_zh_tab6(data):
-    try:
-        is_other_inventory = data["is_other_inventory"]
-        DB.session.execute(
-            update(TZH)
-            .where(TZH.id_zh == data["id_zh"])
-            .values(
-                update_author=data["update_author"],
-                update_date=data["update_date"],
-                is_other_inventory=is_other_inventory,
-                remark_is_other_inventory=(
-                    data["remark_is_other_inventory"] if is_other_inventory else None
-                ),
-            )
+    is_other_inventory = data["is_other_inventory"]
+    DB.session.execute(
+        update(TZH)
+        .where(TZH.id_zh == data["id_zh"])
+        .values(
+            update_author=data["update_author"],
+            update_date=data["update_date"],
+            is_other_inventory=is_other_inventory,
+            remark_is_other_inventory=(
+                data["remark_is_other_inventory"] if is_other_inventory else None
+            ),
         )
-        DB.session.flush()
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="update_zh_tab6_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
-            )
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="update_zh_tab6_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    )
+    DB.session.flush()
 
 
 def update_urban_docs(id_zh, urban_docs):
-    try:
-        DB.session.execute(delete(TUrbanPlanningDocs).where(TUrbanPlanningDocs.id_zh == id_zh))
-        post_urban_docs(id_zh, urban_docs)
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="update_urban_docs_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
-            )
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="update_urban_docs_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    DB.session.execute(delete(TUrbanPlanningDocs).where(TUrbanPlanningDocs.id_zh == id_zh))
+    post_urban_docs(id_zh, urban_docs)
 
 
 def post_urban_docs(id_zh, urban_docs):
@@ -894,23 +624,10 @@ def post_urban_docs(id_zh, urban_docs):
 
 
 def update_actions(id_zh, actions):
-    try:
-        # delete cascade actions
-        DB.session.execute(delete(TActions).where(TActions.id_zh == id_zh))
-        # post new actions
-        post_actions(id_zh, actions)
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="update_actions_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
-            )
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="update_actions_error",
-            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
-        )
+    # delete cascade actions
+    DB.session.execute(delete(TActions).where(TActions.id_zh == id_zh))
+    # post new actions
+    post_actions(id_zh, actions)
 
 
 def post_actions(id_zh, actions):
@@ -930,158 +647,119 @@ def post_actions(id_zh, actions):
 
 
 def post_file_info(id_zh, title, author, description, extension, media_path=None):
-    try:
-        unique_id_media = DB.session.execute(
-            select(TZH.zh_uuid).where(TZH.id_zh == int(id_zh))
-        ).scalar_one()
-        uuid_attached_row = uuid.uuid4()
-        if extension == ".pdf":
-            mnemo = "PDF"
-        elif extension == ".csv":
-            mnemo = "Tableur"
-        else:
-            mnemo = "Photo"
-        id_nomenclature_media_type = DB.session.execute(
-            select(TNomenclatures.id_nomenclature).where(TNomenclatures.mnemonique == mnemo)
-        ).scalar_one()
-        id_table_location = DB.session.execute(
-            select(BibTablesLocation.id_table_location).where(
-                and_(
-                    BibTablesLocation.schema_name == "pr_zh",
-                    BibTablesLocation.table_name == "t_zh",
-                )
-            )
-        ).scalar_one()
-        post_date = datetime.datetime.now()
-        DB.session.add(
-            TMedias(
-                unique_id_media=unique_id_media,
-                id_nomenclature_media_type=id_nomenclature_media_type,
-                id_table_location=id_table_location,
-                uuid_attached_row=uuid_attached_row,
-                title_fr=title,
-                author=author,
-                description_fr=description,
-                is_public=True,
-                media_path=media_path,
-                meta_create_date=str(post_date),
-                meta_update_date=str(post_date),
+    unique_id_media = DB.session.execute(
+        select(TZH.zh_uuid).where(TZH.id_zh == int(id_zh))
+    ).scalar_one()
+    uuid_attached_row = uuid.uuid4()
+    if extension == ".pdf":
+        mnemo = "PDF"
+    elif extension == ".csv":
+        mnemo = "Tableur"
+    else:
+        mnemo = "Photo"
+    id_nomenclature_media_type = DB.session.execute(
+        select(TNomenclatures.id_nomenclature).where(TNomenclatures.mnemonique == mnemo)
+    ).scalar_one()
+    id_table_location = DB.session.execute(
+        select(BibTablesLocation.id_table_location).where(
+            and_(
+                BibTablesLocation.schema_name == "pr_zh",
+                BibTablesLocation.table_name == "t_zh",
             )
         )
-        DB.session.commit()
-        id_media = DB.session.execute(
-            select(TMedias.id_media).where(TMedias.uuid_attached_row == uuid_attached_row)
-        ).scalar_one()
-        return id_media
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="post_file_info_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
-            )
-        raise ZHApiError(message="post_file_info_error", details=str(e))
+    ).scalar_one()
+    post_date = datetime.datetime.now()
+    DB.session.add(
+        TMedias(
+            unique_id_media=unique_id_media,
+            id_nomenclature_media_type=id_nomenclature_media_type,
+            id_table_location=id_table_location,
+            uuid_attached_row=uuid_attached_row,
+            title_fr=title,
+            author=author,
+            description_fr=description,
+            is_public=True,
+            media_path=media_path,
+            meta_create_date=str(post_date),
+            meta_update_date=str(post_date),
+        )
+    )
+    DB.session.commit()
+    id_media = DB.session.execute(
+        select(TMedias.id_media).where(TMedias.uuid_attached_row == uuid_attached_row)
+    ).scalar_one()
+    return id_media
 
 
 def patch_file_info(id_zh, id_media, title, author, description):
-    try:
-        unique_id_media = DB.session.execute(
-            select(TZH.zh_uuid).where(TZH.id_zh == int(id_zh))
-        ).scalar_one()
-        uuid_attached_row = uuid.uuid4()
-        id_table_location = DB.session.execute(
-            select(BibTablesLocation.id_table_location).where(
-                and_(
-                    BibTablesLocation.schema_name == "pr_zh",
-                    BibTablesLocation.table_name == "t_zh",
-                )
-            )
-        ).scalar_one()
-        post_date = datetime.datetime.now()
-        DB.session.execute(
-            update(TMedias)
-            .where(TMedias.id_media == id_media)
-            .values(
-                unique_id_media=unique_id_media,
-                id_table_location=id_table_location,
-                uuid_attached_row=uuid_attached_row,
-                title_fr=title,
-                author=author,
-                description_fr=description,
-                is_public=True,
-                meta_update_date=str(post_date),
+    unique_id_media = DB.session.execute(
+        select(TZH.zh_uuid).where(TZH.id_zh == int(id_zh))
+    ).scalar_one()
+    uuid_attached_row = uuid.uuid4()
+    id_table_location = DB.session.execute(
+        select(BibTablesLocation.id_table_location).where(
+            and_(
+                BibTablesLocation.schema_name == "pr_zh",
+                BibTablesLocation.table_name == "t_zh",
             )
         )
-        DB.session.flush()
-    except exc.DataError as e:
-        raise ZHApiError(
-            message="patch_file_info_db_error",
-            details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-            status_code=400,
+    ).scalar_one()
+    post_date = datetime.datetime.now()
+    DB.session.execute(
+        update(TMedias)
+        .where(TMedias.id_media == id_media)
+        .values(
+            unique_id_media=unique_id_media,
+            id_table_location=id_table_location,
+            uuid_attached_row=uuid_attached_row,
+            title_fr=title,
+            author=author,
+            description_fr=description,
+            is_public=True,
+            meta_update_date=str(post_date),
         )
-    except Exception as e:
-        raise ZHApiError(message="patch_file_info_error", details=str(e))
+    )
+    DB.session.flush()
 
 
 def update_file_extension(id_media, extension):
-    try:
-        if extension == ".pdf":
-            mnemo = "PDF"
-        elif extension == ".csv":
-            mnemo = "Tableur"
-        else:
-            mnemo = "Photo"
-        id_nomenclature_media_type = DB.session.execute(
-            select(TNomenclatures.id_nomenclature).where(TNomenclatures.mnemonique == mnemo)
-        ).scalar_one()
-        DB.session.execute(
-            update(TMedias)
-            .where(TMedias.id_media == id_media)
-            .values(id_nomenclature_media_type=id_nomenclature_media_type)
-        )
-        DB.session.flush()
-    except exc.DataError as e:
-        raise ZHApiError(
-            message="update_file_extension_db_error",
-            details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-            status_code=400,
-        )
-    except Exception as e:
-        raise ZHApiError(message="update_file_extension_error", details=str(e))
+    if extension == ".pdf":
+        mnemo = "PDF"
+    elif extension == ".csv":
+        mnemo = "Tableur"
+    else:
+        mnemo = "Photo"
+    id_nomenclature_media_type = DB.session.execute(
+        select(TNomenclatures.id_nomenclature).where(TNomenclatures.mnemonique == mnemo)
+    ).scalar_one()
+    DB.session.execute(
+        update(TMedias)
+        .where(TMedias.id_media == id_media)
+        .values(id_nomenclature_media_type=id_nomenclature_media_type)
+    )
+    DB.session.flush()
 
 
 def post_note(id_zh, cor_rule_id, note, attribute_id, note_type_id):
-    try:
-        element = DB.session.scalars(
-            select(CorZhNotes)
-            .where(CorZhNotes.id_zh == id_zh)
-            .where(CorZhNotes.cor_rule_id == cor_rule_id)
-        ).first()
-        if element:
-            if element.note != note:
-                element.note = note
-                element.attribute_id = attribute_id
-                element.note_type_id = note_type_id
-                DB.session.flush()
-        else:
-            DB.session.add(
-                CorZhNotes(
-                    id_zh=id_zh,
-                    cor_rule_id=cor_rule_id,
-                    note=note,
-                    attribute_id=attribute_id,
-                    note_type_id=note_type_id,
-                )
-            )
+    element = DB.session.scalars(
+        select(CorZhNotes)
+        .where(CorZhNotes.id_zh == id_zh)
+        .where(CorZhNotes.cor_rule_id == cor_rule_id)
+    ).first()
+    if element:
+        if element.note != note:
+            element.note = note
+            element.attribute_id = attribute_id
+            element.note_type_id = note_type_id
             DB.session.flush()
-    except Exception as e:
-        if e.__class__.__name__ == "DataError":
-            raise ZHApiError(
-                message="post_note_db_error",
-                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
-                status_code=400,
+    else:
+        DB.session.add(
+            CorZhNotes(
+                id_zh=id_zh,
+                cor_rule_id=cor_rule_id,
+                note=note,
+                attribute_id=attribute_id,
+                note_type_id=note_type_id,
             )
-        exc_type, value, tb = sys.exc_info()
-        raise ZHApiError(
-            message="post_note_error", details=str(exc_type) + ": " + str(e.with_traceback(tb))
         )
+        DB.session.flush()
