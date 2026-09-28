@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.5.1 - (2026-XX-XX)
+
+**🚀 Nouveautés**
+
+- Ajout d'un filtre de recherche basé des types géographiques (#122, by @juggler31)
+
+**🐛 Corrections**
+
+
+
 ## 1.5.0 - Montagne des Fanges (2026-04-14)
 
 > Attention à bien regarder les notes de version avant de faire une mise à jour

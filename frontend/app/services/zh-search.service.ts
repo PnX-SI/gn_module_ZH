@@ -27,6 +27,8 @@ export class SearchFormService {
       basin: [null],
       departement: [null],
       communes: [null],
+      geographic_types: [null],
+      territories: this._fb.group({}),
       sdage: [null],
       nameorcode: [null],
       zones: [null],

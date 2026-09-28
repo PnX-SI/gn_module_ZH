@@ -38,6 +38,22 @@
         [form]="_searchService.searchForm.get('communes')"
       ></zh-search-dependant>
       <hr />
+      <zh-search-input
+        label="Ajouter un filtre géographique"
+        [form]="_searchService.searchForm.get('geographic_types')"
+        [displayCode]="true"
+        [data]="geographic_types"
+        [multiple]="true"
+        (onSelected)="onGeographicTypeSelected($event)"
+      ></zh-search-input>
+      <zh-search-dependant
+        *ngFor="let value of types_territories; let i = index"
+        [label]="value.name"
+        [inputData]="territories[value.code]"
+        [multiple]="true"
+        [form]="_searchService.searchForm.get('territories.' + value.code)"
+      ></zh-search-dependant>
+      <hr />
       <zh-search-code [form]="_searchService.searchForm.get('nameorcode')"></zh-search-code>
       <hr />
       <zh-search-sdage
