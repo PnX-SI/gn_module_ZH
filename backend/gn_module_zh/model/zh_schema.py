@@ -6,6 +6,7 @@ from geonature.utils.env import DB
 from pypn_habref_api.models import CorespHab, Habref
 from pypnnomenclature.models import BibNomenclaturesTypes, TNomenclatures
 from geonature.core.gn_commons.models import TMedias
+from geonature.core.gn_permissions.tools import get_permissions
 from pypnusershub.db.models import User
 from pypnusershub.db.tools import InsufficientRightsError
 from sqlalchemy import ForeignKey
@@ -82,9 +83,27 @@ class ZhModel(DB.Model):
             - user : a TRole object
             - user_cruved: object return by cruved_for_user_in_app(user)
         """
-        return {
-            action: self.user_is_allowed_to(user, level) for action, level in user_cruved.items()
-        }
+        ret = {}
+
+        for action, level in user_cruved.items():
+            user_permissions = get_permissions(
+                action_code=action, id_role=user.id_role, module_code="ZONES_HUMIDES"
+            )
+            query = select(TZH).join(CorZhArea, CorZhArea.id_zh == TZH.id_zh)
+            ret[action] = self.user_is_allowed_to(user, level)
+            if ret[action]:
+                for p in user_permissions:
+                    if p.areas_filter:
+                        query = query.filter(
+                            CorZhArea.id_area.in_(
+                                list(map(lambda value: value.id_area, p.areas_filter))
+                            )
+                        ).filter(CorZhArea.id_zh == self.id_zh)
+                        if len(DB.session.scalars(query).all()) > 0:
+                            ret[action] = True
+                        else:
+                            ret[action] = False
+        return ret
 
 
 class Nomenclatures(TNomenclatures):
